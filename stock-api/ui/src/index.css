@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { font-family: 'Inter', sans-serif; }
+
+body { background: #131722; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #1e222d; }
+::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3d4254; }
+
+/* ApexCharts overrides */
+.apexcharts-toolbar { z-index: 1 !important; }
+.apexcharts-menu { background: #1e222d !important; border: 1px solid #2a2e39 !important; }
+.apexcharts-menu-item:hover { background: #2a2e39 !important; }
+.apexcharts-tooltip { border: 1px solid #2a2e39 !important; }
+.apexcharts-tooltip-title { background: #131722 !important; border-bottom: 1px solid #2a2e39 !important; }
+
+/* ── Scan line effect on chart container ────────────────────────────────── */
+.chart-scan {
+  position: relative;
+  overflow: hidden;
+}
+.chart-scan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 60px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(33, 150, 243, 0.04) 40%,
+    rgba(33, 150, 243, 0.08) 50%,
+    rgba(33, 150, 243, 0.04) 60%,
+    transparent 100%
+  );
+  animation: scan 5s linear infinite;
+}
+
+/* ── Animated gradient border (AI panel) ────────────────────────────────── */
+.grad-border {
+  position: relative;
+  border-radius: 12px;
+}
+.grad-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 13px;
+  background: linear-gradient(90deg, #9c6bff, #2196f3, #26a69a, #9c6bff);
+  background-size: 300% 100%;
+  animation: gradBorder 3s ease infinite;
+  z-index: 0;
+}
+.grad-border > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Shimmer skeleton loading ────────────────────────────────────────────── */
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    #1e222d 25%,
+    #262b3a 50%,
+    #1e222d 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+
+/* ── Price flash on update ───────────────────────────────────────────────── */
+@keyframes flashGreen {
+  0%   { background-color: rgba(38, 166, 154, 0.25); border-radius: 4px; }
+  100% { background-color: transparent; }
+}
+@keyframes flashRed {
+  0%   { background-color: rgba(239, 83, 80, 0.25); border-radius: 4px; }
+  100% { background-color: transparent; }
+}
+.flash-green { animation: flashGreen 0.7s ease-out; }
+.flash-red   { animation: flashRed   0.7s ease-out; }
+
+/* ── Staggered animation delays ─────────────────────────────────────────── */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.12s; }
+.stagger-3 { animation-delay: 0.19s; }
+.stagger-4 { animation-delay: 0.26s; }
+.stagger-5 { animation-delay: 0.33s; }
