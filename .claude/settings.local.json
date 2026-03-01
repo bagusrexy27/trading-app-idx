@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /e/Trading/stock-api && go mod tidy 2>&1)",
+      "Bash(cd /e/Trading/stock-api && go build ./... 2>&1)",
+      "Bash(curl:*)",
+      "Bash(ss:*)",
+      "Bash(cmd:*)",
+      "Bash(head:*)",
+      "Bash(echo === SIGNALS ===:*)",
+      "Bash(echo === ALL INDICATORS ===:*)",
+      "Bash(echo === RSI last 5 ===:*)",
+      "Bash(tail:*)",
+      "Bash(cd /e/Trading/stock-api/ui && npm run build 2>&1)",
+      "Bash(cd:*)",
+      "Bash(grep :8080:*)",
+      "Bash(cd /e/Trading/stock-api && go build -o stock-api.exe . 2>&1)",
+      "Bash(cd \"E:/Trading/stock-api\" && go build ./... 2>&1)",
+      "Bash(test:*)",
+      "Bash(cd \"E:/Trading/stock-api\" && go build -o stock-api.exe . 2>&1)",
+      "Bash(taskkill:*)",
+      "Bash(go build:*)",
+      "Bash(netstat:*)",
+      "Bash(ls:*)",
+      "Bash(go get:*)",
+      "Bash(go:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
