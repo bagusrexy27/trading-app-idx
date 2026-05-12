@@ -41,6 +41,7 @@ export const api = {
     exportUrl:     (symbol)     => `/api/stocks/${symbol}/export.csv`,
     listReports:   (symbol)     => req(`/stocks/${symbol}/reports`),
     deleteReport:  (symbol, id) => req(`/stocks/${symbol}/reports/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+    fundamental:        (symbol) => req(`/stocks/${symbol}/fundamental`),
     uploadReport:  (symbol, file) => {
       const form = new FormData()
       form.append('file', file)

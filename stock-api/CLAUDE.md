@@ -4,100 +4,117 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-**IDX Stock Analyzer** — A full-stack app for technical analysis of Indonesian (IDX) stocks. Go backend fetches data from Yahoo Finance and runs technical indicators; React frontend renders charts and signals.
+**IDX Stock Analyzer** — Full-stack technical analysis platform for Indonesian (IDX) stocks. Go backend (Gorilla Mux) fetches Yahoo Finance data and runs 15 technical indicators plus a rule-based local AI write-up; React + Vite frontend renders charts, signals, screener, portfolio, comparison, alerts, fundamentals, and uploaded PDF research reports.
+
+All code lives in `stock-api/`. Run all commands from this directory unless noted.
 
 ## Commands
 
-### Backend (Go)
+### Backend (Go) — run from `stock-api/`
 ```bash
-# Build binary
-go build -o stock-api.exe .
-
-# Run server (port 8080)
-./stock-api.exe
-
-# Compile-check all packages without producing a binary
-go build ./...
-
-# Vet code
-go vet ./...
+go build -o stock-api.exe .   # Build binary
+./stock-api.exe               # Run server on :8080 (also serves UI from ./static)
+go build ./...                # Compile-check all packages
+go vet ./...                  # Vet code
 ```
 
-### Frontend (React + Vite)
+`main.go` calls `loadEnv(".env")` on startup (best-effort, no error if missing). No env vars are currently consumed by the code — `.env` exists for future hooks.
+
+### Frontend (React + Vite) — run from `stock-api/ui/`
 ```bash
-cd ui
-
-# Install dependencies (requires --legacy-peer-deps due to react-apexcharts)
-npm install --legacy-peer-deps
-
-# Dev server with API proxy to :8080 (http://localhost:5173)
-npm run dev
-
-# Production build → outputs to ../static/ (served by Go)
-npm run build
+npm install --legacy-peer-deps   # required: react-apexcharts vs React 18 peer dep
+npm run dev                      # :5173, proxies /api/* to :8080
+npm run build                    # outputs to ../static/ (served by Go)
 ```
 
-### Full development workflow
-- Terminal 1: `./stock-api.exe` (API on :8080)
-- Terminal 2: `cd ui && npm run dev` (UI on :5173, proxied to API)
-- Production: `cd ui && npm run build` then `./stock-api.exe` (single server on :8080)
+### Development workflow
+- Terminal 1: `./stock-api.exe` (API + static files on :8080)
+- Terminal 2: `cd ui && npm run dev` (hot-reload UI on :5173)
+- Production: build UI first, then run the binary (single server)
 
 ## Architecture
 
 ### Backend (Go)
 
-Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage/` + `fetcher/`
+Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage/` + `fetcher/`.
 
-| Package | Responsibility |
-|---------|---------------|
-| `models/` | Shared types: `StockPrice` (OHLCV + date) and `StockData` (symbol + prices slice) |
-| `fetcher/` | Calls Yahoo Finance v8 chart API; appends `.JK` suffix for IDX tickers automatically |
-| `storage/` | Reads/writes `./data/{SYMBOL}.json`; thread-safe via `sync.RWMutex` |
-| `analysis/` | Pure calculation functions (no I/O): SMA, EMA, RSI, MACD, Bollinger, Stochastic |
-| `handlers/handlers.go` | CRUD for stocks — list, add, get (with `?limit=`, `?from=`, `?to=`), update, delete |
-| `handlers/analysis.go` | Analysis endpoints — uses `loadPrices()` helper, calls `analysis.*` functions |
+| Package / file | Responsibility |
+|---|---|
+| `models/` | `StockPrice` (OHLCV + date) and `StockData` (symbol + prices) |
+| `fetcher/` | Yahoo Finance v8 chart API; appends `.JK` automatically |
+| `storage/` | `./data/{SYMBOL}.json`; thread-safe via `sync.RWMutex` |
+| `analysis/analysis.go` | Pure indicator math: SMA, EMA, RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku, Fibonacci, Pivots |
+| `analysis/amd.go` | Accumulation–Manipulation–Distribution (Wyckoff-style) phase detector |
+| `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate` |
+| `handlers/analysis.go` | All `/api/analysis/*` endpoints (calls `analysis.*`) |
+| `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative analysis (no external LLM); uses signals, indicators, pattern detection, and uploaded reports text |
+| `handlers/backtest.go` | `GET /api/analysis/{symbol}/backtest` — simulates BUY/SELL on composite-signal change at next open; returns trades + summary (win rate, drawdown, etc.) |
+| `handlers/reports.go` | PDF research reports — list/upload/delete under `./data/reports/{SYMBOL}/`; uses `github.com/ledongthuc/pdf` for text extraction (consumed by AI handler) |
+| `handlers/fundamental.go` | Read/write arbitrary JSON to `./data/fundamentals/{SYMBOL}.json` |
 
-**Incremental data fetching** (`doUpdate` in `handlers/handlers.go`): reads the last saved date, starts the next Yahoo Finance request from `lastDate + 1 day`, deduplicates by date string, then appends and sorts.
+**Routes** (registered in `main.go`):
 
-**API response envelope** — every endpoint returns:
-```json
-{ "success": true, "message": "...", "data": { ... } }
-```
+- Stocks: `GET/POST /api/stocks`, `POST /api/stocks/update-all`, `GET/DELETE /api/stocks/{symbol}`, `GET /api/stocks/{symbol}/latest`, `POST /api/stocks/{symbol}/update`, `GET /api/stocks/{symbol}/export.csv`
+- Reports: `GET/POST /api/stocks/{symbol}/reports`, `DELETE /api/stocks/{symbol}/reports/{id}`
+- Fundamental: `GET/POST /api/stocks/{symbol}/fundamental`
+- Analysis: `summary`, `indicators`, `signals`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `pivots`, `amd`, `ai`, `backtest` under `/api/analysis/{symbol}/*`
+- Market: `GET /api/overview`, `GET /api/session`
 
-**Stock symbols** are stored without the `.JK` suffix (e.g. `BBCA`, not `BBCA.JK`). The fetcher adds `.JK` internally. The `canonicalSymbol()` helper in handlers strips `.JK` from user input.
+**Incremental fetching** (`doUpdate`): reads last saved date, requests from `lastDate+1`, dedupes by date string, appends and re-sorts.
+
+**Symbols** stored without `.JK` (e.g. `BBCA`). `canonicalSymbol()` strips `.JK` from user input; fetcher re-adds it internally.
+
+**API envelope** — every endpoint returns `{ "success": bool, "message": "...", "data": {...} }`. Helper `respond(w, status, ok, msg, data)`.
 
 ### Frontend (React)
 
-Component tree:
 ```
-App.jsx              ← global state (stocks[], selected, toast)
-├── Sidebar.jsx      ← stock list + search + "Update All"
-├── StockPanel.jsx   ← loads all data in parallel (Promise.all), tab container
-│   ├── Overview.jsx     ← change cards, 52-week range, volume, MA, RSI bar
-│   ├── ChartTab.jsx     ← ApexCharts candlestick + SMA overlays + volume; range filter (1M/3M/6M/1Y/All)
-│   ├── Indicators.jsx   ← RSI area, MACD mixed, Bollinger line, Stochastic line
-│   └── Signals.jsx      ← composite BUY/SELL/NEUTRAL badge + breakdown table
-└── AddStockModal.jsx ← POST /api/stocks with symbol + optional from date
+App.jsx                       ← global state (stocks[], selected, view, toast)
+                                view ∈ home | overview | session | screener | portfolio | comparison
+├── Sidebar.jsx                ← stock list + search + "Update All" + view switcher
+├── StockPanel.jsx             ← (view=home) loads tabs in parallel (Promise.all), tab container
+│   ├── Overview.jsx           ← change cards, 52-week range, volume, MA, RSI bar
+│   ├── ChartTab.jsx           ← ApexCharts candlestick + SMA overlays + volume; range filter
+│   ├── Indicators.jsx         ← RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku
+│   ├── Signals.jsx            ← composite BUY/SELL/NEUTRAL badge + breakdown
+│   ├── AMD.jsx                ← Accumulation/Manipulation/Distribution phase view
+│   ├── RiskCalc.jsx           ← position sizing / stop-loss helper
+│   ├── FundamentalAnalysis.jsx← reads/edits ./data/fundamentals/{SYMBOL}.json
+│   └── ReportUpload.jsx       ← upload/list/delete PDF reports
+├── MarketOverview.jsx         ← (view=overview) market-wide overview
+├── SessionPrep.jsx            ← (view=session) trading-session prep
+├── Screener.jsx               ← (view=screener) filter stocks by indicator criteria
+├── Portfolio.jsx              ← (view=portfolio) holdings tracker
+├── Comparison.jsx             ← (view=comparison) multi-stock side-by-side
+├── AlertsPanel.jsx            ← modal; exports useAlertChecker (5-min poll, mounted in App)
+└── AddStockModal.jsx          ← POST /api/stocks (symbol + optional from-date)
 ```
 
-**`api.js`** — thin fetch wrapper; throws on `success: false`; two namespaces: `api.stocks.*` and `api.analysis.*`.
+**`api.js`** — fetch wrapper; throws on `success: false`; namespaces: `api.stocks.*`, `api.analysis.*` (and helpers for reports/fundamental).
 
-**`utils.js`** — formatting (`fmt.price`, `fmt.pct`, `fmt.vol`) + Tailwind class helpers (`colorOf`, `signalStyle`) + `APEX_DARK` (shared ApexCharts dark theme base options).
+**`utils.js`** — `fmt.price/pct/vol`, `colorOf`/`signalStyle` Tailwind helpers, `APEX_DARK` shared ApexCharts theme.
 
-**Chart alignment**: SMA/Bollinger data has fewer points than raw prices. In `ChartTab.jsx` and `Indicators.jsx`, a date→value Map is built from indicator data, then `prices.map(p => ({ x: p.date, y: map[p.date] ?? null }))` aligns series so ApexCharts receives arrays of equal length with `null` for missing values.
+**Chart alignment** — indicator series (SMA, Bollinger, etc.) have fewer points than raw prices. Components build a `date → value` Map from indicator data, then map over the full price array using `map[p.date] ?? null` so all ApexCharts series share equal-length arrays.
+
+### Data & storage
+
+| Path | Content |
+|---|---|
+| `./data/{SYMBOL}.json` | OHLCV time series — `StockData` struct, `prices` always sorted by date string (lex-sort is correct for `YYYY-MM-DD`) |
+| `./data/fundamentals/{SYMBOL}.json` | Free-form JSON saved by user via the Fundamental tab |
+| `./data/reports/{SYMBOL}/{timestamp}_{filename}.pdf` | Uploaded PDF research reports; AI handler reads text from these |
+
+No database. Concurrent writes to OHLCV files are protected by `sync.RWMutex` in `storage/storage.go`. Other dirs (`fundamentals/`, `reports/`) are written without an in-process lock — the handlers assume single-user usage.
 
 ### Tailwind custom colors
 
-Defined in `ui/tailwind.config.js` under the `tv` key:
-`tv-bg`, `tv-card`, `tv-hover`, `tv-border`, `tv-text`, `tv-muted`, `tv-green`, `tv-red`, `tv-blue`, `tv-yellow`, `tv-purple`, `tv-input`
-
-### Data storage
-
-Each stock is a single JSON file at `./data/{SYMBOL}.json` — `StockData` struct serialized with `json.MarshalIndent`. The `prices` array is always kept sorted by date string (lexicographic sort is correct for `YYYY-MM-DD`).
+Defined in `ui/tailwind.config.js` under the `tv` namespace: `tv-bg` (#131722), `tv-card` (#1e222d), `tv-hover`, `tv-border`, `tv-text`, `tv-muted`, `tv-green`, `tv-red`, `tv-blue`, `tv-yellow`, `tv-purple`, `tv-input`.
 
 ## Key constraints
 
-- **IDX only** — Yahoo Finance `.JK` suffix; prices are in Indonesian Rupiah (integers, no decimals needed).
-- **No database** — file-based persistence; concurrent writes are protected by `sync.RWMutex` in `storage/storage.go`.
-- **`npm install` requires `--legacy-peer-deps`** due to `react-apexcharts` peer dependency conflict with React 18.
-- The `ui/` build output directory is `../static/` (relative to `ui/`), which is the same directory that Go's `http.FileServer` serves from.
+- **IDX only** — Yahoo Finance `.JK` suffix; prices are integers (Indonesian Rupiah, no decimals).
+- **No database** — file-based persistence only. OHLCV is `RWMutex`-protected; `fundamentals/` and `reports/` assume single-user.
+- **`npm install` requires `--legacy-peer-deps`** — `react-apexcharts` peer-dep conflict with React 18.
+- **PDF dependency** — `github.com/ledongthuc/pdf` (text extraction for uploaded research reports).
+- **AI is local** — `/api/analysis/{symbol}/ai` is rule-based (no external LLM call); safe to ship without secrets.
+- The `ui/` Vite build outputs to `../static/` (i.e. `stock-api/static/`), which Go's `http.FileServer` serves at the root.

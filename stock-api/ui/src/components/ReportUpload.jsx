@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { api } from '../api'
+import FundamentalAnalysis from './FundamentalAnalysis'
 
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`
@@ -17,10 +18,11 @@ function formatDate(iso) {
 }
 
 export default function ReportUpload({ symbol, showToast }) {
-  const [reports, setReports]     = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [uploading, setUploading] = useState(false)
-  const [dragOver, setDragOver]   = useState(false)
+  const [reports, setReports]         = useState([])
+  const [loading, setLoading]         = useState(true)
+  const [uploading, setUploading]     = useState(false)
+  const [dragOver, setDragOver]       = useState(false)
+  const [fundamental, setFundamental] = useState(null)
   const fileInputRef = useRef(null)
 
   const loadReports = async () => {
@@ -35,7 +37,19 @@ export default function ReportUpload({ symbol, showToast }) {
     }
   }
 
-  useEffect(() => { loadReports() }, [symbol])
+  const loadFundamental = async () => {
+    try {
+      const data = await api.stocks.fundamental(symbol)
+      setFundamental(data)
+    } catch {
+      setFundamental(null)
+    }
+  }
+
+  useEffect(() => {
+    loadReports()
+    loadFundamental()
+  }, [symbol])
 
   const handleUpload = async (file) => {
     if (!file) return
@@ -76,6 +90,17 @@ export default function ReportUpload({ symbol, showToast }) {
 
   return (
     <div className="p-6 space-y-6 max-w-2xl">
+
+      {/* ── Fundamental Analysis ────────────────────────────────────────── */}
+      {fundamental
+        ? <FundamentalAnalysis data={fundamental} />
+        : (
+          <div className="flex items-center gap-2 py-2 text-[11px] text-tv-muted/60 italic">
+            <span>📊</span>
+            <span>Belum ada analisa fundamental untuk {symbol} — upload PDF laporan keuangan untuk memulai</span>
+          </div>
+        )
+      }
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div>
@@ -186,14 +211,12 @@ export default function ReportUpload({ symbol, showToast }) {
         )}
       </div>
 
-      {/* ── Info box ───────────────────────────────────────────────────── */}
+      {/* ── Claude info ────────────────────────────────────────────────── */}
       {reports.length > 0 && (
-        <div className="flex gap-3 p-4 rounded-lg bg-tv-purple/5 border border-tv-purple/20">
+        <div className="flex gap-2 items-start p-4 rounded-lg bg-tv-purple/5 border border-tv-purple/20">
           <span className="text-tv-purple mt-0.5 flex-shrink-0">✦</span>
           <p className="text-[12px] text-tv-muted leading-relaxed">
-            AI Analisa untuk <strong className="text-tv-text">{symbol}</strong> akan otomatis membaca
-            laporan-laporan di atas dan menambahkan seksi <em>Fundamental</em> pada hasilnya.
-            Klik <strong className="text-tv-purple">✦ AI Analisa</strong> di header untuk mencoba.
+            Terminal Claude Code otomatis terbuka saat upload. Claude akan membaca PDF dan menyimpan analisa fundamental ke <code className="text-tv-text text-[11px]">data/fundamentals/{symbol}.json</code> — setelah selesai, refresh halaman ini untuk melihat hasilnya.
           </p>
         </div>
       )}

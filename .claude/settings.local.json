@@ -24,7 +24,10 @@
       "Bash(ls:*)",
       "Bash(go get:*)",
       "Bash(go:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "PowerShell(Invoke-WebRequest -Uri \"https://query1.finance.yahoo.com/v8/finance/chart/DSSA.JK?range=6mo&interval=1d\" -UserAgent \"Mozilla/5.0\" -OutFile \"D:\\\\Code\\\\trading-app-idx\\\\dssa_raw.json\"; \\(Get-Item \"D:\\\\Code\\\\trading-app-idx\\\\dssa_raw.json\"\\).Length)"
     ]
   }
 }

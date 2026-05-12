@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -130,6 +131,33 @@ func UploadReport(w http.ResponseWriter, r *http.Request) {
 		Size:       size,
 		UploadedAt: time.Now().Format(time.RFC3339),
 	})
+
+	go openClaudeTerminal(symbol, savePath)
+}
+
+// openClaudeTerminal opens a new terminal window running Claude Code in the project directory.
+// The initial prompt directs Claude to analyse the uploaded PDF and save the result.
+func openClaudeTerminal(symbol, pdfPath string) {
+	workDir, err := filepath.Abs(".")
+	if err != nil {
+		return
+	}
+
+	// Use forward slashes and relative path for the prompt
+	relPath := strings.ReplaceAll(filepath.ToSlash(pdfPath), `'`, ``)
+	prompt := fmt.Sprintf(
+		"Laporan keuangan %s baru diupload: %s — tolong baca PDF ini dan buat analisa fundamental, lalu simpan ke data/fundamentals/%s.json (lihat data/fundamentals/VKTR.json sebagai contoh format).",
+		symbol, relPath, symbol,
+	)
+
+	// Try Windows Terminal (wt) first, fall back to plain cmd
+	if _, err := exec.LookPath("wt"); err == nil {
+		exec.Command("wt", "-d", workDir, "cmd", "/k",
+			fmt.Sprintf(`claude "%s"`, prompt)).Start()
+	} else {
+		exec.Command("cmd", "/c", "start", "cmd", "/k",
+			fmt.Sprintf(`cd /d "%s" && claude "%s"`, workDir, prompt)).Start()
+	}
 }
 
 // ── DELETE /api/stocks/{symbol}/reports/{id} ─────────────────────────────────
@@ -194,6 +222,11 @@ func extractPDFText(path string, maxChars int) (string, error) {
 // Used by the AI handler to enrich the prompt with fundamental data.
 // Total text is capped at ~4000 characters.
 func GetReportsText(symbol string) string {
+	return GetPDFText(symbol, 4000)
+}
+
+// GetPDFText returns combined text from all PDFs for a symbol, capped at limit chars.
+func GetPDFText(symbol string, limit int) string {
 	dir := reportDir(symbol)
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -201,22 +234,18 @@ func GetReportsText(symbol string) string {
 	}
 
 	var sb strings.Builder
-	const totalLimit = 4000
-
 	for _, e := range entries {
 		if e.IsDir() || !strings.HasSuffix(strings.ToLower(e.Name()), ".pdf") {
 			continue
 		}
-		path := filepath.Join(dir, e.Name())
-		remaining := totalLimit - sb.Len()
+		remaining := limit - sb.Len()
 		if remaining <= 0 {
 			break
 		}
-		text, err := extractPDFText(path, remaining)
+		text, err := extractPDFText(filepath.Join(dir, e.Name()), remaining)
 		if err != nil || text == "" {
 			continue
 		}
-		// Use original filename (strip timestamp prefix) as label
 		label := e.Name()
 		if idx := strings.Index(label, "_"); idx != -1 {
 			label = label[idx+1:]

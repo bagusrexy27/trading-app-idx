@@ -57,6 +57,8 @@ func main() {
 	api.HandleFunc("/stocks/{symbol}/reports", handlers.ListReports).Methods("GET")
 	api.HandleFunc("/stocks/{symbol}/reports", handlers.UploadReport).Methods("POST")
 	api.HandleFunc("/stocks/{symbol}/reports/{id}", handlers.DeleteReport).Methods("DELETE")
+	api.HandleFunc("/stocks/{symbol}/fundamental", handlers.GetFundamental).Methods("GET")
+	api.HandleFunc("/stocks/{symbol}/fundamental", handlers.SaveFundamental).Methods("POST")
 
 	// ── Analysis endpoints ────────────────────────────────────────────────────
 	api.HandleFunc("/analysis/{symbol}/summary", a.Summary).Methods("GET")

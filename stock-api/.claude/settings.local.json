@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(go build:*)"
+      "Bash(go build:*)",
+      "Bash(echo GO NOT FOUND:*)",
+      "Bash(echo NODE NOT FOUND:*)",
+      "Bash(echo EXIT: $?:*)",
+      "Bash(python:*)"
     ]
   }
 }
