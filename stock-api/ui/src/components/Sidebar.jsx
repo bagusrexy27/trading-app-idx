@@ -5,7 +5,7 @@ function loadGroups() { try { return JSON.parse(localStorage.getItem(GROUP_KEY) 
 function saveGroups(g) { localStorage.setItem(GROUP_KEY, JSON.stringify(g)) }
 
 export default function Sidebar({ stocks, selected, activeView, loading, onSelect, onAdd, onUpdateAll,
-  onViewOverview, onViewSession, onViewScreener, onViewPortfolio, onViewComparison, onOpenAlerts }) {
+  onViewOverview, onViewSession, onViewScreener, onViewAdvisor, onViewPortfolio, onViewComparison, onOpenAlerts }) {
   const [search, setSearch]           = useState('')
   const [groups, setGroups]           = useState(loadGroups)
   const [activeGroup, setActiveGroup] = useState('ALL')
@@ -43,7 +43,7 @@ export default function Sidebar({ stocks, selected, activeView, loading, onSelec
   }
 
   return (
-    <aside className="w-[220px] flex-shrink-0 bg-tv-card border-r border-tv-border flex flex-col">
+    <aside className="w-[220px] flex-shrink-0 glass border-r border-tv-border flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-tv-border">
         <span className="font-bold text-sm tracking-tight">📈 IDX Analyzer</span>
@@ -68,6 +68,7 @@ export default function Sidebar({ stocks, selected, activeView, loading, onSelec
           <NavBtn icon="📊" label="Market Overview" badge={stocks.length} active={activeView === 'overview'} onClick={onViewOverview} />
           <NavBtn icon="🕯️" label="Last Session"    badge={null}         active={activeView === 'session'}  onClick={onViewSession} />
           <NavBtn icon="🔍" label="Screener"        badge={null}         active={activeView === 'screener'} onClick={onViewScreener} />
+          <NavBtn icon="🧭" label="Advisor Screener" badge={null}        active={activeView === 'advisor'} onClick={onViewAdvisor} />
           <NavBtn icon="💼" label="Portfolio"       badge={null}         active={activeView === 'portfolio'} onClick={onViewPortfolio} />
           <NavBtn icon="⚖️"  label="Compare"        badge={null}         active={activeView === 'comparison'} onClick={onViewComparison} />
         </div>

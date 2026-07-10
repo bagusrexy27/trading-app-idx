@@ -8,13 +8,21 @@ import Signals from './Signals'
 import RiskCalc from './RiskCalc'
 import ReportUpload from './ReportUpload'
 import AMD from './AMD'
+import SmartMoney from './SmartMoney'
+import Bandar from './Bandar'
+import TradingView from './TradingView'
+import Advisor from './Advisor'
 
 const TABS = [
   { id: 'overview',   label: '📋 Overview' },
   { id: 'chart',      label: '📊 Chart' },
+  { id: 'tradingview',label: '🌐 TradingView' },
   { id: 'indicators', label: '📉 Indicators' },
   { id: 'amd',        label: '🔄 AMD' },
+  { id: 'smart',      label: '💰 Smart Money' },
+  { id: 'bandar',     label: '🐋 Bandar' },
   { id: 'signals',    label: '🎯 Signals' },
+  { id: 'advisor',    label: '🧭 Saran' },
   { id: 'risk',       label: '⚖️ Risk' },
   { id: 'laporan',    label: '📄 Laporan' },
 ]
@@ -35,7 +43,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
     setLoading(true)
     setError(null)
     try {
-      const [summary, pricesResp, signals, rsi, macd, boll, stoch, sma20, sma50, atr, obv, amdResp] = await Promise.all([
+      const [summary, pricesResp, signals, rsi, macd, boll, stoch, sma20, sma50, atr, obv, amdResp, adline, cmf, mfi] = await Promise.all([
         api.analysis.summary(symbol),
         api.stocks.get(symbol, 300),
         api.analysis.signals(symbol),
@@ -48,6 +56,9 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         api.analysis.atr(symbol, 300),
         api.analysis.obv(symbol, 300),
         api.analysis.amd(symbol, 10, 200),
+        api.analysis.adline(symbol, 300),
+        api.analysis.cmf(symbol, 300),
+        api.analysis.mfi(symbol, 300),
       ])
       setData({
         summary,
@@ -62,6 +73,9 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         atr:      atr?.data      || [],
         obv:      obv?.data      || [],
         amd:      amdResp        || null,
+        adline:   adline?.data   || [],
+        cmf:      cmf?.data      || [],
+        mfi:      mfi?.data      || [],
       })
     } catch (e) {
       setError(e.message)
@@ -162,7 +176,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   return (
     <div className="flex flex-col h-full">
       {/* ── Header ─────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 bg-tv-card border-b border-tv-border">
+      <div className="sticky top-0 z-20 glass border-b border-tv-border">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-6 py-3">
           {/* Symbol + exchange */}
           <div className="flex items-center gap-2">
@@ -282,9 +296,13 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         <div key={tab} className="animate-slide-up h-full">
           {tab === 'overview'   && <Overview   data={data} />}
           {tab === 'chart'      && <ChartTab   data={data} />}
+          {tab === 'tradingview'&& <TradingView symbol={symbol} />}
           {tab === 'indicators' && <Indicators data={data} />}
           {tab === 'amd'        && <AMD        data={data} />}
+          {tab === 'smart'      && <SmartMoney data={data} />}
+          {tab === 'bandar'     && <Bandar     symbol={symbol} showToast={showToast} />}
           {tab === 'signals'    && <Signals    data={data} />}
+          {tab === 'advisor'    && <Advisor    symbol={symbol} />}
           {tab === 'risk'       && <RiskCalc      data={data} />}
           {tab === 'laporan'    && <ReportUpload  symbol={symbol} showToast={showToast} />}
         </div>

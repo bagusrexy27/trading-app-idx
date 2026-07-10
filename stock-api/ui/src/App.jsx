@@ -5,9 +5,11 @@ import MarketOverview from './components/MarketOverview'
 import SessionPrep from './components/SessionPrep'
 import Screener from './components/Screener'
 import Portfolio from './components/Portfolio'
+import AdvisorScreen from './components/AdvisorScreen'
 import Comparison from './components/Comparison'
 import AlertsPanel, { useAlertChecker } from './components/AlertsPanel'
 import AddStockModal from './components/AddStockModal'
+import IHSGBadge from './components/IHSGBadge'
 import { api } from './api'
 
 export default function App() {
@@ -73,7 +75,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-tv-bg text-tv-text overflow-hidden">
+    <div className="flex h-screen bg-transparent text-tv-text overflow-hidden">
       <Sidebar
         stocks={stocks}
         selected={selected}
@@ -85,18 +87,25 @@ export default function App() {
         onViewOverview={()    => setView('overview')}
         onViewSession={()     => setView('session')}
         onViewScreener={()    => setView('screener')}
+        onViewAdvisor={()     => setView('advisor')}
         onViewPortfolio={()   => setView('portfolio')}
         onViewComparison={()  => setView('comparison')}
         onOpenAlerts={() => setShowAlerts(true)}
       />
 
-      <main className="flex-1 overflow-auto min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="flex items-center justify-end gap-3 px-4 py-2 glass border-b border-tv-border">
+          <IHSGBadge />
+        </div>
+        <div className="flex-1 overflow-auto">
         {view === 'overview' ? (
           <MarketOverview onSelectStock={handleSelectStock} showToast={showToast} />
         ) : view === 'session' ? (
           <SessionPrep onSelectStock={handleSelectStock} showToast={showToast} />
         ) : view === 'screener' ? (
           <Screener onSelectStock={handleSelectStock} showToast={showToast} />
+        ) : view === 'advisor' ? (
+          <AdvisorScreen onSelectStock={handleSelectStock} showToast={showToast} />
         ) : view === 'portfolio' ? (
           <Portfolio showToast={showToast} />
         ) : view === 'comparison' ? (
@@ -112,6 +121,7 @@ export default function App() {
         ) : (
           <WelcomeScreen onAdd={() => setShowAdd(true)} />
         )}
+        </div>
       </main>
 
       {showAdd && (

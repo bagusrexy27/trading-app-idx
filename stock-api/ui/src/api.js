@@ -5,7 +5,18 @@ async function req(path, options = {}) {
     headers: options.body ? { 'Content-Type': 'application/json' } : {},
     ...options,
   })
-  const json = await res.json()
+  const text = await res.text()
+  let json
+  try {
+    json = JSON.parse(text)
+  } catch {
+    // Non-JSON response (e.g. "404 page not found" from an old server build)
+    throw new Error(
+      res.status === 404
+        ? `Endpoint ${path} tidak ditemukan — restart backend (rebuild stock-api.exe) untuk memuat route baru`
+        : `Server mengembalikan respons tak terduga (${res.status}): ${text.slice(0, 80)}`
+    )
+  }
   if (!json.success) throw new Error(json.message || 'Terjadi kesalahan pada server')
   return json.data
 }
@@ -29,6 +40,10 @@ export const api = {
     fibonacci:  (s)       => req(`/analysis/${s}/fibonacci`),
     pivots:     (s)       => req(`/analysis/${s}/pivots`),
     amd:        (s, accum, lookback) => req(`/analysis/${s}/amd?accum=${accum ?? 10}&lookback=${lookback ?? 200}`),
+    adline:     (s, n) => req(`/analysis/${s}/adline?limit=${n ?? 300}`),
+    cmf:        (s, n) => req(`/analysis/${s}/cmf?limit=${n ?? 300}`),
+    mfi:        (s, n) => req(`/analysis/${s}/mfi?limit=${n ?? 300}`),
+    advisor:    (s)       => req(`/analysis/${s}/advisor`),
     backtest:   (s)       => req(`/analysis/${s}/backtest`),
   },
   stocks: {
@@ -51,5 +66,13 @@ export const api = {
     },
   },
   overview: () => req('/overview'),
+  advisorScreen: (mode, minTurnover) => req(`/advisor/screen?mode=${mode ?? 'buy'}&min_turnover=${minTurnover ?? 2}`),
   session:  () => req('/session'),
+  ihsg:     () => req('/ihsg'),
+  broker: {
+    get:     (s)            => req(`/broker/${s}`),
+    summary: (s, lookback, top) => req(`/broker/${s}/summary?lookback=${lookback ?? 20}&top=${top ?? 5}`),
+    mock:    (s, days)      => req(`/broker/${s}/mock?days=${days ?? 30}`, { method: 'POST' }),
+    delete:  (s)            => req(`/broker/${s}`, { method: 'DELETE' }),
+  },
 }

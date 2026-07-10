@@ -1,0 +1,50 @@
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  # Build command — output to tmp/ so the watched binary doesn't clobber stock-api.exe
+  cmd = "go build -o ./tmp/stock-api.exe ."
+  bin = "./tmp/stock-api.exe"
+  full_bin = ""
+
+  # File extensions to watch
+  include_ext = ["go"]
+  include_dir = ["analysis", "fetcher", "handlers", "models", "storage"]
+  include_file = ["main.go", ".env"]
+
+  # Ignore these
+  exclude_dir   = ["tmp", "data", "static", "ui", "node_modules", ".git"]
+  exclude_file  = []
+  exclude_regex = ["_test\\.go"]
+  exclude_unchanged = true
+  follow_symlink = false
+
+  # Delay before rebuild after change (ms)
+  delay = 500
+
+  # Stop running app on build error so logs don't accumulate
+  stop_on_error = true
+  send_interrupt = false
+  kill_delay = "0s"
+
+  # Log file for build errors
+  log = "build-errors.log"
+
+[color]
+  app     = ""
+  build   = "yellow"
+  main    = "magenta"
+  runner  = "green"
+  watcher = "cyan"
+
+[log]
+  time      = true
+  main_only = false
+
+[misc]
+  clean_on_exit = true
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll      = true

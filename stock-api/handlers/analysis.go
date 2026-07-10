@@ -643,6 +643,58 @@ func (h *AnalysisHandler) Fibonacci(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ── GET /api/analysis/{symbol}/adline?limit=300 ──────────────────────────────
+
+func (h *AnalysisHandler) ADLine(w http.ResponseWriter, r *http.Request) {
+	symbol := canonicalSymbol(mux.Vars(r)["symbol"])
+	prices, ok := loadPrices(w, symbol)
+	if !ok {
+		return
+	}
+	pts := tailPoints(analysis.ADLine(prices), intParam(r, "limit", 9999))
+	respond(w, 200, true, "", map[string]interface{}{
+		"symbol": symbol, "count": len(pts), "data": pts,
+	})
+}
+
+// ── GET /api/analysis/{symbol}/cmf?period=20&limit=300 ───────────────────────
+
+func (h *AnalysisHandler) CMF(w http.ResponseWriter, r *http.Request) {
+	symbol := canonicalSymbol(mux.Vars(r)["symbol"])
+	prices, ok := loadPrices(w, symbol)
+	if !ok {
+		return
+	}
+	period := intParam(r, "period", 20)
+	pts := tailPoints(analysis.CMF(prices, period), intParam(r, "limit", 9999))
+	respond(w, 200, true, "", map[string]interface{}{
+		"symbol": symbol, "period": period,
+		"bullish_threshold": 0.05, "bearish_threshold": -0.05,
+		"count": len(pts), "data": pts,
+	})
+}
+
+// ── GET /api/analysis/{symbol}/mfi?period=14&limit=300 ───────────────────────
+
+func (h *AnalysisHandler) MFI(w http.ResponseWriter, r *http.Request) {
+	symbol := canonicalSymbol(mux.Vars(r)["symbol"])
+	prices, ok := loadPrices(w, symbol)
+	if !ok {
+		return
+	}
+	period := intParam(r, "period", 14)
+	pts := analysis.MFI(prices, period)
+	limit := intParam(r, "limit", 9999)
+	if limit < len(pts) {
+		pts = pts[len(pts)-limit:]
+	}
+	respond(w, 200, true, "", map[string]interface{}{
+		"symbol": symbol, "period": period,
+		"overbought": 80, "oversold": 20,
+		"count": len(pts), "data": pts,
+	})
+}
+
 // ── GET /api/analysis/{symbol}/amd?accum=10&lookback=200 ─────────────────────
 
 func (h *AnalysisHandler) AMD(w http.ResponseWriter, r *http.Request) {

@@ -5,19 +5,27 @@ export default {
     extend: {
       colors: {
         tv: {
-          bg:     '#131722',
-          card:   '#1e222d',
-          hover:  '#262b3a',
-          border: '#2a2e39',
-          text:   '#d1d4dc',
-          muted:  '#787b86',
-          green:  '#26a69a',
-          red:    '#ef5350',
-          blue:   '#2196f3',
-          yellow: '#ffc107',
-          purple: '#9c6bff',
-          input:  '#0f1117',
+          bg:     '#0a0a0f',
+          card:   '#13131a',
+          hover:  '#1b1b24',
+          border: 'rgba(255,255,255,0.08)',
+          text:   '#ededef',
+          muted:  '#8a8f98',
+          green:  '#2ebd85',
+          red:    '#f6465d',
+          blue:   '#7c8aff',
+          yellow: '#f5b950',
+          purple: '#a78bfa',
+          input:  '#0d0d13',
+          accent: '#5e6ad2',
         },
+      },
+      borderRadius: {
+        xl:  '1rem',
+        '2xl': '1.375rem',
+      },
+      transitionTimingFunction: {
+        cinema: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         fadeIn: {

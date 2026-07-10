@@ -14,8 +14,8 @@ echo.
 
 cd /d "%~dp0"
 
-:: Start backend in new window
-start "IDX Backend :8080" cmd /k "cd /d "%~dp0" && stock-api.exe"
+:: Start backend in new window with Air (live-reload)
+start "IDX Backend :8080 [air]" cmd /k "cd /d "%~dp0" && air"
 
 :: Wait backend ready
 timeout /t 2 /nobreak >nul

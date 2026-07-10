@@ -4,19 +4,69 @@
 
 * { font-family: 'Inter', sans-serif; }
 
-body { background: #131722; }
+/* ── Modern Dark Cinema base ─────────────────────────────────────────────── */
+body {
+  background: radial-gradient(ellipse 120% 80% at 50% -10%, #14141f 0%, #0a0a0f 45%, #06060a 100%) fixed;
+  min-height: 100vh;
+}
 
+/* Ambient light blobs — subtle, behind everything */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 9999px;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+body::before {
+  width: 520px; height: 520px;
+  top: -180px; left: -120px;
+  background: rgba(94, 106, 210, 0.14);           /* indigo glow */
+  animation: blobDrift 26s ease-in-out infinite alternate;
+}
+body::after {
+  width: 420px; height: 420px;
+  bottom: -160px; right: -100px;
+  background: rgba(46, 189, 133, 0.08);           /* teal glow */
+  animation: blobDrift 32s ease-in-out infinite alternate-reverse;
+}
+@keyframes blobDrift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(60px, 40px) scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before, body::after { animation: none; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Frosted glass surface — for sticky headers / sidebar / topbar */
+.glass {
+  background: rgba(16, 16, 24, 0.65) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Keyboard focus ring (a11y) */
+:focus-visible {
+  outline: 2px solid #5e6ad2;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #1e222d; }
-::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #3d4254; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
-/* ApexCharts overrides */
+/* ── ApexCharts overrides ────────────────────────────────────────────────── */
 .apexcharts-toolbar { z-index: 1 !important; }
-.apexcharts-menu { background: #1e222d !important; border: 1px solid #2a2e39 !important; }
-.apexcharts-menu-item:hover { background: #2a2e39 !important; }
-.apexcharts-tooltip { border: 1px solid #2a2e39 !important; }
-.apexcharts-tooltip-title { background: #131722 !important; border-bottom: 1px solid #2a2e39 !important; }
+.apexcharts-menu { background: #13131a !important; border: 1px solid rgba(255,255,255,0.08) !important; }
+.apexcharts-menu-item:hover { background: #1b1b24 !important; }
+.apexcharts-tooltip { border: 1px solid rgba(255,255,255,0.08) !important; }
+.apexcharts-tooltip-title { background: #0a0a0f !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
 
 /* ── Scan line effect on chart container ────────────────────────────────── */
 .chart-scan {
@@ -33,9 +83,9 @@ body { background: #131722; }
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(33, 150, 243, 0.04) 40%,
-    rgba(33, 150, 243, 0.08) 50%,
-    rgba(33, 150, 243, 0.04) 60%,
+    rgba(124, 138, 255, 0.04) 40%,
+    rgba(124, 138, 255, 0.08) 50%,
+    rgba(124, 138, 255, 0.04) 60%,
     transparent 100%
   );
   animation: scan 5s linear infinite;
@@ -44,14 +94,14 @@ body { background: #131722; }
 /* ── Animated gradient border (AI panel) ────────────────────────────────── */
 .grad-border {
   position: relative;
-  border-radius: 12px;
+  border-radius: 16px;
 }
 .grad-border::before {
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: 13px;
-  background: linear-gradient(90deg, #9c6bff, #2196f3, #26a69a, #9c6bff);
+  border-radius: 17px;
+  background: linear-gradient(90deg, #a78bfa, #7c8aff, #2ebd85, #a78bfa);
   background-size: 300% 100%;
   animation: gradBorder 3s ease infinite;
   z-index: 0;
@@ -65,9 +115,9 @@ body { background: #131722; }
 .shimmer-bg {
   background: linear-gradient(
     90deg,
-    #1e222d 25%,
-    #262b3a 50%,
-    #1e222d 75%
+    #13131a 25%,
+    #1b1b24 50%,
+    #13131a 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s linear infinite;
@@ -75,11 +125,11 @@ body { background: #131722; }
 
 /* ── Price flash on update ───────────────────────────────────────────────── */
 @keyframes flashGreen {
-  0%   { background-color: rgba(38, 166, 154, 0.25); border-radius: 4px; }
+  0%   { background-color: rgba(46, 189, 133, 0.25); border-radius: 4px; }
   100% { background-color: transparent; }
 }
 @keyframes flashRed {
-  0%   { background-color: rgba(239, 83, 80, 0.25); border-radius: 4px; }
+  0%   { background-color: rgba(246, 70, 93, 0.25); border-radius: 4px; }
   100% { background-color: transparent; }
 }
 .flash-green { animation: flashGreen 0.7s ease-out; }

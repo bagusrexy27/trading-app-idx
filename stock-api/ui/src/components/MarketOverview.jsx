@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, signalStyle } from '../utils'
+import IHSGChart from './IHSGChart'
 
 const SIGNAL_ORDER = ['STRONG BUY', 'BUY', 'NEUTRAL', 'SELL', 'STRONG SELL']
 
@@ -95,6 +96,9 @@ export default function MarketOverview({ onSelectStock, showToast }) {
           Refresh
         </button>
       </div>
+
+      {/* IHSG live chart */}
+      <IHSGChart />
 
       {/* Summary cards */}
       <div className="grid grid-cols-5 gap-3 mb-6">
