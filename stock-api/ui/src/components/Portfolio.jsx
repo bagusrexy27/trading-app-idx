@@ -152,7 +152,7 @@ export default function Portfolio({ showToast }) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-tv-border">
-                {['Saham', 'Lot', 'Harga Beli', 'Harga Kini', 'Invested', 'Cur. Value', 'P&L', '%', ''].map(h => (
+                {['Saham', 'Lot', 'Avg', 'Harga Kini', 'Invested', 'Cur. Value', 'P&L', '%', ''].map(h => (
                   <th key={h} className="text-[10px] text-tv-muted uppercase font-bold px-3 py-2 text-left">{h}</th>
                 ))}
               </tr>
@@ -199,15 +199,15 @@ export default function Portfolio({ showToast }) {
 }
 
 function AddPositionModal({ onAdd, onClose }) {
-  const [symbol,   setSymbol]   = useState('')
-  const [qty,      setQty]      = useState('')
-  const [buyPrice, setBuyPrice] = useState('')
-  const [buyDate,  setBuyDate]  = useState('')
+  const [symbol, setSymbol] = useState('')
+  const [lots,   setLots]   = useState('')
+  const [avg,    setAvg]    = useState('')
 
   const handle = (e) => {
     e.preventDefault()
-    if (!symbol || !qty || !buyPrice) return
-    onAdd({ symbol: symbol.toUpperCase(), qty: +qty, buyPrice: +buyPrice, buyDate })
+    if (!symbol || !lots || !avg) return
+    // 1 lot = 100 lembar; avg price boleh desimal (mis. 615.02)
+    onAdd({ symbol: symbol.toUpperCase(), qty: +lots * 100, buyPrice: +avg })
   }
 
   return (
@@ -217,15 +217,15 @@ function AddPositionModal({ onAdd, onClose }) {
         <div className="text-sm font-bold mb-4">Tambah Posisi</div>
         <form onSubmit={handle} className="space-y-3">
           {[
-            { label: 'Kode Saham',   value: symbol,   set: setSymbol,   type: 'text',   ph: 'BBCA' },
-            { label: 'Jumlah Lembar',value: qty,      set: setQty,      type: 'number', ph: '1000' },
-            { label: 'Harga Beli',   value: buyPrice, set: setBuyPrice, type: 'number', ph: '9800' },
-            { label: 'Tanggal Beli', value: buyDate,  set: setBuyDate,  type: 'date',   ph: '' },
+            { label: 'Kode Saham',            value: symbol, set: setSymbol, type: 'text',   ph: 'BBCA' },
+            { label: 'Balance (Lot)',         value: lots,   set: setLots,   type: 'number', ph: '39' },
+            { label: 'Harga Rata-rata (Avg)', value: avg,    set: setAvg,    type: 'number', ph: '615.02' },
           ].map(f => (
             <div key={f.label}>
               <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1">{f.label}</label>
               <input
                 type={f.type}
+                step={f.type === 'number' ? 'any' : undefined}
                 value={f.value}
                 onChange={e => f.set(e.target.value)}
                 placeholder={f.ph}
