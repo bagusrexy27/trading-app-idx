@@ -11,6 +11,7 @@ const MarketOverview = lazy(() => import('./components/MarketOverview'))
 const SessionPrep    = lazy(() => import('./components/SessionPrep'))
 const Portfolio      = lazy(() => import('./components/Portfolio'))
 const AdvisorScreen  = lazy(() => import('./components/AdvisorScreen'))
+const Watchlist      = lazy(() => import('./components/Watchlist'))
 
 const ViewLoading = () => (
   <div className="flex items-center justify-center h-full text-tv-muted">
@@ -21,7 +22,7 @@ const ViewLoading = () => (
 export default function App() {
   const [stocks, setStocks]       = useState([])
   const [selected, setSelected]   = useState(null)
-  const [view, setView]           = useState('home') // 'home'|'overview'|'session'|'screener'|'portfolio'|'comparison'
+  const [view, setView]           = useState('watchlist') // 'watchlist'|'home'|'overview'|'session'|'advisor'|'portfolio'
   const [showAdd, setShowAdd]     = useState(false)
   const [showAlerts, setShowAlerts] = useState(false)
   const [loading, setLoading]     = useState(true)
@@ -59,8 +60,19 @@ export default function App() {
   const handleDeleted = () => {
     loadStocks()
     setSelected(null)
-    setView('home')
+    setView('watchlist')
     showToast('Saham dihapus dari tracking')
+  }
+
+  // Quick-add dari chip syariah di Watchlist (tanpa modal)
+  const handleQuickAdd = async (symbol) => {
+    try {
+      await api.stocks.add(symbol, '')
+      showToast(`✓ ${symbol} ditambahkan ke watchlist`)
+      loadStocks()
+    } catch (e) {
+      showToast(e.message, 'error')
+    }
   }
 
   const handleSelectStock = (symbol) => {
@@ -90,6 +102,7 @@ export default function App() {
         onSelect={handleSelectStock}
         onAdd={() => setShowAdd(true)}
         onUpdateAll={handleUpdateAll}
+        onViewWatchlist={()   => { setSelected(null); setView('watchlist') }}
         onViewOverview={()    => setView('overview')}
         onViewSession={()     => setView('session')}
         onViewAdvisor={()     => setView('advisor')}
@@ -111,7 +124,7 @@ export default function App() {
           <AdvisorScreen onSelectStock={handleSelectStock} showToast={showToast} />
         ) : view === 'portfolio' ? (
           <Portfolio showToast={showToast} />
-        ) : selected ? (
+        ) : view !== 'watchlist' && selected ? (
           <StockPanel
             key={selected}
             symbol={selected}
@@ -120,7 +133,14 @@ export default function App() {
             showToast={showToast}
           />
         ) : (
-          <WelcomeScreen onAdd={() => setShowAdd(true)} />
+          <Watchlist
+            stocks={stocks}
+            loading={loading}
+            onSelect={handleSelectStock}
+            onAdd={() => setShowAdd(true)}
+            onUpdateAll={handleUpdateAll}
+            onQuickAdd={handleQuickAdd}
+          />
         )}
         </Suspense>
         </div>
