@@ -53,8 +53,10 @@ export default function Portfolio({ showToast }) {
     const curVal= cur * pos.qty
     const pnl   = curVal - invest
     const pnlPct= invest > 0 ? (pnl / invest) * 100 : 0
-    return { ...pos, cur, lots, invest, curVal, pnl, pnlPct }
+    const stopHit = pnlPct <= -7   // aturan disiplin: stop loss -7%
+    return { ...pos, cur, lots, invest, curVal, pnl, pnlPct, stopHit }
   })
+  const breached = enriched.filter(p => p.stopHit)
 
   const totalInvest = enriched.reduce((s, p) => s + p.invest, 0)
   const totalCur    = enriched.reduce((s, p) => s + p.curVal, 0)
@@ -95,6 +97,20 @@ export default function Portfolio({ showToast }) {
               <div className={`text-sm font-bold tabular-nums ${c.color}`}>{c.value}</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Stop-loss breach warning */}
+      {breached.length > 0 && (
+        <div className="border-2 border-tv-red/40 bg-tv-red/5 rounded-xl p-4 animate-fade-in">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-lg">🚨</span>
+            <span className="text-sm font-extrabold text-tv-red">STOP LOSS TERTEMBUS ({breached.length} posisi)</span>
+          </div>
+          <p className="text-xs text-tv-muted leading-relaxed">
+            {breached.map(p => `${p.symbol} (${p.pnlPct.toFixed(1)}%)`).join(' · ')} sudah turun lebih dari batas -7%.
+            Aturan disiplin: <b className="text-tv-text">potong kecil sebelum jadi besar</b> — evaluasi keluar, jangan average down.
+          </p>
         </div>
       )}
 
@@ -144,11 +160,18 @@ export default function Portfolio({ showToast }) {
             <tbody>
               {enriched.map((pos, i) => (
                 <tr key={pos.id}
-                  className="border-b border-tv-border/50 last:border-0 hover:bg-tv-hover transition-colors animate-slide-up"
+                  className={`border-b border-tv-border/50 last:border-0 hover:bg-tv-hover transition-colors animate-slide-up ${pos.stopHit ? 'bg-tv-red/5' : ''}`}
                   style={{ animationDelay: `${i * 0.04}s` }}
                 >
                   <td className="px-3 py-2.5">
-                    <div className="font-bold text-sm text-tv-text">{pos.symbol}</div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-sm text-tv-text">{pos.symbol}</span>
+                      {pos.stopHit && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-tv-red/15 text-tv-red border border-tv-red/40">
+                          STOP LOSS
+                        </span>
+                      )}
+                    </div>
                     {pos.buyDate && <div className="text-[10px] text-tv-muted">{pos.buyDate}</div>}
                   </td>
                   <td className="px-3 py-2.5 text-xs tabular-nums">{pos.lots.toFixed(0)}</td>

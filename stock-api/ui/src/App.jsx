@@ -1,16 +1,22 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import Sidebar from './components/Sidebar'
 import StockPanel from './components/StockPanel'
-import MarketOverview from './components/MarketOverview'
-import SessionPrep from './components/SessionPrep'
-import Screener from './components/Screener'
-import Portfolio from './components/Portfolio'
-import AdvisorScreen from './components/AdvisorScreen'
-import Comparison from './components/Comparison'
 import AlertsPanel, { useAlertChecker } from './components/AlertsPanel'
 import AddStockModal from './components/AddStockModal'
 import IHSGBadge from './components/IHSGBadge'
 import { api } from './api'
+
+// Heavy views load on demand (code-splitting)
+const MarketOverview = lazy(() => import('./components/MarketOverview'))
+const SessionPrep    = lazy(() => import('./components/SessionPrep'))
+const Portfolio      = lazy(() => import('./components/Portfolio'))
+const AdvisorScreen  = lazy(() => import('./components/AdvisorScreen'))
+
+const ViewLoading = () => (
+  <div className="flex items-center justify-center h-full text-tv-muted">
+    <div className="w-8 h-8 border-2 border-tv-border border-t-tv-blue rounded-full animate-spin" />
+  </div>
+)
 
 export default function App() {
   const [stocks, setStocks]       = useState([])
@@ -86,10 +92,8 @@ export default function App() {
         onUpdateAll={handleUpdateAll}
         onViewOverview={()    => setView('overview')}
         onViewSession={()     => setView('session')}
-        onViewScreener={()    => setView('screener')}
         onViewAdvisor={()     => setView('advisor')}
         onViewPortfolio={()   => setView('portfolio')}
-        onViewComparison={()  => setView('comparison')}
         onOpenAlerts={() => setShowAlerts(true)}
       />
 
@@ -98,18 +102,15 @@ export default function App() {
           <IHSGBadge />
         </div>
         <div className="flex-1 overflow-auto">
+        <Suspense fallback={<ViewLoading />}>
         {view === 'overview' ? (
           <MarketOverview onSelectStock={handleSelectStock} showToast={showToast} />
         ) : view === 'session' ? (
           <SessionPrep onSelectStock={handleSelectStock} showToast={showToast} />
-        ) : view === 'screener' ? (
-          <Screener onSelectStock={handleSelectStock} showToast={showToast} />
         ) : view === 'advisor' ? (
           <AdvisorScreen onSelectStock={handleSelectStock} showToast={showToast} />
         ) : view === 'portfolio' ? (
           <Portfolio showToast={showToast} />
-        ) : view === 'comparison' ? (
-          <Comparison stocks={stocks} showToast={showToast} />
         ) : selected ? (
           <StockPanel
             key={selected}
@@ -121,6 +122,7 @@ export default function App() {
         ) : (
           <WelcomeScreen onAdd={() => setShowAdd(true)} />
         )}
+        </Suspense>
         </div>
       </main>
 

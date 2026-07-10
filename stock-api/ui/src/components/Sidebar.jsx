@@ -5,7 +5,7 @@ function loadGroups() { try { return JSON.parse(localStorage.getItem(GROUP_KEY) 
 function saveGroups(g) { localStorage.setItem(GROUP_KEY, JSON.stringify(g)) }
 
 export default function Sidebar({ stocks, selected, activeView, loading, onSelect, onAdd, onUpdateAll,
-  onViewOverview, onViewSession, onViewScreener, onViewAdvisor, onViewPortfolio, onViewComparison, onOpenAlerts }) {
+  onViewOverview, onViewSession, onViewAdvisor, onViewPortfolio, onOpenAlerts }) {
   const [search, setSearch]           = useState('')
   const [groups, setGroups]           = useState(loadGroups)
   const [activeGroup, setActiveGroup] = useState('ALL')
@@ -67,10 +67,8 @@ export default function Sidebar({ stocks, selected, activeView, loading, onSelec
         <div className="border-b border-tv-border">
           <NavBtn icon="📊" label="Market Overview" badge={stocks.length} active={activeView === 'overview'} onClick={onViewOverview} />
           <NavBtn icon="🕯️" label="Last Session"    badge={null}         active={activeView === 'session'}  onClick={onViewSession} />
-          <NavBtn icon="🔍" label="Screener"        badge={null}         active={activeView === 'screener'} onClick={onViewScreener} />
           <NavBtn icon="🧭" label="Advisor Screener" badge={null}        active={activeView === 'advisor'} onClick={onViewAdvisor} />
           <NavBtn icon="💼" label="Portfolio"       badge={null}         active={activeView === 'portfolio'} onClick={onViewPortfolio} />
-          <NavBtn icon="⚖️"  label="Compare"        badge={null}         active={activeView === 'comparison'} onClick={onViewComparison} />
         </div>
       )}
 
@@ -114,7 +112,7 @@ export default function Sidebar({ stocks, selected, activeView, loading, onSelec
             <div key={s.symbol} className="relative group/item">
               <StockItem
                 stock={s}
-                active={s.symbol === selected && activeView !== 'overview' && activeView !== 'session' && activeView !== 'screener' && activeView !== 'portfolio' && activeView !== 'comparison'}
+                active={s.symbol === selected && !['overview', 'session', 'advisor', 'portfolio'].includes(activeView)}
                 onClick={() => onSelect(s.symbol)}
               />
               {/* Group assign button */}

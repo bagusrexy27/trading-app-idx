@@ -43,7 +43,8 @@ export const api = {
     adline:     (s, n) => req(`/analysis/${s}/adline?limit=${n ?? 300}`),
     cmf:        (s, n) => req(`/analysis/${s}/cmf?limit=${n ?? 300}`),
     mfi:        (s, n) => req(`/analysis/${s}/mfi?limit=${n ?? 300}`),
-    advisor:    (s)       => req(`/analysis/${s}/advisor`),
+    advisor:         (s) => req(`/analysis/${s}/advisor`),
+    advisorBacktest: (s) => req(`/analysis/${s}/advisor-backtest`),
     backtest:   (s)       => req(`/analysis/${s}/backtest`),
   },
   stocks: {

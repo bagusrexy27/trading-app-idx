@@ -24,3 +24,21 @@ func (h *AnalysisHandler) Advisor(w http.ResponseWriter, r *http.Request) {
 		"advice": advice,
 	})
 }
+
+// AdvisorBacktest — GET /api/analysis/{symbol}/advisor-backtest
+//
+// Replays the Advisor decision tree over history (no look-ahead) and reports
+// win rate / expectancy of its STRONG_BUY & BUY calls on this stock.
+func (h *AnalysisHandler) AdvisorBacktest(w http.ResponseWriter, r *http.Request) {
+	symbol := canonicalSymbol(mux.Vars(r)["symbol"])
+	prices, ok := loadPrices(w, symbol)
+	if !ok {
+		return
+	}
+	result := analysis.BacktestAdvisor(prices)
+
+	respond(w, 200, true, "", map[string]interface{}{
+		"symbol":   symbol,
+		"backtest": result,
+	})
+}

@@ -1,27 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, signalStyle } from '../utils'
 import Overview from './Overview'
-import ChartTab from './ChartTab'
-import Indicators from './Indicators'
-import Signals from './Signals'
 import RiskCalc from './RiskCalc'
 import ReportUpload from './ReportUpload'
-import AMD from './AMD'
-import SmartMoney from './SmartMoney'
-import Bandar from './Bandar'
-import TradingView from './TradingView'
 import Advisor from './Advisor'
+
+// ApexCharts-heavy tabs load on demand (code-splitting)
+const ChartTab   = lazy(() => import('./ChartTab'))
+const Indicators = lazy(() => import('./Indicators'))
 
 const TABS = [
   { id: 'overview',   label: '📋 Overview' },
   { id: 'chart',      label: '📊 Chart' },
-  { id: 'tradingview',label: '🌐 TradingView' },
   { id: 'indicators', label: '📉 Indicators' },
-  { id: 'amd',        label: '🔄 AMD' },
-  { id: 'smart',      label: '💰 Smart Money' },
-  { id: 'bandar',     label: '🐋 Bandar' },
-  { id: 'signals',    label: '🎯 Signals' },
   { id: 'advisor',    label: '🧭 Saran' },
   { id: 'risk',       label: '⚖️ Risk' },
   { id: 'laporan',    label: '📄 Laporan' },
@@ -39,44 +31,18 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(null)
 
+  // Core data only — everything else lazy-loads per tab (see effect below).
   const load = async () => {
     setLoading(true)
     setError(null)
     try {
-      const [summary, pricesResp, signals, rsi, macd, boll, stoch, sma20, sma50, atr, obv, amdResp, adline, cmf, mfi] = await Promise.all([
+      const [summary, pricesResp, signals] = await Promise.all([
         api.analysis.summary(symbol),
         api.stocks.get(symbol, 300),
         api.analysis.signals(symbol),
-        api.analysis.rsi(symbol, 300),
-        api.analysis.macd(symbol, 300),
-        api.analysis.bollinger(symbol, 300),
-        api.analysis.stochastic(symbol, 300),
-        api.analysis.sma(symbol, 20, 300),
-        api.analysis.sma(symbol, 50, 300),
-        api.analysis.atr(symbol, 300),
-        api.analysis.obv(symbol, 300),
-        api.analysis.amd(symbol, 10, 200),
-        api.analysis.adline(symbol, 300),
-        api.analysis.cmf(symbol, 300),
-        api.analysis.mfi(symbol, 300),
       ])
-      setData({
-        summary,
-        prices:   pricesResp?.prices || [],
-        signals,
-        rsi:      rsi?.data      || [],
-        macd:     macd?.data     || [],
-        bollinger: boll?.data    || [],
-        stoch:    stoch?.data    || [],
-        sma20:    sma20?.data    || [],
-        sma50:    sma50?.data    || [],
-        atr:      atr?.data      || [],
-        obv:      obv?.data      || [],
-        amd:      amdResp        || null,
-        adline:   adline?.data   || [],
-        cmf:      cmf?.data      || [],
-        mfi:      mfi?.data      || [],
-      })
+      // Fresh object drops stale tab extras → the tab effect refetches them.
+      setData({ summary, prices: pricesResp?.prices || [], signals })
     } catch (e) {
       setError(e.message)
     } finally {
@@ -86,6 +52,34 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   }
 
   useEffect(() => { load() }, [symbol])
+
+  // What each tab needs beyond core. Missing keys are fetched on tab activation.
+  const TAB_NEEDS = {
+    chart:      ['sma20', 'sma50'],
+    indicators: ['rsi', 'macd', 'obv'],
+    risk:       ['atr'],
+  }
+
+  useEffect(() => {
+    if (!data) return
+    const needs = (TAB_NEEDS[tab] || []).filter(k => data[k] === undefined)
+    if (!needs.length) return
+    const fetchers = {
+      sma20: () => api.analysis.sma(symbol, 20, 300).then(r => r?.data || []),
+      sma50: () => api.analysis.sma(symbol, 50, 300).then(r => r?.data || []),
+      rsi:   () => api.analysis.rsi(symbol, 300).then(r => r?.data || []),
+      macd:  () => api.analysis.macd(symbol, 300).then(r => r?.data || []),
+      obv:   () => api.analysis.obv(symbol, 300).then(r => r?.data || []),
+      atr:   () => api.analysis.atr(symbol, 300).then(r => r?.data || []),
+    }
+    let alive = true
+    Promise.all(needs.map(k => fetchers[k]().catch(() => [])))
+      .then(vals => {
+        if (!alive) return
+        setData(d => d ? { ...d, ...Object.fromEntries(needs.map((k, i) => [k, vals[i]])) } : d)
+      })
+    return () => { alive = false }
+  }, [tab, data, symbol])
   // Reset AI state when symbol changes
   useEffect(() => { setAiResult(null); setAiOpen(false) }, [symbol])
 
@@ -294,19 +288,32 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
       {/* ── Tab Content ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-auto">
         <div key={tab} className="animate-slide-up h-full">
-          {tab === 'overview'   && <Overview   data={data} />}
-          {tab === 'chart'      && <ChartTab   data={data} />}
-          {tab === 'tradingview'&& <TradingView symbol={symbol} />}
-          {tab === 'indicators' && <Indicators data={data} />}
-          {tab === 'amd'        && <AMD        data={data} />}
-          {tab === 'smart'      && <SmartMoney data={data} />}
-          {tab === 'bandar'     && <Bandar     symbol={symbol} showToast={showToast} />}
-          {tab === 'signals'    && <Signals    data={data} />}
-          {tab === 'advisor'    && <Advisor    symbol={symbol} />}
-          {tab === 'risk'       && <RiskCalc      data={data} />}
-          {tab === 'laporan'    && <ReportUpload  symbol={symbol} showToast={showToast} />}
+          {(() => {
+            const extrasReady = (TAB_NEEDS[tab] || []).every(k => data[k] !== undefined)
+            if (!extrasReady) return <TabLoading />
+            return (
+              <Suspense fallback={<TabLoading />}>
+                {tab === 'overview'   && <Overview   data={data} />}
+                {tab === 'chart'      && <ChartTab   data={data} />}
+                {tab === 'indicators' && <Indicators data={data} />}
+                {tab === 'advisor'    && <Advisor    symbol={symbol} />}
+                {tab === 'risk'       && <RiskCalc      data={data} />}
+                {tab === 'laporan'    && <ReportUpload  symbol={symbol} showToast={showToast} />}
+              </Suspense>
+            )
+          })()}
         </div>
       </div>
+    </div>
+  )
+}
+
+// ── Per-tab lazy-load spinner ─────────────────────────────────────────────────
+
+function TabLoading() {
+  return (
+    <div className="flex items-center justify-center h-40 text-tv-muted">
+      <div className="w-6 h-6 border-2 border-tv-border border-t-tv-blue rounded-full animate-spin" />
     </div>
   )
 }

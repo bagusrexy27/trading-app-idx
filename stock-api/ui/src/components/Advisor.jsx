@@ -24,14 +24,19 @@ export default function Advisor({ symbol }) {
   const [adv, setAdv]         = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(null)
+  const [bt, setBt]           = useState(null)
 
   useEffect(() => {
     let alive = true
-    setLoading(true); setError(null)
+    setLoading(true); setError(null); setBt(null)
     api.analysis.advisor(symbol)
       .then(r => { if (alive) setAdv(r.advice) })
       .catch(e => { if (alive) setError(e.message) })
       .finally(() => { if (alive) setLoading(false) })
+    // Historical performance of this exact method on this stock (non-blocking).
+    api.analysis.advisorBacktest(symbol)
+      .then(r => { if (alive) setBt(r.backtest) })
+      .catch(() => {})
     return () => { alive = false }
   }, [symbol])
 
@@ -154,6 +159,39 @@ export default function Advisor({ symbol }) {
           ))}
         </ul>
       </div>
+
+      {/* ── Historical backtest of this method ─────────────────── */}
+      {bt && bt.total > 0 && (
+        <div className="bg-tv-card border border-tv-border rounded-xl p-4">
+          <div className="text-xs font-bold text-tv-muted uppercase mb-3">📊 Uji Historis Metode Ini (saham ini)</div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+            <div>
+              <div className="text-[10px] text-tv-muted uppercase">Sinyal Beli</div>
+              <div className="text-lg font-extrabold tabular-nums">{bt.total}</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-tv-muted uppercase">Win Rate</div>
+              <div className={`text-lg font-extrabold tabular-nums ${bt.win_rate >= 50 ? 'text-tv-green' : 'text-tv-red'}`}>{bt.win_rate?.toFixed(0)}%</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-tv-muted uppercase">Avg Untung</div>
+              <div className="text-lg font-extrabold tabular-nums text-tv-green">+{bt.avg_win_pct?.toFixed(1)}%</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-tv-muted uppercase">Avg Rugi</div>
+              <div className="text-lg font-extrabold tabular-nums text-tv-red">{bt.avg_loss_pct?.toFixed(1)}%</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-tv-muted uppercase">Expectancy</div>
+              <div className={`text-lg font-extrabold tabular-nums ${bt.expectancy_pct >= 0 ? 'text-tv-green' : 'text-tv-red'}`}>{bt.expectancy_pct >= 0 ? '+' : ''}{bt.expectancy_pct?.toFixed(2)}%</div>
+            </div>
+          </div>
+          <p className="text-[10px] text-tv-muted mt-3 leading-relaxed">
+            Simulasi entry di sinyal BELI historis (tanpa look-ahead), exit di stop/target. Expectancy positif = metode ini
+            menghasilkan rata-rata untung per trade di saham ini. Masa lalu tidak menjamin masa depan.
+          </p>
+        </div>
+      )}
 
       <p className="text-[10px] text-tv-muted text-center pt-2">
         Bukan ajakan beli/jual. Alat bantu belajar price action — keputusan & risiko di tangan kamu.

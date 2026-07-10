@@ -48,7 +48,7 @@ const indChart = (id, type, height) => ({
 })
 
 export default function Indicators({ data }) {
-  const { rsi, macd, bollinger, stoch, prices, obv } = data
+  const { rsi, macd, prices, obv } = data
 
   // Master date list from prices — all indicator charts use this as their category array.
   // This ensures all charts have identical category counts so group sync works correctly
@@ -57,11 +57,9 @@ export default function Indicators({ data }) {
 
   return (
     <div className="p-4 space-y-4">
-      <div className="animate-slide-up stagger-1"><RSIChart       rsi={rsi}                  dates={dates} /></div>
-      <div className="animate-slide-up stagger-2"><MACDChart      macd={macd}                dates={dates} /></div>
-      <div className="animate-slide-up stagger-3"><BollingerChart bollinger={bollinger} prices={prices} dates={dates} /></div>
-      <div className="animate-slide-up stagger-4"><StochChart     stoch={stoch}              dates={dates} /></div>
-      <div className="animate-slide-up stagger-5"><OBVChart       obv={obv ?? []}            dates={dates} /></div>
+      <div className="animate-slide-up stagger-1"><RSIChart  rsi={rsi}       dates={dates} /></div>
+      <div className="animate-slide-up stagger-2"><MACDChart macd={macd}     dates={dates} /></div>
+      <div className="animate-slide-up stagger-3"><OBVChart  obv={obv ?? []} dates={dates} /></div>
     </div>
   )
 }
@@ -162,104 +160,6 @@ function MACDChart({ macd, dates }) {
           { name: 'MACD',      type: 'line', data: macdLine },
           { name: 'Signal',    type: 'line', data: sigLine  },
           { name: 'Histogram', type: 'bar',  data: histData },
-        ]}
-        options={opts}
-      />
-    </IndicatorCard>
-  )
-}
-
-/* ── Bollinger ─────────────────────────────────────────────────────────── */
-function BollingerChart({ bollinger, prices, dates }) {
-  const last = bollinger[bollinger.length - 1]
-  const pb   = last?.percent_b ?? 50
-  const zone = pb >= 95 ? 'Upper Band' : pb <= 5 ? 'Lower Band' : 'Mid Band'
-
-  const bollMap  = useMemo(() => Object.fromEntries(bollinger.map(p => [p.date, p])), [bollinger])
-  const closeMap = useMemo(() => Object.fromEntries(prices.map(p => [p.date, p.close])), [prices])
-
-  const opts = {
-    ...APEX_DARK,
-    chart: indChart('ind-boll', 'line', 220),
-    xaxis: CAT_XAXIS,
-    stroke: { width: [1.5, 1, 1.5, 1], curve: 'smooth', dashArray: [0, 4, 0, 4] },
-    colors: ['#d1d4dc', '#ef535066', '#ffc107', '#26a69a66'],
-    fill: { type: 'solid', opacity: [1, 0.1, 1, 0.1] },
-    markers: { size: 0 },
-    yaxis: { labels: { style: { colors: '#787b86', fontSize: '10px' }, formatter: v => fmt.price(v) } },
-    tooltip: { theme: 'dark', shared: true },
-    legend: { show: true, labels: { colors: '#d1d4dc' }, fontSize: '10px' },
-  }
-
-  return (
-    <IndicatorCard
-      title="Bollinger Bands (20, 2)"
-      current={`%B: ${fmt.num(pb)}%`}
-      badge={zone}
-      badgeColor={pb >= 95 ? 'text-tv-red bg-tv-red/10 border-tv-red/30' : pb <= 5 ? 'text-tv-green bg-tv-green/10 border-tv-green/30' : 'text-tv-muted bg-tv-muted/10 border-tv-muted/20'}
-    >
-      <ReactApexChart
-        type="line"
-        height={220}
-        series={[
-          { name: 'Close',  data: dates.map(date => ({ x: date, y: closeMap[date]       ?? null })) },
-          { name: 'Upper',  data: dates.map(date => ({ x: date, y: bollMap[date]?.upper  ?? null })) },
-          { name: 'Middle', data: dates.map(date => ({ x: date, y: bollMap[date]?.middle ?? null })) },
-          { name: 'Lower',  data: dates.map(date => ({ x: date, y: bollMap[date]?.lower  ?? null })) },
-        ]}
-        options={opts}
-      />
-    </IndicatorCard>
-  )
-}
-
-/* ── Stochastic ─────────────────────────────────────────────────────────── */
-function StochChart({ stoch, dates }) {
-  const last  = stoch[stoch.length - 1]
-  const k     = last?.k ?? 0
-  const label = k >= 80 ? 'Overbought' : k <= 20 ? 'Oversold' : 'Neutral'
-
-  const stochMap = useMemo(() => Object.fromEntries(stoch.map(p => [p.date, p])), [stoch])
-
-  const opts = {
-    ...APEX_DARK,
-    chart: indChart('ind-stoch', 'line', 180),
-    xaxis: CAT_XAXIS,
-    stroke: { width: [1.5, 1.5], curve: 'smooth' },
-    colors: ['#2196f3', '#ffc107'],
-    markers: { size: 0 },
-    yaxis: {
-      min: 0, max: 100,
-      labels: { style: { colors: '#787b86', fontSize: '10px' } },
-      tickAmount: 4,
-    },
-    annotations: {
-      yaxis: [
-        { y: 80, borderColor: '#ef535060', strokeDashArray: 5 },
-        { y: 20, borderColor: '#26a69a60', strokeDashArray: 5 },
-      ],
-    },
-    legend: { show: true, labels: { colors: '#d1d4dc' }, fontSize: '10px' },
-    tooltip: {
-      theme: 'dark',
-      shared: true,
-      y: [{ formatter: v => v?.toFixed(2) + '%' }, { formatter: v => v?.toFixed(2) + '%' }],
-    },
-  }
-
-  return (
-    <IndicatorCard
-      title="Stochastic (14, 3)"
-      current={`%K: ${fmt.num(k)}`}
-      badge={label}
-      badgeColor={k >= 80 ? 'text-tv-red bg-tv-red/10 border-tv-red/30' : k <= 20 ? 'text-tv-green bg-tv-green/10 border-tv-green/30' : 'text-tv-muted bg-tv-muted/10 border-tv-muted/20'}
-    >
-      <ReactApexChart
-        type="line"
-        height={180}
-        series={[
-          { name: '%K', data: dates.map(date => ({ x: date, y: stochMap[date]?.k ?? null })) },
-          { name: '%D', data: dates.map(date => ({ x: date, y: stochMap[date]?.d ?? null })) },
         ]}
         options={opts}
       />

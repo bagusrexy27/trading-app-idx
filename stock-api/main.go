@@ -228,6 +228,7 @@ func main() {
 	api.HandleFunc("/analysis/{symbol}/cmf", a.CMF).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/mfi", a.MFI).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/advisor", a.Advisor).Methods("GET")
+	api.HandleFunc("/analysis/{symbol}/advisor-backtest", a.AdvisorBacktest).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/backtest", bt.Backtest).Methods("GET")
 	api.HandleFunc("/overview", a.Overview).Methods("GET")
 	api.HandleFunc("/advisor/screen", a.AdvisorScreen).Methods("GET")
