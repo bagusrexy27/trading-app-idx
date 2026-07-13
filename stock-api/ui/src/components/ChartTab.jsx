@@ -74,17 +74,21 @@ export default function ChartTab({ data, symbol }) {
     const el = chartBoxRef.current
     if (!el) return
     const total = sliced.length
-    const onWheel = (e) => {
-      e.preventDefault()
-      if (total < 10) return
+    let raf = 0                 // throttle: kumpulkan notch, render 1x per frame
+    let pendingDelta = 0
+    let lastX = 0
+    const apply = () => {
+      raf = 0
+      if (total < 10 || pendingDelta === 0) return
       const cur = zoomRef.current || { min: 1, max: total }
       const span = cur.max - cur.min
-      // zoom in 20% per notch ke arah kursor; zoom out sebaliknya
-      const dir = e.deltaY < 0 ? 1 : -1
-      const newSpan = Math.max(10, Math.min(total, Math.round(span * (dir > 0 ? 0.8 : 1.25))))
+      // gabungkan beberapa notch jadi satu langkah zoom
+      const factor = Math.pow(0.8, pendingDelta)
+      pendingDelta = 0
+      const newSpan = Math.max(10, Math.min(total, Math.round(span * factor)))
       if (newSpan === span) return
       const rect = el.getBoundingClientRect()
-      const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
+      const frac = Math.min(1, Math.max(0, (lastX - rect.left) / rect.width))
       const anchor = cur.min + frac * span
       let min = Math.round(anchor - frac * newSpan)
       let max = min + newSpan
@@ -93,8 +97,14 @@ export default function ChartTab({ data, symbol }) {
       zoomRef.current = { min, max }
       try { ApexCharts.getChartByID('chart-candle')?.zoomX(min, max) } catch { /* toolbar fallback */ }
     }
+    const onWheel = (e) => {
+      e.preventDefault()
+      pendingDelta += e.deltaY < 0 ? 1 : -1
+      lastX = e.clientX
+      if (!raf) raf = requestAnimationFrame(apply)
+    }
     el.addEventListener('wheel', onWheel, { passive: false })
-    return () => el.removeEventListener('wheel', onWheel)
+    return () => { el.removeEventListener('wheel', onWheel); if (raf) cancelAnimationFrame(raf) }
   }, [sliced.length, range, symbol])
 
   // Shared category x-axis base — explicit categories required so the crosshair
@@ -131,6 +141,10 @@ export default function ChartTab({ data, symbol }) {
         tools: { download: false, zoom: true, pan: true, reset: true, selection: false, zoomin: true, zoomout: true },
       },
       zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
+      // animasi dimatikan: redraw SVG penuh tiap zoom/pan — animasi bikin lag berlipat
+      animations: { enabled: false, dynamicAnimation: { enabled: false } },
+      redrawOnParentResize: false,
+      redrawOnWindowResize: false,
     },
     plotOptions: {
       candlestick: {
@@ -257,6 +271,9 @@ export default function ChartTab({ data, symbol }) {
       toolbar: { show: true, autoSelected: 'pan', tools: { download: false, selection: false, zoom: false, zoomin: false, zoomout: false, pan: true, reset: false } },
       // zoom enabled agar tetap sinkron dengan chart utama dalam satu group
       zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
+      animations: { enabled: false, dynamicAnimation: { enabled: false } },
+      redrawOnParentResize: false,
+      redrawOnWindowResize: false,
     },
     xaxis: {
       ...catBase,
