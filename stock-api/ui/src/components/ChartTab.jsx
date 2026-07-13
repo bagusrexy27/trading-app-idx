@@ -28,6 +28,10 @@ export default function ChartTab({ data, symbol }) {
   const [range, setRange] = useState('3M')
   const [showFib, setShowFib] = useState(false)
   const [fib, setFib] = useState(null)          // FibLevels dari API (lookback 100 bar)
+  // Indicator visibility toggles — klik legend untuk on/off
+  const [showSma20, setShowSma20] = useState(true)
+  const [showSma50, setShowSma50] = useState(true)
+  const [showVol,   setShowVol]   = useState(true)
   const { prices, sma20, sma50 } = data
 
   // Fetch level fibonacci saat toggle pertama dinyalakan
@@ -47,8 +51,9 @@ export default function ChartTab({ data, symbol }) {
   const cats     = useMemo(() => sliced.map(p => p.date), [sliced])
 
   const candleData = sliced.map(p => ({ x: p.date, y: [p.open, p.high, p.low, p.close] }))
-  const sma20Data  = sliced.map(p => ({ x: p.date, y: sma20Map[p.date] ?? null }))
-  const sma50Data  = sliced.map(p => ({ x: p.date, y: sma50Map[p.date] ?? null }))
+  // Saat toggle off, seri diisi null agar index colors/stroke tetap sejajar
+  const sma20Data  = sliced.map(p => ({ x: p.date, y: showSma20 ? (sma20Map[p.date] ?? null) : null }))
+  const sma50Data  = sliced.map(p => ({ x: p.date, y: showSma50 ? (sma50Map[p.date] ?? null) : null }))
   const volumeData = sliced.map(p => ({
     x: p.date,
     y: p.volume,
@@ -105,7 +110,8 @@ export default function ChartTab({ data, symbol }) {
     stroke: { width: [1, 1.5, 1.5], curve: 'smooth', dashArray: [0, 0, 6] },
     // colors index: [OHLC (ignored by candlestick renderer), SMA20, SMA50]
     colors: ['transparent', '#ffc107', '#9c6bff'],
-    xaxis: { ...catBase, labels: { show: false } }, // labels shown only in volume chart below
+    // labels tampil di chart volume; kalau volume disembunyikan, tampilkan di sini
+    xaxis: { ...catBase, labels: showVol ? { show: false } : { show: true, style: { colors: '#8a8f98', fontSize: '10px' }, rotate: 0, formatter: fmtDate } },
     yaxis: {
       tooltip: { enabled: true },
       tickAmount: 6,
@@ -176,8 +182,8 @@ export default function ChartTab({ data, symbol }) {
         const clr  = up ? '#26a69a' : '#ef5350'
         const chg  = d.close - d.open
         const pct  = d.open ? (chg / d.open * 100).toFixed(2) : '0.00'
-        const s20  = sma20Map[d.date]
-        const s50  = sma50Map[d.date]
+        const s20  = showSma20 ? sma20Map[d.date] : null
+        const s50  = showSma50 ? sma50Map[d.date] : null
         const sign = up ? '+' : ''
         return (
           '<div style="background:#1e222d;border:1px solid #2a2e39;border-radius:6px;' +
@@ -205,7 +211,7 @@ export default function ChartTab({ data, symbol }) {
       },
     },
     legend: { show: false },
-  }), [sliced, catBase, last, lastUp, sma20Map, sma50Map, showFib, fib])
+  }), [sliced, catBase, last, lastUp, sma20Map, sma50Map, showFib, fib, showSma20, showSma50, showVol])
 
   // ── Volume chart ─────────────────────────────────────────────────────
   const volOpts = useMemo(() => ({
@@ -272,10 +278,11 @@ export default function ChartTab({ data, symbol }) {
         >
           𝜑 Fib
         </button>
-        <div className="ml-auto flex items-center gap-4">
-          <SmaLegendItem color="#ffc107" label="SMA20" dashed={false} />
-          <SmaLegendItem color="#9c6bff" label="SMA50" dashed={true} />
-          <span className="text-[10px] text-tv-muted tabular-nums">{sliced.length} bars</span>
+        <div className="ml-auto flex items-center gap-2">
+          <IndicatorToggle color="#ffc107" label="SMA20" dashed={false} active={showSma20} onClick={() => setShowSma20(v => !v)} />
+          <IndicatorToggle color="#9c6bff" label="SMA50" dashed={true}  active={showSma50} onClick={() => setShowSma50(v => !v)} />
+          <IndicatorToggle color="#8a8f98" label="Vol"   dashed={false} active={showVol}   onClick={() => setShowVol(v => !v)} />
+          <span className="text-[10px] text-tv-muted tabular-nums ml-2">{sliced.length} bars</span>
         </div>
       </div>
 
@@ -305,22 +312,24 @@ export default function ChartTab({ data, symbol }) {
           />
         </div>
 
-        {/* Visual divider */}
-        <div className="mx-3 border-t border-tv-border/40" />
-
-        {/* Volume — same group, syncs with main on pan/zoom */}
-        <div className="px-3 pb-2 pt-0">
-          <div className="text-[9px] text-tv-muted/50 font-semibold uppercase tracking-wider pt-2 px-1 mb-0">
-            Vol
-          </div>
-          <ReactApexChart
-            key={`vol-${range}`}
-            type="bar"
-            height={78}
-            series={[{ name: 'Volume', data: volumeData }]}
-            options={volOpts}
-          />
-        </div>
+        {/* Volume — same group, syncs with main on pan/zoom; toggleable */}
+        {showVol && (
+          <>
+            <div className="mx-3 border-t border-tv-border/40" />
+            <div className="px-3 pb-2 pt-0 animate-fade-in">
+              <div className="text-[9px] text-tv-muted/50 font-semibold uppercase tracking-wider pt-2 px-1 mb-0">
+                Vol
+              </div>
+              <ReactApexChart
+                key={`vol-${range}`}
+                type="bar"
+                height={78}
+                series={[{ name: 'Volume', data: volumeData }]}
+                options={volOpts}
+              />
+            </div>
+          </>
+        )}
 
       </div>
     </div>
@@ -489,19 +498,26 @@ function CandleVisual({ p }) {
   )
 }
 
-// Renders a small SMA legend line — solid for SMA20, dashed for SMA50
-function SmaLegendItem({ color, label, dashed }) {
+// Clickable indicator legend — toggles the series on/off
+function IndicatorToggle({ color, label, dashed, active, onClick }) {
   return (
-    <div className="flex items-center gap-1.5">
+    <button
+      onClick={onClick}
+      title={`${active ? 'Sembunyikan' : 'Tampilkan'} ${label}`}
+      className={`flex items-center gap-1.5 px-2 py-1 rounded-md border transition-all duration-200
+        ${active
+          ? 'border-tv-border bg-tv-card'
+          : 'border-transparent bg-transparent opacity-40 hover:opacity-70'}`}
+    >
       {dashed ? (
         <svg width="18" height="3" className="flex-shrink-0">
           <line x1="0" y1="1.5" x2="18" y2="1.5"
             stroke={color} strokeWidth="1.5" strokeDasharray="4 3" />
         </svg>
       ) : (
-        <div className="w-4 h-px flex-shrink-0 rounded" style={{ background: color, height: '1.5px' }} />
+        <div className="w-4 flex-shrink-0 rounded" style={{ background: color, height: '1.5px' }} />
       )}
-      <span className="text-[10px] text-tv-muted">{label}</span>
-    </div>
+      <span className={`text-[10px] ${active ? 'text-tv-text' : 'text-tv-muted line-through'}`}>{label}</span>
+    </button>
   )
 }
