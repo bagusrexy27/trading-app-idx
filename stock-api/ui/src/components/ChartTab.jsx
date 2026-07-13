@@ -18,6 +18,22 @@ const RANGES = ['1W', '1M', '3M', '6M', '1Y', 'All']
 const RANGE_DAYS = { '1W': 5, '1M': 22, '3M': 66, '6M': 132, '1Y': 252, 'All': 9999 }
 
 const UP = '#26a69a', DOWN = '#ef5350'
+const AVWAP_COLOR = '#29b6f6'
+
+// AVWAP: harga tipikal tertimbang volume, kumulatif dari bar anchor → akhir data
+const computeAvwap = (prices, anchorDate) => {
+  const i0 = prices.findIndex(p => p.date === anchorDate)
+  if (i0 < 0) return []
+  let pv = 0, vv = 0
+  const out = []
+  for (let i = i0; i < prices.length; i++) {
+    const p = prices[i]
+    const tp = (p.high + p.low + p.close) / 3
+    pv += tp * p.volume; vv += p.volume
+    out.push({ time: p.date, value: vv ? pv / vv : tp })
+  }
+  return out
+}
 
 // param.time bisa berupa string 'YYYY-MM-DD' atau BusinessDay {year,month,day}
 const timeToDate = t => typeof t === 'string'
@@ -32,6 +48,9 @@ export default function ChartTab({ data, symbol }) {
   const [showSma20, setShowSma20] = useState(true)
   const [showSma50, setShowSma50] = useState(true)
   const [showVol,   setShowVol]   = useState(true)
+  // AVWAP: toggle on = klik candle untuk anchor; preset Low/High/Vol tersedia
+  const [avwapOn, setAvwapOn]         = useState(false)
+  const [avwapAnchor, setAvwapAnchor] = useState(null)  // date string
   const { prices, sma20, sma50 } = data
 
   // Fetch level fibonacci saat toggle pertama dinyalakan
@@ -43,7 +62,26 @@ export default function ChartTab({ data, symbol }) {
       .catch(() => { if (alive) setShowFib(false) })
     return () => { alive = false }
   }, [showFib, fib, symbol])
-  useEffect(() => { setFib(null); setShowFib(false) }, [symbol])
+  useEffect(() => { setFib(null); setShowFib(false); setAvwapAnchor(null); setAvwapOn(false) }, [symbol])
+
+  // gambar/hapus garis AVWAP saat anchor berubah
+  useEffect(() => {
+    const s = avwapRef.current
+    if (!s) return
+    s.setData(avwapOn && avwapAnchor ? computeAvwap(prices, avwapAnchor) : [])
+  }, [avwapOn, avwapAnchor, prices])
+
+  // preset anchor: swing low / swing high / volume tertinggi di window range aktif
+  const presetAnchor = (kind) => {
+    if (!sliced.length) return
+    let pick = sliced[0]
+    for (const p of sliced) {
+      if (kind === 'low'  && p.low    < pick.low)    pick = p
+      if (kind === 'high' && p.high   > pick.high)   pick = p
+      if (kind === 'vol'  && p.volume > pick.volume) pick = p
+    }
+    setAvwapAnchor(pick.date)
+  }
 
   // sliced hanya untuk RangeStats + bar count — chart memuat SEMUA data,
   // range selector cuma menggeser visible window (bisa pan mundur ke histori)
@@ -58,6 +96,9 @@ export default function ChartTab({ data, symbol }) {
   const volRef       = useRef(null)
   const barMapRef    = useRef({})     // date → price obj (untuk tooltip)
   const fibLinesRef  = useRef([])
+  const avwapRef     = useRef(null)
+  const avwapOnRef   = useRef(false)  // dibaca handler klik (dibuat sekali di init)
+  useEffect(() => { avwapOnRef.current = avwapOn }, [avwapOn])
 
   // ── Create chart once ────────────────────────────────────────────────
   useEffect(() => {
@@ -105,6 +146,18 @@ export default function ChartTab({ data, symbol }) {
       priceLineVisible: false, lastValueVisible: false,
     })
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 }, visible: false })
+
+    const avwap = chart.addSeries(LineSeries, {
+      color: AVWAP_COLOR, lineWidth: 2,
+      priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+    })
+
+    // klik candle = set anchor AVWAP (hanya saat toggle aktif)
+    const onClick = (param) => {
+      if (!avwapOnRef.current || !param.time) return
+      setAvwapAnchor(timeToDate(param.time))
+    }
+    chart.subscribeClick(onClick)
 
     // ── Tooltip OHLCV mengambang (subscribeCrosshairMove) ──────────────
     const onMove = (param) => {
@@ -155,8 +208,10 @@ export default function ChartTab({ data, symbol }) {
     sma20Ref.current  = s20
     sma50Ref.current  = s50
     volRef.current    = vol
+    avwapRef.current  = avwap
     return () => {
       chart.unsubscribeCrosshairMove(onMove)
+      chart.unsubscribeClick(onClick)
       chart.remove()
       chartRef.current = null
     }
@@ -243,6 +298,29 @@ export default function ChartTab({ data, symbol }) {
         >
           𝜑 Fib
         </button>
+        <button
+          onClick={() => setAvwapOn(v => !v)}
+          title="Anchored VWAP — aktifkan lalu klik candle untuk set anchor, atau pakai preset"
+          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all
+            ${avwapOn
+              ? 'bg-tv-blue/15 text-tv-blue border border-tv-blue/40 shadow-[0_0_12px_rgba(41,182,246,0.25)]'
+              : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
+        >
+          ⚓ AVWAP
+        </button>
+        {avwapOn && (
+          <span className="flex items-center gap-1 text-[10px]">
+            {[['low', 'Low'], ['high', 'High'], ['vol', 'Vol×']].map(([k, lbl]) => (
+              <button key={k} onClick={() => presetAnchor(k)}
+                className="px-2 py-0.5 rounded border border-tv-border text-tv-muted hover:text-tv-blue hover:border-tv-blue/40 transition-colors">
+                {lbl}
+              </button>
+            ))}
+            <span className="text-tv-muted ml-1">
+              {avwapAnchor ? <>⚓ <span style={{ color: AVWAP_COLOR }}>{avwapAnchor}</span></> : 'klik candle'}
+            </span>
+          </span>
+        )}
         <div className="ml-auto flex items-center gap-2">
           <IndicatorToggle color="#ffc107" label="SMA20" dashed={false} active={showSma20} onClick={() => setShowSma20(v => !v)} />
           <IndicatorToggle color="#9c6bff" label="SMA50" dashed={true}  active={showSma50} onClick={() => setShowSma50(v => !v)} />
