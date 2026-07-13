@@ -42,6 +42,88 @@ function candleLabel(bars) {
   return [c.close > c.open ? 'Bar hijau' : 'Bar merah', c.close > c.open ? 'naik' : 'turun']
 }
 
+// Kumpulan sinyal pra-tebakan: tiap sinyal punya arah + alasan singkat.
+// Dipakai untuk bedah "kenapa naik/turun" — di reveal, tiap sinyal diberi ✓/✗.
+function buildSignals(bars) {
+  const closes = bars.map(b => b.close)
+  const last = bars[bars.length - 1]
+  const signals = []
+
+  // 1. Tren — posisi harga & SMA20 vs SMA50
+  const s20 = sma(closes, 20), s50 = sma(closes, 50)
+  if (s50 != null) {
+    const dir = last.close > s50 && s20 > s50 ? 'naik' : last.close < s50 && s20 < s50 ? 'turun' : 'netral'
+    signals.push({
+      nama: 'Tren (SMA20/50)', arah: dir,
+      detail: dir === 'netral'
+        ? 'Harga & MA saling silang — tidak ada tren jelas'
+        : `Harga ${last.close > s50 ? 'di atas' : 'di bawah'} SMA50 dan SMA20 ${s20 > s50 ? '>' : '<'} SMA50 — tren ${dir}`,
+    })
+  }
+
+  // 2. RSI 14
+  const r = rsi14(closes)
+  if (r != null) {
+    signals.push({
+      nama: 'RSI 14', arah: r >= 70 ? 'turun' : r <= 30 ? 'naik' : 'netral',
+      detail: r >= 70 ? `RSI ${r.toFixed(0)} overbought — rawan koreksi`
+        : r <= 30 ? `RSI ${r.toFixed(0)} oversold — rawan pantulan`
+        : `RSI ${r.toFixed(0)} netral — tidak ekstrem`,
+    })
+  }
+
+  // 3. Pola candle terakhir
+  const [pattern, patternDir] = candleLabel(bars)
+  signals.push({
+    nama: `Pola: ${pattern}`, arah: patternDir,
+    detail: patternDir === 'netral' ? 'Doji/netral — pasar ragu' : `${pattern} — bias ${patternDir}`,
+  })
+
+  // 4. Volume candle terakhir vs rata-rata 20 hari
+  const avgVol = sma(bars.map(b => b.volume), 20)
+  if (avgVol) {
+    const ratio = last.volume / avgVol
+    const lastDir = last.close > last.open ? 'naik' : last.close < last.open ? 'turun' : 'netral'
+    const strong = ratio >= 1.5
+    signals.push({
+      nama: 'Volume', arah: strong ? lastDir : 'netral',
+      detail: strong
+        ? `Volume ${ratio.toFixed(1)}× rata-rata — candle ${lastDir === 'naik' ? 'hijau' : 'merah'} terkonfirmasi tenaga besar`
+        : `Volume ${ratio.toFixed(1)}× rata-rata — biasa saja, tanpa konfirmasi kuat`,
+    })
+  }
+
+  // 5. Posisi vs support/resistance (swing low/high window, exclude 3 bar terakhir)
+  const body = bars.slice(0, -3)
+  if (body.length > 10) {
+    const support = Math.min(...body.map(b => b.low))
+    const resist = Math.max(...body.map(b => b.high))
+    const pos = (last.close - support) / (resist - support || 1)   // 0 = di support, 1 = di resistance
+    signals.push({
+      nama: 'Support/Resistance',
+      arah: pos <= 0.15 ? 'naik' : pos >= 0.85 ? 'turun' : 'netral',
+      detail: pos <= 0.15 ? `Harga nempel support ${fmt.price(support)} — area pantulan umum`
+        : pos >= 0.85 ? `Harga nempel resistance ${fmt.price(resist)} — area tolakan umum`
+        : `Di tengah range ${fmt.price(support)}–${fmt.price(resist)} — jauh dari level kunci`,
+    })
+  }
+
+  // 6. Momentum 3 candle terakhir
+  const last3 = bars.slice(-3)
+  if (last3.length === 3) {
+    const ups = last3.filter(b => b.close > b.open).length
+    signals.push({
+      nama: 'Momentum 3 hari',
+      arah: ups === 3 ? 'naik' : ups === 0 ? 'turun' : 'netral',
+      detail: ups === 3 ? '3 candle hijau beruntun — momentum beli (tapi hati-hati jenuh)'
+        : ups === 0 ? '3 candle merah beruntun — momentum jual (tapi rawan pantulan teknikal)'
+        : `${ups} hijau ${3 - ups} merah dari 3 hari — campur, tidak ada momentum searah`,
+    })
+  }
+
+  return signals
+}
+
 export default function Practice({ stocks = [] }) {
   const [score, setScore]     = useState(loadScore)
   const [round, setRound]     = useState(null)   // { symbol, bars, answerBar, futureBars }
@@ -79,8 +161,10 @@ export default function Practice({ stocks = [] }) {
     if (phase !== 'guess' || !round) return
     setGuess(dir)
     const lastClose = round.bars[round.bars.length - 1].close
+    const tie = round.answerBar.close === lastClose
     const up = round.answerBar.close > lastClose
-    const correct = (dir === 'up') === up
+    // seri (close sama persis) tidak dihitung salah — dianggap benar apa pun tebakannya
+    const correct = tie || (dir === 'up') === up
     const streak = correct ? score.streak + 1 : 0
     saveScore({
       total: score.total + 1,
@@ -94,18 +178,26 @@ export default function Practice({ stocks = [] }) {
   // ── derived (analisis edukatif) ────────────────────────────────────────────
   const analysis = useMemo(() => {
     if (!round) return null
-    const closes = round.bars.map(b => b.close)
-    const last = closes[closes.length - 1]
-    const s20 = sma(closes, 20), s50 = sma(closes, 50)
-    const trend = s50 == null ? 'Sideways' : last > s50 && s20 > s50 ? 'Naik' : last < s50 && s20 < s50 ? 'Turun' : 'Sideways'
-    const r = rsi14(closes)
-    const [pattern, patternDir] = candleLabel(round.bars)
-    const up = round.answerBar.close > last
-    const chg = (round.answerBar.close / last - 1) * 100
-    return { trend, rsi: r, pattern, patternDir, up, chg, lastClose: last }
+    const last = round.bars[round.bars.length - 1].close
+    const a = round.answerBar
+    const up = a.close > last
+    const tie = a.close === last
+    const chg = (a.close / last - 1) * 100
+    // anatomi candle jawaban: gap open + pergerakan intraday
+    const gap = a.open - last
+    const gapPct = (gap / last) * 100
+    const intraday = a.close - a.open
+    const candleGreen = a.close > a.open
+    // divergensi: warna candle ≠ arah close-to-close (biang "kok hijau tapi salah?")
+    const divergence = !tie && candleGreen !== up && intraday !== 0
+    const signals = buildSignals(round.bars)
+    const naik = signals.filter(s => s.arah === 'naik').length
+    const turun = signals.filter(s => s.arah === 'turun').length
+    const konsensus = naik > turun ? 'naik' : turun > naik ? 'turun' : 'netral'
+    return { up, tie, chg, lastClose: last, gap, gapPct, intraday, candleGreen, divergence, signals, naik, turun, konsensus }
   }, [round])
 
-  const correct = phase === 'reveal' && guess != null && analysis != null && ((guess === 'up') === analysis.up)
+  const correct = phase === 'reveal' && guess != null && analysis != null && (analysis.tie || (guess === 'up') === analysis.up)
   const accuracy = score.total > 0 ? (score.correct / score.total) * 100 : 0
 
   // ── chart series ───────────────────────────────────────────────────────────
@@ -186,18 +278,23 @@ export default function Practice({ stocks = [] }) {
 
           {/* ── tombol tebak / hasil ──────────────────────────── */}
           {phase === 'guess' && (
-            <div className="flex items-center justify-center gap-3 mt-4">
-              <button onClick={() => answer('up')}
-                className="flex-1 max-w-[220px] py-3.5 rounded-xl font-extrabold text-sm border-2 border-tv-green/40 bg-tv-green/10 text-tv-green
-                  transition-all duration-200 hover:bg-tv-green/20 hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(46,189,133,0.3)] active:scale-95">
-                📈 NAIK
-              </button>
-              <button onClick={() => answer('down')}
-                className="flex-1 max-w-[220px] py-3.5 rounded-xl font-extrabold text-sm border-2 border-tv-red/40 bg-tv-red/10 text-tv-red
-                  transition-all duration-200 hover:bg-tv-red/20 hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(246,70,93,0.3)] active:scale-95">
-                📉 TURUN
-              </button>
-            </div>
+            <>
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <button onClick={() => answer('up')}
+                  className="flex-1 max-w-[220px] py-3.5 rounded-xl font-extrabold text-sm border-2 border-tv-green/40 bg-tv-green/10 text-tv-green
+                    transition-all duration-200 hover:bg-tv-green/20 hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(46,189,133,0.3)] active:scale-95">
+                  📈 NAIK
+                </button>
+                <button onClick={() => answer('down')}
+                  className="flex-1 max-w-[220px] py-3.5 rounded-xl font-extrabold text-sm border-2 border-tv-red/40 bg-tv-red/10 text-tv-red
+                    transition-all duration-200 hover:bg-tv-red/20 hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(246,70,93,0.3)] active:scale-95">
+                  📉 TURUN
+                </button>
+              </div>
+              <p className="text-[10px] text-tv-muted text-center mt-2">
+                Yang dinilai: <b className="text-tv-text">close besok vs close terakhir</b> — bukan warna candle. Candle hijau bisa tetap "turun" kalau open-nya gap ke bawah.
+              </p>
+            </>
           )}
 
           {phase === 'reveal' && analysis && (
@@ -205,39 +302,60 @@ export default function Practice({ stocks = [] }) {
               {/* hasil */}
               <div className={`pop-in rounded-xl border-2 p-4 text-center ${correct ? 'border-tv-green/40 bg-tv-green/5' : 'border-tv-red/40 bg-tv-red/5'}`}>
                 <div className={`text-xl font-extrabold ${correct ? 'text-tv-green' : 'text-tv-red'}`}>
-                  {correct ? '✅ BENAR!' : '❌ SALAH'}
+                  {analysis.tie ? '🤝 SERI — dihitung benar' : correct ? '✅ BENAR!' : '❌ SALAH'}
                 </div>
                 <div className="text-xs text-tv-muted mt-1">
-                  Besoknya {analysis.up ? 'NAIK' : 'TURUN'} <b className={analysis.up ? 'text-tv-green' : 'text-tv-red'}>{analysis.chg >= 0 ? '+' : ''}{analysis.chg.toFixed(2)}%</b>
-                  {' '}(close {fmt.price(analysis.lastClose)} → {fmt.price(round.answerBar.close)})
+                  {analysis.tie
+                    ? <>Close sama persis ({fmt.price(analysis.lastClose)})</>
+                    : <>Besoknya {analysis.up ? 'NAIK' : 'TURUN'} <b className={analysis.up ? 'text-tv-green' : 'text-tv-red'}>{analysis.chg >= 0 ? '+' : ''}{analysis.chg.toFixed(2)}%</b>
+                      {' '}(close {fmt.price(analysis.lastClose)} → {fmt.price(round.answerBar.close)})</>}
                   {correct && score.streak > 1 && <span className="ml-1">· streak {score.streak} 🔥</span>}
                 </div>
               </div>
 
-              {/* bedah analisis — bagian informatif */}
+              {/* anatomi candle jawaban — kenapa hijau/merah ≠ naik/turun */}
+              {analysis.divergence && (
+                <div className="rounded-xl border border-tv-yellow/40 bg-tv-yellow/5 p-3 text-[11px] leading-relaxed">
+                  <b className="text-tv-yellow">⚠️ Candle-nya {analysis.candleGreen ? 'HIJAU' : 'MERAH'} tapi dinilai {analysis.up ? 'NAIK' : 'TURUN'} — ini bukan bug.</b>{' '}
+                  <span className="text-tv-muted">
+                    Harga open {analysis.gap > 0 ? 'gap NAIK' : 'gap TURUN'} <b className="text-tv-text">{analysis.gapPct >= 0 ? '+' : ''}{analysis.gapPct.toFixed(2)}%</b> dari close kemarin
+                    ({fmt.price(analysis.lastClose)} → open {fmt.price(round.answerBar.open)}), lalu intraday bergerak {analysis.intraday > 0 ? 'naik' : 'turun'} {fmt.price(Math.abs(analysis.intraday))}.
+                    Warna candle = open→close <i>hari itu</i>; penilaian = close→close <i>antar hari</i>. Dua hal berbeda — gap yang menentukan.
+                  </span>
+                </div>
+              )}
+
+              {/* bedah analisis — tiap sinyal dinilai benar/salah */}
               <div className="bg-tv-bg border border-tv-border rounded-xl p-4">
-                <div className="text-[10px] font-bold text-tv-muted uppercase mb-2">🔬 Bedah: apa kata analisis sebelum candle ini?</div>
-                <div className="grid sm:grid-cols-3 gap-2 text-xs">
-                  <div className="bg-tv-card rounded-lg p-2.5 border border-tv-border">
-                    <div className="text-[9px] text-tv-muted uppercase">Tren (SMA20/50)</div>
-                    <div className={`font-bold ${analysis.trend === 'Naik' ? 'text-tv-green' : analysis.trend === 'Turun' ? 'text-tv-red' : 'text-tv-yellow'}`}>{analysis.trend}</div>
-                  </div>
-                  <div className="bg-tv-card rounded-lg p-2.5 border border-tv-border">
-                    <div className="text-[9px] text-tv-muted uppercase">RSI 14</div>
-                    <div className="font-bold">{analysis.rsi?.toFixed(0) ?? '—'} <span className="text-[10px] text-tv-muted font-normal">{analysis.rsi >= 70 ? '(overbought)' : analysis.rsi <= 30 ? '(oversold)' : '(netral)'}</span></div>
-                  </div>
-                  <div className="bg-tv-card rounded-lg p-2.5 border border-tv-border">
-                    <div className="text-[9px] text-tv-muted uppercase">Candle terakhir</div>
-                    <div className="font-bold">{analysis.pattern} <span className={`text-[10px] font-normal ${analysis.patternDir === 'naik' ? 'text-tv-green' : analysis.patternDir === 'turun' ? 'text-tv-red' : 'text-tv-muted'}`}>→ bias {analysis.patternDir}</span></div>
-                  </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-tv-muted uppercase">🔬 Bedah: {analysis.signals.length} sinyal sebelum candle ini</span>
+                  <span className="text-[10px] text-tv-muted">
+                    konsensus: <b className={analysis.konsensus === 'naik' ? 'text-tv-green' : analysis.konsensus === 'turun' ? 'text-tv-red' : 'text-tv-yellow'}>{analysis.konsensus.toUpperCase()}</b> ({analysis.naik}↑ {analysis.turun}↓)
+                  </span>
+                </div>
+                <div className="space-y-1.5">
+                  {analysis.signals.map(s => {
+                    const actual = analysis.up ? 'naik' : 'turun'
+                    const hit = analysis.tie ? null : s.arah === 'netral' ? null : s.arah === actual
+                    return (
+                      <div key={s.nama} className="flex items-start gap-2 bg-tv-card rounded-lg px-3 py-2 border border-tv-border text-[11px]">
+                        <span className="w-5 text-center shrink-0">{hit == null ? '·' : hit ? '✓' : '✗'}</span>
+                        <div className="min-w-0">
+                          <span className="font-bold">{s.nama}</span>
+                          <span className={`ml-1.5 font-semibold ${s.arah === 'naik' ? 'text-tv-green' : s.arah === 'turun' ? 'text-tv-red' : 'text-tv-yellow'}`}>→ {s.arah}</span>
+                          <div className="text-tv-muted mt-0.5">{s.detail}</div>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
                 <p className="text-[11px] text-tv-muted mt-3 leading-relaxed">
-                  {analysis.trend !== 'Sideways'
-                    ? <>Tren <b className="text-tv-text">{analysis.trend.toLowerCase()}</b> — aturan #1 price action: candle tunggal lebih sering <i>melanjutkan tren</i> daripada melawannya. </>
-                    : <>Pasar <b className="text-tv-text">sideways</b> — arah harian nyaris koin lempar; di sinilah trader disiplin memilih <i>tidak trading</i>. </>}
-                  {analysis.rsi >= 70 && 'RSI overbought menaikkan peluang koreksi. '}
-                  {analysis.rsi <= 30 && 'RSI oversold menaikkan peluang pantulan. '}
-                  Satu candle = noise; yang menghasilkan uang adalah <b className="text-tv-text">probabilitas + risk management</b>, bukan tebakan sempurna. Akurasi 55% dengan R/R 1:2 sudah sangat profitable.
+                  {analysis.konsensus !== 'netral'
+                    ? <>Mayoritas sinyal bilang <b className="text-tv-text">{analysis.konsensus}</b>{!analysis.tie && ((analysis.konsensus === 'naik') === analysis.up
+                        ? <> — dan pasar menurutinya. Begini rasanya trading <i>dengan</i> konfluensi.</>
+                        : <> — tapi pasar melawan. Ini pelajaran penting: sinyal = probabilitas, bukan kepastian.</>)}</>
+                    : <>Sinyal berimbang — arah harian nyaris koin lempar; di sinilah trader disiplin memilih <i>tidak trading</i>.</>}
+                  {' '}Satu candle = noise; yang menghasilkan uang adalah <b className="text-tv-text">probabilitas + risk management</b>. Akurasi 55% dengan R/R 1:2 sudah sangat profitable.
                 </p>
               </div>
 
