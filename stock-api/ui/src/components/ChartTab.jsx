@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import ReactApexChart from 'react-apexcharts'
+import ApexCharts from 'apexcharts'
 import { api } from '../api'
 import { fmt, APEX_DARK } from '../utils'
 
@@ -64,6 +65,38 @@ export default function ChartTab({ data, symbol }) {
   const last   = sliced[sliced.length - 1]
   const lastUp = last ? last.close >= last.open : true
 
+  // ── Scroll-wheel zoom (gaya TradingView): zoom ke arah posisi kursor ──────
+  const chartBoxRef = useRef(null)
+  const zoomRef = useRef(null)   // { min, max } indeks kategori saat ini
+  useEffect(() => { zoomRef.current = null }, [range, symbol]) // reset saat ganti range/saham
+
+  useEffect(() => {
+    const el = chartBoxRef.current
+    if (!el) return
+    const total = sliced.length
+    const onWheel = (e) => {
+      e.preventDefault()
+      if (total < 10) return
+      const cur = zoomRef.current || { min: 1, max: total }
+      const span = cur.max - cur.min
+      // zoom in 20% per notch ke arah kursor; zoom out sebaliknya
+      const dir = e.deltaY < 0 ? 1 : -1
+      const newSpan = Math.max(10, Math.min(total, Math.round(span * (dir > 0 ? 0.8 : 1.25))))
+      if (newSpan === span) return
+      const rect = el.getBoundingClientRect()
+      const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
+      const anchor = cur.min + frac * span
+      let min = Math.round(anchor - frac * newSpan)
+      let max = min + newSpan
+      if (min < 1) { min = 1; max = min + newSpan }
+      if (max > total) { max = total; min = Math.max(1, max - newSpan) }
+      zoomRef.current = { min, max }
+      try { ApexCharts.getChartByID('chart-candle')?.zoomX(min, max) } catch { /* toolbar fallback */ }
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [sliced.length, range, symbol])
+
   // Shared category x-axis base — explicit categories required so the crosshair
   // snaps to the center of each bar, not the category edge
   const catBase = useMemo(() => ({
@@ -94,11 +127,10 @@ export default function ChartTab({ data, symbol }) {
       toolbar: {
         show: true,
         autoSelected: 'pan',
-        // zoom:false removes drag-selection-zoom entirely; drag now ALWAYS pans (TradingView style)
-        tools: { download: false, zoom: false, pan: true, reset: true, selection: false, zoomin: true, zoomout: true },
+        // pan default (drag = geser); 🔍 selection-zoom + tombol +/− tersedia; scroll wheel di-handle manual
+        tools: { download: false, zoom: true, pan: true, reset: true, selection: false, zoomin: true, zoomout: true },
       },
-      // enabled:false disables drag-to-zoom at the engine level; zoom buttons still work via API
-      zoom: { enabled: false, type: 'x', autoScaleYaxis: true },
+      zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
     },
     plotOptions: {
       candlestick: {
@@ -223,8 +255,8 @@ export default function ChartTab({ data, symbol }) {
       type: 'bar',
       height: 80,
       toolbar: { show: true, autoSelected: 'pan', tools: { download: false, selection: false, zoom: false, zoomin: false, zoomout: false, pan: true, reset: false } },
-      // enabled:false disables drag-to-zoom at the engine level; toolbar must be shown so autoSelected:'pan' initializes
-      zoom: { enabled: false, type: 'x', autoScaleYaxis: true },
+      // zoom enabled agar tetap sinkron dengan chart utama dalam satu group
+      zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
     },
     xaxis: {
       ...catBase,
@@ -295,7 +327,7 @@ export default function ChartTab({ data, symbol }) {
       )}
 
       {/* ── Unified chart card: price (+ SMA overlay) + volume ───── */}
-      <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan">
+      <div ref={chartBoxRef} className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan">
 
         {/* Main: candlestick with SMA20 & SMA50 overlaid as lines */}
         <div className="px-3 pt-3 pb-0">
