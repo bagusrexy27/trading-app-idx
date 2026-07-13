@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
-import ReactApexChart from 'react-apexcharts'
-import ApexCharts from 'apexcharts'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { createChart, CandlestickSeries, LineSeries, HistogramSeries, LineStyle, CrosshairMode } from 'lightweight-charts'
 import { api } from '../api'
-import { fmt, APEX_DARK } from '../utils'
+import { fmt } from '../utils'
 
 // Fibonacci retracement levels: key in API response, label, line color
 const FIB_STYLE = [
@@ -18,12 +17,12 @@ const FIB_STYLE = [
 const RANGES = ['1W', '1M', '3M', '6M', '1Y', 'All']
 const RANGE_DAYS = { '1W': 5, '1M': 22, '3M': 66, '6M': 132, '1Y': 252, 'All': 9999 }
 
-const MONTHS = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const fmtDate = v => {
-  if (!v || !v.includes('-')) return ''
-  const p = v.split('-')
-  return `${+p[2]} ${MONTHS[+p[1]]}`
-}
+const UP = '#26a69a', DOWN = '#ef5350'
+
+// param.time bisa berupa string 'YYYY-MM-DD' atau BusinessDay {year,month,day}
+const timeToDate = t => typeof t === 'string'
+  ? t
+  : `${t.year}-${String(t.month).padStart(2, '0')}-${String(t.day).padStart(2, '0')}`
 
 export default function ChartTab({ data, symbol }) {
   const [range, setRange] = useState('3M')
@@ -46,256 +45,173 @@ export default function ChartTab({ data, symbol }) {
   }, [showFib, fib, symbol])
   useEffect(() => { setFib(null); setShowFib(false) }, [symbol])
 
-  const sliced   = useMemo(() => prices.slice(-RANGE_DAYS[range]), [prices, range])
-  const sma20Map = useMemo(() => Object.fromEntries(sma20.map(p => [p.date, p.value])), [sma20])
-  const sma50Map = useMemo(() => Object.fromEntries(sma50.map(p => [p.date, p.value])), [sma50])
-  const cats     = useMemo(() => sliced.map(p => p.date), [sliced])
+  // sliced hanya untuk RangeStats + bar count — chart memuat SEMUA data,
+  // range selector cuma menggeser visible window (bisa pan mundur ke histori)
+  const sliced = useMemo(() => prices.slice(-RANGE_DAYS[range]), [prices, range])
 
-  const candleData = sliced.map(p => ({ x: p.date, y: [p.open, p.high, p.low, p.close] }))
-  // Saat toggle off, seri diisi null agar index colors/stroke tetap sejajar
-  const sma20Data  = sliced.map(p => ({ x: p.date, y: showSma20 ? (sma20Map[p.date] ?? null) : null }))
-  const sma50Data  = sliced.map(p => ({ x: p.date, y: showSma50 ? (sma50Map[p.date] ?? null) : null }))
-  const volumeData = sliced.map(p => ({
-    x: p.date,
-    y: p.volume,
-    fillColor:   p.close >= p.open ? '#26a69a55' : '#ef535055',
-    strokeColor: p.close >= p.open ? '#26a69a'   : '#ef5350',
-  }))
+  const containerRef = useRef(null)   // div chart
+  const tooltipRef   = useRef(null)   // div tooltip mengambang
+  const chartRef     = useRef(null)
+  const candleRef    = useRef(null)
+  const sma20Ref     = useRef(null)
+  const sma50Ref     = useRef(null)
+  const volRef       = useRef(null)
+  const barMapRef    = useRef({})     // date → price obj (untuk tooltip)
+  const fibLinesRef  = useRef([])
 
-  const last   = sliced[sliced.length - 1]
-  const lastUp = last ? last.close >= last.open : true
-
-  // ── Scroll-wheel zoom (gaya TradingView): zoom ke arah posisi kursor ──────
-  const chartBoxRef = useRef(null)
-  const zoomRef = useRef(null)   // { min, max } indeks kategori saat ini
-  useEffect(() => { zoomRef.current = null }, [range, symbol]) // reset saat ganti range/saham
-
+  // ── Create chart once ────────────────────────────────────────────────
   useEffect(() => {
-    const el = chartBoxRef.current
+    const el = containerRef.current
     if (!el) return
-    const total = sliced.length
-    let raf = 0                 // throttle: kumpulkan notch, render 1x per frame
-    let pendingDelta = 0
-    let lastX = 0
-    const apply = () => {
-      raf = 0
-      if (total < 10 || pendingDelta === 0) return
-      const cur = zoomRef.current || { min: 1, max: total }
-      const span = cur.max - cur.min
-      // gabungkan beberapa notch jadi satu langkah zoom
-      const factor = Math.pow(0.8, pendingDelta)
-      pendingDelta = 0
-      const newSpan = Math.max(10, Math.min(total, Math.round(span * factor)))
-      if (newSpan === span) return
-      const rect = el.getBoundingClientRect()
-      const frac = Math.min(1, Math.max(0, (lastX - rect.left) / rect.width))
-      const anchor = cur.min + frac * span
-      let min = Math.round(anchor - frac * newSpan)
-      let max = min + newSpan
-      if (min < 1) { min = 1; max = min + newSpan }
-      if (max > total) { max = total; min = Math.max(1, max - newSpan) }
-      zoomRef.current = { min, max }
-      try { ApexCharts.getChartByID('chart-candle')?.zoomX(min, max) } catch { /* toolbar fallback */ }
-    }
-    const onWheel = (e) => {
-      e.preventDefault()
-      pendingDelta += e.deltaY < 0 ? 1 : -1
-      lastX = e.clientX
-      if (!raf) raf = requestAnimationFrame(apply)
-    }
-    el.addEventListener('wheel', onWheel, { passive: false })
-    return () => { el.removeEventListener('wheel', onWheel); if (raf) cancelAnimationFrame(raf) }
-  }, [sliced.length, range, symbol])
+    const chart = createChart(el, {
+      autoSize: true,
+      layout: {
+        background: { color: 'transparent' },
+        textColor: '#787b86',
+        fontSize: 10,
+        fontFamily: 'Inter, sans-serif',
+        attributionLogo: false,
+      },
+      grid: {
+        vertLines: { visible: false },
+        horzLines: { color: '#2a2e3950', style: LineStyle.Dashed },
+      },
+      crosshair: {
+        mode: CrosshairMode.Normal,
+        vertLine: { color: '#787b86', width: 1, style: LineStyle.Dashed, labelBackgroundColor: '#2a2e39' },
+        horzLine: { color: '#787b86', width: 1, style: LineStyle.Dashed, labelBackgroundColor: '#2a2e39' },
+      },
+      rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.05, bottom: 0.28 } },
+      timeScale: { borderVisible: false, rightOffset: 3, minBarSpacing: 2 },
+      localization: { priceFormatter: v => fmt.price(v) },
+    })
 
-  // Shared category x-axis base — explicit categories required so the crosshair
-  // snaps to the center of each bar, not the category edge
-  const catBase = useMemo(() => ({
-    type: 'category',
-    categories: cats,
-    tickAmount: 8,
-    axisBorder: { show: false },
-    axisTicks:  { show: false },
-    crosshairs: {
-      show: true,
-      width: 'barWidth',
-      position: 'back',
-      fill:   { type: 'solid', color: 'rgba(120,123,134,0.08)' },
-      stroke: { color: '#787b86', width: 1, dashArray: 3 },
-    },
-    tooltip: { enabled: false },
-  }), [cats])
+    const candle = chart.addSeries(CandlestickSeries, {
+      upColor: UP, downColor: DOWN,
+      wickUpColor: UP, wickDownColor: DOWN,
+      borderVisible: false,
+    })
+    const s20 = chart.addSeries(LineSeries, {
+      color: '#ffc107', lineWidth: 2,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+    })
+    const s50 = chart.addSeries(LineSeries, {
+      color: '#9c6bff', lineWidth: 2, lineStyle: LineStyle.Dashed,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+    })
+    const vol = chart.addSeries(HistogramSeries, {
+      priceScaleId: 'vol',
+      priceFormat: { type: 'volume' },
+      priceLineVisible: false, lastValueVisible: false,
+    })
+    chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 }, visible: false })
 
-  // ── Main chart: candlestick + SMA20 + SMA50 overlay ─────────────────
-  const priceOpts = useMemo(() => ({
-    ...APEX_DARK,
-    chart: {
-      ...APEX_DARK.chart,
-      id: 'chart-candle',
-      group: 'chartGroup',
-      type: 'candlestick',
-      height: 420,
-      toolbar: {
-        show: true,
-        autoSelected: 'pan',
-        // pan default (drag = geser); 🔍 selection-zoom + tombol +/− tersedia; scroll wheel di-handle manual
-        tools: { download: false, zoom: true, pan: true, reset: true, selection: false, zoomin: true, zoomout: true },
-      },
-      zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
-      // animasi dimatikan: redraw SVG penuh tiap zoom/pan — animasi bikin lag berlipat
-      animations: { enabled: false, dynamicAnimation: { enabled: false } },
-      redrawOnParentResize: false,
-      redrawOnWindowResize: false,
-    },
-    plotOptions: {
-      candlestick: {
-        colors: { upward: '#26a69a', downward: '#ef5350' },
-        wick: { useFillColor: true },
-      },
-    },
-    // stroke index: [candlestick_wick, SMA20, SMA50]
-    stroke: { width: [1, 1.5, 1.5], curve: 'smooth', dashArray: [0, 0, 6] },
-    // colors index: [OHLC (ignored by candlestick renderer), SMA20, SMA50]
-    colors: ['transparent', '#ffc107', '#9c6bff'],
-    // labels tampil di chart volume; kalau volume disembunyikan, tampilkan di sini
-    xaxis: { ...catBase, labels: showVol ? { show: false } : { show: true, style: { colors: '#8a8f98', fontSize: '10px' }, rotate: 0, formatter: fmtDate } },
-    yaxis: {
-      tooltip: { enabled: true },
-      tickAmount: 6,
-      forceNiceScale: true,
-      labels: {
-        style: { colors: '#787b86', fontSize: '10px' },
-        formatter: v => fmt.price(v),
-      },
-    },
-    grid: {
-      borderColor: '#2a2e3950',
-      strokeDashArray: 4,
-      xaxis: { lines: { show: false } },
-      yaxis: { lines: { show: true } },
-      padding: { right: 8 },
-    },
-    annotations: {
-      yaxis: [
-        ...(last ? [{
-          y: last.close,
-          borderColor: lastUp ? '#26a69a' : '#ef5350',
-          borderWidth: 1,
-          strokeDashArray: 3,
-          label: {
-            borderColor: 'transparent',
-            style: {
-              background: lastUp ? '#26a69a20' : '#ef535020',
-              color: lastUp ? '#26a69a' : '#ef5350',
-              fontSize: '10px',
-              fontWeight: '600',
-              padding: { top: 2, bottom: 2, left: 6, right: 6 },
-            },
-            text: fmt.price(last.close),
-            position: 'right',
-            offsetX: -8,
-          },
-        }] : []),
-        // ── Fibonacci retracement overlay (toggle 𝜑) ─────────────
-        ...(showFib && fib ? FIB_STYLE.map(([key, lbl, color]) => ({
-          y: fib[key],
-          borderColor: color + '80',
-          borderWidth: 1,
-          strokeDashArray: 5,
-          label: {
-            borderColor: 'transparent',
-            position: 'left',
-            offsetX: 8,
-            style: {
-              background: '#13131aE6',
-              color,
-              fontSize: '9px',
-              fontWeight: '600',
-              padding: { top: 1, bottom: 1, left: 5, right: 5 },
-            },
-            text: `${lbl} · ${fmt.price(fib[key])}`,
-          },
-        })) : []),
-      ],
-    },
-    tooltip: {
-      theme: 'dark',
-      shared: true,
-      intersect: false,
-      custom: ({ dataPointIndex }) => {
-        const d = sliced[dataPointIndex]
-        if (!d) return ''
-        const up   = d.close >= d.open
-        const clr  = up ? '#26a69a' : '#ef5350'
-        const chg  = d.close - d.open
-        const pct  = d.open ? (chg / d.open * 100).toFixed(2) : '0.00'
-        const s20  = showSma20 ? sma20Map[d.date] : null
-        const s50  = showSma50 ? sma50Map[d.date] : null
-        const sign = up ? '+' : ''
-        return (
-          '<div style="background:#1e222d;border:1px solid #2a2e39;border-radius:6px;' +
-          'padding:10px 14px;font-size:11px;font-family:Inter,sans-serif;min-width:175px;line-height:1.5">' +
-            '<div style="color:#787b86;font-size:10px;font-weight:600;letter-spacing:.04em;margin-bottom:6px">' + d.date + '</div>' +
-            '<div style="display:grid;grid-template-columns:auto 1fr;gap:1px 10px">' +
-              '<span style="color:#787b86">O</span><b>' + fmt.price(d.open) + '</b>' +
-              '<span style="color:#26a69a">H</span><b style="color:#26a69a">' + fmt.price(d.high) + '</b>' +
-              '<span style="color:#ef5350">L</span><b style="color:#ef5350">' + fmt.price(d.low)  + '</b>' +
-              '<span style="color:' + clr + '">C</span><b style="color:' + clr + '">' + fmt.price(d.close) + '</b>' +
-              '<span style="color:#787b86">V</span><b style="color:#d1d4dc">' + fmt.vol(d.volume) + '</b>' +
-            '</div>' +
-            '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #2a2e39;' +
-            'color:' + clr + ';font-weight:700;font-size:11px">' +
-              sign + fmt.chg(chg) + ' (' + sign + pct + '%)' +
-            '</div>' +
-            ((s20 != null || s50 != null) ?
-              '<div style="margin-top:5px;padding-top:5px;border-top:1px solid #2a2e39;display:flex;gap:12px">' +
-                (s20 != null ? '<span style="color:#ffc107;font-size:10px">SMA20&nbsp;<b>' + fmt.price(s20) + '</b></span>' : '') +
-                (s50 != null ? '<span style="color:#9c6bff;font-size:10px">SMA50&nbsp;<b>' + fmt.price(s50) + '</b></span>' : '') +
-              '</div>'
-            : '') +
+    // ── Tooltip OHLCV mengambang (subscribeCrosshairMove) ──────────────
+    const onMove = (param) => {
+      const tt = tooltipRef.current
+      if (!tt) return
+      if (!param.time || !param.point) { tt.style.display = 'none'; return }
+      const d = barMapRef.current[timeToDate(param.time)]
+      if (!d) { tt.style.display = 'none'; return }
+      const up   = d.close >= d.open
+      const clr  = up ? UP : DOWN
+      const chg  = d.close - d.open
+      const pct  = d.open ? (chg / d.open * 100).toFixed(2) : '0.00'
+      const s20v = param.seriesData.get(s20)?.value   // undefined saat toggle off
+      const s50v = param.seriesData.get(s50)?.value
+      const sign = up ? '+' : ''
+      tt.innerHTML =
+        '<div style="color:#787b86;font-size:10px;font-weight:600;letter-spacing:.04em;margin-bottom:6px">' + d.date + '</div>' +
+        '<div style="display:grid;grid-template-columns:auto 1fr;gap:1px 10px">' +
+          '<span style="color:#787b86">O</span><b>' + fmt.price(d.open) + '</b>' +
+          '<span style="color:' + UP + '">H</span><b style="color:' + UP + '">' + fmt.price(d.high) + '</b>' +
+          '<span style="color:' + DOWN + '">L</span><b style="color:' + DOWN + '">' + fmt.price(d.low)  + '</b>' +
+          '<span style="color:' + clr + '">C</span><b style="color:' + clr + '">' + fmt.price(d.close) + '</b>' +
+          '<span style="color:#787b86">V</span><b style="color:#d1d4dc">' + fmt.vol(d.volume) + '</b>' +
+        '</div>' +
+        '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #2a2e39;' +
+        'color:' + clr + ';font-weight:700;font-size:11px">' +
+          fmt.chg(chg) + ' (' + sign + pct + '%)' +
+        '</div>' +
+        ((s20v != null || s50v != null) ?
+          '<div style="margin-top:5px;padding-top:5px;border-top:1px solid #2a2e39;display:flex;gap:12px">' +
+            (s20v != null ? '<span style="color:#ffc107;font-size:10px">SMA20&nbsp;<b>' + fmt.price(s20v) + '</b></span>' : '') +
+            (s50v != null ? '<span style="color:#9c6bff;font-size:10px">SMA50&nbsp;<b>' + fmt.price(s50v) + '</b></span>' : '') +
           '</div>'
-        )
-      },
-    },
-    legend: { show: false },
-  }), [sliced, catBase, last, lastUp, sma20Map, sma50Map, showFib, fib, showSma20, showSma50, showVol])
+        : '')
+      tt.style.display = 'block'
+      const pad = 16
+      let x = param.point.x + pad
+      if (x + tt.offsetWidth > el.clientWidth) x = param.point.x - tt.offsetWidth - pad
+      let y = param.point.y + pad
+      if (y + tt.offsetHeight > el.clientHeight) y = param.point.y - tt.offsetHeight - pad
+      tt.style.left = Math.max(0, x) + 'px'
+      tt.style.top  = Math.max(0, y) + 'px'
+    }
+    chart.subscribeCrosshairMove(onMove)
 
-  // ── Volume chart ─────────────────────────────────────────────────────
-  const volOpts = useMemo(() => ({
-    ...APEX_DARK,
-    chart: {
-      ...APEX_DARK.chart,
-      id: 'chart-vol',
-      group: 'chartGroup',
-      type: 'bar',
-      height: 80,
-      toolbar: { show: true, autoSelected: 'pan', tools: { download: false, selection: false, zoom: false, zoomin: false, zoomout: false, pan: true, reset: false } },
-      // zoom enabled agar tetap sinkron dengan chart utama dalam satu group
-      zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
-      animations: { enabled: false, dynamicAnimation: { enabled: false } },
-      redrawOnParentResize: false,
-      redrawOnWindowResize: false,
-    },
-    xaxis: {
-      ...catBase,
-      labels: {
-        style: { colors: '#787b86', fontSize: '10px' },
-        rotate: 0,
-        formatter: fmtDate,
-      },
-    },
-    plotOptions: { bar: { columnWidth: '80%' } },
-    yaxis: {
-      labels: { style: { colors: '#787b86', fontSize: '9px' }, formatter: v => fmt.vol(v) },
-    },
-    grid: {
-      borderColor: '#2a2e3930',
-      strokeDashArray: 4,
-      xaxis: { lines: { show: false } },
-      yaxis: { lines: { show: false } },
-      padding: { right: 8 },
-    },
-    tooltip: { theme: 'dark', y: { formatter: v => fmt.vol(v) } },
-  }), [catBase])
+    chartRef.current  = chart
+    candleRef.current = candle
+    sma20Ref.current  = s20
+    sma50Ref.current  = s50
+    volRef.current    = vol
+    return () => {
+      chart.unsubscribeCrosshairMove(onMove)
+      chart.remove()
+      chartRef.current = null
+    }
+  }, [])
+
+  // ── Visible window mengikuti range selector ──────────────────────────
+  const applyRange = useCallback((r) => {
+    const chart = chartRef.current
+    if (!chart || !prices.length) return
+    const ts = chart.timeScale()
+    if (r === 'All') { ts.fitContent(); return }
+    const n = Math.min(RANGE_DAYS[r], prices.length)
+    ts.setVisibleLogicalRange({ from: prices.length - n - 0.5, to: prices.length + 2 })
+  }, [prices.length])
+
+  // ── Set data saat prices/SMA berubah ─────────────────────────────────
+  useEffect(() => {
+    const candle = candleRef.current
+    if (!candle || !prices.length) return
+    barMapRef.current = Object.fromEntries(prices.map(p => [p.date, p]))
+    candle.setData(prices.map(p => ({ time: p.date, open: p.open, high: p.high, low: p.low, close: p.close })))
+    sma20Ref.current.setData(sma20.map(p => ({ time: p.date, value: p.value })))
+    sma50Ref.current.setData(sma50.map(p => ({ time: p.date, value: p.value })))
+    volRef.current.setData(prices.map(p => ({
+      time: p.date, value: p.volume,
+      color: p.close >= p.open ? UP + '55' : DOWN + '55',
+    })))
+    applyRange(range)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prices, sma20, sma50])
+
+  useEffect(() => { applyRange(range) }, [range, applyRange])
+
+  // ── Indicator visibility toggles ─────────────────────────────────────
+  useEffect(() => { sma20Ref.current?.applyOptions({ visible: showSma20 }) }, [showSma20])
+  useEffect(() => { sma50Ref.current?.applyOptions({ visible: showSma50 }) }, [showSma50])
+  useEffect(() => { volRef.current?.applyOptions({ visible: showVol }) },     [showVol])
+
+  // ── Fibonacci retracement — horizontal price lines ───────────────────
+  useEffect(() => {
+    const candle = candleRef.current
+    if (!candle) return
+    fibLinesRef.current.forEach(l => candle.removePriceLine(l))
+    fibLinesRef.current = []
+    if (showFib && fib) {
+      fibLinesRef.current = FIB_STYLE.map(([key, lbl, color]) => candle.createPriceLine({
+        price: fib[key],
+        color: color + '80',
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        axisLabelVisible: true,
+        title: lbl,
+      }))
+    }
+  }, [showFib, fib])
 
   const yesterday = prices.length >= 2 ? prices[prices.length - 2] : null
   const today     = prices.length >= 1 ? prices[prices.length - 1] : null
@@ -343,43 +259,20 @@ export default function ChartTab({ data, symbol }) {
         <YesterdayCard yesterday={yesterday} today={today} />
       )}
 
-      {/* ── Unified chart card: price (+ SMA overlay) + volume ───── */}
-      <div ref={chartBoxRef} className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan">
-
-        {/* Main: candlestick with SMA20 & SMA50 overlaid as lines */}
-        <div className="px-3 pt-3 pb-0">
-          <ReactApexChart
-            key={`candle-${range}`}
-            type="candlestick"
-            height={420}
-            series={[
-              { name: 'OHLC',  type: 'candlestick', data: candleData },
-              { name: 'SMA20', type: 'line',         data: sma20Data  },
-              { name: 'SMA50', type: 'line',         data: sma50Data  },
-            ]}
-            options={priceOpts}
+      {/* ── Chart card: candlestick + SMA + volume dalam satu canvas ── */}
+      <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan p-3">
+        <div className="relative" style={{ height: 500 }}>
+          <div ref={containerRef} className="absolute inset-0" />
+          <div
+            ref={tooltipRef}
+            style={{
+              display: 'none', position: 'absolute', zIndex: 20, pointerEvents: 'none',
+              background: '#1e222d', border: '1px solid #2a2e39', borderRadius: 6,
+              padding: '10px 14px', fontSize: 11, fontFamily: 'Inter, sans-serif',
+              minWidth: 175, lineHeight: 1.5, color: '#d1d4dc',
+            }}
           />
         </div>
-
-        {/* Volume — same group, syncs with main on pan/zoom; toggleable */}
-        {showVol && (
-          <>
-            <div className="mx-3 border-t border-tv-border/40" />
-            <div className="px-3 pb-2 pt-0 animate-fade-in">
-              <div className="text-[9px] text-tv-muted/50 font-semibold uppercase tracking-wider pt-2 px-1 mb-0">
-                Vol
-              </div>
-              <ReactApexChart
-                key={`vol-${range}`}
-                type="bar"
-                height={78}
-                series={[{ name: 'Volume', data: volumeData }]}
-                options={volOpts}
-              />
-            </div>
-          </>
-        )}
-
       </div>
     </div>
   )
@@ -455,7 +348,6 @@ function YesterdayCard({ yesterday: y, today: t }) {
   const gap   = t.open - y.close  // gap dari close kemarin ke open hari ini
   const gapPct = y.close ? (gap / y.close * 100) : 0
 
-  const clr = (up) => up ? '#26a69a' : '#ef5350'
   const cls = (up) => up ? 'text-tv-green' : 'text-tv-red'
   const sign = (v) => v > 0 ? '+' : ''
 
@@ -531,7 +423,7 @@ function YesterdayCard({ yesterday: y, today: t }) {
 // Tiny inline candle SVG
 function CandleVisual({ p }) {
   const up    = p.close >= p.open
-  const color = up ? '#26a69a' : '#ef5350'
+  const color = up ? UP : DOWN
   const H     = 36
   const range = p.high - p.low || 1
   const toY   = v => H - ((v - p.low) / range) * H
