@@ -294,7 +294,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
             return (
               <Suspense fallback={<TabLoading />}>
                 {tab === 'overview'   && <Overview   data={data} />}
-                {tab === 'chart'      && <ChartTab   data={data} />}
+                {tab === 'chart'      && <ChartTab   data={data} symbol={symbol} />}
                 {tab === 'indicators' && <Indicators data={data} />}
                 {tab === 'advisor'    && <Advisor    symbol={symbol} />}
                 {tab === 'risk'       && <RiskCalc      data={data} />}

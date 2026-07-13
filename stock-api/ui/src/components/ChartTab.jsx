@@ -1,6 +1,18 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import ReactApexChart from 'react-apexcharts'
+import { api } from '../api'
 import { fmt, APEX_DARK } from '../utils'
+
+// Fibonacci retracement levels: key in API response, label, line color
+const FIB_STYLE = [
+  ['l0',   '0%',    '#8a8f98'],
+  ['l236', '23.6%', '#7c8aff'],
+  ['l382', '38.2%', '#2ebd85'],
+  ['l500', '50%',   '#f5b950'],
+  ['l618', '61.8%', '#f6465d'],
+  ['l786', '78.6%', '#a78bfa'],
+  ['l100', '100%',  '#8a8f98'],
+]
 
 const RANGES = ['1W', '1M', '3M', '6M', '1Y', 'All']
 const RANGE_DAYS = { '1W': 5, '1M': 22, '3M': 66, '6M': 132, '1Y': 252, 'All': 9999 }
@@ -12,9 +24,22 @@ const fmtDate = v => {
   return `${+p[2]} ${MONTHS[+p[1]]}`
 }
 
-export default function ChartTab({ data }) {
+export default function ChartTab({ data, symbol }) {
   const [range, setRange] = useState('3M')
+  const [showFib, setShowFib] = useState(false)
+  const [fib, setFib] = useState(null)          // FibLevels dari API (lookback 100 bar)
   const { prices, sma20, sma50 } = data
+
+  // Fetch level fibonacci saat toggle pertama dinyalakan
+  useEffect(() => {
+    if (!showFib || fib || !symbol) return
+    let alive = true
+    api.analysis.fibonacci(symbol)
+      .then(r => { if (alive) setFib(r.levels) })
+      .catch(() => { if (alive) setShowFib(false) })
+    return () => { alive = false }
+  }, [showFib, fib, symbol])
+  useEffect(() => { setFib(null); setShowFib(false) }, [symbol])
 
   const sliced   = useMemo(() => prices.slice(-RANGE_DAYS[range]), [prices, range])
   const sma20Map = useMemo(() => Object.fromEntries(sma20.map(p => [p.date, p.value])), [sma20])
@@ -98,25 +123,47 @@ export default function ChartTab({ data }) {
       padding: { right: 8 },
     },
     annotations: {
-      yaxis: last ? [{
-        y: last.close,
-        borderColor: lastUp ? '#26a69a' : '#ef5350',
-        borderWidth: 1,
-        strokeDashArray: 3,
-        label: {
-          borderColor: 'transparent',
-          style: {
-            background: lastUp ? '#26a69a20' : '#ef535020',
-            color: lastUp ? '#26a69a' : '#ef5350',
-            fontSize: '10px',
-            fontWeight: '600',
-            padding: { top: 2, bottom: 2, left: 6, right: 6 },
+      yaxis: [
+        ...(last ? [{
+          y: last.close,
+          borderColor: lastUp ? '#26a69a' : '#ef5350',
+          borderWidth: 1,
+          strokeDashArray: 3,
+          label: {
+            borderColor: 'transparent',
+            style: {
+              background: lastUp ? '#26a69a20' : '#ef535020',
+              color: lastUp ? '#26a69a' : '#ef5350',
+              fontSize: '10px',
+              fontWeight: '600',
+              padding: { top: 2, bottom: 2, left: 6, right: 6 },
+            },
+            text: fmt.price(last.close),
+            position: 'right',
+            offsetX: -8,
           },
-          text: fmt.price(last.close),
-          position: 'right',
-          offsetX: -8,
-        },
-      }] : [],
+        }] : []),
+        // ── Fibonacci retracement overlay (toggle 𝜑) ─────────────
+        ...(showFib && fib ? FIB_STYLE.map(([key, lbl, color]) => ({
+          y: fib[key],
+          borderColor: color + '80',
+          borderWidth: 1,
+          strokeDashArray: 5,
+          label: {
+            borderColor: 'transparent',
+            position: 'left',
+            offsetX: 8,
+            style: {
+              background: '#13131aE6',
+              color,
+              fontSize: '9px',
+              fontWeight: '600',
+              padding: { top: 1, bottom: 1, left: 5, right: 5 },
+            },
+            text: `${lbl} · ${fmt.price(fib[key])}`,
+          },
+        })) : []),
+      ],
     },
     tooltip: {
       theme: 'dark',
@@ -158,7 +205,7 @@ export default function ChartTab({ data }) {
       },
     },
     legend: { show: false },
-  }), [sliced, catBase, last, lastUp, sma20Map, sma50Map])
+  }), [sliced, catBase, last, lastUp, sma20Map, sma50Map, showFib, fib])
 
   // ── Volume chart ─────────────────────────────────────────────────────
   const volOpts = useMemo(() => ({
@@ -215,6 +262,16 @@ export default function ChartTab({ data }) {
             {r}
           </button>
         ))}
+        <button
+          onClick={() => setShowFib(v => !v)}
+          title="Fibonacci retracement (swing high–low 100 bar terakhir)"
+          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all
+            ${showFib
+              ? 'bg-tv-yellow/15 text-tv-yellow border border-tv-yellow/40 shadow-[0_0_12px_rgba(245,185,80,0.25)]'
+              : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
+        >
+          𝜑 Fib
+        </button>
         <div className="ml-auto flex items-center gap-4">
           <SmaLegendItem color="#ffc107" label="SMA20" dashed={false} />
           <SmaLegendItem color="#9c6bff" label="SMA50" dashed={true} />
