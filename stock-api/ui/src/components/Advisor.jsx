@@ -59,9 +59,9 @@ export default function Advisor({ symbol }) {
     <div className="p-4 sm:p-6 space-y-5 max-w-4xl mx-auto">
 
       {/* ── Verdict banner ─────────────────────────────────────── */}
-      <div className={`rounded-xl border-2 p-5 ${v.banner}`}>
+      <div className={`rounded-xl border-2 p-5 ${v.banner} ${canTrade ? 'breathe-green' : ''}`}>
         <div className="flex items-center gap-3 mb-2">
-          <span className="text-3xl">{v.icon}</span>
+          <span className="text-3xl float-y">{v.icon}</span>
           <div>
             <div className={`text-xl font-extrabold ${v.text}`}>{v.label}</div>
             <div className="text-[11px] text-tv-muted">

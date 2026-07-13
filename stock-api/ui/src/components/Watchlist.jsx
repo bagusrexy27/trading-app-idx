@@ -40,7 +40,7 @@ function Sparkline({ data, positive }) {
   const color = positive ? '#2ebd85' : '#f6465d'
   const gid = `spark-${positive ? 'up' : 'dn'}`
   return (
-    <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="block">
+    <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="block spark-draw">
       <defs>
         <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.25" />
@@ -48,7 +48,7 @@ function Sparkline({ data, positive }) {
         </linearGradient>
       </defs>
       <polygon points={area} fill={`url(#${gid})`} />
-      <polyline points={line} fill="none" stroke={color} strokeWidth="1.8"
+      <polyline points={line} pathLength="1" fill="none" stroke={color} strokeWidth="1.8"
         strokeLinejoin="round" strokeLinecap="round" />
     </svg>
   )
@@ -61,7 +61,7 @@ function StockCard({ s, onSelect, delay }) {
     <button
       onClick={() => onSelect(s.symbol)}
       style={{ animationDelay: `${delay}ms` }}
-      className="group text-left bg-tv-card border border-tv-border rounded-2xl p-4 animate-slide-up
+      className="group card-shine text-left bg-tv-card border border-tv-border rounded-2xl p-4 animate-slide-up
         transition-all duration-300 ease-cinema cursor-pointer
         hover:-translate-y-1 hover:border-tv-accent/50 hover:shadow-[0_10px_40px_-8px_rgba(94,106,210,0.35)]
         active:scale-[0.98]"
@@ -74,8 +74,9 @@ function StockCard({ s, onSelect, delay }) {
           <div className="text-[10px] text-tv-muted">{s.newest_date?.slice(5)} · {s.data_points}d</div>
         </div>
         {pct != null && (
-          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border tabular-nums
-            ${pos ? 'text-tv-green bg-tv-green/10 border-tv-green/30' : 'text-tv-red bg-tv-red/10 border-tv-red/30'}`}>
+          <span className={`pop-in text-[11px] font-bold px-2 py-0.5 rounded-full border tabular-nums
+            ${pos ? 'text-tv-green bg-tv-green/10 border-tv-green/30' : 'text-tv-red bg-tv-red/10 border-tv-red/30'}`}
+            style={{ animationDelay: '0.25s' }}>
             {pos ? '▲' : '▼'} {Math.abs(pct).toFixed(2)}%
           </span>
         )}
@@ -108,7 +109,7 @@ export default function Watchlist({ stocks = [], loading, onSelect, onAdd, onUpd
       {/* ── Hero ─────────────────────────────────────────────── */}
       <div className="text-center mb-7 animate-fade-in">
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-          ⭐ Watchlist
+          <span className="float-y">⭐</span> <span className="text-gradient-animate">Watchlist</span>
         </h1>
         <p className="text-xs text-tv-muted mt-1.5">
           {stocks.length} saham dipantau
