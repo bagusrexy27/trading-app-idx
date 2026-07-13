@@ -1,6 +1,6 @@
 // Slim navigation sidebar — the stock list itself lives in the Watchlist view.
 export default function Sidebar({ stocks, activeView, onAdd, onUpdateAll,
-  onViewWatchlist, onViewOverview, onViewSession, onViewAdvisor, onViewPortfolio, onOpenAlerts }) {
+  onViewWatchlist, onViewOverview, onViewSession, onViewAdvisor, onViewPortfolio, onViewPractice, onOpenAlerts }) {
   return (
     <aside className="w-[200px] flex-shrink-0 glass border-r border-tv-border flex flex-col">
       {/* Header */}
@@ -28,6 +28,7 @@ export default function Sidebar({ stocks, activeView, onAdd, onUpdateAll,
         <NavBtn icon="🕯️" label="Last Session"     badge={null} active={activeView === 'session'}   onClick={onViewSession} />
         <NavBtn icon="🧭" label="Advisor Screener" badge={null} active={activeView === 'advisor'}   onClick={onViewAdvisor} />
         <NavBtn icon="💼" label="Portfolio"        badge={null} active={activeView === 'portfolio'} onClick={onViewPortfolio} />
+        <NavBtn icon="🎮" label="Latihan"          badge={null} active={activeView === 'practice'}  onClick={onViewPractice} />
       </div>
 
       {/* Footer */}

@@ -12,6 +12,7 @@ const SessionPrep    = lazy(() => import('./components/SessionPrep'))
 const Portfolio      = lazy(() => import('./components/Portfolio'))
 const AdvisorScreen  = lazy(() => import('./components/AdvisorScreen'))
 const Watchlist      = lazy(() => import('./components/Watchlist'))
+const Practice       = lazy(() => import('./components/Practice'))
 
 const ViewLoading = () => (
   <div className="flex items-center justify-center h-full text-tv-muted">
@@ -107,6 +108,7 @@ export default function App() {
         onViewSession={()     => setView('session')}
         onViewAdvisor={()     => setView('advisor')}
         onViewPortfolio={()   => setView('portfolio')}
+        onViewPractice={()    => setView('practice')}
         onOpenAlerts={() => setShowAlerts(true)}
       />
 
@@ -124,6 +126,8 @@ export default function App() {
           <AdvisorScreen onSelectStock={handleSelectStock} showToast={showToast} />
         ) : view === 'portfolio' ? (
           <Portfolio showToast={showToast} />
+        ) : view === 'practice' ? (
+          <Practice stocks={stocks} />
         ) : view !== 'watchlist' && selected ? (
           <StockPanel
             key={selected}
