@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { createChart, CandlestickSeries, LineSeries, HistogramSeries, LineStyle, CrosshairMode } from 'lightweight-charts'
 import { api } from '../api'
 import { fmt } from '../utils'
+import { FVGZonesPrimitive } from './chart/FVGZonesPrimitive'
 
 // Fibonacci retracement levels: key in API response, label, line color
 const FIB_STYLE = [
@@ -44,6 +45,8 @@ export default function ChartTab({ data, symbol }) {
   const [range, setRange] = useState('3M')
   const [showFib, setShowFib] = useState(false)
   const [fib, setFib] = useState(null)          // FibLevels dari API (lookback 100 bar)
+  const [showFvg, setShowFvg] = useState(false)
+  const [fvgZones, setFvgZones] = useState(null) // 3 zona FVG/iFVG terdekat dari API
   // Indicator visibility toggles — klik legend untuk on/off
   const [showSma20, setShowSma20] = useState(true)
   const [showSma50, setShowSma50] = useState(true)
@@ -62,7 +65,17 @@ export default function ChartTab({ data, symbol }) {
       .catch(() => { if (alive) setShowFib(false) })
     return () => { alive = false }
   }, [showFib, fib, symbol])
-  useEffect(() => { setFib(null); setShowFib(false); setAvwapAnchor(null); setAvwapOn(false) }, [symbol])
+  useEffect(() => { setFib(null); setShowFib(false); setAvwapAnchor(null); setAvwapOn(false); setFvgZones(null); setShowFvg(false) }, [symbol])
+
+  // Fetch zona FVG saat toggle pertama dinyalakan — hanya 3 zona terdekat
+  useEffect(() => {
+    if (!showFvg || fvgZones || !symbol) return
+    let alive = true
+    api.analysis.fvg(symbol)
+      .then(r => { if (alive) setFvgZones(r.active?.slice(0, 3) ?? []) })
+      .catch(() => { if (alive) setShowFvg(false) })
+    return () => { alive = false }
+  }, [showFvg, fvgZones, symbol])
 
   // gambar/hapus garis AVWAP saat anchor berubah
   useEffect(() => {
@@ -96,6 +109,7 @@ export default function ChartTab({ data, symbol }) {
   const volRef       = useRef(null)
   const barMapRef    = useRef({})     // date → price obj (untuk tooltip)
   const fibLinesRef  = useRef([])
+  const fvgPrimRef   = useRef(null)
   const avwapRef     = useRef(null)
   const avwapOnRef   = useRef(false)  // dibaca handler klik (dibuat sekali di init)
   useEffect(() => { avwapOnRef.current = avwapOn }, [avwapOn])
@@ -146,6 +160,10 @@ export default function ChartTab({ data, symbol }) {
       priceLineVisible: false, lastValueVisible: false,
     })
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 }, visible: false })
+
+    const fvgPrim = new FVGZonesPrimitive()
+    candle.attachPrimitive(fvgPrim)
+    fvgPrimRef.current = fvgPrim
 
     const avwap = chart.addSeries(LineSeries, {
       color: AVWAP_COLOR, lineWidth: 2,
@@ -212,6 +230,8 @@ export default function ChartTab({ data, symbol }) {
     return () => {
       chart.unsubscribeCrosshairMove(onMove)
       chart.unsubscribeClick(onClick)
+      candle.detachPrimitive(fvgPrim)
+      fvgPrimRef.current = null
       chart.remove()
       chartRef.current = null
     }
@@ -268,6 +288,11 @@ export default function ChartTab({ data, symbol }) {
     }
   }, [showFib, fib])
 
+  // ── FVG/iFVG zone boxes — custom primitive ───────────────────────────
+  useEffect(() => {
+    fvgPrimRef.current?.updateZones(showFvg && fvgZones ? fvgZones : [])
+  }, [showFvg, fvgZones])
+
   const yesterday = prices.length >= 2 ? prices[prices.length - 2] : null
   const today     = prices.length >= 1 ? prices[prices.length - 1] : null
 
@@ -307,6 +332,16 @@ export default function ChartTab({ data, symbol }) {
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
         >
           ⚓ AVWAP
+        </button>
+        <button
+          onClick={() => setShowFvg(v => !v)}
+          title="Fair Value Gap zones — gap 3-candle; kotak amber = iFVG (inverted)"
+          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all
+            ${showFvg
+              ? 'bg-tv-purple/15 text-tv-purple border border-tv-purple/40 shadow-[0_0_12px_rgba(167,139,250,0.25)]'
+              : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
+        >
+          ▦ FVG
         </button>
         {avwapOn && (
           <span className="flex items-center gap-1 text-[10px]">

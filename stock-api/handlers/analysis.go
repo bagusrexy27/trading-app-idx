@@ -643,6 +643,46 @@ func (h *AnalysisHandler) Fibonacci(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ── GET /api/analysis/{symbol}/fvg?lookback=200&min_gap=0.3 ──────────────────
+
+func (h *AnalysisHandler) FVG(w http.ResponseWriter, r *http.Request) {
+	symbol := canonicalSymbol(mux.Vars(r)["symbol"])
+	prices, ok := loadPrices(w, symbol)
+	if !ok {
+		return
+	}
+	lookback := intParam(r, "lookback", 200)
+	minGap := 0.3
+	if v := r.URL.Query().Get("min_gap"); v != "" {
+		if f, err := strconv.ParseFloat(v, 64); err == nil && f >= 0 {
+			minGap = f
+		}
+	}
+	zones := analysis.FVG(prices, lookback, minGap)
+
+	// Active zones (active + inverted), nearest to last close first.
+	lastClose := prices[len(prices)-1].Close
+	active := make([]analysis.FVGZone, 0, len(zones))
+	for _, z := range zones {
+		if z.Status != "filled" {
+			active = append(active, z)
+		}
+	}
+	sort.Slice(active, func(i, j int) bool {
+		di := math.Abs((active[i].Top+active[i].Bottom)/2 - lastClose)
+		dj := math.Abs((active[j].Top+active[j].Bottom)/2 - lastClose)
+		return di < dj
+	})
+
+	respond(w, 200, true, "", map[string]interface{}{
+		"symbol": symbol,
+		"params": map[string]interface{}{"lookback": lookback, "min_gap": minGap},
+		"count":  len(zones),
+		"zones":  zones,
+		"active": active,
+	})
+}
+
 // ── GET /api/analysis/{symbol}/adline?limit=300 ──────────────────────────────
 
 func (h *AnalysisHandler) ADLine(w http.ResponseWriter, r *http.Request) {

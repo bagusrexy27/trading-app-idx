@@ -222,6 +222,7 @@ func main() {
 	api.HandleFunc("/analysis/{symbol}/sar", a.SAR).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/ichimoku", a.Ichimoku).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/fibonacci", a.Fibonacci).Methods("GET")
+	api.HandleFunc("/analysis/{symbol}/fvg", a.FVG).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/pivots", a.Pivots).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/amd", a.AMD).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/adline", a.ADLine).Methods("GET")

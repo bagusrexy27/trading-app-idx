@@ -38,6 +38,7 @@ export const api = {
     sar:        (s, n)    => req(`/analysis/${s}/sar?limit=${n ?? 300}`),
     ichimoku:   (s, n)    => req(`/analysis/${s}/ichimoku?limit=${n ?? 300}`),
     fibonacci:  (s)       => req(`/analysis/${s}/fibonacci`),
+    fvg:        (s, lookback) => req(`/analysis/${s}/fvg?lookback=${lookback ?? 200}`),
     pivots:     (s)       => req(`/analysis/${s}/pivots`),
     amd:        (s, accum, lookback) => req(`/analysis/${s}/amd?accum=${accum ?? 10}&lookback=${lookback ?? 200}`),
     adline:     (s, n) => req(`/analysis/${s}/adline?limit=${n ?? 300}`),

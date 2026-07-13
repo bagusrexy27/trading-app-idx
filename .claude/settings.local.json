@@ -54,7 +54,14 @@
       "Bash(ls broker/)",
       "Bash(ls data/broker*)",
       "Bash(ls -d */)",
-      "Bash(./stock-api.exe)"
+      "Bash(./stock-api.exe)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'docs: consolidate CLAUDE.md into single root file *)",
+      "Bash(git commit -m 'feat: migrate ChartTab to lightweight-charts *)",
+      "Bash(node verify-practice.js)",
+      "Bash(node verify-avwap.js)",
+      "Bash(git commit -m 'feat: Anchored VWAP overlay on chart *)",
+      "Bash(node verify-fvg.js)"
     ]
   }
 }
