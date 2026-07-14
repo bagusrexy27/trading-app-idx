@@ -45,6 +45,7 @@ export const api = {
     cmf:        (s, n) => req(`/analysis/${s}/cmf?limit=${n ?? 300}`),
     mfi:        (s, n) => req(`/analysis/${s}/mfi?limit=${n ?? 300}`),
     advisor:         (s) => req(`/analysis/${s}/advisor`),
+    decision:        (s) => req(`/analysis/${s}/decision`),
     advisorBacktest: (s) => req(`/analysis/${s}/advisor-backtest`),
     backtest:   (s)       => req(`/analysis/${s}/backtest`),
   },

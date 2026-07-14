@@ -11,6 +11,27 @@ const VERDICT = {
   AVOID:      { label: 'HINDARI',                icon: '🚫', text: 'text-tv-red',    banner: 'border-tv-red/40 bg-tv-red/5' },
 }
 
+// Decision-engine signal → label + tone (5 levels).
+const SIGNAL = {
+  STRONG_BUY:  { label: 'STRONG BUY',  tone: 'text-tv-green' },
+  BUY:         { label: 'BUY',         tone: 'text-tv-green' },
+  WAIT:        { label: 'WAIT',        tone: 'text-tv-yellow' },
+  SELL:        { label: 'SELL',        tone: 'text-tv-red' },
+  STRONG_SELL: { label: 'STRONG SELL', tone: 'text-tv-red' },
+}
+
+const trendToneOf = (t) =>
+  t?.includes('Bullish') ? 'text-tv-green' : t?.includes('Bearish') ? 'text-tv-red' : 'text-tv-yellow'
+
+function ScoreBar({ score }) {
+  const color = score >= 60 ? 'bg-tv-green' : score >= 40 ? 'bg-tv-yellow' : 'bg-tv-red'
+  return (
+    <div className="w-16 h-1.5 bg-tv-bg rounded-full overflow-hidden shrink-0">
+      <div className={`h-full ${color}`} style={{ width: `${score}%` }} />
+    </div>
+  )
+}
+
 function Pill({ label, value, tone = 'text-tv-text' }) {
   return (
     <div className="bg-tv-bg border border-tv-border rounded-lg px-3 py-2">
@@ -25,10 +46,11 @@ export default function Advisor({ symbol }) {
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(null)
   const [bt, setBt]           = useState(null)
+  const [dec, setDec]         = useState(null)
 
   useEffect(() => {
     let alive = true
-    setLoading(true); setError(null); setBt(null)
+    setLoading(true); setError(null); setBt(null); setDec(null)
     api.analysis.advisor(symbol)
       .then(r => { if (alive) setAdv(r.advice) })
       .catch(e => { if (alive) setError(e.message) })
@@ -36,6 +58,10 @@ export default function Advisor({ symbol }) {
     // Historical performance of this exact method on this stock (non-blocking).
     api.analysis.advisorBacktest(symbol)
       .then(r => { if (alive) setBt(r.backtest) })
+      .catch(() => {})
+    // Weighted multi-factor decision engine (non-blocking).
+    api.analysis.decision(symbol)
+      .then(r => { if (alive) setDec(r.decision) })
       .catch(() => {})
     return () => { alive = false }
   }, [symbol])
@@ -71,6 +97,87 @@ export default function Advisor({ symbol }) {
         </div>
         <p className="text-sm text-tv-text leading-relaxed">{adv.action}</p>
       </div>
+
+      {/* ── Decision Engine (skor berbobot multi-faktor) ───────── */}
+      {dec && (
+        <div className="bg-tv-card border border-tv-border rounded-xl p-4 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="text-xs font-bold text-tv-muted uppercase">🤖 Decision Engine</div>
+            <div className="text-sm">
+              <span className={`font-extrabold ${(SIGNAL[dec.signal] || SIGNAL.WAIT).tone}`}>
+                {(SIGNAL[dec.signal] || SIGNAL.WAIT).label}
+              </span>
+              <span className="text-tv-muted"> · skor <b className="text-tv-text">{dec.score}</b>/100 · keyakinan <b className="text-tv-text">{dec.confidence}%</b></span>
+            </div>
+          </div>
+
+          {/* Probability distribution */}
+          <div>
+            <div className="flex h-2.5 rounded-full overflow-hidden bg-tv-bg">
+              <div className="bg-tv-green" style={{ width: `${dec.probability.bullish}%` }} />
+              <div className="bg-tv-yellow" style={{ width: `${dec.probability.sideways}%` }} />
+              <div className="bg-tv-red" style={{ width: `${dec.probability.bearish}%` }} />
+            </div>
+            <div className="flex justify-between text-[11px] mt-1">
+              <span className="text-tv-green">Naik {dec.probability.bullish}%</span>
+              <span className="text-tv-yellow">Sideways {dec.probability.sideways}%</span>
+              <span className="text-tv-red">Turun {dec.probability.bearish}%</span>
+            </div>
+          </div>
+
+          {/* Multi-timeframe trend + structure */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <Pill label="Trend Panjang" value={dec.trend.long} tone={trendToneOf(dec.trend.long)} />
+            <Pill label="Trend Menengah" value={dec.trend.medium} tone={trendToneOf(dec.trend.medium)} />
+            <Pill label="Trend Pendek" value={dec.trend.short} tone={trendToneOf(dec.trend.short)} />
+            <Pill label="Struktur" value={`${dec.market_structure.state} (${dec.market_structure.strength})`} />
+          </div>
+
+          {/* Trade plan zone */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+            <div>
+              <div className="text-[11px] text-tv-muted">Entry Zone (ideal {fmt.price(dec.entry_zone.ideal)})</div>
+              <div className="font-bold tabular-nums">{fmt.price(dec.entry_zone.buy[0])} – {fmt.price(dec.entry_zone.buy[1])}</div>
+            </div>
+            <div>
+              <div className="text-[11px] text-tv-muted">Stop Loss</div>
+              <div className="font-bold tabular-nums text-tv-red">{fmt.price(dec.stop_loss)}</div>
+            </div>
+            <div>
+              <div className="text-[11px] text-tv-muted">Take Profit</div>
+              <div className="font-bold tabular-nums text-tv-green">
+                {dec.take_profit.map(t => `${fmt.price(t.price)} (${t.portion})`).join(' · ')}
+              </div>
+            </div>
+            <div>
+              <div className="text-[11px] text-tv-muted">Risk / Reward</div>
+              <div className={`font-bold ${dec.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-red'}`}>1 : {dec.risk_reward?.toFixed(1)}</div>
+            </div>
+          </div>
+
+          {/* S/R zones */}
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-[12px]">
+            <span className="text-tv-muted">Support: <b className="text-tv-green tabular-nums">{dec.support.map(fmt.price).join(' · ')}</b></span>
+            <span className="text-tv-muted">Resistance: <b className="text-tv-red tabular-nums">{dec.resistance.map(fmt.price).join(' · ')}</b></span>
+          </div>
+
+          {/* Transparent factor breakdown */}
+          <div className="space-y-1.5">
+            {dec.components?.map((c, i) => (
+              <div key={i} className="flex items-center gap-2 text-[12px]">
+                <span className="w-36 shrink-0 text-tv-muted">{c.name} <span className="text-[10px]">({c.weight}%)</span></span>
+                <ScoreBar score={c.score} />
+                <span className="w-7 text-right tabular-nums font-bold">{c.score}</span>
+                <span className="text-tv-muted truncate">{c.note}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-tv-muted">
+            Skor 50 = netral. Bobot: Struktur 30% · Trend 20% · Volume 15% · S/R 15% · Momentum 10% · Candle 5% · R/R 5%.
+            Keyakinan = seberapa searah semua faktor, bukan jaminan harga.
+          </p>
+        </div>
+      )}
 
       {/* ── Snapshot pills ─────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">

@@ -349,10 +349,12 @@ func doUpdate(symbol string) (added int, data *models.StockData, msg string, err
 	}
 
 	// Determine the start date for the incremental fetch.
+	// Re-fetch from the last stored date (not +1) so a partial intraday candle
+	// saved earlier gets refreshed with final values.
 	var from time.Time
 	if len(existing.Prices) > 0 {
 		lastDate, _ := time.Parse("2006-01-02", existing.Prices[len(existing.Prices)-1].Date)
-		from = lastDate.AddDate(0, 0, 1)
+		from = lastDate
 	} else {
 		from = time.Now().AddDate(-1, 0, 0)
 	}
@@ -371,14 +373,16 @@ func doUpdate(symbol string) (added int, data *models.StockData, msg string, err
 		return
 	}
 
-	// Build a set of dates already stored to avoid duplicates.
-	known := make(map[string]bool, len(existing.Prices))
-	for _, p := range existing.Prices {
-		known[p.Date] = true
+	// Index stored dates so re-fetched dates overwrite (refresh) instead of duplicate.
+	known := make(map[string]int, len(existing.Prices))
+	for i, p := range existing.Prices {
+		known[p.Date] = i
 	}
 
 	for _, p := range newPrices {
-		if !known[p.Date] {
+		if i, ok := known[p.Date]; ok {
+			existing.Prices[i] = p
+		} else {
 			existing.Prices = append(existing.Prices, p)
 			added++
 		}

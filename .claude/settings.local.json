@@ -61,7 +61,19 @@
       "Bash(node verify-practice.js)",
       "Bash(node verify-avwap.js)",
       "Bash(git commit -m 'feat: Anchored VWAP overlay on chart *)",
-      "Bash(node verify-fvg.js)"
+      "Bash(node verify-fvg.js)",
+      "PowerShell(try { $r = Invoke-RestMethod -Uri \"http://localhost:8080/api/advisor/screen?mode=buy\" -TimeoutSec 30; $r | ConvertTo-Json -Depth 5 -Compress } catch { \"SERVER_DOWN: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(Start-Process -FilePath \"D:\\\\Code\\\\trading-app-idx\\\\stock-api\\\\stock-api.exe\" -WorkingDirectory \"D:\\\\Code\\\\trading-app-idx\\\\stock-api\" -WindowStyle Hidden; Start-Sleep -Seconds 2; try { \\(Invoke-RestMethod -Uri \"http://localhost:8080/api/stocks\" -TimeoutSec 10\\).success } catch { \"STILL_DOWN: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(ConvertTo-Json *)",
+      "PowerShell($u = Invoke-RestMethod -Method Post -Uri \"http://localhost:8080/api/stocks/update-all\" -TimeoutSec 300; $u.message)",
+      "PowerShell($r = Invoke-RestMethod -Uri \"http://localhost:8080/api/advisor/screen?mode=all&min_turnover=0\" -TimeoutSec 120; $r.data.results | Select-Object -First 15 | ConvertTo-Json -Depth 5)",
+      "PowerShell($r = Invoke-RestMethod -Uri \"http://localhost:8080/api/advisor/screen?mode=all&min_turnover=0\" -TimeoutSec 120; $r.data.results | Where-Object { $_.close -le 2000 } | Sort-Object pass_count -Descending | Select-Object symbol, close, verdict, trend, location, rsi, stop_pct, target_pct, risk_reward, turnover_bn, pass_count | Format-Table -AutoSize | Out-String -Width 200)",
+      "PowerShell($u = Invoke-RestMethod -Uri \"http://localhost:8080/api/analysis/UNVR/advisor\" -TimeoutSec 30; $b = Invoke-RestMethod -Uri \"http://localhost:8080/api/analysis/BRIS/advisor\" -TimeoutSec 30; \"=== UNVR ===\"; $u.data | ConvertTo-Json -Depth 5; \"=== BRIS ===\"; $b.data | ConvertTo-Json -Depth 5)",
+      "PowerShell($d = Invoke-RestMethod -Uri \"http://localhost:8080/api/analysis/DEWA/advisor\" -TimeoutSec 30; $b = Invoke-RestMethod -Uri \"http://localhost:8080/api/analysis/BRMS/advisor\" -TimeoutSec 30; \"=== DEWA ===\"; $d.data.advice | Select-Object verdict, action, trend, location, candle, volume_state, rsi, close, support, resistance, stop_pct, target_pct, risk_reward | ConvertTo-Json; $d.data.advice.checklist | ForEach-Object { \"$\\(if\\($_.pass\\){'PASS'}else{'FAIL'}\\) $\\($_.label\\) — $\\($_.note\\)\" }; \"=== BRMS ===\"; $b.data.advice | Select-Object verdict, action, trend, location, candle, volume_state, rsi, close, support, resistance, stop_pct, target_pct, risk_reward | ConvertTo-Json; $b.data.advice.checklist | ForEach-Object { \"$\\(if\\($_.pass\\){'PASS'}else{'FAIL'}\\) $\\($_.label\\) — $\\($_.note\\)\" })",
+      "PowerShell($r1 = Invoke-RestMethod -Method Post -Uri \"http://localhost:8080/api/stocks/BRMS/update\" -TimeoutSec 60; $r2 = Invoke-RestMethod -Method Post -Uri \"http://localhost:8080/api/stocks/DEWA/update\" -TimeoutSec 60; $r1.message; $r2.message; $l1 = Invoke-RestMethod -Uri \"http://localhost:8080/api/stocks/BRMS/latest\"; $l2 = Invoke-RestMethod -Uri \"http://localhost:8080/api/stocks/DEWA/latest\"; \"BRMS latest:\"; $l1.data | ConvertTo-Json; \"DEWA latest:\"; $l2.data | ConvertTo-Json)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell($null = Invoke-RestMethod -Method Post -Uri \"http://localhost:8080/api/stocks/DEWA/update\"; \\(Invoke-RestMethod -Uri \"http://localhost:8080/api/stocks/DEWA/latest\"\\).data.price | ConvertTo-Json -Compress; \"--- FVG BRMS ---\"; \\(Invoke-RestMethod -Uri \"http://localhost:8080/api/analysis/BRMS/fvg\"\\).data | ConvertTo-Json -Depth 4 -Compress; \"--- FVG DEWA ---\"; \\(Invoke-RestMethod -Uri \"http://localhost:8080/api/analysis/DEWA/fvg\"\\).data | ConvertTo-Json -Depth 4 -Compress)",
+      "PowerShell(node \"C:\\\\Users\\\\ITDEVE~2.SMF\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--Code-trading-app-idx\\\\62c83ad8-a7df-4626-8f49-392da047b6f5\\\\scratchpad\\\\avwap.js\")"
     ]
   }
 }
