@@ -68,6 +68,7 @@ func (h *Handler) ListStocks(w http.ResponseWriter, r *http.Request) {
 		LastClose   float64   `json:"last_close,omitempty"`
 		ChangePct   float64   `json:"change_pct,omitempty"`
 		Sparkline   []float64 `json:"sparkline,omitempty"`
+		Syariah     bool      `json:"syariah"`
 	}
 
 	list := make([]Summary, 0, len(symbols))
@@ -81,6 +82,7 @@ func (h *Handler) ListStocks(w http.ResponseWriter, r *http.Request) {
 			Exchange:    d.Exchange,
 			LastUpdated: d.LastUpdated,
 			DataPoints:  len(d.Prices),
+			Syariah:     isSyariah(sym),
 		}
 		if len(d.Prices) > 0 {
 			s.OldestDate = d.Prices[0].Date

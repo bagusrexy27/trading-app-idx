@@ -11,10 +11,10 @@ import (
 
 // AdvisorScreen — GET /api/advisor/screen?mode=buy&min_turnover=2
 //
-// Runs the price-action Advisor across every tracked stock and returns a ranked
-// list. `mode=buy` (default) keeps only actionable long setups (STRONG_BUY/BUY);
-// `mode=all` returns every stock. `min_turnover` (in billion IDR/day) filters
-// out illiquid names where price action is unreliable (default 2).
+// Runs the weighted Decision Engine across every tracked stock and returns a
+// ranked list. `mode=buy` (default) keeps only actionable long setups
+// (STRONG_BUY/BUY); `mode=all` returns every stock. `min_turnover` (in billion
+// IDR/day) filters out illiquid names (default 2).
 func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) {
 	mode := r.URL.Query().Get("mode")
 	if mode == "" {
@@ -34,28 +34,24 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 	}
 
 	type Row struct {
-		Symbol      string  `json:"symbol"`
-		Close       float64 `json:"close"`
-		Verdict     string  `json:"verdict"`
-		Confidence  string  `json:"confidence"`
-		Trend       string  `json:"trend"`
-		Location    string  `json:"location"`
-		Candle      string  `json:"candle"`
-		VolumeState string  `json:"volume_state"`
-		RSI         float64 `json:"rsi"`
-		Entry       float64 `json:"entry"`
-		Stop        float64 `json:"stop"`
-		Target      float64 `json:"target"`
-		StopPct     float64 `json:"stop_pct"`
-		TargetPct   float64 `json:"target_pct"`
-		RiskReward  float64 `json:"risk_reward"`
-		TurnoverBn  float64 `json:"turnover_bn"`
-		PassCount   int     `json:"pass_count"`
-		Action      string  `json:"action"`
+		Symbol      string               `json:"symbol"`
+		Close       float64              `json:"close"`
+		Signal      string               `json:"signal"`
+		Score       int                  `json:"score"`
+		Confidence  int                  `json:"confidence"`
+		Trend       analysis.TrendSet    `json:"trend"`
+		Structure   string               `json:"structure"`
+		VolumeState string               `json:"volume_state"`
+		EntryLow    float64              `json:"entry_low"`
+		EntryHigh   float64              `json:"entry_high"`
+		EntryIdeal  float64              `json:"entry_ideal"`
+		Stop        float64              `json:"stop"`
+		Target      float64              `json:"target"`
+		RiskReward  float64              `json:"risk_reward"`
+		Probability analysis.Probability `json:"probability"`
+		TurnoverBn  float64              `json:"turnover_bn"`
+		Syariah     bool                 `json:"syariah"`
 	}
-
-	// Verdict ranking weight (higher = surfaced first).
-	weight := map[string]int{"STRONG_BUY": 5, "BUY": 4, "REDUCE": 3, "WAIT": 2, "AVOID": 1}
 
 	rows := make([]Row, 0, len(symbols))
 	scanned := 0
@@ -77,29 +73,25 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		a := analysis.Advisor(d.Prices)
-		pass := 0
-		for _, c := range a.Checklist {
-			if c.Pass {
-				pass++
-			}
-		}
+		dec := analysis.DecisionEngine(d.Prices)
 		rows = append(rows, Row{
-			Symbol: sym, Close: a.Close, Verdict: a.Verdict, Confidence: a.Confidence,
-			Trend: a.Trend, Location: a.Location, Candle: a.Candle, VolumeState: a.VolumeState,
-			RSI: a.RSI, Entry: a.Entry, Stop: a.Stop, Target: a.Target,
-			StopPct: a.StopPct, TargetPct: a.TargetPct, RiskReward: a.RiskReward,
-			TurnoverBn: analysis.R2(turnover), PassCount: pass, Action: a.Action,
+			Symbol: sym, Close: d.Prices[n-1].Close,
+			Signal: dec.Signal, Score: dec.Score, Confidence: dec.Confidence,
+			Trend: dec.Trend, Structure: dec.MarketStructure.State, VolumeState: dec.Volume.Status,
+			EntryLow: dec.EntryZone.Buy[0], EntryHigh: dec.EntryZone.Buy[1], EntryIdeal: dec.EntryZone.Ideal,
+			Stop: dec.StopLoss, Target: dec.TakeProfit[0].Price, RiskReward: dec.RiskReward,
+			Probability: dec.Probability, TurnoverBn: analysis.R2(turnover),
+			Syariah: isSyariah(sym),
 		})
 	}
 
-	// Rank: verdict weight → checklist passes → risk/reward.
+	// Rank: decision score → confidence → risk/reward.
 	sort.Slice(rows, func(i, j int) bool {
-		if weight[rows[i].Verdict] != weight[rows[j].Verdict] {
-			return weight[rows[i].Verdict] > weight[rows[j].Verdict]
+		if rows[i].Score != rows[j].Score {
+			return rows[i].Score > rows[j].Score
 		}
-		if rows[i].PassCount != rows[j].PassCount {
-			return rows[i].PassCount > rows[j].PassCount
+		if rows[i].Confidence != rows[j].Confidence {
+			return rows[i].Confidence > rows[j].Confidence
 		}
 		return rows[i].RiskReward > rows[j].RiskReward
 	})
@@ -109,7 +101,7 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 	if mode == "buy" {
 		out = out[:0]
 		for _, row := range rows {
-			if row.Verdict == "STRONG_BUY" || row.Verdict == "BUY" {
+			if row.Signal == "STRONG_BUY" || row.Signal == "BUY" {
 				out = append(out, row)
 			}
 		}

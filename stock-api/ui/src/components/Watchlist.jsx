@@ -92,9 +92,17 @@ function StockCard({ s, onSelect, delay }) {
 export default function Watchlist({ stocks = [], loading, onSelect, onAdd, onUpdateAll, onQuickAdd }) {
   const [search, setSearch] = useState('')
   const [adding, setAdding] = useState(null)   // symbol currently being quick-added
+  const [arah, setArah]         = useState('')  // '' | 'naik' | 'turun'
+  const [maxPrice, setMaxPrice] = useState(0)   // 0 = semua
+  const [syariahOnly, setSyariahOnly] = useState(false)
 
   const owned = useMemo(() => new Set(stocks.map(s => s.symbol)), [stocks])
-  const filtered = stocks.filter(s => !search || s.symbol.toLowerCase().includes(search.toLowerCase()))
+  const filtered = stocks.filter(s =>
+    (!search || s.symbol.toLowerCase().includes(search.toLowerCase())) &&
+    (!arah || (arah === 'naik' ? (s.change_pct ?? 0) > 0 : (s.change_pct ?? 0) < 0)) &&
+    (!maxPrice || (s.last_close ?? 0) <= maxPrice) &&
+    (!syariahOnly || s.syariah)
+  )
   const gainers = stocks.filter(s => (s.change_pct ?? 0) > 0).length
   const losers  = stocks.filter(s => (s.change_pct ?? 0) < 0).length
   const suggestions = SYARIAH_PICKS.filter(p => !owned.has(p.s))
@@ -133,6 +141,28 @@ export default function Watchlist({ stocks = [], loading, onSelect, onAdd, onUpd
             hover:bg-tv-accent/80 hover:shadow-[0_0_20px_rgba(94,106,210,0.4)] transition-all">
           + Tambah
         </button>
+        {stocks.length > 0 && (
+          <>
+            <select value={arah} onChange={e => setArah(e.target.value)}
+              className="bg-tv-input border border-tv-border rounded-xl px-3 py-2.5 text-xs text-tv-text outline-none">
+              <option value="">Semua arah</option>
+              <option value="naik">▲ Naik</option>
+              <option value="turun">▼ Turun</option>
+            </select>
+            <select value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))}
+              className="bg-tv-input border border-tv-border rounded-xl px-3 py-2.5 text-xs text-tv-text outline-none">
+              <option value={0}>Semua harga</option>
+              <option value={500}>≤ 500</option>
+              <option value={1000}>≤ 1.000</option>
+              <option value={2000}>≤ 2.000</option>
+              <option value={5000}>≤ 5.000</option>
+            </select>
+            <button onClick={() => setSyariahOnly(s => !s)}
+              className={`px-3 py-2.5 text-xs font-semibold rounded-xl border transition-all ${syariahOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}>
+              ☪ Syariah
+            </button>
+          </>
+        )}
         {stocks.length > 0 && (
           <button onClick={onUpdateAll}
             className="px-4 py-2.5 text-xs font-medium rounded-xl border border-tv-border

@@ -217,7 +217,6 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 
 	last := prices[n-1]
 	close := last.Close
-	prevClose := prices[n-2].Close
 
 	ema10 := lastVal(EMA(prices, 10))
 	ema20 := lastVal(EMA(prices, 20))
@@ -324,18 +323,25 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 	case vr < 0.8:
 		volStatus = "Below Average"
 	}
+	// Arah pakai 5 hari terakhir — sama dengan timeframe rasio volume (v5/v20).
 	dir := 1.0
-	if close < prevClose {
+	if close < prices[n-6].Close {
 		dir = -1
 	}
 	volSc := clampScore(50 + (vr-1)*50*dir)
 
 	// ── Momentum (RSI + MACD histogram) ──────────────────────────────────────
+	// Overbought dilipat jadi penalti: RSI 70 = puncak skor, di atasnya turun
+	// (80→50, 90→30) supaya tidak dorong BUY di pucuk.
+	momRaw := rsi
+	if rsi > 70 {
+		momRaw = 70 - 2*(rsi-70)
+	}
 	momAdj := -10.0
 	if macdHist > 0 {
 		momAdj = 10
 	}
-	momSc := clampScore(rsi + momAdj)
+	momSc := clampScore(momRaw + momAdj)
 	momStatus := "Neutral"
 	switch {
 	case momSc > 60:

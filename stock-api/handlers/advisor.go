@@ -41,6 +41,7 @@ func (h *AnalysisHandler) Decision(w http.ResponseWriter, r *http.Request) {
 	respond(w, 200, true, "", map[string]interface{}{
 		"symbol":   symbol,
 		"decision": d,
+		"syariah":  isSyariah(symbol),
 	})
 }
 

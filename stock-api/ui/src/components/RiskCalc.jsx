@@ -110,6 +110,96 @@ export default function RiskCalc({ data }) {
           Data ATR belum tersedia untuk {entry ? 'saham ini' : 'kalkulasi'}
         </div>
       )}
+      <AvgCalc lastClose={lastClose} inputCls={inputCls} />
+    </div>
+  )
+}
+
+// Kalkulator average harga: posisi sekarang + pembelian baru → avg gabungan.
+function AvgCalc({ lastClose, inputCls }) {
+  const [curLot, setCurLot]     = useState('')
+  const [curAvg, setCurAvg]     = useState('')
+  const [buys, setBuys]         = useState([{ lot: '', price: String(lastClose || '') }])
+
+  const setBuy = (i, key, val) =>
+    setBuys(b => b.map((row, j) => j === i ? { ...row, [key]: val } : row))
+
+  const c = useMemo(() => {
+    const rows = [{ lot: curLot, price: curAvg }, ...buys]
+      .map(r => ({ lot: parseFloat(r.lot) || 0, price: parseFloat(r.price) || 0 }))
+      .filter(r => r.lot > 0 && r.price > 0)
+    const totLot   = rows.reduce((a, r) => a + r.lot, 0)
+    const totModal = rows.reduce((a, r) => a + r.lot * 100 * r.price, 0)
+    const avg      = totLot > 0 ? totModal / (totLot * 100) : 0
+    const oldAvg   = parseFloat(curAvg) || 0
+    const mkt      = lastClose || 0
+    return {
+      avg, totLot, totModal,
+      plOld: oldAvg > 0 && mkt > 0 ? (mkt - oldAvg) / oldAvg * 100 : null,
+      plNew: avg > 0 && mkt > 0 ? (mkt - avg) / avg * 100 : null,
+    }
+  }, [curLot, curAvg, buys, lastClose])
+
+  const plTone = (v) => v >= 0 ? 'text-tv-green' : 'text-tv-red'
+
+  return (
+    <div className="bg-tv-card border border-tv-border rounded-xl p-4 space-y-4">
+      <div>
+        <h2 className="text-sm font-bold">🧮 Kalkulator Average Harga</h2>
+        <p className="text-xs text-tv-muted mt-0.5">Hitung harga rata-rata baru kalau nambah beli (average up/down)</p>
+      </div>
+
+      {/* Posisi sekarang */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Lot Sekarang</label>
+          <input type="number" value={curLot} onChange={e => setCurLot(e.target.value)} placeholder="cth: 9" className={inputCls} />
+        </div>
+        <div>
+          <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Harga Avg Sekarang</label>
+          <input type="number" value={curAvg} onChange={e => setCurAvg(e.target.value)} placeholder="cth: 487.17" className={inputCls} />
+        </div>
+      </div>
+
+      {/* Pembelian baru */}
+      {buys.map((b, i) => (
+        <div key={i} className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Lot Beli {buys.length > 1 ? `#${i + 1}` : 'Baru'}</label>
+            <input type="number" value={b.lot} onChange={e => setBuy(i, 'lot', e.target.value)} placeholder="lot" className={inputCls} />
+          </div>
+          <div>
+            <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Harga Beli {buys.length > 1 ? `#${i + 1}` : 'Baru'}</label>
+            <input type="number" value={b.price} onChange={e => setBuy(i, 'price', e.target.value)} placeholder="harga" className={inputCls} />
+          </div>
+        </div>
+      ))}
+      <div className="flex gap-2">
+        <button onClick={() => setBuys(b => [...b, { lot: '', price: '' }])}
+          className="px-3 py-1.5 text-xs rounded-lg border border-tv-border text-tv-muted hover:text-tv-blue hover:border-tv-blue/40 transition-colors">
+          + Tambah pembelian
+        </button>
+        {buys.length > 1 && (
+          <button onClick={() => setBuys(b => b.slice(0, -1))}
+            className="px-3 py-1.5 text-xs rounded-lg border border-tv-border text-tv-muted hover:text-tv-red hover:border-tv-red/40 transition-colors">
+            − Hapus baris
+          </button>
+        )}
+      </div>
+
+      {/* Hasil */}
+      {c.totLot > 0 && (
+        <div className="pt-3 border-t border-tv-border space-y-2">
+          <Row label="Harga Average Baru" value={fmt.price(c.avg)} color="text-tv-blue" />
+          <Row label="Total Lot" value={`${c.totLot} lot (${(c.totLot * 100).toLocaleString('id-ID')} lbr)`} />
+          <Row label="Total Modal" value={fmt.price(c.totModal)} />
+          {c.plNew != null && (
+            <Row label={`P/L di harga pasar (${fmt.price(lastClose)})`}
+              value={`${c.plNew >= 0 ? '+' : ''}${c.plNew.toFixed(2)}%${c.plOld != null ? ` (sebelumnya ${c.plOld >= 0 ? '+' : ''}${c.plOld.toFixed(2)}%)` : ''}`}
+              color={plTone(c.plNew)} />
+          )}
+        </div>
+      )}
     </div>
   )
 }

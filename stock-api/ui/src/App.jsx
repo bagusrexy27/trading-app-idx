@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import Sidebar from './components/Sidebar'
 import StockPanel from './components/StockPanel'
 import AlertsPanel, { useAlertChecker } from './components/AlertsPanel'
@@ -29,6 +29,51 @@ export default function App() {
   const [loading, setLoading]     = useState(true)
   const [toast, setToast]         = useState(null)
 
+  // Navigasi terdaftar ke history browser: back mouse, Alt+←/→, tombol back
+  // browser, dan Backspace semuanya jalan lewat pushState/popstate.
+  const viewRef = useRef(view);     viewRef.current = view
+  const selRef  = useRef(selected); selRef.current  = selected
+  const navigate = useCallback((nextView, nextSelected = null) => {
+    if (viewRef.current !== nextView || selRef.current !== nextSelected) {
+      const idx = (window.history.state?.idx ?? 0) + 1
+      window.history.pushState({ view: nextView, selected: nextSelected, idx }, '')
+    }
+    setView(nextView)
+    setSelected(nextSelected)
+  }, [])
+
+  useEffect(() => {
+    // Entry awal + pulihkan view terakhir saat halaman di-refresh.
+    const s = window.history.state
+    if (s?.view) {
+      setView(s.view)
+      setSelected(s.selected ?? null)
+    } else {
+      window.history.replaceState({ view: 'watchlist', selected: null, idx: 0 }, '')
+    }
+    const onPop = (e) => {
+      setView(e.state?.view ?? 'watchlist')
+      setSelected(e.state?.selected ?? null)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== 'Backspace') return
+      const t = e.target
+      // Jangan bajak backspace saat mengetik atau saat modal terbuka.
+      if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable) return
+      if (showAdd || showAlerts) return
+      e.preventDefault()
+      // Jangan keluar dari app: mundur hanya kalau masih ada riwayat milik app.
+      if ((window.history.state?.idx ?? 0) > 0) window.history.back()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showAdd, showAlerts])
+
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 4000)
@@ -53,15 +98,13 @@ export default function App() {
   const handleAdded = (symbol) => {
     setShowAdd(false)
     loadStocks()
-    setSelected(symbol)
-    setView('home')
+    navigate('home', symbol)
     showToast(`✓ ${symbol} berhasil ditambahkan`)
   }
 
   const handleDeleted = () => {
     loadStocks()
-    setSelected(null)
-    setView('watchlist')
+    navigate('watchlist')
     showToast('Saham dihapus dari tracking')
   }
 
@@ -77,8 +120,7 @@ export default function App() {
   }
 
   const handleSelectStock = (symbol) => {
-    setSelected(symbol)
-    setView('home')
+    navigate('home', symbol)
   }
 
   const handleUpdateAll = async () => {
@@ -103,12 +145,12 @@ export default function App() {
         onSelect={handleSelectStock}
         onAdd={() => setShowAdd(true)}
         onUpdateAll={handleUpdateAll}
-        onViewWatchlist={()   => { setSelected(null); setView('watchlist') }}
-        onViewOverview={()    => setView('overview')}
-        onViewSession={()     => setView('session')}
-        onViewAdvisor={()     => setView('advisor')}
-        onViewPortfolio={()   => setView('portfolio')}
-        onViewPractice={()    => setView('practice')}
+        onViewWatchlist={()   => navigate('watchlist')}
+        onViewOverview={()    => navigate('overview', selected)}
+        onViewSession={()     => navigate('session', selected)}
+        onViewAdvisor={()     => navigate('advisor', selected)}
+        onViewPortfolio={()   => navigate('portfolio', selected)}
+        onViewPractice={()    => navigate('practice', selected)}
         onOpenAlerts={() => setShowAlerts(true)}
       />
 
