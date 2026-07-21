@@ -5,7 +5,7 @@ echo  ========================================
 echo   IDX Stock Analyzer - Development Mode
 echo  ========================================
 echo.
-echo  Backend  : http://localhost:8080
+echo  Backend  : http://localhost:1111
 echo  Frontend : http://localhost:5173  (hot reload)
 echo.
 echo  Dua jendela terminal akan terbuka.
@@ -15,7 +15,7 @@ echo.
 cd /d "%~dp0"
 
 :: Start backend in new window with Air (live-reload)
-start "IDX Backend :8080 [air]" cmd /k "cd /d "%~dp0" && air"
+start "IDX Backend :1111 [air]" cmd /k "cd /d "%~dp0" && air"
 
 :: Wait backend ready
 timeout /t 2 /nobreak >nul

@@ -106,7 +106,7 @@ stock-api/
     │       ├── AddStockModal.jsx  # Form tambah saham baru
     │       └── ReportUpload.jsx   # Upload laporan PDF
     ├── tailwind.config.js    # Custom tv-* color palette
-    └── vite.config.js        # Proxy /api/* → :8080
+    └── vite.config.js        # Proxy /api/* → :1111
 ```
 
 ---
@@ -133,7 +133,7 @@ go mod download
 # Build
 go build -o stock-api.exe .
 
-# Jalankan (port 8080)
+# Jalankan (port 1111)
 ./stock-api.exe
 ```
 
@@ -145,7 +145,7 @@ cd ui
 # Install — wajib --legacy-peer-deps (react-apexcharts vs React 18)
 npm install --legacy-peer-deps
 
-# Dev server (port 5173, proxy /api/* ke :8080)
+# Dev server (port 5173, proxy /api/* ke :1111)
 npm run dev
 
 # Build produksi → output ke ../static/
@@ -169,10 +169,10 @@ Buka `http://localhost:5173`
 ```bash
 cd ui && npm run build
 cd ..
-./stock-api.exe        # Serve UI + API di :8080
+./stock-api.exe        # Serve UI + API di :1111
 ```
 
-Buka `http://localhost:8080`
+Buka `http://localhost:1111`
 
 ---
 

@@ -9,7 +9,7 @@ Analisa saham IDX dari `stock-api/data/{SYMBOL}.json` dengan metodologi quant: s
 
 ## Langkah 0 — Data
 
-1. Kalau server jalan (cek cepat `GET http://localhost:8080/api/ihsg` atau skip kalau sudah tahu), refresh dulu: `POST http://localhost:8080/api/stocks/{SYMBOL}/update`. Server mati → pakai data yang ada, sebutkan tanggal data terakhir di output.
+1. Kalau server jalan (cek cepat `GET http://localhost:1111/api/ihsg` atau skip kalau sudah tahu), refresh dulu: `POST http://localhost:1111/api/stocks/{SYMBOL}/update`. Server mati → pakai data yang ada, sebutkan tanggal data terakhir di output.
 2. Hitung fitur (JANGAN hitung manual dari candle satu per satu — rawan salah):
    ```bash
    node .claude/skills/analisa-saham/analyze.mjs SYMBOL [n=60]
@@ -74,4 +74,4 @@ Lalu probabilitas skenario besok: Naik X% / Sideways Y% / Turun Z% (jumlah 100%)
 
 Ringkas tapi lengkap: fase trend → level S/R → volume → candle → tabel skor → verdict + probabilitas → trade plan. Tutup dengan disclaimer satu baris bahwa ini analisa probabilistik, bukan kepastian.
 
-Pembanding opsional: `GET http://localhost:8080/api/analysis/{SYMBOL}/advisor` (rule engine internal app). Kalau verdict beda jauh dengan analisamu, sebutkan bedanya.
+Pembanding opsional: `GET http://localhost:1111/api/analysis/{SYMBOL}/advisor` (rule engine internal app). Kalau verdict beda jauh dengan analisamu, sebutkan bedanya.
