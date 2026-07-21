@@ -16,13 +16,18 @@ import (
 // profit, and a bullish/sideways/bearish probability distribution.
 //
 // Weights:
-//   Market Structure 30% · Trend EMA 20% · Volume 15% · Support/Resistance 15%
-//   Momentum 10% · Candlestick 5% · Risk/Reward 5%
+//   Market Structure 25% · Trend EMA 18% · Money Flow 12% · Volume 12%
+//   Support/Resistance 12% · Momentum 8% · Trend Strength 5% · Candlestick 4%
+//   Risk/Reward 4%
+//
+// A low-confidence result (factors disagreeing sharply) is downgraded to WAIT
+// rather than emitting a BUY/SELL the components do not actually support.
 
 type TrendSet struct {
-	Long   string `json:"long"`   // EMA50 vs EMA200
-	Medium string `json:"medium"` // EMA20 vs EMA50
-	Short  string `json:"short"`  // EMA10 vs EMA20
+	Long    string `json:"long"`    // EMA50 vs EMA200
+	Medium  string `json:"medium"`  // EMA20 vs EMA50
+	Short   string `json:"short"`   // EMA10 vs EMA20
+	Overall string `json:"overall"` // weighted 0.5·long + 0.3·medium + 0.2·short
 }
 
 type StructInfo struct {
@@ -75,7 +80,19 @@ type Decision struct {
 	RiskReward      float64       `json:"risk_reward"`
 	Probability     Probability   `json:"probability"`
 	Components      []FactorScore `json:"components"`
+	Note            string        `json:"note,omitempty"` // set when the signal was gated down
 }
+
+// Calibration knobs. These are tuned against IDX behaviour (crash gaps leave
+// swing levels stranded far above price), not universal constants — adjust
+// them if the engine starts over- or under-rating stretched setups.
+const (
+	srNearMaxPct  = 15.0 // beyond this a level stops counting as a nearby reference
+	srNoStructPct = 25.0 // no resistance within this = no structural target at all
+	tp1ATRMult    = 3.0  // first target ceiling, in ATR from close
+	tp2ATRMult    = 5.0  // second target ceiling
+	rrImplausible = 6.0  // R/R above this usually means the target isn't real
+)
 
 // ── IDX tick size ────────────────────────────────────────────────────────────
 
@@ -202,6 +219,22 @@ func trendScore(label string) int {
 	}
 }
 
+// overallTrendLabel is the inverse of trendScore, applied to the blended score.
+func overallTrendLabel(score int) string {
+	switch {
+	case score >= 78:
+		return "Bullish"
+	case score >= 58:
+		return "Weak Bullish"
+	case score >= 42:
+		return "Sideways"
+	case score >= 22:
+		return "Weak Bearish"
+	default:
+		return "Bearish"
+	}
+}
+
 func clampScore(v float64) int {
 	return int(math.Round(math.Max(0, math.Min(100, v))))
 }
@@ -211,7 +244,7 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 	n := len(prices)
 	if n < 60 {
 		return Decision{Signal: "WAIT", Confidence: 0,
-			Trend:      TrendSet{"Sideways", "Sideways", "Sideways"},
+			Trend:      TrendSet{"Sideways", "Sideways", "Sideways", "Sideways"},
 			Components: []FactorScore{{Name: "Data", Score: 0, Weight: 100, Note: "Data belum cukup (butuh ≥60 hari)"}}}
 	}
 
@@ -242,6 +275,10 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 	trendSc := clampScore(0.5*float64(trendScore(trend.Long)) +
 		0.3*float64(trendScore(trend.Medium)) +
 		0.2*float64(trendScore(trend.Short)))
+	// Label the blend the engine actually scores — a single timeframe read on
+	// its own misrepresents the verdict (medium can be red while the setup is
+	// bullish overall).
+	trend.Overall = overallTrendLabel(trendSc)
 
 	// ── Market structure from fractal swings ─────────────────────────────────
 	swings := fractalSwings(prices, 90)
@@ -306,8 +343,17 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 	r1 := resistances[0]
 	distSup := pctDiff(close, s1)
 	distRes := pctDiff(r1, close)
-	srSc := clampScore(50 + (distRes-distSup)*3) // near support & far from resistance = good
+	// Distances are capped before scoring: a level 70% away is not "room to
+	// run", it is the gap a crash left behind. Past srNoStructPct there is no
+	// usable reference at all, so the score is pulled back toward neutral
+	// instead of reading as a perfect setup.
+	nearDist := func(d float64) float64 { return math.Min(d, srNearMaxPct) }
+	srSc := clampScore(50 + (nearDist(distRes)-nearDist(distSup))*3)
 	srNote := fmt.Sprintf("support -%.1f%% / resistance +%.1f%%", distSup, distRes)
+	if distRes > srNoStructPct {
+		srSc = clampScore(50 + float64(srSc-50)*0.4)
+		srNote += " (tanpa resistance terdekat)"
+	}
 
 	// ── Volume (direction-aware: high volume only bullish on an up move) ─────
 	v5 := avgVol(prices, 5, 0)
@@ -350,6 +396,48 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 		momStatus = "Bearish"
 	}
 
+	// ── Money Flow (CMF + MFI) ───────────────────────────────────────────────
+	// Orthogonal to the price-only factors: answers "is volume actually being
+	// accumulated or distributed", which price structure alone cannot see.
+	// Both fall back to neutral 50 when there aren't enough bars.
+	cmfSc, mfiSc := 50.0, 50.0
+	cmf, mfi := 0.0, 0.0
+	if pts := CMF(prices, 20); len(pts) > 0 {
+		cmf = pts[len(pts)-1].Value
+		cmfSc = float64(clampScore(50 + cmf*250)) // ±0.20 saturates
+	}
+	if pts := MFI(prices, 14); len(pts) > 0 {
+		mfi = pts[len(pts)-1].Value
+		raw := mfi
+		if mfi > 80 { // overbought money flow folds back down, same as RSI
+			raw = 80 - 2*(mfi-80)
+		}
+		mfiSc = float64(clampScore(raw))
+	}
+	flowSc := clampScore(0.6*cmfSc + 0.4*mfiSc)
+	flowStatus := "Netral"
+	switch {
+	case flowSc > 60:
+		flowStatus = "Akumulasi"
+	case flowSc < 40:
+		flowStatus = "Distribusi"
+	}
+
+	// ── Trend Strength (ADX + DI direction) ──────────────────────────────────
+	// ADX below ~20 means no real trend: the score stays near neutral so a
+	// choppy market cannot be scored as a confident directional call.
+	adxSc, adxVal := 50, 0.0
+	if pts := ADX(prices, 14); len(pts) > 0 {
+		a := pts[len(pts)-1]
+		adxVal = a.ADX
+		strength := math.Min(a.ADX, 40) / 40 // 0–1, saturates at ADX 40
+		adxDir := -1.0
+		if a.PlusDI > a.MinusDI {
+			adxDir = 1
+		}
+		adxSc = clampScore(50 + adxDir*strength*50)
+	}
+
 	// ── Candlestick (confirmation only) ──────────────────────────────────────
 	candleLabel, candleDir := candlePattern(prices, n-1)
 	strongCandle := candleLabel != "Bar hijau" && candleLabel != "Bar merah" && candleLabel != "-"
@@ -377,11 +465,19 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 		stop = roundTick(lo * 0.97)
 	}
 
+	// Targets are capped at what ATR says is reachable. A resistance stranded
+	// far above by an earlier collapse makes a nonsense first target and an
+	// inflated R/R.
+	tp1 := math.Min(resistances[0], close+tp1ATRMult*atr)
 	var tp []TPLevel
 	if len(resistances) >= 2 {
-		tp = []TPLevel{{resistances[0], "50%"}, {resistances[1], "50%"}}
+		tp2 := math.Min(resistances[1], close+tp2ATRMult*atr)
+		if tp2 <= tp1 {
+			tp2 = tp1 + atr // keep the tiers ordered after capping
+		}
+		tp = []TPLevel{{roundTick(tp1), "50%"}, {roundTick(tp2), "50%"}}
 	} else {
-		tp = []TPLevel{{resistances[0], "100%"}}
+		tp = []TPLevel{{roundTick(tp1), "100%"}}
 	}
 
 	rr := 0.0
@@ -390,6 +486,8 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 	}
 	rrSc := 25
 	switch {
+	case rr > rrImplausible:
+		rrSc = 50 // too good to be structural — treat as unknown, not excellent
 	case rr >= 3:
 		rrSc = 90
 	case rr >= 2:
@@ -402,13 +500,15 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 
 	// ── Weighted total → signal ──────────────────────────────────────────────
 	comps := []FactorScore{
-		{Name: "Market Structure", Score: structSc, Weight: 30, Note: structState},
-		{Name: "Trend EMA", Score: trendSc, Weight: 20, Note: fmt.Sprintf("L:%s M:%s S:%s", trend.Long, trend.Medium, trend.Short)},
-		{Name: "Volume", Score: volSc, Weight: 15, Note: fmt.Sprintf("%s (%.2f× rata-rata 20D)", volStatus, vr)},
-		{Name: "Support/Resistance", Score: srSc, Weight: 15, Note: srNote},
-		{Name: "Momentum", Score: momSc, Weight: 10, Note: fmt.Sprintf("RSI %.0f, MACD hist %+.1f", rsi, macdHist)},
-		{Name: "Candlestick", Score: candleSc, Weight: 5, Note: candleLabel},
-		{Name: "Risk/Reward", Score: rrSc, Weight: 5, Note: fmt.Sprintf("R/R %.1f", rr)},
+		{Name: "Market Structure", Score: structSc, Weight: 25, Note: structState},
+		{Name: "Trend EMA", Score: trendSc, Weight: 18, Note: fmt.Sprintf("L:%s M:%s S:%s", trend.Long, trend.Medium, trend.Short)},
+		{Name: "Money Flow", Score: flowSc, Weight: 12, Note: fmt.Sprintf("%s (CMF %+.2f, MFI %.0f)", flowStatus, cmf, mfi)},
+		{Name: "Volume", Score: volSc, Weight: 12, Note: fmt.Sprintf("%s (%.2f× rata-rata 20D)", volStatus, vr)},
+		{Name: "Support/Resistance", Score: srSc, Weight: 12, Note: srNote},
+		{Name: "Momentum", Score: momSc, Weight: 8, Note: fmt.Sprintf("RSI %.0f, MACD hist %+.1f", rsi, macdHist)},
+		{Name: "Trend Strength", Score: adxSc, Weight: 5, Note: fmt.Sprintf("ADX %.0f (%s)", adxVal, adxLabel(adxVal))},
+		{Name: "Candlestick", Score: candleSc, Weight: 4, Note: candleLabel},
+		{Name: "Risk/Reward", Score: rrSc, Weight: 4, Note: fmt.Sprintf("R/R %.1f", rr)},
 	}
 	total := 0.0
 	for _, c := range comps {
@@ -429,12 +529,22 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 	}
 
 	// Confidence = factor agreement: low weighted deviation between component
-	// scores and the total means the factors point the same way.
+	// scores and the total means the factors point the same way. Deviation
+	// tops out near 50, so it is doubled to use the full 0–100 range instead
+	// of never reporting below 50.
 	dev := 0.0
 	for _, c := range comps {
 		dev += math.Abs(float64(c.Score)-total) * float64(c.Weight) / 100
 	}
-	confidence := clampScore(100 - dev)
+	confidence := clampScore(100 - 2*dev)
+
+	// Disagreement gate: an actionable call needs the factors to actually
+	// agree. When they don't, say WAIT instead of guessing a direction.
+	note := ""
+	if confidence < 45 && signal != "WAIT" {
+		note = fmt.Sprintf("Sinyal %s diturunkan ke WAIT — faktor saling bertentangan (keyakinan %d%%). Tunggu konfirmasi.", signal, confidence)
+		signal = "WAIT"
+	}
 
 	// Probability distribution (always sums to 100).
 	sideways := 20 + int(math.Round((50-math.Abs(total-50))*0.4))
@@ -457,6 +567,20 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 		RiskReward:      R2(rr),
 		Probability:     Probability{Bullish: bullish, Sideways: sideways, Bearish: bearish},
 		Components:      comps,
+		Note:            note,
+	}
+}
+
+func adxLabel(v float64) string {
+	switch {
+	case v >= 40:
+		return "sangat kuat"
+	case v >= 25:
+		return "kuat"
+	case v >= 20:
+		return "mulai tren"
+	default:
+		return "sideways"
 	}
 }
 

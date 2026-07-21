@@ -48,7 +48,11 @@ function Card({ r, onSelect }) {
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-3">
-        <Chip tone={trendToneOf(r.trend?.medium)}>Trend {r.trend?.medium}</Chip>
+        {/* Blended trend — a single timeframe here reads as a contradiction
+            against the verdict, which scores all three. */}
+        <span title={`Panjang: ${r.trend?.long} · Menengah: ${r.trend?.medium} · Pendek: ${r.trend?.short}`}>
+          <Chip tone={trendToneOf(r.trend?.overall)}>Trend {r.trend?.overall}</Chip>
+        </span>
         <Chip>{r.structure}</Chip>
         <Chip>Vol {r.volume_state}</Chip>
         <Chip tone="text-tv-green">Naik {r.probability?.bullish}%</Chip>
@@ -104,7 +108,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
     (!minScore || r.score >= minScore) &&
     (!volFilter || r.volume_state === volFilter) &&
     (!minRR || r.risk_reward >= minRR) &&
-    (!trendFilter || r.trend?.medium?.includes(trendFilter))
+    (!trendFilter || r.trend?.overall?.includes(trendFilter))
   )
 
   return (

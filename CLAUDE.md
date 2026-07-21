@@ -13,7 +13,7 @@ All code lives in `stock-api/`. Run all commands from that directory unless note
 ### Backend (Go) — run from `stock-api/`
 ```bash
 go build -o stock-api.exe .   # Build binary
-./stock-api.exe               # Run server on :8080 (also serves UI from ./static)
+./stock-api.exe               # Run server on :1111 (also serves UI from ./static)
 go build ./...                # Compile-check all packages
 go vet ./...                  # Vet code
 go test ./analysis/           # Advisor unit tests
@@ -24,12 +24,12 @@ go test ./analysis/           # Advisor unit tests
 ### Frontend (React + Vite) — run from `stock-api/ui/`
 ```bash
 npm install --legacy-peer-deps   # required: react-apexcharts vs React 18 peer dep
-npm run dev                      # :5173, proxies /api/* to :8080
+npm run dev                      # :5173, proxies /api/* to :1111
 npm run build                    # outputs to ../static/ (served by Go)
 ```
 
 ### Development workflow
-- Terminal 1: `./stock-api.exe` (API + static files on :8080)
+- Terminal 1: `./stock-api.exe` (API + static files on :1111)
 - Terminal 2: `cd ui && npm run dev` (hot-reload UI on :5173)
 - Production: build UI first, then run the binary (single server)
 

@@ -76,8 +76,11 @@ export default function Advisor({ symbol }) {
               )}
             </div>
             <div className="text-[11px] text-tv-muted">
-              Skor <b className="text-tv-text">{dec.score}/100</b> · keyakinan <b className="text-tv-text">{dec.confidence}%</b> · Decision Engine (skor berbobot 7 faktor)
+              Skor <b className="text-tv-text">{dec.score}/100</b> · keyakinan <b className="text-tv-text">{dec.confidence}%</b> · Decision Engine (skor berbobot 9 faktor)
             </div>
+            {dec.note && (
+              <div className="mt-1.5 text-[11px] text-tv-yellow">⚠️ {dec.note}</div>
+            )}
           </div>
         </div>
       </div>

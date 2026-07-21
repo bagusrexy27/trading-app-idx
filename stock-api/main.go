@@ -250,10 +250,10 @@ func main() {
 	fmt.Println(cBold + cFgCyan + "  ╭──────────────────────────────────────────────────╮" + cReset)
 	fmt.Println(cBold + cFgCyan + "  │ " + cFgMag + "IDX Stock Analyzer" + cReset + cBold + cFgCyan + " · API + UI server          │" + cReset)
 	fmt.Println(cBold + cFgCyan + "  ╰──────────────────────────────────────────────────╯" + cReset)
-	fmt.Println(cFgGray + "    server   " + cReset + "→ " + cFgGreen + "http://localhost:8080" + cReset)
+	fmt.Println(cFgGray + "    server   " + cReset + "→ " + cFgGreen + "http://localhost:1111" + cReset)
 	fmt.Println(cFgGray + "    data     " + cReset + "→ ./data/")
 	fmt.Println(cFgGray + "    ui (dev) " + cReset + "→ " + cFgGreen + "http://localhost:5173" + cReset + cFgGray + "  (npm run dev inside ui/)" + cReset)
 	fmt.Println(cFgGray + "    logging  " + cReset + "→ enabled for /api/* (Gin-style)")
 	fmt.Println()
-	log.Fatal(http.ListenAndServe(":8080", logger(r)))
+	log.Fatal(http.ListenAndServe(":1111", logger(r)))
 }

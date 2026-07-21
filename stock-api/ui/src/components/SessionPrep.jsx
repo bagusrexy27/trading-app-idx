@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api'
-import { fmt, colorOf, signalStyle } from '../utils'
+import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 
 // ── Mini Candlestick (SVG) ────────────────────────────────────────────────────
 function MiniCandle({ open, high, low, close }) {
@@ -300,7 +300,7 @@ function SessionRow({ item, isLast, onClick }) {
       {/* Signal */}
       <td className="px-3 py-2.5">
         <span className={`px-2 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap ${signalStyle(item.signal)}`}>
-          {item.signal}
+          {signalLabel(item.signal)}
         </span>
       </td>
     </tr>

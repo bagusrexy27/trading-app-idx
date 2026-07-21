@@ -834,7 +834,10 @@ func (h *AnalysisHandler) Overview(w http.ResponseWriter, r *http.Request) {
 			if vol20 > 0 {
 				volRatio = analysis.R2(float64(latest.Volume) / float64(vol20))
 			}
-			sig := calcSignals(prices)
+			// Same engine as the Saran tab — see analysis/decision.go. Anything
+			// that shows a BUY/SELL verdict must come from here, or the views
+			// contradict each other.
+			dec := analysis.DecisionEngine(prices)
 
 			ch <- res{ok: true, item: overviewItem{
 				Symbol:   sym,
@@ -845,9 +848,9 @@ func (h *AnalysisHandler) Overview(w http.ResponseWriter, r *http.Request) {
 				Pct1M:    pct(22),
 				RSI:      rsi14,
 				Trend:    trendLabel(latest.Close, sma20, sma50),
-				Signal:   sig.Signal,
-				Score:    sig.Score,
-				MaxScore: sig.MaxScore,
+				Signal:   dec.Signal,
+				Score:    dec.Score,
+				MaxScore: 100,
 				VolRatio: volRatio,
 			}}
 		}()
@@ -1073,7 +1076,7 @@ func (h *AnalysisHandler) Session(w http.ResponseWriter, r *http.Request) {
 				volRatio = analysis.R2(float64(cur.Volume) / float64(vol20))
 			}
 
-			sig := calcSignals(prices)
+			dec := analysis.DecisionEngine(prices) // single source of verdict truth
 
 			ch <- res{ok: true, item: sessionItem{
 				Symbol:       sym,
@@ -1091,9 +1094,9 @@ func (h *AnalysisHandler) Session(w http.ResponseWriter, r *http.Request) {
 				LowerWickPct: lowerWickPct,
 				VolRatio:     volRatio,
 				Pattern:      detectPattern(prices),
-				Signal:       sig.Signal,
-				Score:        sig.Score,
-				MaxScore:     sig.MaxScore,
+				Signal:       dec.Signal,
+				Score:        dec.Score,
+				MaxScore:     100,
 			}}
 		}()
 	}

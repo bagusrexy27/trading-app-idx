@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api'
-import { fmt, colorOf, signalStyle } from '../utils'
+import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import IHSGChart from './IHSGChart'
 
 const SIGNAL_ORDER = ['STRONG BUY', 'BUY', 'NEUTRAL', 'SELL', 'STRONG SELL']
@@ -186,7 +186,7 @@ export default function MarketOverview({ onSelectStock, showToast }) {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-0.5 rounded text-xs font-bold border whitespace-nowrap ${signalStyle(item.signal)}`}>
-                          {item.signal}
+                          {signalLabel(item.signal)}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
