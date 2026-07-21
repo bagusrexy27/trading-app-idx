@@ -3,6 +3,27 @@ import { createChart, CandlestickSeries, LineSeries, HistogramSeries, LineStyle,
 import { api } from '../api'
 import { fmt } from '../utils'
 import { FVGZonesPrimitive } from './chart/FVGZonesPrimitive'
+import { FibZonesPrimitive } from './chart/FibZonesPrimitive'
+
+// Batas atas proyeksi, dalam hari bursa. Panjang sebenarnya dihitung per saham
+// dari jarak target dibagi ATR — kalau dipatok tetap, semua saham tampil dengan
+// bentuk proyeksi yang sama persis.
+const PROJ_MAX = 30
+const PROJ_PLAN = '#26a69a'
+const PROJ_CONE = '#787b86'
+
+// Tanggal hari bursa berikutnya (lewati akhir pekan; libur bursa diabaikan —
+// proyeksi ini soal jarak ke depan, bukan tanggal presisi).
+const futureDates = (lastDate, n) => {
+  const out = []
+  const d = new Date(lastDate + 'T00:00:00Z')
+  while (out.length < n) {
+    d.setUTCDate(d.getUTCDate() + 1)
+    const wd = d.getUTCDay()
+    if (wd !== 0 && wd !== 6) out.push(d.toISOString().slice(0, 10))
+  }
+  return out
+}
 
 // Fibonacci retracement levels: key in API response, label, line color
 const FIB_STYLE = [
@@ -47,6 +68,8 @@ export default function ChartTab({ data, symbol }) {
   const [fib, setFib] = useState(null)          // FibLevels dari API (lookback 100 bar)
   const [showFvg, setShowFvg] = useState(false)
   const [fvgZones, setFvgZones] = useState(null) // 3 zona FVG/iFVG terdekat dari API
+  const [showProj, setShowProj] = useState(false)
+  const [proj, setProj] = useState(null)         // Decision dari API (entry/stop/TP)
   // Indicator visibility toggles — klik legend untuk on/off
   const [showSma20, setShowSma20] = useState(true)
   const [showSma50, setShowSma50] = useState(true)
@@ -65,7 +88,28 @@ export default function ChartTab({ data, symbol }) {
       .catch(() => { if (alive) setShowFib(false) })
     return () => { alive = false }
   }, [showFib, fib, symbol])
-  useEffect(() => { setFib(null); setShowFib(false); setAvwapAnchor(null); setAvwapOn(false); setFvgZones(null); setShowFvg(false) }, [symbol])
+  useEffect(() => { setFib(null); setShowFib(false); setAvwapAnchor(null); setAvwapOn(false); setFvgZones(null); setShowFvg(false); setProj(null); setShowProj(false) }, [symbol])
+
+  // Rencana trade untuk proyeksi — sumbernya Decision Engine, sama dengan tab Saran
+  useEffect(() => {
+    if (!showProj || proj || !symbol) return
+    let alive = true
+    api.analysis.decision(symbol)
+      .then(r => { if (alive) setProj(r.decision) })
+      .catch(() => { if (alive) setShowProj(false) })
+    return () => { alive = false }
+  }, [showProj, proj, symbol])
+
+  // ATR(14) dihitung dari prices yang sudah ada — tidak perlu request tambahan.
+  const atr14 = useMemo(() => {
+    if (prices.length < 15) return 0
+    let sum = 0
+    for (let i = prices.length - 14; i < prices.length; i++) {
+      const p = prices[i], q = prices[i - 1]
+      sum += Math.max(p.high - p.low, Math.abs(p.high - q.close), Math.abs(p.low - q.close))
+    }
+    return sum / 14
+  }, [prices])
 
   // Fetch zona FVG saat toggle pertama dinyalakan — hanya 3 zona terdekat
   useEffect(() => {
@@ -110,6 +154,11 @@ export default function ChartTab({ data, symbol }) {
   const barMapRef    = useRef({})     // date → price obj (untuk tooltip)
   const fibLinesRef  = useRef([])
   const fvgPrimRef   = useRef(null)
+  const fibPrimRef   = useRef(null)
+  const planRef      = useRef(null)   // garis rencana: close → entry → TP1 → TP2
+  const coneUpRef    = useRef(null)   // batas atas kerucut ATR
+  const coneLoRef    = useRef(null)
+  const stopLineRef  = useRef(null)
   const avwapRef     = useRef(null)
   const avwapOnRef   = useRef(false)  // dibaca handler klik (dibuat sekali di init)
   useEffect(() => { avwapOnRef.current = avwapOn }, [avwapOn])
@@ -164,6 +213,28 @@ export default function ChartTab({ data, symbol }) {
     const fvgPrim = new FVGZonesPrimitive()
     candle.attachPrimitive(fvgPrim)
     fvgPrimRef.current = fvgPrim
+
+    const fibPrim = new FibZonesPrimitive()
+    candle.attachPrimitive(fibPrim)
+    fibPrimRef.current = fibPrim
+
+    // Proyeksi ke depan. Seri ini memakai tanggal setelah bar terakhir, jadi
+    // sumbu waktu ikut memanjang ke kanan dengan sendirinya.
+    const plan = chart.addSeries(LineSeries, {
+      color: PROJ_PLAN, lineWidth: 2, lineStyle: LineStyle.Dashed,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+    })
+    const coneUp = chart.addSeries(LineSeries, {
+      color: PROJ_CONE + '80', lineWidth: 1, lineStyle: LineStyle.Dotted,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+    })
+    const coneLo = chart.addSeries(LineSeries, {
+      color: PROJ_CONE + '80', lineWidth: 1, lineStyle: LineStyle.Dotted,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+    })
+    planRef.current   = plan
+    coneUpRef.current = coneUp
+    coneLoRef.current = coneLo
 
     const avwap = chart.addSeries(LineSeries, {
       color: AVWAP_COLOR, lineWidth: 2,
@@ -231,7 +302,9 @@ export default function ChartTab({ data, symbol }) {
       chart.unsubscribeCrosshairMove(onMove)
       chart.unsubscribeClick(onClick)
       candle.detachPrimitive(fvgPrim)
+      candle.detachPrimitive(fibPrim)
       fvgPrimRef.current = null
+      fibPrimRef.current = null
       chart.remove()
       chartRef.current = null
     }
@@ -293,6 +366,72 @@ export default function ChartTab({ data, symbol }) {
     fvgPrimRef.current?.updateZones(showFvg && fvgZones ? fvgZones : [])
   }, [showFvg, fvgZones])
 
+  // ── Arsiran discount/premium Fibonacci ───────────────────────────────
+  useEffect(() => {
+    fibPrimRef.current?.updateFib(showFib && fib ? fib : null)
+  }, [showFib, fib])
+
+  // ── Proyeksi: jalur rencana + kerucut ATR ────────────────────────────
+  useEffect(() => {
+    const plan = planRef.current, up = coneUpRef.current, lo = coneLoRef.current
+    const candle = candleRef.current
+    if (!plan || !up || !lo || !candle) return
+
+    if (stopLineRef.current) {
+      candle.removePriceLine(stopLineRef.current)
+      stopLineRef.current = null
+    }
+    if (!showProj || !proj || !prices.length) {
+      plan.setData([]); up.setData([]); lo.setData([])
+      return
+    }
+
+    const last  = prices[prices.length - 1]
+    const tp    = proj.take_profit ?? []
+    const entry = proj.entry_zone?.ideal ?? last.close
+
+    // Jarak ditempuh dalam satuan "berapa hari gerak rata-rata" = jarak / ATR.
+    // Target yang jauh relatif volatilitasnya butuh lebih banyak bar, jadi tiap
+    // saham dapat bentuk proyeksi sendiri, bukan zigzag seragam.
+    const barsFor = (from, to) =>
+      atr14 > 0 ? Math.max(1, Math.round(Math.abs(to - from) / atr14)) : 3
+
+    const entryBar = Math.min(PROJ_MAX - 2, barsFor(last.close, entry))
+    const tp1Bar = tp[0] ? Math.min(PROJ_MAX - 1, entryBar + barsFor(entry, tp[0].price)) : 0
+    const tp2Bar = tp[1] ? Math.min(PROJ_MAX, tp1Bar + barsFor(tp[0].price, tp[1].price)) : 0
+
+    const horizon = Math.max(entryBar, tp1Bar, tp2Bar) + 1
+    const fut = futureDates(last.date, horizon)
+    const at = b => fut[Math.min(b, fut.length) - 1]
+
+    // Jalur rencana: harga sekarang → entry → TP1 → TP2 (yang tersedia saja).
+    const pts = [{ time: last.date, value: last.close }, { time: at(entryBar), value: entry }]
+    if (tp[0] && tp1Bar > entryBar) pts.push({ time: at(tp1Bar), value: tp[0].price })
+    if (tp[1] && tp2Bar > tp1Bar)   pts.push({ time: at(tp2Bar), value: tp[1].price })
+    plan.setData(pts)
+
+    // Kerucut melebar sebagai akar waktu, bukan linear — itu cara jujur
+    // menggambar ketidakpastian yang menumpuk. Garis lurus akan menyiratkan
+    // kepastian arah yang tidak dimiliki engine ini.
+    const cu = [{ time: last.date, value: last.close }]
+    const cl = [{ time: last.date, value: last.close }]
+    fut.forEach((d, i) => {
+      const w = atr14 * Math.sqrt(i + 1)
+      cu.push({ time: d, value: last.close + w })
+      cl.push({ time: d, value: Math.max(1, last.close - w) })
+    })
+    up.setData(cu)
+    lo.setData(cl)
+
+    if (proj.stop_loss) {
+      stopLineRef.current = candle.createPriceLine({
+        price: proj.stop_loss,
+        color: DOWN, lineWidth: 1, lineStyle: LineStyle.Dashed,
+        axisLabelVisible: true, title: 'Stop',
+      })
+    }
+  }, [showProj, proj, prices, atr14])
+
   const yesterday = prices.length >= 2 ? prices[prices.length - 2] : null
   const today     = prices.length >= 1 ? prices[prices.length - 1] : null
 
@@ -343,6 +482,16 @@ export default function ChartTab({ data, symbol }) {
         >
           ▦ FVG
         </button>
+        <button
+          onClick={() => setShowProj(v => !v)}
+          title="Proyeksi: jalur rencana Decision Engine (entry → TP) + kerucut ATR. Skenario, bukan ramalan harga."
+          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all
+            ${showProj
+              ? 'bg-tv-green/15 text-tv-green border border-tv-green/40 shadow-[0_0_12px_rgba(38,166,154,0.25)]'
+              : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
+        >
+          ⤳ Proyeksi
+        </button>
         {avwapOn && (
           <span className="flex items-center gap-1 text-[10px]">
             {[['low', 'Low'], ['high', 'High'], ['vol', 'Vol×']].map(([k, lbl]) => (
@@ -387,6 +536,98 @@ export default function ChartTab({ data, symbol }) {
           />
         </div>
       </div>
+
+      <ChartGlossary />
+    </div>
+  )
+}
+
+// ── Glosarium istilah chart ──────────────────────────────────────────────────
+// Ditulis untuk pemula: apa artinya, lalu cara bacanya. Sengaja tidak memberi
+// instruksi beli/jual — indikator memberi konteks, bukan keputusan.
+const GLOSSARY = [
+  {
+    icon: '𝜑', color: 'text-tv-yellow', term: 'Fibonacci Retracement',
+    what: 'Garis-garis mendatar antara titik tertinggi dan terendah dalam 100 hari terakhir, dibagi pada rasio 23,6% · 38,2% · 50% · 61,8% · 78,6%.',
+    how: 'Setelah harga bergerak jauh, biasanya ia mundur dulu sebagian sebelum lanjut. Level-level ini adalah tempat harga sering berhenti mundur.',
+  },
+  {
+    icon: '▬', color: 'text-tv-green', term: 'Discount (arsiran hijau)',
+    what: 'Area di bawah level 50% — harga sedang berada di paruh bawah rentangnya.',
+    how: 'Dianggap "relatif murah" dibanding pergerakan terakhir. Bukan berarti pasti naik — saham yang jatuh terus juga selalu terlihat murah.',
+  },
+  {
+    icon: '▬', color: 'text-tv-red', term: 'Premium (arsiran merah)',
+    what: 'Area di atas level 50% — harga di paruh atas rentangnya.',
+    how: 'Dianggap "relatif mahal". Pembeli yang masuk di sini menanggung risiko lebih besar karena jarak ke titik tertinggi makin dekat.',
+  },
+  {
+    icon: '▬', color: 'text-tv-yellow', term: 'Golden Pocket (61,8–78,6%)',
+    what: 'Pita kuning pekat di dalam area discount.',
+    how: 'Bagian yang paling banyak diperhatikan trader. Karena banyak yang menaruh order di situ, harga sering bereaksi di area ini.',
+  },
+  {
+    icon: '⚓', color: 'text-tv-blue', term: 'AVWAP (Anchored VWAP)',
+    what: 'Harga rata-rata sejak satu tanggal yang kamu pilih, dibobot volume — jadi hari bervolume besar lebih berpengaruh.',
+    how: 'Kira-kira "rata-rata modal" orang yang masuk sejak tanggal itu. Harga di atas garis = mayoritas mereka untung; di bawah = mayoritas rugi.',
+  },
+  {
+    icon: '▦', color: 'text-tv-purple', term: 'FVG (Fair Value Gap)',
+    what: 'Celah harga dari tiga candle berurutan yang melompat tanpa transaksi bertemu di tengahnya.',
+    how: 'Menandai lompatan yang terlalu cepat. Harga cukup sering kembali "mengisi" celah ini sebelum melanjutkan arah.',
+  },
+  {
+    icon: '▦', color: 'text-tv-yellow', term: 'iFVG (inverted FVG)',
+    what: 'Kotak amber — FVG yang sudah ditembus harga.',
+    how: 'Setelah ditembus, celah itu berganti peran: yang tadinya menahan dari bawah kini menekan dari atas, dan sebaliknya.',
+  },
+  {
+    icon: '⤳', color: 'text-tv-green', term: 'Proyeksi',
+    what: 'Garis hijau putus-putus: harga sekarang → area entry → target 1 → target 2, memakai rencana dari Decision Engine. Garis merah = stop loss.',
+    how: 'Ini skenario, BUKAN ramalan. Artinya "kalau rencana ini berjalan, jalurnya kira-kira begini" — bukan "harga akan ke sini".',
+  },
+  {
+    icon: '⋯', color: 'text-tv-muted', term: 'Kerucut ATR',
+    what: 'Dua garis titik-titik yang melebar ke kanan, dihitung dari rata-rata rentang gerak harian (ATR).',
+    how: 'Menunjukkan seberapa lebar harga wajar bergerak ke depan. Makin jauh ke depan makin melebar, karena makin jauh makin tidak pasti.',
+  },
+]
+
+function ChartGlossary() {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-tv-hover transition-colors"
+      >
+        <span className="text-xs font-bold text-tv-text">📖 Arti Istilah di Chart</span>
+        <span className="text-[10px] text-tv-muted">untuk yang baru mulai</span>
+        <span className={`ml-auto text-tv-muted text-xs transition-transform ${open ? 'rotate-90' : ''}`}>›</span>
+      </button>
+
+      {open && (
+        <div className="border-t border-tv-border divide-y divide-tv-border/60">
+          {GLOSSARY.map(g => (
+            <div key={g.term} className="px-4 py-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`${g.color} text-sm w-4 text-center`}>{g.icon}</span>
+                <span className="text-xs font-bold text-tv-text">{g.term}</span>
+              </div>
+              <div className="pl-6 space-y-1">
+                <p className="text-[11px] text-tv-muted leading-relaxed">{g.what}</p>
+                <p className="text-[11px] text-tv-text/80 leading-relaxed">
+                  <span className="text-tv-muted">Cara baca: </span>{g.how}
+                </p>
+              </div>
+            </div>
+          ))}
+          <p className="px-4 py-3 text-[10px] text-tv-muted leading-relaxed">
+            Semua alat di atas menggambarkan apa yang <b className="text-tv-text/80">sudah</b> terjadi pada harga.
+            Tidak ada yang bisa memastikan apa yang akan terjadi — gunakan sebagai bahan pertimbangan, bukan sebagai perintah beli atau jual.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
