@@ -18,9 +18,12 @@ export const colorOf = (n) =>
 export const bgOf = (n) =>
   n > 0 ? 'bg-tv-green/10 text-tv-green' : n < 0 ? 'bg-tv-red/10 text-tv-red' : 'bg-tv-muted/10 text-tv-muted'
 
+// Decision Engine emits STRONG_BUY / STRONG_SELL; older payloads use spaces.
+export const signalLabel = (s) => (s ? s.toUpperCase().replace(/_/g, ' ') : '')
+
 export const signalStyle = (s) => {
-  if (!s) return 'bg-tv-muted/10 text-tv-muted border-tv-muted/20'
-  const u = s.toUpperCase()
+  const u = signalLabel(s)
+  if (!u) return 'bg-tv-muted/10 text-tv-muted border-tv-muted/20'
   if (u.includes('STRONG BUY'))  return 'bg-tv-green text-white border-tv-green'
   if (u.includes('BUY'))         return 'bg-tv-green/15 text-tv-green border-tv-green/30'
   if (u.includes('STRONG SELL')) return 'bg-tv-red text-white border-tv-red'

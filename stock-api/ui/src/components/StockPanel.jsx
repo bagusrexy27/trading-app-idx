@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { api } from '../api'
-import { fmt, colorOf, signalStyle } from '../utils'
+import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import Overview from './Overview'
 import RiskCalc from './RiskCalc'
 import ReportUpload from './ReportUpload'
@@ -36,13 +36,15 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
     setLoading(true)
     setError(null)
     try {
-      const [summary, pricesResp, signals] = await Promise.all([
+      // Verdict comes from the Decision Engine — same source as the Saran tab,
+      // so the header badge can never contradict it.
+      const [summary, pricesResp, decision] = await Promise.all([
         api.analysis.summary(symbol),
         api.stocks.get(symbol, 300),
-        api.analysis.signals(symbol),
+        api.analysis.decision(symbol),
       ])
       // Fresh object drops stale tab extras → the tab effect refetches them.
-      setData({ summary, prices: pricesResp?.prices || [], signals })
+      setData({ summary, prices: pricesResp?.prices || [], decision })
     } catch (e) {
       setError(e.message)
     } finally {
@@ -165,7 +167,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const { summary } = data
   const p = summary.price
   const c = summary.changes['1d']
-  const signalNow = data.signals?.signal
+  const signalNow = data.decision?.decision?.signal
 
   return (
     <div className="flex flex-col h-full">
@@ -199,7 +201,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
           {/* Signal badge */}
           {signalNow && (
             <span className={`hidden md:inline-flex px-2.5 py-0.5 rounded-full border text-xs font-bold ${signalStyle(signalNow)}`}>
-              {signalNow}
+              {signalLabel(signalNow)}
             </span>
           )}
 

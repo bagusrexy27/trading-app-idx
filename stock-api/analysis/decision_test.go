@@ -63,6 +63,66 @@ func TestDecisionEngineInvariants(t *testing.T) {
 	}
 }
 
+// The gate is what stops the engine from calling a direction the factors do
+// not agree on — if it ever stops firing, WAIT-on-conflict is silently gone.
+func TestDecisionEngineLowConfidenceGate(t *testing.T) {
+	d := DecisionEngine(synthPrices(120))
+	if d.Confidence < 45 && d.Signal != "WAIT" {
+		t.Errorf("confidence %d < 45 must be gated to WAIT, got %s", d.Confidence, d.Signal)
+	}
+	if d.Note != "" && d.Signal != "WAIT" {
+		t.Errorf("gate note set but signal is %s, want WAIT", d.Signal)
+	}
+}
+
+func TestDecisionEngineHasNewFactors(t *testing.T) {
+	d := DecisionEngine(synthPrices(120))
+	want := map[string]bool{"Money Flow": false, "Trend Strength": false}
+	for _, c := range d.Components {
+		if _, ok := want[c.Name]; ok {
+			want[c.Name] = true
+			if c.Score < 0 || c.Score > 100 {
+				t.Errorf("%s score out of range: %d", c.Name, c.Score)
+			}
+		}
+	}
+	for name, found := range want {
+		if !found {
+			t.Errorf("missing factor %q", name)
+		}
+	}
+}
+
+// A stock that collapsed leaves swing levels stranded far above price. Without
+// capping, that reads as unlimited upside: perfect S/R score and absurd R/R.
+func TestDecisionEngineCapsStrandedTargets(t *testing.T) {
+	p := synthPrices(120)
+	// Drop the last 30 bars to a fraction of their price, leaving the old
+	// highs far overhead — the TPIA shape.
+	for i := len(p) - 30; i < len(p); i++ {
+		p[i].Open *= 0.4
+		p[i].High *= 0.4
+		p[i].Low *= 0.4
+		p[i].Close *= 0.4
+	}
+	d := DecisionEngine(p)
+
+	last := p[len(p)-1].Close
+	if d.TakeProfit[0].Price > last*2 {
+		t.Errorf("TP1 %v is more than 2x price %v — target not capped", d.TakeProfit[0].Price, last)
+	}
+	if len(d.TakeProfit) > 1 && d.TakeProfit[1].Price <= d.TakeProfit[0].Price {
+		t.Errorf("TP tiers out of order: %v", d.TakeProfit)
+	}
+	if d.RiskReward > rrImplausible {
+		for _, c := range d.Components {
+			if c.Name == "Risk/Reward" && c.Score > 50 {
+				t.Errorf("implausible R/R %.1f scored %d, want ≤50", d.RiskReward, c.Score)
+			}
+		}
+	}
+}
+
 func TestDecisionEngineInsufficientData(t *testing.T) {
 	d := DecisionEngine(synthPrices(30))
 	if d.Signal != "WAIT" || d.Confidence != 0 {
