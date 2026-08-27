@@ -42,21 +42,6 @@ const RANGE_DAYS = { '1W': 5, '1M': 22, '3M': 66, '6M': 132, '1Y': 252, 'All': 9
 const UP = '#26a69a', DOWN = '#ef5350'
 const AVWAP_COLOR = '#29b6f6'
 
-// AVWAP: harga tipikal tertimbang volume, kumulatif dari bar anchor → akhir data
-const computeAvwap = (prices, anchorDate) => {
-  const i0 = prices.findIndex(p => p.date === anchorDate)
-  if (i0 < 0) return []
-  let pv = 0, vv = 0
-  const out = []
-  for (let i = i0; i < prices.length; i++) {
-    const p = prices[i]
-    const tp = (p.high + p.low + p.close) / 3
-    pv += tp * p.volume; vv += p.volume
-    out.push({ time: p.date, value: vv ? pv / vv : tp })
-  }
-  return out
-}
-
 // param.time bisa berupa string 'YYYY-MM-DD' atau BusinessDay {year,month,day}
 const timeToDate = t => typeof t === 'string'
   ? t
@@ -121,12 +106,23 @@ export default function ChartTab({ data, symbol }) {
     return () => { alive = false }
   }, [showFvg, fvgZones, symbol])
 
-  // gambar/hapus garis AVWAP saat anchor berubah
+  // gambar/hapus garis AVWAP saat anchor berubah (via backend)
   useEffect(() => {
     const s = avwapRef.current
     if (!s) return
-    s.setData(avwapOn && avwapAnchor ? computeAvwap(prices, avwapAnchor) : [])
-  }, [avwapOn, avwapAnchor, prices])
+    if (!avwapOn || !avwapAnchor) {
+      s.setData([])
+      return
+    }
+    let alive = true
+    api.analysis.avwap(symbol, avwapAnchor)
+      .then(r => {
+        if (!alive) return
+        s.setData((r.data || []).map(p => ({ time: p.date, value: p.value })))
+      })
+      .catch(() => { if (alive) s.setData([]) })
+    return () => { alive = false }
+  }, [avwapOn, avwapAnchor, symbol, prices])
 
   // preset anchor: swing low / swing high / volume tertinggi di window range aktif
   const presetAnchor = (kind) => {

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { api } from '../api'
 import { fmt } from '../utils'
 
-// Decision-engine signal → banner styling (5 levels, static classes for JIT).
 const SIGNAL = {
   STRONG_BUY:  { label: 'STRONG BUY',  icon: '🚀', text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
   BUY:         { label: 'BUY',         icon: '✅', text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
@@ -32,20 +31,34 @@ function Pill({ label, value, tone = 'text-tv-text' }) {
   )
 }
 
-export default function Advisor({ symbol }) {
+export default function Advisor({ symbol, decisionData }) {
   const [dec, setDec]         = useState(null)
+  const [bt, setBt]           = useState(null)
   const [loading, setLoading] = useState(true)
+  const [btLoading, setBtLoading] = useState(true)
   const [error, setError]     = useState(null)
 
   useEffect(() => {
     let alive = true
     setLoading(true); setError(null)
-    api.analysis.decision(symbol)
+
+    const loadDec = decisionData?.decision
+      ? Promise.resolve({ decision: decisionData.decision, syariah: decisionData.syariah })
+      : api.analysis.decision(symbol)
+
+    loadDec
       .then(r => { if (alive) setDec({ ...r.decision, syariah: r.syariah }) })
       .catch(e => { if (alive) setError(e.message) })
       .finally(() => { if (alive) setLoading(false) })
+
+    setBtLoading(true)
+    api.analysis.decisionBacktest(symbol)
+      .then(r => { if (alive) setBt(r.backtest) })
+      .catch(() => { if (alive) setBt(null) })
+      .finally(() => { if (alive) setBtLoading(false) })
+
     return () => { alive = false }
-  }, [symbol])
+  }, [symbol, decisionData])
 
   if (loading) return (
     <div className="flex items-center justify-center h-64 text-tv-muted">
@@ -64,7 +77,6 @@ export default function Advisor({ symbol }) {
   return (
     <div className="p-4 sm:p-6 space-y-5 max-w-4xl mx-auto">
 
-      {/* ── Verdict banner ─────────────────────────────────────── */}
       <div className={`rounded-xl border-2 p-5 ${v.banner} ${canTrade ? 'breathe-green' : ''}`}>
         <div className="flex items-center gap-3">
           <span className="text-3xl float-y">{v.icon}</span>
@@ -76,7 +88,7 @@ export default function Advisor({ symbol }) {
               )}
             </div>
             <div className="text-[11px] text-tv-muted">
-              Skor <b className="text-tv-text">{dec.score}/100</b> · keyakinan <b className="text-tv-text">{dec.confidence}%</b> · Decision Engine (skor berbobot 9 faktor)
+              Skor <b className="text-tv-text">{dec.score}/100</b> · keyakinan <b className="text-tv-text">{dec.confidence}%</b> · Decision Engine (11 faktor berbobot)
             </div>
             {dec.note && (
               <div className="mt-1.5 text-[11px] text-tv-yellow">⚠️ {dec.note}</div>
@@ -85,7 +97,40 @@ export default function Advisor({ symbol }) {
         </div>
       </div>
 
-      {/* ── Probability distribution ───────────────────────────── */}
+      {/* Backtest historis Decision Engine */}
+      <div className="bg-tv-card border border-tv-border rounded-xl p-4">
+        <div className="text-xs font-bold text-tv-muted uppercase mb-3">📊 Backtest Decision Engine</div>
+        {btLoading ? (
+          <div className="text-sm text-tv-muted">Menghitung performa historis...</div>
+        ) : !bt || (bt.total === 0 && bt.open_trades === 0) ? (
+          <div className="text-sm text-tv-muted">Data belum cukup untuk backtest (butuh ≥61 bar).</div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+              <div>
+                <div className="text-[11px] text-tv-muted">Win rate</div>
+                <div className={`font-bold ${bt.win_rate >= 50 ? 'text-tv-green' : 'text-tv-red'}`}>{bt.win_rate?.toFixed(1)}%</div>
+              </div>
+              <div>
+                <div className="text-[11px] text-tv-muted">Expectancy / trade</div>
+                <div className={`font-bold ${bt.expectancy_pct >= 0 ? 'text-tv-green' : 'text-tv-red'}`}>{bt.expectancy_pct > 0 ? '+' : ''}{bt.expectancy_pct?.toFixed(2)}%</div>
+              </div>
+              <div>
+                <div className="text-[11px] text-tv-muted">Trades (closed)</div>
+                <div className="font-bold">{bt.total} <span className="text-tv-muted font-normal">({bt.wins}W / {bt.losses}L{bt.open_trades ? ` · ${bt.open_trades} open` : ''})</span></div>
+              </div>
+              <div>
+                <div className="text-[11px] text-tv-muted">Avg R/R rencana</div>
+                <div className="font-bold">1 : {bt.avg_rr?.toFixed(1)}</div>
+              </div>
+            </div>
+            <p className="text-[10px] text-tv-muted mt-2">
+              Simulasi: entry saat sinyal STRONG_BUY/BUY, keluar di stop/target intrabar. Tanpa look-ahead.
+            </p>
+          </>
+        )}
+      </div>
+
       <div className="bg-tv-card border border-tv-border rounded-xl p-4">
         <div className="text-xs font-bold text-tv-muted uppercase mb-3">🎲 Probabilitas Skenario</div>
         <div className="flex h-2.5 rounded-full overflow-hidden bg-tv-bg">
@@ -100,7 +145,6 @@ export default function Advisor({ symbol }) {
         </div>
       </div>
 
-      {/* ── Trend + structure pills ────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Pill label="Trend Panjang" value={dec.trend.long} tone={trendToneOf(dec.trend.long)} />
         <Pill label="Trend Menengah" value={dec.trend.medium} tone={trendToneOf(dec.trend.medium)} />
@@ -108,7 +152,6 @@ export default function Advisor({ symbol }) {
         <Pill label="Struktur" value={`${dec.market_structure.state} (${dec.market_structure.strength})`} />
       </div>
 
-      {/* ── Trade plan ─────────────────────────────────────────── */}
       <div className="bg-tv-card border border-tv-border rounded-xl p-4">
         <div className="text-xs font-bold text-tv-muted uppercase mb-3">📐 Rencana Trading</div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
@@ -128,7 +171,7 @@ export default function Advisor({ symbol }) {
           </div>
           <div>
             <div className="text-[11px] text-tv-muted">Risk / Reward</div>
-            <div className={`font-bold ${dec.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-red'}`}>1 : {dec.risk_reward?.toFixed(1)}</div>
+            <div className={`font-bold ${dec.risk_reward >= 2 ? 'text-tv-green' : dec.risk_reward >= 1 ? 'text-tv-yellow' : 'text-tv-red'}`}>1 : {dec.risk_reward?.toFixed(1)}</div>
           </div>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-[12px] mt-3">
@@ -142,7 +185,6 @@ export default function Advisor({ symbol }) {
         )}
       </div>
 
-      {/* ── Transparent factor breakdown ───────────────────────── */}
       <div className="bg-tv-card border border-tv-border rounded-xl p-4">
         <div className="text-xs font-bold text-tv-muted uppercase mb-3">🧠 Breakdown Skor per Faktor</div>
         <div className="space-y-1.5">
@@ -151,13 +193,13 @@ export default function Advisor({ symbol }) {
               <span className="w-36 shrink-0 text-tv-muted">{c.name} <span className="text-[10px]">({c.weight}%)</span></span>
               <ScoreBar score={c.score} />
               <span className="w-7 text-right tabular-nums font-bold">{c.score}</span>
-              <span className="text-tv-muted truncate">{c.note}</span>
+              <span className="text-tv-muted truncate" title={c.note}>{c.note}</span>
             </div>
           ))}
         </div>
         <p className="text-[10px] text-tv-muted mt-3 leading-relaxed">
-          Skor 50 = netral. Bobot: Struktur 30% · Trend 20% · Volume 15% · S/R 15% · Momentum 10% · Candle 5% · R/R 5%.
-          Keyakinan = seberapa searah semua faktor menunjuk arah yang sama, bukan jaminan harga.
+          Skor 50 = netral. Termasuk FVG Confluence dan Bandarmology (jika data broker tersedia).
+          Keyakinan = seberapa searah semua faktor — bukan jaminan harga.
         </p>
       </div>
 

@@ -3,14 +3,14 @@ import { api } from '../api'
 import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import IHSGChart from './IHSGChart'
 
-const SIGNAL_ORDER = ['STRONG BUY', 'BUY', 'NEUTRAL', 'SELL', 'STRONG SELL']
+const SIGNAL_ORDER = ['STRONG_BUY', 'BUY', 'NEUTRAL', 'SELL', 'STRONG_SELL']
 
 const SUMMARY_CARDS = [
-  { signal: 'STRONG BUY',  label: 'Strong Buy',  cls: 'bg-tv-green text-white' },
+  { signal: 'STRONG_BUY',  label: 'Strong Buy',  cls: 'bg-tv-green text-white' },
   { signal: 'BUY',         label: 'Buy',          cls: 'bg-tv-green/15 text-tv-green border border-tv-green/30' },
   { signal: 'NEUTRAL',     label: 'Neutral',      cls: 'bg-tv-muted/10 text-tv-muted border border-tv-muted/20' },
   { signal: 'SELL',        label: 'Sell',         cls: 'bg-tv-red/15 text-tv-red border border-tv-red/30' },
-  { signal: 'STRONG SELL', label: 'Strong Sell',  cls: 'bg-tv-red text-white' },
+  { signal: 'STRONG_SELL', label: 'Strong Sell',  cls: 'bg-tv-red text-white' },
 ]
 
 const COLUMNS = [

@@ -298,7 +298,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
                 {tab === 'overview'   && <Overview   data={data} />}
                 {tab === 'chart'      && <ChartTab   data={data} symbol={symbol} />}
                 {tab === 'indicators' && <Indicators data={data} />}
-                {tab === 'advisor'    && <Advisor    symbol={symbol} />}
+                {tab === 'advisor'    && <Advisor    symbol={symbol} decisionData={data.decision} />}
                 {tab === 'risk'       && <RiskCalc      data={data} />}
                 {tab === 'laporan'    && <ReportUpload  symbol={symbol} showToast={showToast} />}
               </Suspense>

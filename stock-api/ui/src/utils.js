@@ -22,12 +22,12 @@ export const bgOf = (n) =>
 export const signalLabel = (s) => (s ? s.toUpperCase().replace(/_/g, ' ') : '')
 
 export const signalStyle = (s) => {
-  const u = signalLabel(s)
+  const u = (s || '').toUpperCase().replace(/ /g, '_')
   if (!u) return 'bg-tv-muted/10 text-tv-muted border-tv-muted/20'
-  if (u.includes('STRONG BUY'))  return 'bg-tv-green text-white border-tv-green'
-  if (u.includes('BUY'))         return 'bg-tv-green/15 text-tv-green border-tv-green/30'
-  if (u.includes('STRONG SELL')) return 'bg-tv-red text-white border-tv-red'
-  if (u.includes('SELL'))        return 'bg-tv-red/15 text-tv-red border-tv-red/30'
+  if (u === 'STRONG_BUY')  return 'bg-tv-green text-white border-tv-green'
+  if (u === 'BUY')         return 'bg-tv-green/15 text-tv-green border-tv-green/30'
+  if (u === 'STRONG_SELL') return 'bg-tv-red text-white border-tv-red'
+  if (u === 'SELL')        return 'bg-tv-red/15 text-tv-red border-tv-red/30'
   return 'bg-tv-muted/10 text-tv-muted border-tv-muted/20'
 }
 
