@@ -28,6 +28,19 @@ func brokerPath(symbol string) string {
 	return filepath.Join(brokerDir, symbol+".json")
 }
 
+// LoadBrokerDays reads broker summary history for a symbol (nil slice if missing).
+func LoadBrokerDays(symbol string) []analysis.BrokerDay {
+	b, err := os.ReadFile(brokerPath(symbol))
+	if err != nil {
+		return nil
+	}
+	var d analysis.BrokerData
+	if err := json.Unmarshal(b, &d); err != nil {
+		return nil
+	}
+	return d.Days
+}
+
 // ── Storage IO ───────────────────────────────────────────────────────────────
 
 func (h *BrokerHandler) load(symbol string) (*analysis.BrokerData, error) {

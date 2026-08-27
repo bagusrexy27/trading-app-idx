@@ -16,9 +16,9 @@ import (
 // profit, and a bullish/sideways/bearish probability distribution.
 //
 // Weights:
-//   Market Structure 25% · Trend EMA 18% · Money Flow 12% · Volume 12%
-//   Support/Resistance 12% · Momentum 8% · Trend Strength 5% · Candlestick 4%
-//   Risk/Reward 4%
+//   Market Structure 23% · Trend EMA 16% · Money Flow 10% · Volume 10%
+//   Support/Resistance 10% · Momentum 7% · Trend Strength 4% · Candlestick 3%
+//   Risk/Reward 2% · FVG Confluence 7% · Bandarmology 8%
 //
 // A low-confidence result (factors disagreeing sharply) is downgraded to WAIT
 // rather than emitting a BUY/SELL the components do not actually support.
@@ -241,6 +241,11 @@ func clampScore(v float64) int {
 
 // DecisionEngine runs the weighted scoring model. Needs ≥ 60 bars.
 func DecisionEngine(prices []models.StockPrice) Decision {
+	return DecisionEngineWithBroker(prices, nil)
+}
+
+// DecisionEngineWithBroker is DecisionEngine with optional broker-summary flow.
+func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay) Decision {
 	n := len(prices)
 	if n < 60 {
 		return Decision{Signal: "WAIT", Confidence: 0,
@@ -498,17 +503,22 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 		rrSc = 45
 	}
 
+	fvgSc, fvgNote := scoreFVGConfluence(prices, close)
+	bandarSc, bandarNote := scoreBandarmology(brokerDays)
+
 	// ── Weighted total → signal ──────────────────────────────────────────────
 	comps := []FactorScore{
-		{Name: "Market Structure", Score: structSc, Weight: 25, Note: structState},
-		{Name: "Trend EMA", Score: trendSc, Weight: 18, Note: fmt.Sprintf("L:%s M:%s S:%s", trend.Long, trend.Medium, trend.Short)},
-		{Name: "Money Flow", Score: flowSc, Weight: 12, Note: fmt.Sprintf("%s (CMF %+.2f, MFI %.0f)", flowStatus, cmf, mfi)},
-		{Name: "Volume", Score: volSc, Weight: 12, Note: fmt.Sprintf("%s (%.2f× rata-rata 20D)", volStatus, vr)},
-		{Name: "Support/Resistance", Score: srSc, Weight: 12, Note: srNote},
-		{Name: "Momentum", Score: momSc, Weight: 8, Note: fmt.Sprintf("RSI %.0f, MACD hist %+.1f", rsi, macdHist)},
-		{Name: "Trend Strength", Score: adxSc, Weight: 5, Note: fmt.Sprintf("ADX %.0f (%s)", adxVal, adxLabel(adxVal))},
-		{Name: "Candlestick", Score: candleSc, Weight: 4, Note: candleLabel},
-		{Name: "Risk/Reward", Score: rrSc, Weight: 4, Note: fmt.Sprintf("R/R %.1f", rr)},
+		{Name: "Market Structure", Score: structSc, Weight: 23, Note: structState},
+		{Name: "Trend EMA", Score: trendSc, Weight: 16, Note: fmt.Sprintf("L:%s M:%s S:%s", trend.Long, trend.Medium, trend.Short)},
+		{Name: "Money Flow", Score: flowSc, Weight: 10, Note: fmt.Sprintf("%s (CMF %+.2f, MFI %.0f)", flowStatus, cmf, mfi)},
+		{Name: "Volume", Score: volSc, Weight: 10, Note: fmt.Sprintf("%s (%.2f× rata-rata 20D)", volStatus, vr)},
+		{Name: "Support/Resistance", Score: srSc, Weight: 10, Note: srNote},
+		{Name: "Momentum", Score: momSc, Weight: 7, Note: fmt.Sprintf("RSI %.0f, MACD hist %+.1f", rsi, macdHist)},
+		{Name: "Trend Strength", Score: adxSc, Weight: 4, Note: fmt.Sprintf("ADX %.0f (%s)", adxVal, adxLabel(adxVal))},
+		{Name: "Candlestick", Score: candleSc, Weight: 3, Note: candleLabel},
+		{Name: "Risk/Reward", Score: rrSc, Weight: 2, Note: fmt.Sprintf("R/R %.1f", rr)},
+		{Name: "FVG Confluence", Score: fvgSc, Weight: 7, Note: fvgNote},
+		{Name: "Bandarmology", Score: bandarSc, Weight: 8, Note: bandarNote},
 	}
 	total := 0.0
 	for _, c := range comps {
@@ -569,6 +579,76 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 		Components:      comps,
 		Note:            note,
 	}
+}
+
+// scoreFVGConfluence scores proximity to active/inverted Fair Value Gaps.
+func scoreFVGConfluence(prices []models.StockPrice, close float64) (int, string) {
+	zones := FVG(prices, 200, 0.3)
+	if len(zones) == 0 {
+		return 50, "tidak ada FVG terdeteksi"
+	}
+	const nearPct = 3.0
+	bullBoost, bearPenalty := 0.0, 0.0
+	bullNote, bearNote := "", ""
+	for _, z := range zones {
+		if z.Status != "active" && z.Status != "inverted" {
+			continue
+		}
+		mid := (z.Top + z.Bottom) / 2
+		if close <= 0 {
+			continue
+		}
+		dist := math.Abs(close-mid) / close * 100
+		if dist > nearPct {
+			continue
+		}
+		switch z.Type {
+		case "bull":
+			if z.Bottom <= close {
+				boost := (nearPct - dist) / nearPct * 40
+				if boost > bullBoost {
+					bullBoost = boost
+					bullNote = fmt.Sprintf("FVG bull %s (%.1f%%)", z.Status, dist)
+				}
+			}
+		case "bear":
+			if z.Top >= close {
+				pen := (nearPct - dist) / nearPct * 40
+				if pen > bearPenalty {
+					bearPenalty = pen
+					bearNote = fmt.Sprintf("FVG bear %s (%.1f%%)", z.Status, dist)
+				}
+			}
+		}
+	}
+	sc := clampScore(50 + bullBoost - bearPenalty)
+	note := "tidak ada FVG aktif terdekat"
+	switch {
+	case bullNote != "" && bearNote != "":
+		note = bullNote + " · " + bearNote
+	case bullNote != "":
+		note = bullNote
+	case bearNote != "":
+		note = bearNote
+	}
+	return sc, note
+}
+
+// scoreBandarmology maps broker flow to 0–100 (50 = neutral / no data).
+func scoreBandarmology(days []BrokerDay) (int, string) {
+	if len(days) == 0 {
+		return 50, "data broker tidak tersedia"
+	}
+	bs := BandarScore(days, 10)
+	sc := clampScore(50 + bs*0.5)
+	status := "netral"
+	switch {
+	case bs > 20:
+		status = "akumulasi"
+	case bs < -20:
+		status = "distribusi"
+	}
+	return sc, fmt.Sprintf("%s (skor %+.0f)", status, bs)
 }
 
 func adxLabel(v float64) string {

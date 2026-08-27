@@ -1,66 +1,347 @@
-// Slim navigation sidebar — the stock list itself lives in the Watchlist view.
-export default function Sidebar({ stocks, activeView, onAdd, onUpdateAll,
-  onViewWatchlist, onViewOverview, onViewSession, onViewAdvisor, onViewPortfolio, onViewPractice, onOpenAlerts }) {
+import { useState, useMemo } from 'react'
+import { fmt } from '../utils'
+
+const NAV = [
+  { id: 'watchlist', icon: '⭐', label: 'Watchlist', badgeFrom: 'stocks' },
+  { id: 'overview',  icon: '📊', label: 'Market Overview' },
+  { id: 'session',   icon: '🕯️', label: 'Last Session' },
+  { id: 'advisor',   icon: '🧭', label: 'Advisor Screener' },
+  { id: 'portfolio', icon: '💼', label: 'Portfolio' },
+  { id: 'practice',  icon: '🎮', label: 'Latihan' },
+]
+
+// Nav + quick watchlist jump. Collapsed icon rail saves space on desktop.
+export default function Sidebar({
+  stocks, selectedSymbol, activeView, recentSymbols = [], mobileOpen, collapsed, onToggleCollapse,
+  onMobileClose, onAdd, onUpdateAll, onSelectStock,
+  onViewWatchlist, onViewOverview, onViewSession,
+  onViewAdvisor, onViewPortfolio, onViewPractice, onOpenAlerts,
+}) {
+  const [query, setQuery] = useState('')
+  const [listSort, setListSort] = useState('symbol') // symbol | pct
+  const nav = (fn) => () => { fn(); onMobileClose?.() }
+
+  const viewFns = {
+    watchlist: onViewWatchlist,
+    overview: onViewOverview,
+    session: onViewSession,
+    advisor: onViewAdvisor,
+    portfolio: onViewPortfolio,
+    practice: onViewPractice,
+  }
+
+  const expanded = mobileOpen || !collapsed
+
+  const marketPulse = useMemo(() => {
+    const list = stocks || []
+    const gainers = list.filter(s => (s.change_pct ?? 0) > 0).length
+    const losers  = list.filter(s => (s.change_pct ?? 0) < 0).length
+    return { gainers, losers, total: list.length }
+  }, [stocks])
+
+  const recent = useMemo(
+    () => recentSymbols.filter(sym => (stocks || []).some(s => s.symbol === sym)),
+    [recentSymbols, stocks],
+  )
+
+  const watchlistRows = useMemo(() => {
+    const q = query.trim().toUpperCase()
+    let list = [...(stocks || [])]
+    if (q) list = list.filter(s => s.symbol.includes(q))
+    if (listSort === 'pct') {
+      list.sort((a, b) => (b.change_pct ?? -999) - (a.change_pct ?? -999))
+    } else {
+      list.sort((a, b) => a.symbol.localeCompare(b.symbol))
+    }
+    return list
+  }, [stocks, query, listSort])
+
   return (
-    <aside className="w-[200px] flex-shrink-0 glass border-r border-tv-border flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-tv-border">
-        <span className="font-bold text-sm tracking-tight">📈 IDX Analyzer</span>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={onOpenAlerts}
-            title="Price Alerts"
-            className="w-6 h-6 rounded-md text-tv-muted hover:text-tv-yellow text-sm flex items-center justify-center transition-colors"
-          >🔔</button>
-          <button
-            onClick={onAdd}
-            title="Tambah saham"
-            className="w-6 h-6 rounded-md bg-tv-accent text-white text-lg font-bold flex items-center justify-center
-              hover:bg-tv-accent/80 transition-colors leading-none pb-0.5"
-          >+</button>
-        </div>
-      </div>
-
-      {/* Nav */}
-      <div className="flex-1 py-2">
-        <NavBtn icon="⭐" label="Watchlist"        badge={stocks?.length || null} active={activeView === 'watchlist' || activeView === 'home'} onClick={onViewWatchlist} />
-        <NavBtn icon="📊" label="Market Overview"  badge={null} active={activeView === 'overview'}  onClick={onViewOverview} />
-        <NavBtn icon="🕯️" label="Last Session"     badge={null} active={activeView === 'session'}   onClick={onViewSession} />
-        <NavBtn icon="🧭" label="Advisor Screener" badge={null} active={activeView === 'advisor'}   onClick={onViewAdvisor} />
-        <NavBtn icon="💼" label="Portfolio"        badge={null} active={activeView === 'portfolio'} onClick={onViewPortfolio} />
-        <NavBtn icon="🎮" label="Latihan"          badge={null} active={activeView === 'practice'}  onClick={onViewPractice} />
-      </div>
-
-      {/* Footer */}
-      {stocks?.length > 0 && (
-        <div className="px-3 pb-3 pt-2 border-t border-tv-border">
-          <button
-            onClick={onUpdateAll}
-            className="w-full py-2 text-xs font-medium rounded-md border border-tv-border
-              text-tv-muted hover:text-tv-blue hover:border-tv-blue/40 transition-all"
-          >
-            ↻ Update Semua ({stocks.length})
-          </button>
-        </div>
+    <>
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={onMobileClose}
+          aria-hidden="true"
+        />
       )}
-    </aside>
+
+      <aside
+        className={`fixed md:static inset-y-0 left-0 z-40 flex-shrink-0 glass border-r border-tv-border flex flex-col relative
+          transform transition-[width,transform] duration-200 ease-out
+          ${mobileOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full md:translate-x-0'}
+          ${!mobileOpen && (collapsed ? 'md:w-[52px]' : 'md:w-[240px]')}`}
+        aria-label="Navigasi utama"
+        aria-expanded={expanded}
+      >
+        {/* Desktop: drag-style toggle di tepi kanan sidebar */}
+        {!mobileOpen && (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className="hidden md:flex absolute -right-3 top-[42%] z-50 w-6 h-14 items-center justify-center
+              rounded-r-lg bg-tv-card border border-l-0 border-tv-border text-tv-muted text-sm
+              hover:text-tv-blue hover:border-tv-blue/50 shadow-lg transition-colors"
+            aria-label={collapsed ? 'Perluas sidebar' : 'Minimize sidebar'}
+            title={collapsed ? 'Perluas sidebar (Ctrl+B)' : 'Minimize sidebar (Ctrl+B)'}
+          >
+            {collapsed ? '›' : '‹'}
+          </button>
+        )}
+
+        {/* Header */}
+        <div className={`flex items-center border-b border-tv-border shrink-0
+          ${expanded ? 'justify-between px-3 py-3' : 'flex-col gap-1 py-2 px-1'}`}>
+          {expanded ? (
+            <>
+              <span className="font-bold text-sm tracking-tight truncate">📈 IDX Analyzer</span>
+              {!mobileOpen && (
+                <button
+                  type="button"
+                  onClick={onToggleCollapse}
+                  className="hidden md:flex w-7 h-7 shrink-0 items-center justify-center rounded-md
+                    text-tv-muted hover:text-tv-text hover:bg-tv-hover transition-colors"
+                  aria-label="Minimize sidebar"
+                  title="Minimize sidebar (Ctrl+B)"
+                >
+                  ◀
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <span className="text-lg leading-none" title="IDX Analyzer">📈</span>
+              {!mobileOpen && (
+                <button
+                  type="button"
+                  onClick={onToggleCollapse}
+                  className="hidden md:flex w-7 h-7 items-center justify-center rounded-md
+                    text-tv-muted hover:text-tv-blue hover:bg-tv-hover transition-colors text-xs"
+                  aria-label="Perluas sidebar"
+                  title="Perluas sidebar (Ctrl+B)"
+                >
+                  ▶
+                </button>
+              )}
+            </>
+          )}
+          <div className={`flex items-center ${expanded ? 'gap-1' : 'flex-col gap-1'}`}>
+            <IconBtn label="Alert harga" onClick={onOpenAlerts}>🔔</IconBtn>
+            <IconBtn label="Tambah saham" onClick={onAdd} accent>+</IconBtn>
+            {mobileOpen && (
+              <IconBtn label="Tutup menu" onClick={onMobileClose}>×</IconBtn>
+            )}
+          </div>
+        </div>
+
+        {selectedSymbol && activeView === 'home' && expanded && (
+          <div className="px-3 py-2 text-[11px] font-semibold text-tv-blue border-b border-tv-border bg-tv-blue/5 shrink-0">
+            📊 {selectedSymbol}
+          </div>
+        )}
+
+        <nav className="py-1 shrink-0 border-b border-tv-border/50" aria-label="Menu">
+          {NAV.map(item => (
+            <NavBtn
+              key={item.id}
+              icon={item.icon}
+              label={item.label}
+              compact={!expanded}
+              badge={item.badgeFrom === 'stocks' ? (stocks?.length || null) : null}
+              active={activeView === item.id}
+              onClick={nav(viewFns[item.id])}
+            />
+          ))}
+        </nav>
+
+        {/* Quick watchlist — isi ruang kosong dengan data yang berguna */}
+        {expanded && stocks?.length > 0 && (
+          <div className="flex-1 min-h-0 flex flex-col px-2 pt-2 pb-1">
+            <div className="shrink-0 space-y-1.5 mb-2">
+              <div className="flex items-center justify-between gap-1 px-1">
+                <span className="text-[10px] font-semibold text-tv-muted uppercase tracking-wider">
+                  Akses cepat
+                </span>
+                <span className="text-[10px] text-tv-muted tabular-nums">
+                  <span className="text-tv-green">{marketPulse.gainers}</span>
+                  {' · '}
+                  <span className="text-tv-red">{marketPulse.losers}</span>
+                </span>
+              </div>
+
+              {recent.length > 0 && (
+                <div className="flex flex-wrap gap-1 px-0.5">
+                  {recent.slice(0, 5).map(sym => (
+                    <button
+                      key={sym}
+                      onClick={nav(() => onSelectStock?.(sym))}
+                      className={`text-[10px] px-1.5 py-0.5 rounded border font-semibold transition-colors
+                        ${sym === selectedSymbol
+                          ? 'bg-tv-blue/15 border-tv-blue/40 text-tv-blue'
+                          : 'bg-tv-bg border-tv-border text-tv-muted hover:text-tv-text'}`}
+                    >
+                      {sym}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <input
+                id="sidebar-search"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Cari kode..."
+                aria-label="Cari saham di watchlist"
+                className="w-full bg-tv-input border border-tv-border rounded-md px-2 py-1.5 text-xs
+                  text-tv-text placeholder-tv-muted outline-none focus:border-tv-blue"
+              />
+
+              <div className="flex gap-1 px-0.5">
+                {[['symbol', 'A–Z'], ['pct', '% hari ini']].map(([id, lbl]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setListSort(id)}
+                    className={`flex-1 text-[10px] py-0.5 rounded border transition-colors
+                      ${listSort === id
+                        ? 'bg-tv-blue/10 border-tv-blue/40 text-tv-blue font-semibold'
+                        : 'border-tv-border text-tv-muted hover:text-tv-text'}`}
+                  >
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto rounded-lg border border-tv-border/60 bg-tv-bg/40">
+              {watchlistRows.length === 0 ? (
+                <p className="text-[10px] text-tv-muted text-center py-4 px-2">Tidak ada cocok</p>
+              ) : (
+                watchlistRows.map(s => (
+                  <WatchlistRow
+                    key={s.symbol}
+                    s={s}
+                    active={s.symbol === selectedSymbol && activeView === 'home'}
+                    onClick={nav(() => onSelectStock?.(s.symbol))}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {expanded && !stocks?.length && (
+          <div className="flex-1 px-3 py-4 text-center">
+            <p className="text-[11px] text-tv-muted leading-relaxed">
+              Belum ada saham. Tekan <b className="text-tv-text">+</b> untuk tambah, atau buka Watchlist.
+            </p>
+          </div>
+        )}
+
+        {!expanded && <div className="flex-1 min-h-0" aria-hidden="true" />}
+
+        <div className={`shrink-0 border-t border-tv-border ${expanded ? 'px-3 py-2 space-y-1.5' : 'p-1.5 space-y-1'}`}>
+          {stocks?.length > 0 && (
+            <button
+              onClick={onUpdateAll}
+              title={`Update semua ${stocks.length} saham`}
+              className={`w-full font-medium rounded-md border border-tv-border text-tv-muted
+                hover:text-tv-blue hover:border-tv-blue/40 transition-all
+                ${expanded ? 'py-2 text-xs' : 'py-2 text-sm'}`}
+            >
+              {expanded ? `↻ Update Semua (${stocks.length})` : '↻'}
+            </button>
+          )}
+          {!mobileOpen && (
+            <button
+              onClick={onToggleCollapse}
+              title={collapsed ? 'Perluas sidebar (Ctrl+B)' : 'Minimize sidebar (Ctrl+B)'}
+              aria-label={collapsed ? 'Perluas sidebar' : 'Minimize sidebar'}
+              className="hidden md:flex w-full items-center justify-center gap-1 py-1.5 text-[10px] text-tv-muted
+                hover:text-tv-text rounded-md hover:bg-tv-hover transition-colors border border-transparent
+                hover:border-tv-border"
+            >
+              {collapsed ? (
+                <><span className="text-sm">▶</span><span>Perluas</span></>
+              ) : (
+                <><span className="text-sm">◀</span><span>Minimize</span></>
+              )}
+            </button>
+          )}
+        </div>
+      </aside>
+    </>
   )
 }
 
-function NavBtn({ icon, label, badge, active, onClick }) {
+function WatchlistRow({ s, active, onClick }) {
+  const pct = s.change_pct
+  const up = (pct ?? 0) >= 0
+  const hasPct = pct != null
+
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-2 px-3 py-2.5 text-xs font-medium
-        transition-all text-left border-l-2
+      className={`w-full flex items-center gap-2 px-2 py-1.5 text-left border-b border-tv-border/40 last:border-0
+        transition-colors text-[11px]
+        ${active ? 'bg-tv-blue/10' : 'hover:bg-tv-hover'}`}
+    >
+      <span className={`font-bold shrink-0 w-11 ${active ? 'text-tv-blue' : 'text-tv-text'}`}>
+        {s.symbol}
+      </span>
+      <span className="flex-1 tabular-nums text-tv-muted truncate text-[10px]">
+        {s.last_close != null ? fmt.price(s.last_close) : '—'}
+      </span>
+      {hasPct ? (
+        <span className={`tabular-nums font-semibold shrink-0 w-12 text-right ${up ? 'text-tv-green' : 'text-tv-red'}`}>
+          {up ? '+' : ''}{pct.toFixed(2)}%
+        </span>
+      ) : (
+        <span className="text-tv-muted shrink-0 w-12 text-right">—</span>
+      )}
+    </button>
+  )
+}
+
+function IconBtn({ children, label, onClick, accent }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={`w-7 h-7 rounded-md text-sm flex items-center justify-center transition-colors
+        ${accent
+          ? 'bg-tv-accent text-white text-lg font-bold hover:bg-tv-accent/80 leading-none pb-0.5'
+          : 'text-tv-muted hover:text-tv-text'}`}
+    >
+      {children}
+    </button>
+  )
+}
+
+function NavBtn({ icon, label, badge, active, compact, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      title={compact ? label : undefined}
+      aria-current={active ? 'page' : undefined}
+      aria-label={compact ? label : undefined}
+      className={`w-full flex items-center transition-all border-l-2
+        ${compact
+          ? 'justify-center px-0 py-2.5 text-base'
+          : 'gap-2 px-3 py-2 text-xs font-medium text-left'}
         ${active
           ? 'bg-tv-accent/10 text-tv-blue border-l-tv-accent'
           : 'text-tv-muted hover:text-tv-text hover:bg-tv-hover border-l-transparent'}`}
     >
-      <span>{icon}</span>
-      <span>{label}</span>
-      {badge != null && (
-        <span className="ml-auto text-[10px] bg-tv-border rounded px-1.5 py-0.5">{badge}</span>
+      <span aria-hidden="true">{icon}</span>
+      {!compact && (
+        <>
+          <span>{label}</span>
+          {badge != null && (
+            <span className="ml-auto text-[10px] bg-tv-border rounded px-1.5 py-0.5">{badge}</span>
+          )}
+        </>
       )}
     </button>
   )

@@ -67,6 +67,12 @@ function Card({ r, onSelect }) {
         <div><div className="text-[9px] text-tv-muted uppercase">R/R</div><div className={`text-xs font-bold ${r.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-yellow'}`}>1:{r.risk_reward?.toFixed(1)}</div></div>
       </div>
 
+      {r.note && (
+        <p className="text-[10px] text-tv-yellow/90 mb-2 leading-snug border-l-2 border-tv-yellow/40 pl-2">
+          {r.note}
+        </p>
+      )}
+
       {/* decision score bar */}
       <div className="flex items-center gap-2">
         <div className="flex-1 h-1.5 rounded-full bg-tv-bg overflow-hidden">
@@ -86,6 +92,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
   const [minScore, setMinScore]   = useState(0)
   const [volFilter, setVolFilter] = useState('')  // '' = semua
   const [minRR, setMinRR]         = useState(0)
+  const [minConfidence, setMinConfidence] = useState(0)
   const [trendFilter, setTrendFilter] = useState('') // '' | 'Bullish' | 'Bearish'
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
@@ -94,20 +101,24 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
   useEffect(() => {
     let alive = true
     setLoading(true)
-    api.advisorScreen(mode, minTurn)
+    api.advisorScreen({
+      mode,
+      minTurnover: minTurn,
+      minRR: minRR || undefined,
+      minConfidence: minConfidence || undefined,
+      syariah: syariahOnly || undefined,
+    })
       .then(d => { if (alive) setData(d) })
       .catch(e => { if (alive) showToast?.(e.message, 'error') })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
-  }, [mode, minTurn, reloadKey])
+  }, [mode, minTurn, minRR, minConfidence, syariahOnly, reloadKey, showToast])
 
-  // Semua filter tambahan jalan di client — data screener sudah lengkap.
+  // Filter harga/skor/volume/trend tetap di client — backend sudah handle R/R, keyakinan, syariah.
   const results = (data?.results ?? []).filter(r =>
-    (!syariahOnly || r.syariah) &&
     (!maxPrice || r.close <= maxPrice) &&
     (!minScore || r.score >= minScore) &&
     (!volFilter || r.volume_state === volFilter) &&
-    (!minRR || r.risk_reward >= minRR) &&
     (!trendFilter || r.trend?.overall?.includes(trendFilter))
   )
 
@@ -117,7 +128,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       <div className="mb-5">
         <h1 className="text-xl font-extrabold flex items-center gap-2">🧭 Advisor Screener</h1>
         <p className="text-xs text-tv-muted mt-1">
-          Decision Engine ke semua saham: skor berbobot 7 faktor (struktur, trend, volume, S/R, momentum, candle, R/R). Diurutkan dari skor tertinggi.
+          Decision Engine ke semua saham: skor berbobot 11 faktor (struktur, trend, money flow, volume, S/R, momentum, ADX, candle, R/R, FVG, bandarmology). Diurutkan dari skor tertinggi.
         </p>
       </div>
 
@@ -134,8 +145,9 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
         <Select label="Likuiditas" value={minTurn} onChange={setMinTurn} options={[[0, 'Semua'], [2, '≥2 bn/hr'], [5, '≥5 bn/hr'], [20, '≥20 bn/hr']]} />
         <Select label="Harga" value={maxPrice} onChange={setMaxPrice} options={[[0, 'Semua'], [500, '≤500'], [1000, '≤1.000'], [2000, '≤2.000'], [5000, '≤5.000']]} />
         <Select label="Skor" value={minScore} onChange={setMinScore} options={[[0, 'Semua'], [50, '≥50'], [60, '≥60'], [70, '≥70']]} />
+        <Select label="Keyakinan" value={minConfidence} onChange={setMinConfidence} options={[[0, 'Semua'], [50, '≥50%'], [60, '≥60%'], [70, '≥70%']]} />
         <Select label="Volume" value={volFilter} onChange={setVolFilter} strings options={[['', 'Semua'], ['Above Average', 'Di atas rata²'], ['Normal', 'Normal'], ['Below Average', 'Di bawah rata²']]} />
-        <Select label="R/R" value={minRR} onChange={setMinRR} options={[[0, 'Semua'], [1.5, '≥1.5'], [2, '≥2'], [3, '≥3']]} />
+        <Select label="R/R" value={minRR} onChange={setMinRR} options={[[0, '≥1 (default)'], [1.5, '≥1.5'], [2, '≥2'], [3, '≥3']]} />
         <Select label="Trend" value={trendFilter} onChange={setTrendFilter} strings options={[['', 'Semua'], ['Bullish', 'Bullish'], ['Bearish', 'Bearish'], ['Sideways', 'Sideways']]} />
         <button onClick={() => setSyariahOnly(s => !s)}
           className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${syariahOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}>

@@ -61,11 +61,11 @@ func (h *BacktestHandler) Backtest(w http.ResponseWriter, r *http.Request) {
 		nextOpen := prices[i+1].Open
 		nextDate := prices[i+1].Date
 
-		if !inTrade && (sig.Signal == "BUY" || sig.Signal == "STRONG BUY") {
+		if !inTrade && (sig.Signal == "BUY" || sig.Signal == "STRONG_BUY") {
 			inTrade = true
 			entryDate = nextDate
 			entryPrice = nextOpen
-		} else if inTrade && (sig.Signal == "SELL" || sig.Signal == "STRONG SELL" || sig.Signal == "NEUTRAL") {
+		} else if inTrade && (sig.Signal == "SELL" || sig.Signal == "STRONG_SELL" || sig.Signal == "NEUTRAL") {
 			ret := analysis.R2((nextOpen - entryPrice) / entryPrice * 100)
 			win := ret > 0
 			trades = append(trades, btTrade{

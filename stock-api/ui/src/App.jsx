@@ -20,6 +20,20 @@ const ViewLoading = () => (
   </div>
 )
 
+const RECENT_KEY = 'idx-recent-stocks'
+const SIDEBAR_KEY = 'idx-sidebar-collapsed'
+
+function loadRecent() {
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]') } catch { return [] }
+}
+
+function loadSidebarCollapsed() {
+  try {
+    const v = localStorage.getItem(SIDEBAR_KEY)
+    return v == null ? true : v === 'true'
+  } catch { return true }
+}
+
 export default function App() {
   const [stocks, setStocks]       = useState([])
   const [selected, setSelected]   = useState(null)
@@ -28,6 +42,26 @@ export default function App() {
   const [showAlerts, setShowAlerts] = useState(false)
   const [loading, setLoading]     = useState(true)
   const [toast, setToast]         = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(loadSidebarCollapsed)
+  const [recentStocks, setRecentStocks] = useState(loadRecent)
+
+  const pushRecent = useCallback((symbol) => {
+    if (!symbol) return
+    setRecentStocks(prev => {
+      const next = [symbol, ...prev.filter(s => s !== symbol)].slice(0, 8)
+      localStorage.setItem(RECENT_KEY, JSON.stringify(next))
+      return next
+    })
+  }, [])
+
+  const toggleSidebarCollapsed = useCallback(() => {
+    setSidebarCollapsed(prev => {
+      const next = !prev
+      localStorage.setItem(SIDEBAR_KEY, String(next))
+      return next
+    })
+  }, [])
 
   // Navigasi terdaftar ke history browser: back mouse, Alt+←/→, tombol back
   // browser, dan Backspace semuanya jalan lewat pushState/popstate.
@@ -40,6 +74,7 @@ export default function App() {
     }
     setView(nextView)
     setSelected(nextSelected)
+    setSidebarOpen(false)
   }, [])
 
   useEffect(() => {
@@ -61,6 +96,14 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e) => {
+      // Ctrl+B — toggle sidebar minimize (desktop)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        const t = e.target
+        if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) return
+        e.preventDefault()
+        toggleSidebarCollapsed()
+        return
+      }
       if (e.key !== 'Backspace') return
       const t = e.target
       // Jangan bajak backspace saat mengetik atau saat modal terbuka.
@@ -72,7 +115,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [showAdd, showAlerts])
+  }, [showAdd, showAlerts, toggleSidebarCollapsed])
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type })
@@ -98,6 +141,7 @@ export default function App() {
   const handleAdded = (symbol) => {
     setShowAdd(false)
     loadStocks()
+    pushRecent(symbol)
     navigate('home', symbol)
     showToast(`✓ ${symbol} berhasil ditambahkan`)
   }
@@ -120,6 +164,7 @@ export default function App() {
   }
 
   const handleSelectStock = (symbol) => {
+    pushRecent(symbol)
     navigate('home', symbol)
   }
 
@@ -139,10 +184,14 @@ export default function App() {
     <div className="flex h-screen bg-transparent text-tv-text overflow-hidden">
       <Sidebar
         stocks={stocks}
-        selected={selected}
+        selectedSymbol={selected}
         activeView={view}
-        loading={loading}
-        onSelect={handleSelectStock}
+        recentSymbols={recentStocks}
+        mobileOpen={sidebarOpen}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={toggleSidebarCollapsed}
+        onMobileClose={() => setSidebarOpen(false)}
+        onSelectStock={handleSelectStock}
         onAdd={() => setShowAdd(true)}
         onUpdateAll={handleUpdateAll}
         onViewWatchlist={()   => navigate('watchlist')}
@@ -154,8 +203,29 @@ export default function App() {
         onOpenAlerts={() => setShowAlerts(true)}
       />
 
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="flex items-center justify-end gap-3 px-4 py-2 glass border-b border-tv-border">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden md:ml-0">
+        <div className="flex items-center justify-between gap-3 px-4 py-2 glass border-b border-tv-border">
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden px-2 py-1.5 text-sm rounded-lg border border-tv-border text-tv-muted hover:text-tv-text"
+              aria-label="Buka menu navigasi"
+            >
+              ☰ Menu
+            </button>
+            <button
+              type="button"
+              onClick={toggleSidebarCollapsed}
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg border border-tv-border
+                text-tv-muted hover:text-tv-text hover:border-tv-blue/40 transition-colors"
+              aria-label={sidebarCollapsed ? 'Perluas sidebar' : 'Minimize sidebar'}
+              title={`${sidebarCollapsed ? 'Perluas' : 'Minimize'} sidebar (Ctrl+B)`}
+            >
+              <span>{sidebarCollapsed ? '☰' : '◧'}</span>
+              <span className="hidden lg:inline">{sidebarCollapsed ? 'Sidebar' : 'Minimize'}</span>
+            </button>
+          </div>
           <IHSGBadge />
         </div>
         <div className="flex-1 overflow-auto">
@@ -196,7 +266,6 @@ export default function App() {
         <AddStockModal
           onClose={() => setShowAdd(false)}
           onSuccess={handleAdded}
-          showToast={showToast}
         />
       )}
 
@@ -206,6 +275,8 @@ export default function App() {
 
       {toast && (
         <div
+          role="alert"
+          aria-live="polite"
           className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-lg border
             text-sm font-medium shadow-2xl animate-pulse-once
             ${toast.type === 'error'

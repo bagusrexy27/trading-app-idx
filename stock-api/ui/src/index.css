@@ -202,6 +202,14 @@ body::after {
 }
 .breathe-green { animation: breatheGlow 2.8s ease-in-out infinite; }
 
+/* Brief pulse when IHSG price ticks */
+@keyframes ihsgPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(94, 106, 210, 0.45); }
+  70%  { box-shadow: 0 0 0 8px rgba(94, 106, 210, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(94, 106, 210, 0); }
+}
+.ihsg-pulse { animation: ihsgPulse 0.9s ease-out; }
+
 /* fadeIn keyframe used by spark-draw polygon (Tailwind's runs only via class) */
 @keyframes fadeIn {
   from { opacity: 0; }

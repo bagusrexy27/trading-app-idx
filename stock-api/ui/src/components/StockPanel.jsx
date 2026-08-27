@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import Overview from './Overview'
@@ -30,6 +30,22 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const [aiOpen, setAiOpen]       = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(null)
+
+  const tabRefs = useRef([])
+
+  const onTabKeyDown = useCallback((e) => {
+    const idx = TABS.findIndex(t => t.id === tab)
+    if (idx < 0) return
+    let next = idx
+    if (e.key === 'ArrowRight') next = (idx + 1) % TABS.length
+    else if (e.key === 'ArrowLeft') next = (idx - 1 + TABS.length) % TABS.length
+    else if (e.key === 'Home') next = 0
+    else if (e.key === 'End') next = TABS.length - 1
+    else return
+    e.preventDefault()
+    setTab(TABS[next].id)
+    tabRefs.current[next]?.focus()
+  }, [tab])
 
   // Core data only — everything else lazy-loads per tab (see effect below).
   const load = async () => {
@@ -261,10 +277,17 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         </div>
 
         {/* Tabs */}
-        <div className="flex border-t border-tv-border px-4">
-          {TABS.map(t => (
+        <div className="flex border-t border-tv-border px-4" role="tablist" aria-label="Tab analisa saham">
+          {TABS.map((t, i) => (
             <button
               key={t.id}
+              ref={el => { tabRefs.current[i] = el }}
+              role="tab"
+              id={`tab-${t.id}`}
+              aria-selected={tab === t.id}
+              aria-controls={`panel-${t.id}`}
+              tabIndex={tab === t.id ? 0 : -1}
+              onKeyDown={onTabKeyDown}
               onClick={() => setTab(t.id)}
               className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors
                 ${tab === t.id
@@ -289,16 +312,22 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
 
       {/* ── Tab Content ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-auto">
-        <div key={tab} className="animate-slide-up h-full">
+        <div
+          key={tab}
+          id={`panel-${tab}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${tab}`}
+          className="animate-slide-up h-full"
+        >
           {(() => {
             const extrasReady = (TAB_NEEDS[tab] || []).every(k => data[k] !== undefined)
             if (!extrasReady) return <TabLoading />
             return (
               <Suspense fallback={<TabLoading />}>
                 {tab === 'overview'   && <Overview   data={data} />}
-                {tab === 'chart'      && <ChartTab   data={data} symbol={symbol} />}
+                {tab === 'chart'      && <ChartTab   data={data} symbol={symbol} showToast={showToast} />}
                 {tab === 'indicators' && <Indicators data={data} />}
-                {tab === 'advisor'    && <Advisor    symbol={symbol} />}
+                {tab === 'advisor'    && <Advisor    symbol={symbol} decisionData={data.decision} />}
                 {tab === 'risk'       && <RiskCalc      data={data} />}
                 {tab === 'laporan'    && <ReportUpload  symbol={symbol} showToast={showToast} />}
               </Suspense>
