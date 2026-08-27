@@ -67,19 +67,63 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 flex-shrink-0 glass border-r border-tv-border flex flex-col
+        className={`fixed md:static inset-y-0 left-0 z-40 flex-shrink-0 glass border-r border-tv-border flex flex-col relative
           transform transition-[width,transform] duration-200 ease-out
           ${mobileOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full md:translate-x-0'}
           ${!mobileOpen && (collapsed ? 'md:w-[52px]' : 'md:w-[240px]')}`}
         aria-label="Navigasi utama"
+        aria-expanded={expanded}
       >
+        {/* Desktop: drag-style toggle di tepi kanan sidebar */}
+        {!mobileOpen && (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className="hidden md:flex absolute -right-3 top-[42%] z-50 w-6 h-14 items-center justify-center
+              rounded-r-lg bg-tv-card border border-l-0 border-tv-border text-tv-muted text-sm
+              hover:text-tv-blue hover:border-tv-blue/50 shadow-lg transition-colors"
+            aria-label={collapsed ? 'Perluas sidebar' : 'Minimize sidebar'}
+            title={collapsed ? 'Perluas sidebar (Ctrl+B)' : 'Minimize sidebar (Ctrl+B)'}
+          >
+            {collapsed ? '›' : '‹'}
+          </button>
+        )}
+
         {/* Header */}
         <div className={`flex items-center border-b border-tv-border shrink-0
           ${expanded ? 'justify-between px-3 py-3' : 'flex-col gap-1 py-2 px-1'}`}>
           {expanded ? (
-            <span className="font-bold text-sm tracking-tight truncate">📈 IDX Analyzer</span>
+            <>
+              <span className="font-bold text-sm tracking-tight truncate">📈 IDX Analyzer</span>
+              {!mobileOpen && (
+                <button
+                  type="button"
+                  onClick={onToggleCollapse}
+                  className="hidden md:flex w-7 h-7 shrink-0 items-center justify-center rounded-md
+                    text-tv-muted hover:text-tv-text hover:bg-tv-hover transition-colors"
+                  aria-label="Minimize sidebar"
+                  title="Minimize sidebar (Ctrl+B)"
+                >
+                  ◀
+                </button>
+              )}
+            </>
           ) : (
-            <span className="text-lg leading-none" title="IDX Analyzer">📈</span>
+            <>
+              <span className="text-lg leading-none" title="IDX Analyzer">📈</span>
+              {!mobileOpen && (
+                <button
+                  type="button"
+                  onClick={onToggleCollapse}
+                  className="hidden md:flex w-7 h-7 items-center justify-center rounded-md
+                    text-tv-muted hover:text-tv-blue hover:bg-tv-hover transition-colors text-xs"
+                  aria-label="Perluas sidebar"
+                  title="Perluas sidebar (Ctrl+B)"
+                >
+                  ▶
+                </button>
+              )}
+            </>
           )}
           <div className={`flex items-center ${expanded ? 'gap-1' : 'flex-col gap-1'}`}>
             <IconBtn label="Alert harga" onClick={onOpenAlerts}>🔔</IconBtn>
@@ -211,12 +255,17 @@ export default function Sidebar({
           {!mobileOpen && (
             <button
               onClick={onToggleCollapse}
-              title={collapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-              aria-label={collapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-              className="hidden md:flex w-full items-center justify-center py-1.5 text-[10px] text-tv-muted
-                hover:text-tv-text rounded-md hover:bg-tv-hover transition-colors"
+              title={collapsed ? 'Perluas sidebar (Ctrl+B)' : 'Minimize sidebar (Ctrl+B)'}
+              aria-label={collapsed ? 'Perluas sidebar' : 'Minimize sidebar'}
+              className="hidden md:flex w-full items-center justify-center gap-1 py-1.5 text-[10px] text-tv-muted
+                hover:text-tv-text rounded-md hover:bg-tv-hover transition-colors border border-transparent
+                hover:border-tv-border"
             >
-              {collapsed ? '» Perluas' : '« Sembunyikan'}
+              {collapsed ? (
+                <><span className="text-sm">▶</span><span>Perluas</span></>
+              ) : (
+                <><span className="text-sm">◀</span><span>Minimize</span></>
+              )}
             </button>
           )}
         </div>

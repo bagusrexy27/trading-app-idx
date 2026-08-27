@@ -96,6 +96,14 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e) => {
+      // Ctrl+B — toggle sidebar minimize (desktop)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        const t = e.target
+        if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) return
+        e.preventDefault()
+        toggleSidebarCollapsed()
+        return
+      }
       if (e.key !== 'Backspace') return
       const t = e.target
       // Jangan bajak backspace saat mengetik atau saat modal terbuka.
@@ -107,7 +115,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [showAdd, showAlerts])
+  }, [showAdd, showAlerts, toggleSidebarCollapsed])
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type })
@@ -209,11 +217,13 @@ export default function App() {
             <button
               type="button"
               onClick={toggleSidebarCollapsed}
-              className="hidden md:inline-flex px-2 py-1.5 text-sm rounded-lg border border-tv-border text-tv-muted hover:text-tv-text"
-              aria-label={sidebarCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-              title={sidebarCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg border border-tv-border
+                text-tv-muted hover:text-tv-text hover:border-tv-blue/40 transition-colors"
+              aria-label={sidebarCollapsed ? 'Perluas sidebar' : 'Minimize sidebar'}
+              title={`${sidebarCollapsed ? 'Perluas' : 'Minimize'} sidebar (Ctrl+B)`}
             >
-              {sidebarCollapsed ? '☰' : '◧'}
+              <span>{sidebarCollapsed ? '☰' : '◧'}</span>
+              <span className="hidden lg:inline">{sidebarCollapsed ? 'Sidebar' : 'Minimize'}</span>
             </button>
           </div>
           <IHSGBadge />
