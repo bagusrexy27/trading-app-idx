@@ -57,7 +57,7 @@ export default function IHSGChart() {
     <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden mb-6">
       <div className="flex items-center justify-between px-4 py-2 border-b border-tv-border">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-bold">📈 IHSG (Jakarta Composite)</span>
+          <span className="text-sm font-bold">IHSG</span>
           <span className="text-[10px] text-tv-muted bg-tv-bg border border-tv-border px-2 py-0.5 rounded-full">
             TradingView · ~15m delay
           </span>
