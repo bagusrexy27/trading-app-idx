@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { fmt } from '../utils'
 
 const NAV = [
   { id: 'watchlist', icon: '⭐', label: 'Watchlist', badgeFrom: 'stocks' },
@@ -9,7 +10,7 @@ const NAV = [
   { id: 'practice',  icon: '🎮', label: 'Latihan' },
 ]
 
-// Slim nav — stock grid lives in Watchlist. Collapsed icon rail saves horizontal space.
+// Nav + quick watchlist jump. Collapsed icon rail saves space on desktop.
 export default function Sidebar({
   stocks, selectedSymbol, activeView, recentSymbols = [], mobileOpen, collapsed, onToggleCollapse,
   onMobileClose, onAdd, onUpdateAll, onSelectStock,
@@ -17,6 +18,7 @@ export default function Sidebar({
   onViewAdvisor, onViewPortfolio, onViewPractice, onOpenAlerts,
 }) {
   const [query, setQuery] = useState('')
+  const [listSort, setListSort] = useState('symbol') // symbol | pct
   const nav = (fn) => () => { fn(); onMobileClose?.() }
 
   const viewFns = {
@@ -30,25 +32,29 @@ export default function Sidebar({
 
   const expanded = mobileOpen || !collapsed
 
-  const searchHits = useMemo(() => {
-    const q = query.trim().toUpperCase()
-    if (!q || q.length < 1) return []
-    return (stocks || [])
-      .filter(s => s.symbol.includes(q))
-      .slice(0, 6)
-  }, [query, stocks])
-
-  const movers = useMemo(() => {
-    const withPct = (stocks || []).filter(s => s.change_pct != null)
-    if (!withPct.length) return { gainers: [], losers: [] }
-    const sorted = [...withPct].sort((a, b) => b.change_pct - a.change_pct)
-    return { gainers: sorted.slice(0, 3), losers: sorted.slice(-3).reverse() }
+  const marketPulse = useMemo(() => {
+    const list = stocks || []
+    const gainers = list.filter(s => (s.change_pct ?? 0) > 0).length
+    const losers  = list.filter(s => (s.change_pct ?? 0) < 0).length
+    return { gainers, losers, total: list.length }
   }, [stocks])
 
   const recent = useMemo(
     () => recentSymbols.filter(sym => (stocks || []).some(s => s.symbol === sym)),
     [recentSymbols, stocks],
   )
+
+  const watchlistRows = useMemo(() => {
+    const q = query.trim().toUpperCase()
+    let list = [...(stocks || [])]
+    if (q) list = list.filter(s => s.symbol.includes(q))
+    if (listSort === 'pct') {
+      list.sort((a, b) => (b.change_pct ?? -999) - (a.change_pct ?? -999))
+    } else {
+      list.sort((a, b) => a.symbol.localeCompare(b.symbol))
+    }
+    return list
+  }, [stocks, query, listSort])
 
   return (
     <>
@@ -63,8 +69,8 @@ export default function Sidebar({
       <aside
         className={`fixed md:static inset-y-0 left-0 z-40 flex-shrink-0 glass border-r border-tv-border flex flex-col
           transform transition-[width,transform] duration-200 ease-out
-          ${mobileOpen ? 'translate-x-0 w-[240px]' : '-translate-x-full md:translate-x-0'}
-          ${!mobileOpen && (collapsed ? 'md:w-[52px]' : 'md:w-[220px]')}`}
+          ${mobileOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full md:translate-x-0'}
+          ${!mobileOpen && (collapsed ? 'md:w-[52px]' : 'md:w-[240px]')}`}
         aria-label="Navigasi utama"
       >
         {/* Header */}
@@ -90,8 +96,7 @@ export default function Sidebar({
           </div>
         )}
 
-        {/* Primary nav — tidak pakai flex-1 supaya tidak terlihat kosong */}
-        <nav className="py-1 shrink-0" aria-label="Menu">
+        <nav className="py-1 shrink-0 border-b border-tv-border/50" aria-label="Menu">
           {NAV.map(item => (
             <NavBtn
               key={item.id}
@@ -105,45 +110,28 @@ export default function Sidebar({
           ))}
         </nav>
 
-        {/* Konten tambahan hanya saat expanded — isi ruang dengan data berguna */}
-        {expanded && (
-          <div className="flex-1 min-h-0 overflow-y-auto border-t border-tv-border/60 mt-1 px-3 py-2 space-y-3">
-            <div>
-              <label htmlFor="sidebar-search" className="text-[10px] font-semibold text-tv-muted uppercase tracking-wider">
-                Cari saham
-              </label>
-              <input
-                id="sidebar-search"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Kode..."
-                className="mt-1 w-full bg-tv-input border border-tv-border rounded-md px-2 py-1.5 text-xs
-                  text-tv-text placeholder-tv-muted outline-none focus:border-tv-blue"
-              />
-              {searchHits.length > 0 && (
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {searchHits.map(s => (
-                    <button
-                      key={s.symbol}
-                      onClick={nav(() => onSelectStock?.(s.symbol))}
-                      className="text-[10px] px-2 py-0.5 rounded-md bg-tv-bg border border-tv-border
-                        text-tv-text hover:border-tv-blue/50 transition-colors font-semibold"
-                    >
-                      {s.symbol}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+        {/* Quick watchlist — isi ruang kosong dengan data yang berguna */}
+        {expanded && stocks?.length > 0 && (
+          <div className="flex-1 min-h-0 flex flex-col px-2 pt-2 pb-1">
+            <div className="shrink-0 space-y-1.5 mb-2">
+              <div className="flex items-center justify-between gap-1 px-1">
+                <span className="text-[10px] font-semibold text-tv-muted uppercase tracking-wider">
+                  Akses cepat
+                </span>
+                <span className="text-[10px] text-tv-muted tabular-nums">
+                  <span className="text-tv-green">{marketPulse.gainers}</span>
+                  {' · '}
+                  <span className="text-tv-red">{marketPulse.losers}</span>
+                </span>
+              </div>
 
-            {recent.length > 0 && (
-              <Section title="Terbaru dibuka">
-                <div className="flex flex-wrap gap-1">
-                  {recent.map(sym => (
+              {recent.length > 0 && (
+                <div className="flex flex-wrap gap-1 px-0.5">
+                  {recent.slice(0, 5).map(sym => (
                     <button
                       key={sym}
                       onClick={nav(() => onSelectStock?.(sym))}
-                      className={`text-[10px] px-2 py-0.5 rounded-md border font-semibold transition-colors
+                      className={`text-[10px] px-1.5 py-0.5 rounded border font-semibold transition-colors
                         ${sym === selectedSymbol
                           ? 'bg-tv-blue/15 border-tv-blue/40 text-tv-blue'
                           : 'bg-tv-bg border-tv-border text-tv-muted hover:text-tv-text'}`}
@@ -152,26 +140,62 @@ export default function Sidebar({
                     </button>
                   ))}
                 </div>
-              </Section>
-            )}
+              )}
 
-            {(movers.gainers.length > 0 || movers.losers.length > 0) && (
-              <Section title="Pergerakan hari ini">
-                {movers.gainers.map(s => (
-                  <MoverRow key={`g-${s.symbol}`} s={s} onClick={nav(() => onSelectStock?.(s.symbol))} />
+              <input
+                id="sidebar-search"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Cari kode..."
+                aria-label="Cari saham di watchlist"
+                className="w-full bg-tv-input border border-tv-border rounded-md px-2 py-1.5 text-xs
+                  text-tv-text placeholder-tv-muted outline-none focus:border-tv-blue"
+              />
+
+              <div className="flex gap-1 px-0.5">
+                {[['symbol', 'A–Z'], ['pct', '% hari ini']].map(([id, lbl]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setListSort(id)}
+                    className={`flex-1 text-[10px] py-0.5 rounded border transition-colors
+                      ${listSort === id
+                        ? 'bg-tv-blue/10 border-tv-blue/40 text-tv-blue font-semibold'
+                        : 'border-tv-border text-tv-muted hover:text-tv-text'}`}
+                  >
+                    {lbl}
+                  </button>
                 ))}
-                {movers.losers.map(s => (
-                  <MoverRow key={`l-${s.symbol}`} s={s} onClick={nav(() => onSelectStock?.(s.symbol))} />
-                ))}
-              </Section>
-            )}
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto rounded-lg border border-tv-border/60 bg-tv-bg/40">
+              {watchlistRows.length === 0 ? (
+                <p className="text-[10px] text-tv-muted text-center py-4 px-2">Tidak ada cocok</p>
+              ) : (
+                watchlistRows.map(s => (
+                  <WatchlistRow
+                    key={s.symbol}
+                    s={s}
+                    active={s.symbol === selectedSymbol && activeView === 'home'}
+                    onClick={nav(() => onSelectStock?.(s.symbol))}
+                  />
+                ))
+              )}
+            </div>
           </div>
         )}
 
-        {/* Collapsed: spacer tipis supaya footer nempel bawah */}
+        {expanded && !stocks?.length && (
+          <div className="flex-1 px-3 py-4 text-center">
+            <p className="text-[11px] text-tv-muted leading-relaxed">
+              Belum ada saham. Tekan <b className="text-tv-text">+</b> untuk tambah, atau buka Watchlist.
+            </p>
+          </div>
+        )}
+
         {!expanded && <div className="flex-1 min-h-0" aria-hidden="true" />}
 
-        {/* Footer */}
         <div className={`shrink-0 border-t border-tv-border ${expanded ? 'px-3 py-2 space-y-1.5' : 'p-1.5 space-y-1'}`}>
           {stocks?.length > 0 && (
             <button
@@ -192,7 +216,7 @@ export default function Sidebar({
               className="hidden md:flex w-full items-center justify-center py-1.5 text-[10px] text-tv-muted
                 hover:text-tv-text rounded-md hover:bg-tv-hover transition-colors"
             >
-              {collapsed ? '»' : '« Ciutkan'}
+              {collapsed ? '» Perluas' : '« Sembunyikan'}
             </button>
           )}
         </div>
@@ -201,27 +225,31 @@ export default function Sidebar({
   )
 }
 
-function Section({ title, children }) {
-  return (
-    <div>
-      <div className="text-[10px] font-semibold text-tv-muted uppercase tracking-wider mb-1">{title}</div>
-      <div className="space-y-0.5">{children}</div>
-    </div>
-  )
-}
+function WatchlistRow({ s, active, onClick }) {
+  const pct = s.change_pct
+  const up = (pct ?? 0) >= 0
+  const hasPct = pct != null
 
-function MoverRow({ s, onClick }) {
-  const up = (s.change_pct ?? 0) >= 0
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between text-[11px] py-0.5 px-1 rounded
-        hover:bg-tv-hover transition-colors text-left"
+      className={`w-full flex items-center gap-2 px-2 py-1.5 text-left border-b border-tv-border/40 last:border-0
+        transition-colors text-[11px]
+        ${active ? 'bg-tv-blue/10' : 'hover:bg-tv-hover'}`}
     >
-      <span className="font-semibold">{s.symbol}</span>
-      <span className={`tabular-nums font-medium ${up ? 'text-tv-green' : 'text-tv-red'}`}>
-        {up ? '+' : ''}{s.change_pct?.toFixed(2)}%
+      <span className={`font-bold shrink-0 w-11 ${active ? 'text-tv-blue' : 'text-tv-text'}`}>
+        {s.symbol}
       </span>
+      <span className="flex-1 tabular-nums text-tv-muted truncate text-[10px]">
+        {s.last_close != null ? fmt.price(s.last_close) : '—'}
+      </span>
+      {hasPct ? (
+        <span className={`tabular-nums font-semibold shrink-0 w-12 text-right ${up ? 'text-tv-green' : 'text-tv-red'}`}>
+          {up ? '+' : ''}{pct.toFixed(2)}%
+        </span>
+      ) : (
+        <span className="text-tv-muted shrink-0 w-12 text-right">—</span>
+      )}
     </button>
   )
 }
