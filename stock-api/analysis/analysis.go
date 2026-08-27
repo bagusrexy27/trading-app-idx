@@ -617,30 +617,108 @@ type FibLevels struct {
 	L100 float64 `json:"l100"`
 }
 
-// Fibonacci computes retracement levels from the highest high and lowest low
-// in the last `lookback` bars (default 100 if lookback <= 0).
+// Fibonacci computes retracement levels from swing high/low in the last
+// `lookback` bars. In an uptrend (HH+HL) levels retrace from swing high down;
+// in a downtrend from swing low up. Falls back to window high/low when swings
+// are insufficient.
 func Fibonacci(prices []models.StockPrice, lookback int) FibLevels {
 	if lookback <= 0 || lookback > len(prices) {
 		lookback = len(prices)
 	}
-	slice := prices[len(prices)-lookback:]
-	hi, lo := slice[0].High, slice[0].Low
-	for _, p := range slice {
-		if p.High > hi { hi = p.High }
-		if p.Low  < lo { lo = p.Low  }
+	swings := fractalSwings(prices, lookback)
+	var hi, lo float64
+	var hiOK, loOK bool
+	for _, s := range swings {
+		if s.high {
+			if !hiOK || s.price > hi {
+				hi, hiOK = s.price, true
+			}
+		} else {
+			if !loOK || s.price < lo {
+				lo, loOK = s.price, true
+			}
+		}
+	}
+	if !hiOK || !loOK {
+		slice := prices[len(prices)-lookback:]
+		hi, lo = slice[0].High, slice[0].Low
+		for _, p := range slice {
+			if p.High > hi {
+				hi = p.High
+			}
+			if p.Low < lo {
+				lo = p.Low
+			}
+		}
+	}
+	// Uptrend: retrace from high toward low. Downtrend: inverse mapping.
+	uptrend := hi > lo && len(swings) >= 2
+	if uptrend {
+		var highsSeq, lowsSeq []float64
+		for _, s := range swings {
+			if s.high {
+				highsSeq = append(highsSeq, s.price)
+			} else {
+				lowsSeq = append(lowsSeq, s.price)
+			}
+		}
+		if len(highsSeq) >= 2 && len(lowsSeq) >= 2 {
+			uptrend = highsSeq[len(highsSeq)-1] > highsSeq[len(highsSeq)-2] &&
+				lowsSeq[len(lowsSeq)-1] > lowsSeq[len(lowsSeq)-2]
+		}
 	}
 	rng := hi - lo
+	if rng <= 0 {
+		return FibLevels{High: R2(hi), Low: R2(lo), L0: R2(lo), L100: R2(hi)}
+	}
+	if uptrend {
+		return FibLevels{
+			High: R2(hi), Low: R2(lo),
+			L0: R2(hi), L236: R2(hi-0.236*rng), L382: R2(hi-0.382*rng),
+			L500: R2(hi-0.500*rng), L618: R2(hi-0.618*rng), L786: R2(hi-0.786*rng),
+			L100: R2(lo),
+		}
+	}
 	return FibLevels{
-		High: R2(hi),
-		Low:  R2(lo),
-		L0:   R2(lo),
-		L236: R2(lo + 0.236*rng),
-		L382: R2(lo + 0.382*rng),
-		L500: R2(lo + 0.500*rng),
-		L618: R2(lo + 0.618*rng),
-		L786: R2(lo + 0.786*rng),
+		High: R2(hi), Low: R2(lo),
+		L0: R2(lo), L236: R2(lo+0.236*rng), L382: R2(lo+0.382*rng),
+		L500: R2(lo+0.500*rng), L618: R2(lo+0.618*rng), L786: R2(lo+0.786*rng),
 		L100: R2(hi),
 	}
+}
+
+// AVWAPPoint is one bar of anchored VWAP from anchor date forward.
+type AVWAPPoint struct {
+	Date  string  `json:"date"`
+	Value float64 `json:"value"`
+}
+
+// AVWAP computes cumulative VWAP from anchorDate through the end of prices.
+func AVWAP(prices []models.StockPrice, anchorDate string) []AVWAPPoint {
+	i0 := -1
+	for i, p := range prices {
+		if p.Date == anchorDate {
+			i0 = i
+			break
+		}
+	}
+	if i0 < 0 {
+		return nil
+	}
+	var pv, vv float64
+	out := make([]AVWAPPoint, 0, len(prices)-i0)
+	for i := i0; i < len(prices); i++ {
+		p := prices[i]
+		tp := (p.High + p.Low + p.Close) / 3
+		pv += tp * float64(p.Volume)
+		vv += float64(p.Volume)
+		v := tp
+		if vv > 0 {
+			v = pv / vv
+		}
+		out = append(out, AVWAPPoint{Date: p.Date, Value: R2(v)})
+	}
+	return out
 }
 
 // ── Pivot Points (Standard) ───────────────────────────────────────────────────

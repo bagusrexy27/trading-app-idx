@@ -77,7 +77,10 @@ func TestDecisionEngineLowConfidenceGate(t *testing.T) {
 
 func TestDecisionEngineHasNewFactors(t *testing.T) {
 	d := DecisionEngine(synthPrices(120))
-	want := map[string]bool{"Money Flow": false, "Trend Strength": false}
+	want := map[string]bool{
+		"Money Flow": false, "Trend Strength": false,
+		"FVG Confluence": false, "Bandarmology": false,
+	}
 	for _, c := range d.Components {
 		if _, ok := want[c.Name]; ok {
 			want[c.Name] = true

@@ -46,6 +46,8 @@ export const api = {
     mfi:        (s, n) => req(`/analysis/${s}/mfi?limit=${n ?? 300}`),
     advisor:         (s) => req(`/analysis/${s}/advisor`),
     decision:        (s) => req(`/analysis/${s}/decision`),
+    decisionBacktest:(s) => req(`/analysis/${s}/decision-backtest`),
+    avwap:      (s, anchor) => req(`/analysis/${s}/avwap?anchor=${encodeURIComponent(anchor)}`),
     advisorBacktest: (s) => req(`/analysis/${s}/advisor-backtest`),
     backtest:   (s)       => req(`/analysis/${s}/backtest`),
   },

@@ -43,10 +43,10 @@ export function useAlertChecker(stocks) {
         } else if (alert.type === 'rsi_overbought' && s.rsi != null && s.rsi > 70) {
           triggered = true
           msg = `${alert.symbol} RSI overbought: ${s.rsi?.toFixed(1)}`
-        } else if (alert.type === 'signal_buy' && (s.signal === 'BUY' || s.signal === 'STRONG BUY')) {
+        } else if (alert.type === 'signal_buy' && (s.signal === 'BUY' || s.signal === 'STRONG_BUY' || s.signal === 'STRONG BUY')) {
           triggered = true
           msg = `${alert.symbol} sinyal: ${s.signal}`
-        } else if (alert.type === 'signal_sell' && (s.signal === 'SELL' || s.signal === 'STRONG SELL')) {
+        } else if (alert.type === 'signal_sell' && (s.signal === 'SELL' || s.signal === 'STRONG_SELL' || s.signal === 'STRONG SELL')) {
           triggered = true
           msg = `${alert.symbol} sinyal: ${s.signal}`
         }

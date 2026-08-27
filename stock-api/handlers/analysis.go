@@ -92,11 +92,11 @@ func scoreToSignal(score, max int) (overall, strength string) {
 	strength = fmt.Sprintf("%.2f", analysis.R2(ratio))
 	switch {
 	case ratio >= 0.6:
-		overall = "STRONG BUY"
+		overall = "STRONG_BUY"
 	case ratio >= 0.2:
 		overall = "BUY"
 	case ratio <= -0.6:
-		overall = "STRONG SELL"
+		overall = "STRONG_SELL"
 	case ratio <= -0.2:
 		overall = "SELL"
 	default:
@@ -680,6 +680,32 @@ func (h *AnalysisHandler) FVG(w http.ResponseWriter, r *http.Request) {
 		"count":  len(zones),
 		"zones":  zones,
 		"active": active,
+	})
+}
+
+// ── GET /api/analysis/{symbol}/avwap?anchor=YYYY-MM-DD ─────────────────────
+
+func (h *AnalysisHandler) AVWAP(w http.ResponseWriter, r *http.Request) {
+	symbol := canonicalSymbol(mux.Vars(r)["symbol"])
+	prices, ok := loadPrices(w, symbol)
+	if !ok {
+		return
+	}
+	anchor := r.URL.Query().Get("anchor")
+	if anchor == "" {
+		respond(w, 422, false, "parameter anchor (YYYY-MM-DD) wajib diisi", nil)
+		return
+	}
+	pts := analysis.AVWAP(prices, anchor)
+	if pts == nil {
+		respond(w, 404, false, fmt.Sprintf("tanggal anchor %s tidak ditemukan", anchor), nil)
+		return
+	}
+	respond(w, 200, true, "", map[string]interface{}{
+		"symbol": symbol,
+		"anchor": anchor,
+		"count":  len(pts),
+		"data":   pts,
 	})
 }
 

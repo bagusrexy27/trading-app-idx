@@ -326,7 +326,7 @@ func generateLocalAnalysis(
 	if len(supports) > 0 { nearSup = supports[0] }
 
 	switch signal {
-	case "STRONG BUY":
+	case "STRONG_BUY", "STRONG BUY":
 		sb.WriteString(fmt.Sprintf(
 			"ENTRY — Momentum sangat bullish (skor %d/%d). Masuk di area saat ini (%.0f) atau pada pullback ke %s. Stop-loss di %.0f. Target 1: %.0f, Target 2: %.0f. R/R ≈ %.1f:1.",
 			score, maxScore, close, nearSup, stopLoss, t1, t2, rr))
@@ -342,7 +342,7 @@ func generateLocalAnalysis(
 		sb.WriteString(fmt.Sprintf(
 			"KURANGI POSISI — Tekanan jual mulai dominan (skor %d/%d). Take profit sebagian jika masih memegang. Hindari membeli baru. Pantau support %s sebagai potensi titik reversal.",
 			score, maxScore, nearSup))
-	case "STRONG SELL":
+	case "STRONG_SELL", "STRONG SELL":
 		sb.WriteString(fmt.Sprintf(
 			"EXIT — Tekanan bearish kuat (skor %d/%d). Keluar dari posisi atau cut loss jika harga menembus support kritis. Re-entry hanya setelah RSI recovery dari oversold dan MACD bullish crossover terkonfirmasi.",
 			score, maxScore))
