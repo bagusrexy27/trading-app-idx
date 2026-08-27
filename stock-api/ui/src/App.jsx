@@ -20,6 +20,20 @@ const ViewLoading = () => (
   </div>
 )
 
+const RECENT_KEY = 'idx-recent-stocks'
+const SIDEBAR_KEY = 'idx-sidebar-collapsed'
+
+function loadRecent() {
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]') } catch { return [] }
+}
+
+function loadSidebarCollapsed() {
+  try {
+    const v = localStorage.getItem(SIDEBAR_KEY)
+    return v == null ? true : v === 'true'
+  } catch { return true }
+}
+
 export default function App() {
   const [stocks, setStocks]       = useState([])
   const [selected, setSelected]   = useState(null)
@@ -29,6 +43,25 @@ export default function App() {
   const [loading, setLoading]     = useState(true)
   const [toast, setToast]         = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(loadSidebarCollapsed)
+  const [recentStocks, setRecentStocks] = useState(loadRecent)
+
+  const pushRecent = useCallback((symbol) => {
+    if (!symbol) return
+    setRecentStocks(prev => {
+      const next = [symbol, ...prev.filter(s => s !== symbol)].slice(0, 8)
+      localStorage.setItem(RECENT_KEY, JSON.stringify(next))
+      return next
+    })
+  }, [])
+
+  const toggleSidebarCollapsed = useCallback(() => {
+    setSidebarCollapsed(prev => {
+      const next = !prev
+      localStorage.setItem(SIDEBAR_KEY, String(next))
+      return next
+    })
+  }, [])
 
   // Navigasi terdaftar ke history browser: back mouse, Alt+←/→, tombol back
   // browser, dan Backspace semuanya jalan lewat pushState/popstate.
@@ -100,6 +133,7 @@ export default function App() {
   const handleAdded = (symbol) => {
     setShowAdd(false)
     loadStocks()
+    pushRecent(symbol)
     navigate('home', symbol)
     showToast(`✓ ${symbol} berhasil ditambahkan`)
   }
@@ -122,6 +156,7 @@ export default function App() {
   }
 
   const handleSelectStock = (symbol) => {
+    pushRecent(symbol)
     navigate('home', symbol)
   }
 
@@ -143,8 +178,12 @@ export default function App() {
         stocks={stocks}
         selectedSymbol={selected}
         activeView={view}
+        recentSymbols={recentStocks}
         mobileOpen={sidebarOpen}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={toggleSidebarCollapsed}
         onMobileClose={() => setSidebarOpen(false)}
+        onSelectStock={handleSelectStock}
         onAdd={() => setShowAdd(true)}
         onUpdateAll={handleUpdateAll}
         onViewWatchlist={()   => navigate('watchlist')}
@@ -158,15 +197,25 @@ export default function App() {
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden md:ml-0">
         <div className="flex items-center justify-between gap-3 px-4 py-2 glass border-b border-tv-border">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="md:hidden px-2 py-1.5 text-sm rounded-lg border border-tv-border text-tv-muted hover:text-tv-text"
-            aria-label="Buka menu navigasi"
-          >
-            ☰ Menu
-          </button>
-          <div className="flex-1 md:flex-none" />
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden px-2 py-1.5 text-sm rounded-lg border border-tv-border text-tv-muted hover:text-tv-text"
+              aria-label="Buka menu navigasi"
+            >
+              ☰ Menu
+            </button>
+            <button
+              type="button"
+              onClick={toggleSidebarCollapsed}
+              className="hidden md:inline-flex px-2 py-1.5 text-sm rounded-lg border border-tv-border text-tv-muted hover:text-tv-text"
+              aria-label={sidebarCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
+              title={sidebarCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
+            >
+              {sidebarCollapsed ? '☰' : '◧'}
+            </button>
+          </div>
           <IHSGBadge />
         </div>
         <div className="flex-1 overflow-auto">
