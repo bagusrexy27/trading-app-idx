@@ -28,6 +28,7 @@ export default function App() {
   const [showAlerts, setShowAlerts] = useState(false)
   const [loading, setLoading]     = useState(true)
   const [toast, setToast]         = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Navigasi terdaftar ke history browser: back mouse, Alt+←/→, tombol back
   // browser, dan Backspace semuanya jalan lewat pushState/popstate.
@@ -40,6 +41,7 @@ export default function App() {
     }
     setView(nextView)
     setSelected(nextSelected)
+    setSidebarOpen(false)
   }, [])
 
   useEffect(() => {
@@ -139,10 +141,10 @@ export default function App() {
     <div className="flex h-screen bg-transparent text-tv-text overflow-hidden">
       <Sidebar
         stocks={stocks}
-        selected={selected}
+        selectedSymbol={selected}
         activeView={view}
-        loading={loading}
-        onSelect={handleSelectStock}
+        mobileOpen={sidebarOpen}
+        onMobileClose={() => setSidebarOpen(false)}
         onAdd={() => setShowAdd(true)}
         onUpdateAll={handleUpdateAll}
         onViewWatchlist={()   => navigate('watchlist')}
@@ -154,8 +156,17 @@ export default function App() {
         onOpenAlerts={() => setShowAlerts(true)}
       />
 
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="flex items-center justify-end gap-3 px-4 py-2 glass border-b border-tv-border">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden md:ml-0">
+        <div className="flex items-center justify-between gap-3 px-4 py-2 glass border-b border-tv-border">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="md:hidden px-2 py-1.5 text-sm rounded-lg border border-tv-border text-tv-muted hover:text-tv-text"
+            aria-label="Buka menu navigasi"
+          >
+            ☰ Menu
+          </button>
+          <div className="flex-1 md:flex-none" />
           <IHSGBadge />
         </div>
         <div className="flex-1 overflow-auto">
@@ -196,7 +207,6 @@ export default function App() {
         <AddStockModal
           onClose={() => setShowAdd(false)}
           onSuccess={handleAdded}
-          showToast={showToast}
         />
       )}
 
@@ -206,6 +216,8 @@ export default function App() {
 
       {toast && (
         <div
+          role="alert"
+          aria-live="polite"
           className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-lg border
             text-sm font-medium shadow-2xl animate-pulse-once
             ${toast.type === 'error'
