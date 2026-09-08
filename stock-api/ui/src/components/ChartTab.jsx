@@ -47,7 +47,7 @@ const timeToDate = t => typeof t === 'string'
   ? t
   : `${t.year}-${String(t.month).padStart(2, '0')}-${String(t.day).padStart(2, '0')}`
 
-export default function ChartTab({ data, symbol }) {
+export default function ChartTab({ data, symbol, showToast, compact = false }) {
   const [range, setRange] = useState('3M')
   const [showFib, setShowFib] = useState(false)
   const [fib, setFib] = useState(null)          // FibLevels dari API (lookback 100 bar)
@@ -432,7 +432,7 @@ export default function ChartTab({ data, symbol }) {
   const today     = prices.length >= 1 ? prices[prices.length - 1] : null
 
   return (
-    <div className="p-4 space-y-3">
+    <div className={compact ? 'px-5 py-3 space-y-2' : 'p-4 space-y-3'}>
 
       {/* ── Range selector + SMA legend ───────────────────────────── */}
       <div className="flex items-center gap-1.5">
@@ -513,13 +513,13 @@ export default function ChartTab({ data, symbol }) {
       <RangeStats range={range} sliced={sliced} />
 
       {/* ── Yesterday session card (visible only on 1W range) ─────── */}
-      {range === '1W' && yesterday && today && (
+      {!compact && range === '1W' && yesterday && today && (
         <YesterdayCard yesterday={yesterday} today={today} />
       )}
 
       {/* ── Chart card: candlestick + SMA + volume dalam satu canvas ── */}
       <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan p-3">
-        <div className="relative" style={{ height: 500 }}>
+        <div className={compact ? 'relative h-[clamp(240px,34vh,380px)]' : 'relative'} style={compact ? undefined : { height: 500 }}>
           <div ref={containerRef} className="absolute inset-0" />
           <div
             ref={tooltipRef}
@@ -533,7 +533,7 @@ export default function ChartTab({ data, symbol }) {
         </div>
       </div>
 
-      <ChartGlossary />
+      {!compact && <ChartGlossary />}
     </div>
   )
 }
