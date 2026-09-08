@@ -486,7 +486,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
               ? 'bg-tv-green/15 text-tv-green border border-tv-green/40 shadow-[0_0_12px_rgba(38,166,154,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
         >
-          ⤳ Proyeksi
+          ⤳ Projection
         </button>
         {avwapOn && (
           <span className="flex items-center gap-1 text-[10px]">
@@ -497,7 +497,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
               </button>
             ))}
             <span className="text-tv-muted ml-1">
-              {avwapAnchor ? <>⚓ <span style={{ color: AVWAP_COLOR }}>{avwapAnchor}</span></> : 'klik candle'}
+              {avwapAnchor ? <>⚓ <span style={{ color: AVWAP_COLOR }}>{avwapAnchor}</span></> : 'click candle'}
             </span>
           </span>
         )}
