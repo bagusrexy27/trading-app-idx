@@ -647,7 +647,7 @@ function RangeStats({ range, sliced }) {
   }
   const avgVol = totalVol / sliced.length
 
-  const RANGE_LABELS = { '1W': '1 Minggu', '1M': '1 Bulan', '3M': '3 Bulan', '6M': '6 Bulan', '1Y': '1 Tahun', 'All': 'Semua Data' }
+  const RANGE_LABELS = { '1W': '1 Week', '1M': '1 Month', '3M': '3 Months', '6M': '6 Months', '1Y': '1 Year', 'All': 'All data' }
 
   return (
     <div key={range} className="flex flex-wrap items-center gap-x-5 gap-y-1.5 px-4 py-2.5 bg-tv-card border border-tv-border rounded-lg text-xs animate-slide-down">
@@ -657,7 +657,7 @@ function RangeStats({ range, sliced }) {
 
       {/* Perubahan harga */}
       <div className="flex items-center gap-1.5">
-        <span className="text-tv-muted">Perubahan</span>
+        <span className="text-tv-muted">Change</span>
         <span className={`font-bold tabular-nums ${pos ? 'text-tv-green' : 'text-tv-red'}`}>
           {pos ? '+' : ''}{fmt.price(chg)} ({pos ? '+' : ''}{pct.toFixed(2)}%)
         </span>

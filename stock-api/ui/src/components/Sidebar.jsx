@@ -45,12 +45,12 @@ export default function Sidebar({
           </div>
 
           <nav className="flex-1 py-2 flex flex-col gap-0.5">
-            <RailBtn icon={<IconToday />} label="Today" active={activeView === 'today'} onClick={onViewToday} />
-            <RailBtn icon={<IconMarket />} label="Market" active={activeView === 'overview'} onClick={onViewOverview} />
-            <RailBtn icon={<IconSession />} label="Session" active={activeView === 'session'} onClick={onViewSession} />
-            <RailBtn icon={<IconScreener />} label="Screen" active={activeView === 'advisor'} onClick={onViewAdvisor} />
-            <RailBtn icon={<IconPortfolio />} label="Port" active={activeView === 'portfolio'} onClick={onViewPortfolio} />
-            <RailBtn icon={<IconPractice />} label="Drill" active={activeView === 'practice'} onClick={onViewPractice} />
+            <RailBtn icon={<IconToday />} label="Today" active={activeView === 'today'} onClick={() => { onViewToday(); onCloseMobile?.() }} />
+            <RailBtn icon={<IconMarket />} label="Market" active={activeView === 'overview'} onClick={() => { onViewOverview(); onCloseMobile?.() }} />
+            <RailBtn icon={<IconSession />} label="Session" active={activeView === 'session'} onClick={() => { onViewSession(); onCloseMobile?.() }} />
+            <RailBtn icon={<IconScreener />} label="Screen" active={activeView === 'advisor'} onClick={() => { onViewAdvisor(); onCloseMobile?.() }} />
+            <RailBtn icon={<IconPortfolio />} label="Port" active={activeView === 'portfolio'} onClick={() => { onViewPortfolio(); onCloseMobile?.() }} />
+            <RailBtn icon={<IconPractice />} label="Drill" active={activeView === 'practice'} onClick={() => { onViewPractice(); onCloseMobile?.() }} />
           </nav>
 
           <div className="py-2 flex flex-col items-center gap-1 border-t border-tv-border">

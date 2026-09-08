@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, memo } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense, memo } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import Overview from './Overview'
@@ -38,10 +38,13 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const [aiOpen, setAiOpen]       = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(null)
+  const hasDataRef = useRef(false)
 
   // Core + SMA untuk chart permanen di-load awal.
+  // Jangan set loading=true kalau data sudah ada — itu unmount ChartPane & reset zoom.
   const load = async () => {
-    setLoading(true)
+    const cold = !hasDataRef.current
+    if (cold) setLoading(true)
     setError(null)
     try {
       const [summary, pricesResp, decision, sma20, sma50] = await Promise.all([
@@ -51,22 +54,24 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         api.analysis.sma(symbol, 20, 300).then(r => r?.data || []).catch(() => []),
         api.analysis.sma(symbol, 50, 300).then(r => r?.data || []).catch(() => []),
       ])
-      setData({
+      setData(d => ({
+        ...(d || {}),
         summary,
         prices: pricesResp?.prices || [],
         decision,
         sma20,
         sma50,
-      })
+      }))
+      hasDataRef.current = true
     } catch (e) {
       setError(e.message)
     } finally {
-      setLoading(false)
+      if (cold) setLoading(false)
       setLastRefresh(new Date())
     }
   }
 
-  useEffect(() => { load() }, [symbol])
+  useEffect(() => { hasDataRef.current = false; setData(null); load() }, [symbol])
 
   // Prefetch menyusut: chart (sma) sudah di awal; sisa hanya indicators + risk.
   const TAB_NEEDS = {
@@ -178,7 +183,13 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const dec = data.decision?.decision
   const signalNow = dec?.signal
   const buyish = signalNow === 'BUY' || signalNow === 'STRONG_BUY'
-  const verdictLabel = buyish ? 'BUY TODAY' : (signalNow === 'SELL' || signalNow === 'STRONG_SELL' ? 'AVOID' : signalLabel(signalNow) || 'WAIT')
+  const avoidish = signalNow === 'SELL' || signalNow === 'STRONG_SELL'
+  const verdictLabel = buyish ? 'BUY TODAY' : (avoidish ? 'AVOID' : signalLabel(signalNow) || 'WAIT')
+  const verdictTone = buyish
+    ? { wrap: 'bg-tv-green/5 border-tv-green/20', text: 'text-tv-green' }
+    : avoidish
+      ? { wrap: 'bg-tv-red/5 border-tv-red/20', text: 'text-tv-red' }
+      : { wrap: 'bg-tv-yellow/5 border-tv-yellow/20', text: 'text-tv-yellow' }
 
   return (
     <div className="flex flex-col h-full">
@@ -263,9 +274,8 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
 
         {/* Verdict strip */}
         {dec && (
-          <div className={`flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-2.5 border-t
-            ${buyish ? 'bg-tv-green/5 border-tv-green/20' : 'bg-tv-red/5 border-tv-red/20'}`}>
-            <span className={`text-sm font-extrabold tracking-wide ${buyish ? 'text-tv-green' : 'text-tv-red'}`}>
+          <div className={`flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-2.5 border-t ${verdictTone.wrap}`}>
+            <span className={`text-sm font-extrabold tracking-wide ${verdictTone.text}`}>
               {verdictLabel}
             </span>
             <span className="text-xs text-tv-muted">
@@ -325,19 +335,19 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         <div key={tab} className="animate-slide-up h-full">
           {(() => {
             const extrasReady = (TAB_NEEDS[tab] || []).every(k => data[k] !== undefined)
-            if (!extrasReady) return <TabLoading />
             return (
               <Suspense fallback={<TabLoading />}>
                 {tab === 'decision'   && <Advisor symbol={symbol} decisionData={data.decision} />}
                 {tab === 'indicators' && (
                   <div className="space-y-0">
+                    {/* Overview hanya butuh summary — tampil dulu, Indicators menyusul */}
                     <Overview data={data} />
                     <div className="border-t border-tv-border">
-                      <Indicators data={data} />
+                      {extrasReady ? <Indicators data={data} /> : <TabLoading />}
                     </div>
                   </div>
                 )}
-                {tab === 'risk'    && <RiskCalc data={data} />}
+                {tab === 'risk'    && (extrasReady ? <RiskCalc data={data} /> : <TabLoading />)}
                 {tab === 'reports' && <ReportUpload symbol={symbol} showToast={showToast} />}
               </Suspense>
             )
