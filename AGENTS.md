@@ -30,24 +30,19 @@ npm install --legacy-peer-deps     # react-apexcharts vs React 18 peer-dep confl
 
 ## Run
 
-Two supported modes:
+Dev mode is one script (backend `:1111` + Vite `:5173` with hot reload):
 
-**Dev (two servers, hot reload):**
 ```bash
-# Terminal 1 — API + data on :1111
-cd stock-api && ./stock-api.exe
+# Windows
+stock-api/start-dev.bat
 
-# Terminal 2 — UI on :5173, proxies /api/* -> :1111
-cd stock-api/ui && npm run dev
+# Linux / macOS / Cursor Cloud
+stock-api/start-dev.sh
 ```
-Open http://localhost:5173
 
-**Production (single server):**
-```bash
-cd stock-api/ui && npm run build   # outputs to ../static/
-cd stock-api && ./stock-api.exe    # serves API + built UI on :1111
-```
-Open http://localhost:1111
+Then open http://localhost:5173
+
+Production (single server): `cd stock-api/ui && npm run build`, then `stock-api/start.bat` (Windows) or `./stock-api.exe` from `stock-api/` (serves API + built UI on `:1111`).
 
 ## Test / Lint
 
@@ -88,6 +83,5 @@ The frontend defines no lint/test scripts (only `dev`, `build`, `preview`).
 - For UI verification use the dev server on :5173 (or the built UI on :1111). The Watchlist
   is the default landing view; click a stock card to open the detail panel (Overview /
   📊 Chart / 🧭 Saran tabs), and use "＋ Tambah Saham" to add a symbol.
-- Long-running servers should be started in a persistent session (e.g. tmux) so they keep
-  running after the setup step; do not kill them if the user may want to keep testing.
+- Long-running servers: from `stock-api/` run `./start-dev.sh` (Linux/Cloud) or `start-dev.bat` (Windows). The script is idempotent if `:1111` / `:5173` are already up. Do not kill them if the user may want to keep testing.
 - User-facing UI text is in Bahasa Indonesia.
