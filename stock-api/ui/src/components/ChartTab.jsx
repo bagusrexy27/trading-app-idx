@@ -47,7 +47,7 @@ const timeToDate = t => typeof t === 'string'
   ? t
   : `${t.year}-${String(t.month).padStart(2, '0')}-${String(t.day).padStart(2, '0')}`
 
-export default function ChartTab({ data, symbol }) {
+export default function ChartTab({ data, symbol, showToast, compact = false }) {
   const [range, setRange] = useState('3M')
   const [showFib, setShowFib] = useState(false)
   const [fib, setFib] = useState(null)          // FibLevels dari API (lookback 100 bar)
@@ -70,7 +70,11 @@ export default function ChartTab({ data, symbol }) {
     let alive = true
     api.analysis.fibonacci(symbol)
       .then(r => { if (alive) setFib(r.levels) })
-      .catch(() => { if (alive) setShowFib(false) })
+      .catch(e => {
+        if (!alive) return
+        setShowFib(false)
+        showToast?.(`Fibonacci gagal: ${e.message}`, 'error')
+      })
     return () => { alive = false }
   }, [showFib, fib, symbol])
   useEffect(() => { setFib(null); setShowFib(false); setAvwapAnchor(null); setAvwapOn(false); setFvgZones(null); setShowFvg(false); setProj(null); setShowProj(false) }, [symbol])
@@ -81,7 +85,11 @@ export default function ChartTab({ data, symbol }) {
     let alive = true
     api.analysis.decision(symbol)
       .then(r => { if (alive) setProj(r.decision) })
-      .catch(() => { if (alive) setShowProj(false) })
+      .catch(e => {
+        if (!alive) return
+        setShowProj(false)
+        showToast?.(`Proyeksi gagal: ${e.message}`, 'error')
+      })
     return () => { alive = false }
   }, [showProj, proj, symbol])
 
@@ -102,7 +110,11 @@ export default function ChartTab({ data, symbol }) {
     let alive = true
     api.analysis.fvg(symbol)
       .then(r => { if (alive) setFvgZones(r.active?.slice(0, 3) ?? []) })
-      .catch(() => { if (alive) setShowFvg(false) })
+      .catch(e => {
+        if (!alive) return
+        setShowFvg(false)
+        showToast?.(`FVG gagal: ${e.message}`, 'error')
+      })
     return () => { alive = false }
   }, [showFvg, fvgZones, symbol])
 
@@ -120,7 +132,11 @@ export default function ChartTab({ data, symbol }) {
         if (!alive) return
         s.setData((r.data || []).map(p => ({ time: p.date, value: p.value })))
       })
-      .catch(() => { if (alive) s.setData([]) })
+      .catch(e => {
+        if (!alive) return
+        s.setData([])
+        showToast?.(`AVWAP gagal: ${e.message}`, 'error')
+      })
     return () => { alive = false }
   }, [avwapOn, avwapAnchor, symbol, prices])
 
@@ -432,7 +448,7 @@ export default function ChartTab({ data, symbol }) {
   const today     = prices.length >= 1 ? prices[prices.length - 1] : null
 
   return (
-    <div className="p-4 space-y-3">
+    <div className={compact ? 'px-5 py-3 space-y-2' : 'p-4 space-y-3'}>
 
       {/* ── Range selector + SMA legend ───────────────────────────── */}
       <div className="flex items-center gap-1.5">
@@ -486,7 +502,7 @@ export default function ChartTab({ data, symbol }) {
               ? 'bg-tv-green/15 text-tv-green border border-tv-green/40 shadow-[0_0_12px_rgba(38,166,154,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
         >
-          ⤳ Proyeksi
+          ⤳ Projection
         </button>
         {avwapOn && (
           <span className="flex items-center gap-1 text-[10px]">
@@ -497,7 +513,7 @@ export default function ChartTab({ data, symbol }) {
               </button>
             ))}
             <span className="text-tv-muted ml-1">
-              {avwapAnchor ? <>⚓ <span style={{ color: AVWAP_COLOR }}>{avwapAnchor}</span></> : 'klik candle'}
+              {avwapAnchor ? <>⚓ <span style={{ color: AVWAP_COLOR }}>{avwapAnchor}</span></> : 'click candle'}
             </span>
           </span>
         )}
@@ -510,16 +526,16 @@ export default function ChartTab({ data, symbol }) {
       </div>
 
       {/* ── Range performance stats bar ───────────────────────────── */}
-      <RangeStats range={range} sliced={sliced} />
+      {!compact && <RangeStats range={range} sliced={sliced} />}
 
       {/* ── Yesterday session card (visible only on 1W range) ─────── */}
-      {range === '1W' && yesterday && today && (
+      {!compact && range === '1W' && yesterday && today && (
         <YesterdayCard yesterday={yesterday} today={today} />
       )}
 
       {/* ── Chart card: candlestick + SMA + volume dalam satu canvas ── */}
       <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan p-3">
-        <div className="relative" style={{ height: 500 }}>
+        <div className={compact ? 'relative h-[clamp(160px,22vh,260px)]' : 'relative min-h-[50vh] h-[clamp(320px,50vh,720px)]'}>
           <div ref={containerRef} className="absolute inset-0" />
           <div
             ref={tooltipRef}
@@ -533,7 +549,7 @@ export default function ChartTab({ data, symbol }) {
         </div>
       </div>
 
-      <ChartGlossary />
+      {!compact && <ChartGlossary />}
     </div>
   )
 }
@@ -647,7 +663,7 @@ function RangeStats({ range, sliced }) {
   }
   const avgVol = totalVol / sliced.length
 
-  const RANGE_LABELS = { '1W': '1 Minggu', '1M': '1 Bulan', '3M': '3 Bulan', '6M': '6 Bulan', '1Y': '1 Tahun', 'All': 'Semua Data' }
+  const RANGE_LABELS = { '1W': '1 Week', '1M': '1 Month', '3M': '3 Months', '6M': '6 Months', '1Y': '1 Year', 'All': 'All data' }
 
   return (
     <div key={range} className="flex flex-wrap items-center gap-x-5 gap-y-1.5 px-4 py-2.5 bg-tv-card border border-tv-border rounded-lg text-xs animate-slide-down">
@@ -657,7 +673,7 @@ function RangeStats({ range, sliced }) {
 
       {/* Perubahan harga */}
       <div className="flex items-center gap-1.5">
-        <span className="text-tv-muted">Perubahan</span>
+        <span className="text-tv-muted">Change</span>
         <span className={`font-bold tabular-nums ${pos ? 'text-tv-green' : 'text-tv-red'}`}>
           {pos ? '+' : ''}{fmt.price(chg)} ({pos ? '+' : ''}{pct.toFixed(2)}%)
         </span>

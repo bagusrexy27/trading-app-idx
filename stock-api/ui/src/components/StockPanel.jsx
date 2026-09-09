@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense, memo } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import Overview from './Overview'
@@ -6,58 +6,82 @@ import RiskCalc from './RiskCalc'
 import ReportUpload from './ReportUpload'
 import Advisor from './Advisor'
 
-// ApexCharts-heavy tabs load on demand (code-splitting)
+// Chart selalu ter-mount di atas panel — lazy sekali, jangan unmount saat ganti tab.
 const ChartTab   = lazy(() => import('./ChartTab'))
 const Indicators = lazy(() => import('./Indicators'))
 
-const TABS = [
-  { id: 'overview',   label: '📋 Overview' },
-  { id: 'chart',      label: '📊 Chart' },
-  { id: 'indicators', label: '📉 Indicators' },
-  { id: 'advisor',    label: '🧭 Saran' },
-  { id: 'risk',       label: '⚖️ Risk' },
-  { id: 'laporan',    label: '📄 Laporan' },
+const PANELS = [
+  { id: 'decision',   label: 'Decision' },
+  { id: 'indicators', label: 'Indicators' },
+  { id: 'risk',       label: 'Risk' },
+  { id: 'reports',    label: 'Reports' },
 ]
 
+// ChartPane dibungkus memo; hanya terima prices/sma20/sma50/symbol.
+// Jangan tambahkan prop baru yang dibuat inline (object/array literal).
+const ChartPane = memo(function ChartPane({ prices, sma20, sma50, symbol }) {
+  return (
+    <Suspense fallback={<TabLoading />}>
+      <ChartTab data={{ prices, sma20, sma50 }} symbol={symbol} compact />
+    </Suspense>
+  )
+})
+
 export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) {
-  const [tab, setTab]         = useState('overview')
+  const [tab, setTab]         = useState('decision')
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(null)
   const [updating, setUpdating] = useState(false)
-  const [aiResult, setAiResult]   = useState(null)   // { analysis, generated, signal }
+  const [aiResult, setAiResult]   = useState(null)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiOpen, setAiOpen]       = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(null)
+  const [chartOpen, setChartOpen] = useState(() => {
+    try { return localStorage.getItem('idx-chart-open') !== '0' } catch { return true }
+  })
+  const hasDataRef = useRef(false)
 
-  // Core data only — everything else lazy-loads per tab (see effect below).
+  useEffect(() => {
+    try { localStorage.setItem('idx-chart-open', chartOpen ? '1' : '0') } catch { /* ignore */ }
+  }, [chartOpen])
+
+  // Core + SMA untuk chart permanen di-load awal.
+  // Jangan set loading=true kalau data sudah ada — itu unmount ChartPane & reset zoom.
   const load = async () => {
-    setLoading(true)
+    const cold = !hasDataRef.current
+    if (cold) setLoading(true)
     setError(null)
     try {
-      // Verdict comes from the Decision Engine — same source as the Saran tab,
-      // so the header badge can never contradict it.
-      const [summary, pricesResp, decision] = await Promise.all([
+      const [summary, pricesResp, decision, sma20, sma50] = await Promise.all([
         api.analysis.summary(symbol),
         api.stocks.get(symbol, 300),
         api.analysis.decision(symbol),
+        api.analysis.sma(symbol, 20, 300).then(r => r?.data || []).catch(() => []),
+        api.analysis.sma(symbol, 50, 300).then(r => r?.data || []).catch(() => []),
       ])
-      // Fresh object drops stale tab extras → the tab effect refetches them.
-      setData({ summary, prices: pricesResp?.prices || [], decision })
+      setData(d => ({
+        ...(d || {}),
+        summary,
+        prices: pricesResp?.prices || [],
+        decision,
+        sma20,
+        sma50,
+      }))
+      hasDataRef.current = true
     } catch (e) {
       setError(e.message)
     } finally {
-      setLoading(false)
+      if (cold) setLoading(false)
       setLastRefresh(new Date())
     }
   }
 
-  useEffect(() => { load() }, [symbol])
+  useEffect(() => { hasDataRef.current = false; setData(null); load() }, [symbol])
 
-  // What each tab needs beyond core. Missing keys are fetched on tab activation.
+  // Prefetch menyusut: chart (sma) sudah di awal; sisa hanya indicators + risk.
   const TAB_NEEDS = {
-    chart:      ['sma20', 'sma50'],
     indicators: ['rsi', 'macd', 'obv'],
     risk:       ['atr'],
   }
@@ -67,12 +91,10 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
     const needs = (TAB_NEEDS[tab] || []).filter(k => data[k] === undefined)
     if (!needs.length) return
     const fetchers = {
-      sma20: () => api.analysis.sma(symbol, 20, 300).then(r => r?.data || []),
-      sma50: () => api.analysis.sma(symbol, 50, 300).then(r => r?.data || []),
-      rsi:   () => api.analysis.rsi(symbol, 300).then(r => r?.data || []),
-      macd:  () => api.analysis.macd(symbol, 300).then(r => r?.data || []),
-      obv:   () => api.analysis.obv(symbol, 300).then(r => r?.data || []),
-      atr:   () => api.analysis.atr(symbol, 300).then(r => r?.data || []),
+      rsi:  () => api.analysis.rsi(symbol, 300).then(r => r?.data || []),
+      macd: () => api.analysis.macd(symbol, 300).then(r => r?.data || []),
+      obv:  () => api.analysis.obv(symbol, 300).then(r => r?.data || []),
+      atr:  () => api.analysis.atr(symbol, 300).then(r => r?.data || []),
     }
     let alive = true
     Promise.all(needs.map(k => fetchers[k]().catch(() => [])))
@@ -82,10 +104,9 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
       })
     return () => { alive = false }
   }, [tab, data, symbol])
-  // Reset AI state when symbol changes
-  useEffect(() => { setAiResult(null); setAiOpen(false) }, [symbol])
 
-  // Auto-refresh every 15 minutes
+  useEffect(() => { setAiResult(null); setAiOpen(false); setTab('decision') }, [symbol])
+
   useEffect(() => {
     if (!autoRefresh) return
     const id = setInterval(() => load(), 15 * 60 * 1000)
@@ -94,7 +115,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
 
   const handleAI = async () => {
     setAiOpen(true)
-    if (aiResult) return   // already fetched — just re-open
+    if (aiResult) return
     setAiLoading(true)
     try {
       const r = await api.analysis.ai(symbol)
@@ -123,7 +144,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
     setUpdating(true)
     try {
       const r = await api.stocks.update(symbol)
-      showToast(`✓ ${symbol}: ${r.added} data baru`)
+      showToast(`${symbol}: ${r.added} new bars`)
       await load()
       onUpdated?.()
     } catch (e) {
@@ -134,7 +155,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   }
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus ${symbol} dari tracking?`)) return
+    if (!confirm(`Remove ${symbol} from watchlist?`)) return
     try {
       await api.stocks.delete(symbol)
       onDeleted?.()
@@ -147,7 +168,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
     <div className="flex items-center justify-center h-full">
       <div className="flex flex-col items-center gap-3 text-tv-muted">
         <div className="w-8 h-8 border-2 border-tv-border border-t-tv-blue rounded-full animate-spin" />
-        <span className="text-sm">Memuat {symbol}...</span>
+        <span className="text-sm">Loading {symbol}…</span>
       </div>
     </div>
   )
@@ -155,10 +176,9 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   if (error) return (
     <div className="flex items-center justify-center h-full">
       <div className="text-center text-tv-red">
-        <div className="text-4xl mb-3">⚠️</div>
         <p className="text-sm font-medium">{error}</p>
         <button onClick={load} className="mt-4 px-4 py-2 text-xs bg-tv-card border border-tv-border rounded-lg hover:border-tv-blue transition-colors text-tv-text">
-          Coba lagi
+          Retry
         </button>
       </div>
     </div>
@@ -167,22 +187,32 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const { summary } = data
   const p = summary.price
   const c = summary.changes['1d']
-  const signalNow = data.decision?.decision?.signal
+  const dec = data.decision?.decision
+  const signalNow = dec?.signal
+  const buyish = signalNow === 'BUY' || signalNow === 'STRONG_BUY'
+  const avoidish = signalNow === 'SELL' || signalNow === 'STRONG_SELL'
+  const verdictLabel = buyish ? 'BUY TODAY' : (avoidish ? 'AVOID' : signalLabel(signalNow) || 'WAIT')
+  const verdictTone = buyish
+    ? { wrap: 'bg-tv-green/5 border-tv-green/20', text: 'text-tv-green' }
+    : avoidish
+      ? { wrap: 'bg-tv-red/5 border-tv-red/20', text: 'text-tv-red' }
+      : { wrap: 'bg-tv-yellow/5 border-tv-yellow/20', text: 'text-tv-yellow' }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* ── Header ─────────────────────────────────────────────── */}
+    <div className="flex flex-col">
+      {/* Header + tabs sticky. Chart di bawah ikut scroll / bisa di-minimize. */}
       <div className="sticky top-0 z-20 glass border-b border-tv-border">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-6 py-3">
-          {/* Symbol + exchange */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
           <div className="flex items-center gap-2">
             <span className="text-xl font-extrabold tracking-tight">{symbol}</span>
-            <span className="text-[10px] text-tv-muted bg-tv-bg border border-tv-border px-2 py-0.5 rounded-full">
+            <span className="text-[10px] text-tv-muted bg-tv-bg border border-tv-border px-2 py-0.5 rounded">
               {summary.exchange}
             </span>
+            {data.decision?.syariah && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-tv-green/10 text-tv-green border border-tv-green/30">Sharia</span>
+            )}
           </div>
 
-          {/* Price */}
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-bold tabular-nums">{fmt.price(p.close)}</span>
             <div className={`text-sm font-semibold tabular-nums ${colorOf(c.pct)}`}>
@@ -190,7 +220,6 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
             </div>
           </div>
 
-          {/* OHLV mini */}
           <div className="hidden sm:flex items-center gap-3 text-[11px] text-tv-muted border-l border-tv-border pl-4">
             <span>O <b className="text-tv-text">{fmt.price(p.open)}</b></span>
             <span>H <b className="text-tv-green">{fmt.price(p.high)}</b></span>
@@ -198,40 +227,40 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
             <span>V <b className="text-tv-text">{fmt.vol(p.volume)}</b></span>
           </div>
 
-          {/* Signal badge */}
-          {signalNow && (
-            <span className={`hidden md:inline-flex px-2.5 py-0.5 rounded-full border text-xs font-bold ${signalStyle(signalNow)}`}>
-              {signalLabel(signalNow)}
-            </span>
-          )}
-
-          {/* Date + actions */}
           <div className="ml-auto flex items-center gap-2">
             <div className="hidden lg:flex flex-col items-end text-[11px] text-tv-muted leading-tight">
               <span>{p.date}</span>
               {lastRefresh && (
-                <span>Diperbarui: {lastRefresh.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+                <span>Updated {lastRefresh.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
               )}
             </div>
             <button
+              onClick={() => setChartOpen(v => !v)}
+              title={chartOpen ? 'Hide chart' : 'Show chart'}
+              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-all
+                ${chartOpen
+                  ? 'bg-tv-bg border-tv-border text-tv-muted hover:text-tv-text'
+                  : 'bg-tv-blue/10 border-tv-blue/30 text-tv-blue'}`}
+            >
+              {chartOpen ? 'Hide chart' : 'Show chart'}
+            </button>
+            <button
               onClick={() => setAutoRefresh(v => !v)}
-              title={autoRefresh ? 'Matikan auto-refresh' : 'Aktifkan auto-refresh 15 menit'}
+              title={autoRefresh ? 'Disable auto-refresh' : 'Auto-refresh every 15 min'}
               className={`hidden sm:flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg border transition-all
                 ${autoRefresh
                   ? 'bg-tv-green/10 border-tv-green/30 text-tv-green'
                   : 'bg-tv-bg border-tv-border text-tv-muted hover:text-tv-text'}`}
             >
-              <span className={autoRefresh ? 'animate-spin' : ''} style={autoRefresh ? {animationDuration:'3s'} : {}}>↻</span>
-              <span>Auto</span>
+              Auto
             </button>
             <button
               onClick={handleAI}
               disabled={aiLoading}
               className="px-3 py-1.5 text-xs font-medium rounded-lg bg-tv-purple/10 border border-tv-purple/30
-                text-tv-purple hover:bg-tv-purple/20 transition-all disabled:opacity-40 hidden sm:flex items-center gap-1.5"
+                text-tv-purple hover:bg-tv-purple/20 transition-all disabled:opacity-40 hidden sm:flex"
             >
-              <span>{aiLoading ? '⏳' : '✦'}</span>
-              <span>{aiLoading ? 'Menganalisa...' : 'AI Analisa'}</span>
+              {aiLoading ? 'Analyzing…' : 'AI write-up'}
             </button>
             <button
               onClick={handleUpdate}
@@ -239,7 +268,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
               className="px-3 py-1.5 text-xs font-medium rounded-lg bg-tv-bg border border-tv-border
                 text-tv-muted hover:text-tv-blue hover:border-tv-blue/40 transition-all disabled:opacity-40"
             >
-              {updating ? '↻ ...' : '↻ Update'}
+              {updating ? '…' : 'Update'}
             </button>
             <a
               href={api.stocks.exportUrl(symbol)}
@@ -248,21 +277,47 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
               className="px-3 py-1.5 text-xs font-medium rounded-lg bg-tv-bg border border-tv-border
                 text-tv-muted hover:text-tv-green hover:border-tv-green/40 transition-all"
             >
-              ⬇ CSV
+              CSV
             </a>
             <button
               onClick={handleDelete}
               className="px-3 py-1.5 text-xs font-medium rounded-lg bg-tv-red/5 border border-tv-red/20
                 text-tv-red hover:bg-tv-red/10 transition-all"
             >
-              🗑
+              Remove
             </button>
           </div>
         </div>
 
-        {/* Tabs */}
+        {dec && (
+          <div className={`flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-2.5 border-t ${verdictTone.wrap}`}>
+            <span className={`text-sm font-extrabold tracking-wide ${verdictTone.text}`}>
+              {verdictLabel}
+            </span>
+            <span className="text-xs text-tv-muted">
+              Score <b className="text-tv-text tabular-nums">{dec.score}</b>
+              <span className="mx-1.5 text-tv-border">·</span>
+              Conf <b className="text-tv-text tabular-nums">{dec.confidence}%</b>
+            </span>
+            <span className="text-xs text-tv-muted tabular-nums">
+              Entry <b className="text-tv-text">{fmt.price(dec.entry_zone?.ideal ?? dec.entry_zone?.buy?.[0])}</b>
+              <span className="mx-1.5 text-tv-border">·</span>
+              Stop <b className="text-tv-red">{fmt.price(dec.stop_loss)}</b>
+              <span className="mx-1.5 text-tv-border">·</span>
+              Target <b className="text-tv-green">{fmt.price(dec.take_profit?.[0]?.price)}</b>
+              <span className="mx-1.5 text-tv-border">·</span>
+              R:R <b className={dec.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-text'}>1:{dec.risk_reward?.toFixed(1)}</b>
+            </span>
+            {signalNow && (
+              <span className={`ml-auto hidden md:inline-flex px-2 py-0.5 rounded border text-[10px] font-bold ${signalStyle(signalNow)}`}>
+                {signalLabel(signalNow)}
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="flex border-t border-tv-border px-4">
-          {TABS.map(t => (
+          {PANELS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
@@ -277,40 +332,47 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         </div>
       </div>
 
-      {/* ── AI Analysis Panel ───────────────────────────────────── */}
       {aiOpen && (
-        <AIPanel
-          result={aiResult}
-          loading={aiLoading}
-          onClose={() => setAiOpen(false)}
-          onRefresh={refreshAI}
-        />
+        <AIPanel result={aiResult} loading={aiLoading} onClose={() => setAiOpen(false)} onRefresh={refreshAI} />
       )}
 
-      {/* ── Tab Content ─────────────────────────────────────────── */}
-      <div className="flex-1 overflow-auto">
-        <div key={tab} className="animate-slide-up h-full">
-          {(() => {
-            const extrasReady = (TAB_NEEDS[tab] || []).every(k => data[k] !== undefined)
-            if (!extrasReady) return <TabLoading />
-            return (
-              <Suspense fallback={<TabLoading />}>
-                {tab === 'overview'   && <Overview   data={data} />}
-                {tab === 'chart'      && <ChartTab   data={data} symbol={symbol} />}
-                {tab === 'indicators' && <Indicators data={data} />}
-                {tab === 'advisor'    && <Advisor    symbol={symbol} decisionData={data.decision} />}
-                {tab === 'risk'       && <RiskCalc      data={data} />}
-                {tab === 'laporan'    && <ReportUpload  symbol={symbol} showToast={showToast} />}
-              </Suspense>
-            )
-          })()}
-        </div>
+      {/* Chart: tetap di DOM (hindari re-init), collapse via CSS. Satu scroll dengan panel di bawah. */}
+      <div
+        className={`border-b border-tv-border transition-[max-height] duration-300 ease-out overflow-hidden
+          ${chartOpen ? 'max-h-[520px]' : 'max-h-0 border-b-0'}`}
+        aria-hidden={!chartOpen}
+      >
+        <ChartPane
+          prices={data.prices}
+          sma20={data.sma20}
+          sma50={data.sma50}
+          symbol={symbol}
+        />
+      </div>
+
+      <div className="animate-slide-up pb-8">
+        {(() => {
+          const extrasReady = (TAB_NEEDS[tab] || []).every(k => data[k] !== undefined)
+          return (
+            <Suspense fallback={<TabLoading />}>
+              {tab === 'decision'   && <Advisor symbol={symbol} decisionData={data.decision} />}
+              {tab === 'indicators' && (
+                <div className="space-y-0">
+                  <Overview data={data} />
+                  <div className="border-t border-tv-border">
+                    {extrasReady ? <Indicators data={data} /> : <TabLoading />}
+                  </div>
+                </div>
+              )}
+              {tab === 'risk'    && (extrasReady ? <RiskCalc data={data} /> : <TabLoading />)}
+              {tab === 'reports' && <ReportUpload symbol={symbol} showToast={showToast} />}
+            </Suspense>
+          )
+        })()}
       </div>
     </div>
   )
 }
-
-// ── Per-tab lazy-load spinner ─────────────────────────────────────────────────
 
 function TabLoading() {
   return (
@@ -320,10 +382,7 @@ function TabLoading() {
   )
 }
 
-// ── AI Analysis Panel ─────────────────────────────────────────────────────────
-
 function AIPanel({ result, loading, onClose, onRefresh }) {
-  // Render markdown bold (**text**) as <strong>
   const renderMarkdown = (text) => {
     const parts = text.split(/(\*\*[^*]+\*\*)/g)
     return parts.map((part, i) => {
@@ -336,47 +395,30 @@ function AIPanel({ result, loading, onClose, onRefresh }) {
 
   return (
     <div className="animate-slide-down border-b border-tv-purple/20 bg-gradient-to-b from-tv-purple/5 to-transparent">
-      <div className="px-6 py-4">
-        {/* Header row */}
+      <div className="px-5 py-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-tv-purple font-bold text-sm">✦ AI Analisa</span>
-            <span className="text-[10px] text-tv-muted bg-tv-purple/10 border border-tv-purple/20 px-2 py-0.5 rounded-full">
-              rule-based engine
+            <span className="text-tv-purple font-bold text-sm">AI write-up</span>
+            <span className="text-[10px] text-tv-muted bg-tv-purple/10 border border-tv-purple/20 px-2 py-0.5 rounded">
+              rule-based
             </span>
             {result && (
-              <span className="text-[10px] text-tv-muted">
-                Digenerate: {result.generated}
-              </span>
+              <span className="text-[10px] text-tv-muted">Generated {result.generated}</span>
             )}
           </div>
           <div className="flex items-center gap-2">
             {result && !loading && (
-              <button
-                onClick={onRefresh}
-                className="text-[11px] text-tv-muted hover:text-tv-purple transition-colors"
-              >
-                ↻ Refresh
+              <button onClick={onRefresh} className="text-[11px] text-tv-muted hover:text-tv-purple transition-colors">
+                Refresh
               </button>
             )}
-            <button
-              onClick={onClose}
-              className="text-tv-muted hover:text-tv-text transition-colors text-lg leading-none"
-            >
-              ×
-            </button>
+            <button onClick={onClose} className="text-tv-muted hover:text-tv-text transition-colors text-lg leading-none">×</button>
           </div>
         </div>
-
-        {/* Content */}
         {loading ? (
           <div className="flex items-center gap-3 py-3">
-            <div className="relative w-5 h-5 flex-shrink-0">
-              <div className="absolute inset-0 border-2 border-tv-purple/20 rounded-full" />
-              <div className="absolute inset-0 border-2 border-transparent border-t-tv-purple rounded-full animate-spin" />
-              <div className="absolute inset-1 border border-transparent border-t-tv-purple/50 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.6s' }} />
-            </div>
-            <span className="text-sm text-tv-muted animate-pulse">Menganalisa data teknikal dengan AI...</span>
+            <div className="w-5 h-5 border-2 border-tv-purple/20 border-t-tv-purple rounded-full animate-spin" />
+            <span className="text-sm text-tv-muted animate-pulse">Analyzing technical data…</span>
           </div>
         ) : result ? (
           <div className="text-sm text-tv-muted leading-relaxed whitespace-pre-line animate-fade-in">

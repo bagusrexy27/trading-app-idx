@@ -71,7 +71,16 @@ export const api = {
     },
   },
   overview: () => req('/overview'),
-  advisorScreen: (mode, minTurnover) => req(`/advisor/screen?mode=${mode ?? 'buy'}&min_turnover=${minTurnover ?? 2}`),
+  advisorScreen: (opts = {}) => {
+    const p = new URLSearchParams()
+    p.set('mode', opts.mode ?? 'buy')
+    p.set('min_turnover', String(opts.minTurnover ?? 2))
+    if (opts.minRR != null && opts.minRR > 0) p.set('min_rr', String(opts.minRR))
+    if (opts.minConfidence != null && opts.minConfidence > 0) p.set('min_confidence', String(opts.minConfidence))
+    if (opts.syariah) p.set('syariah', 'true')
+    if (opts.includeLowRR) p.set('include_low_rr', 'true')
+    return req(`/advisor/screen?${p}`)
+  },
   session:  () => req('/session'),
   ihsg:     () => req('/ihsg'),
   broker: {

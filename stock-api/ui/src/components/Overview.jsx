@@ -1,4 +1,4 @@
-import { fmt, colorOf, bgOf } from '../utils'
+import { fmt, colorOf } from '../utils'
 
 export default function Overview({ data }) {
   const { summary } = data
@@ -6,13 +6,12 @@ export default function Overview({ data }) {
 
   return (
     <div className="p-5 space-y-5">
-      {/* Price changes row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: '1 Hari',   v: changes['1d'] },
-          { label: '5 Hari',   v: changes['5d'] },
-          { label: '1 Bulan',  v: changes['1m'] },
-          { label: '3 Bulan',  v: changes['3m'] },
+          { label: '1 Day',   v: changes['1d'] },
+          { label: '5 Day',   v: changes['5d'] },
+          { label: '1 Month', v: changes['1m'] },
+          { label: '3 Month', v: changes['3m'] },
         ].map(({ label, v }, i) => (
           <div key={label}
             className="bg-tv-card border border-tv-border rounded-xl p-4 text-center animate-slide-up"
@@ -30,7 +29,6 @@ export default function Overview({ data }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* 52-week range */}
         <Card title="52-Week Range">
           <div className="flex justify-between text-xs text-tv-muted mb-2">
             <span>Low: <b className="text-tv-red">{fmt.price(wk52.low)}</b></span>
@@ -53,16 +51,15 @@ export default function Overview({ data }) {
             })()}
           </div>
           <div className="flex justify-between text-[10px] text-tv-muted mt-1">
-            <span>dari high: <span className="text-tv-red">{fmt.pct(wk52.pct_from_high)}</span></span>
-            <span>dari low: <span className="text-tv-green">{fmt.pct(wk52.pct_from_low)}</span></span>
+            <span>from high: <span className="text-tv-red">{fmt.pct(wk52.pct_from_high)}</span></span>
+            <span>from low: <span className="text-tv-green">{fmt.pct(wk52.pct_from_low)}</span></span>
           </div>
         </Card>
 
-        {/* Volume */}
         <Card title="Volume">
-          <Metric label="Volume Hari Ini"     value={fmt.vol(volume.current)} />
-          <Metric label="Rata-rata 20 Hari"   value={fmt.vol(volume.avg_20d)} />
-          <Metric label="Rasio vs Rata-rata"
+          <Metric label="Today" value={fmt.vol(volume.current)} />
+          <Metric label="20-day average" value={fmt.vol(volume.avg_20d)} />
+          <Metric label="vs average"
             value={
               <span className={volume.ratio_vs_avg > 1.5 ? 'text-tv-green font-bold' :
                                volume.ratio_vs_avg < 0.5 ? 'text-tv-red' : 'text-tv-text'}>
@@ -78,7 +75,6 @@ export default function Overview({ data }) {
           </div>
         </Card>
 
-        {/* Moving Averages */}
         <Card title="Moving Averages">
           <div className="flex items-center gap-2 mb-3">
             <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border
@@ -96,8 +92,7 @@ export default function Overview({ data }) {
           <Metric label="SMA 200" value={fmt.price(ma.sma_200)} />
         </Card>
 
-        {/* Key Indicators */}
-        <Card title="Indikator Utama">
+        <Card title="Key Indicators">
           <RSIBar rsi={indicators.rsi_14} />
           <div className="mt-3 pt-3 border-t border-tv-border">
             <MACDRow macd={indicators.macd} />
@@ -110,8 +105,6 @@ export default function Overview({ data }) {
     </div>
   )
 }
-
-/* ── sub-components ──────────────────────────────────────────── */
 
 function Card({ title, children }) {
   return (
