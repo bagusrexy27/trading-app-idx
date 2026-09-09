@@ -38,7 +38,14 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const [aiOpen, setAiOpen]       = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(null)
+  const [chartOpen, setChartOpen] = useState(() => {
+    try { return localStorage.getItem('idx-chart-open') !== '0' } catch { return true }
+  })
   const hasDataRef = useRef(false)
+
+  useEffect(() => {
+    try { localStorage.setItem('idx-chart-open', chartOpen ? '1' : '0') } catch { /* ignore */ }
+  }, [chartOpen])
 
   // Core + SMA untuk chart permanen di-load awal.
   // Jangan set loading=true kalau data sudah ada — itu unmount ChartPane & reset zoom.
@@ -193,7 +200,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
 
   return (
     <div className="flex flex-col">
-      {/* Header sticky; chart ikut scroll supaya panel di bawah kebaca penuh */}
+      {/* Header + tabs sticky. Chart di bawah ikut scroll / bisa di-minimize. */}
       <div className="sticky top-0 z-20 glass border-b border-tv-border">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
           <div className="flex items-center gap-2">
@@ -227,6 +234,16 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
                 <span>Updated {lastRefresh.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
               )}
             </div>
+            <button
+              onClick={() => setChartOpen(v => !v)}
+              title={chartOpen ? 'Hide chart' : 'Show chart'}
+              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-all
+                ${chartOpen
+                  ? 'bg-tv-bg border-tv-border text-tv-muted hover:text-tv-text'
+                  : 'bg-tv-blue/10 border-tv-blue/30 text-tv-blue'}`}
+            >
+              {chartOpen ? 'Hide chart' : 'Show chart'}
+            </button>
             <button
               onClick={() => setAutoRefresh(v => !v)}
               title={autoRefresh ? 'Disable auto-refresh' : 'Auto-refresh every 15 min'}
@@ -298,35 +315,39 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
             )}
           </div>
         )}
+
+        <div className="flex border-t border-tv-border px-4">
+          {PANELS.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors
+                ${tab === t.id
+                  ? 'text-tv-blue border-tv-blue'
+                  : 'text-tv-muted border-transparent hover:text-tv-text'}`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {aiOpen && (
         <AIPanel result={aiResult} loading={aiLoading} onClose={() => setAiOpen(false)} onRefresh={refreshAI} />
       )}
 
-      {/* Chart ikut scroll (bukan flex-shrink-0 lock); tetap mounted saat ganti tab */}
-      <div className="border-b border-tv-border">
+      {/* Chart: tetap di DOM (hindari re-init), collapse via CSS. Satu scroll dengan panel di bawah. */}
+      <div
+        className={`border-b border-tv-border transition-[max-height] duration-300 ease-out overflow-hidden
+          ${chartOpen ? 'max-h-[520px]' : 'max-h-0 border-b-0'}`}
+        aria-hidden={!chartOpen}
+      >
         <ChartPane
           prices={data.prices}
           sma20={data.sma20}
           sma50={data.sma50}
           symbol={symbol}
         />
-      </div>
-
-      <div className="border-b border-tv-border px-4 flex glass">
-        {PANELS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors
-              ${tab === t.id
-                ? 'text-tv-blue border-tv-blue'
-                : 'text-tv-muted border-transparent hover:text-tv-text'}`}
-          >
-            {t.label}
-          </button>
-        ))}
       </div>
 
       <div className="animate-slide-up pb-8">
