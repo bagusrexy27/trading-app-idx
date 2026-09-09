@@ -192,8 +192,8 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
       : { wrap: 'bg-tv-yellow/5 border-tv-yellow/20', text: 'text-tv-yellow' }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* ── Header ─────────────────────────────────────────────── */}
+    <div className="flex flex-col">
+      {/* Header sticky; chart ikut scroll supaya panel di bawah kebaca penuh */}
       <div className="sticky top-0 z-20 glass border-b border-tv-border">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
           <div className="flex items-center gap-2">
@@ -272,7 +272,6 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
           </div>
         </div>
 
-        {/* Verdict strip */}
         {dec && (
           <div className={`flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-2.5 border-t ${verdictTone.wrap}`}>
             <span className={`text-sm font-extrabold tracking-wide ${verdictTone.text}`}>
@@ -305,8 +304,8 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         <AIPanel result={aiResult} loading={aiLoading} onClose={() => setAiOpen(false)} onRefresh={refreshAI} />
       )}
 
-      {/* Chart permanen — tidak unmount saat ganti panel */}
-      <div className="border-b border-tv-border flex-shrink-0">
+      {/* Chart ikut scroll (bukan flex-shrink-0 lock); tetap mounted saat ganti tab */}
+      <div className="border-b border-tv-border">
         <ChartPane
           prices={data.prices}
           sma20={data.sma20}
@@ -315,8 +314,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         />
       </div>
 
-      {/* Panel tabs */}
-      <div className="flex border-b border-tv-border px-4 flex-shrink-0 glass">
+      <div className="border-b border-tv-border px-4 flex glass">
         {PANELS.map(t => (
           <button
             key={t.id}
@@ -331,28 +329,25 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         ))}
       </div>
 
-      <div className="flex-1 overflow-auto">
-        <div key={tab} className="animate-slide-up h-full">
-          {(() => {
-            const extrasReady = (TAB_NEEDS[tab] || []).every(k => data[k] !== undefined)
-            return (
-              <Suspense fallback={<TabLoading />}>
-                {tab === 'decision'   && <Advisor symbol={symbol} decisionData={data.decision} />}
-                {tab === 'indicators' && (
-                  <div className="space-y-0">
-                    {/* Overview hanya butuh summary — tampil dulu, Indicators menyusul */}
-                    <Overview data={data} />
-                    <div className="border-t border-tv-border">
-                      {extrasReady ? <Indicators data={data} /> : <TabLoading />}
-                    </div>
+      <div className="animate-slide-up pb-8">
+        {(() => {
+          const extrasReady = (TAB_NEEDS[tab] || []).every(k => data[k] !== undefined)
+          return (
+            <Suspense fallback={<TabLoading />}>
+              {tab === 'decision'   && <Advisor symbol={symbol} decisionData={data.decision} />}
+              {tab === 'indicators' && (
+                <div className="space-y-0">
+                  <Overview data={data} />
+                  <div className="border-t border-tv-border">
+                    {extrasReady ? <Indicators data={data} /> : <TabLoading />}
                   </div>
-                )}
-                {tab === 'risk'    && (extrasReady ? <RiskCalc data={data} /> : <TabLoading />)}
-                {tab === 'reports' && <ReportUpload symbol={symbol} showToast={showToast} />}
-              </Suspense>
-            )
-          })()}
-        </div>
+                </div>
+              )}
+              {tab === 'risk'    && (extrasReady ? <RiskCalc data={data} /> : <TabLoading />)}
+              {tab === 'reports' && <ReportUpload symbol={symbol} showToast={showToast} />}
+            </Suspense>
+          )
+        })()}
       </div>
     </div>
   )

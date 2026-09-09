@@ -526,7 +526,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
       </div>
 
       {/* ── Range performance stats bar ───────────────────────────── */}
-      <RangeStats range={range} sliced={sliced} />
+      {!compact && <RangeStats range={range} sliced={sliced} />}
 
       {/* ── Yesterday session card (visible only on 1W range) ─────── */}
       {!compact && range === '1W' && yesterday && today && (
@@ -535,7 +535,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
 
       {/* ── Chart card: candlestick + SMA + volume dalam satu canvas ── */}
       <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan p-3">
-        <div className={compact ? 'relative h-[clamp(240px,34vh,380px)]' : 'relative min-h-[50vh] h-[clamp(320px,50vh,720px)]'}>
+        <div className={compact ? 'relative h-[clamp(160px,22vh,260px)]' : 'relative min-h-[50vh] h-[clamp(320px,50vh,720px)]'}>
           <div ref={containerRef} className="absolute inset-0" />
           <div
             ref={tooltipRef}
