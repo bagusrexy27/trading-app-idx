@@ -120,7 +120,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
     let alive = true
     setLoading(true); setError(null)
     // mode=all + minTurnover=0 supaya saham tidak likuid tetap muncul di "stay away"
-    api.advisorScreen('all', 0)
+    api.advisorScreen({ mode: 'all', minTurnover: 0 })
       .then(d => {
         if (!alive) return
         const merged = (d?.results || []).map(r => ({
