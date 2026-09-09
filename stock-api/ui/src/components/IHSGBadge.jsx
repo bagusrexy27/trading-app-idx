@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { api } from '../api'
 import { fmt, colorOf } from '../utils'
 
@@ -9,11 +9,18 @@ export default function IHSGBadge() {
   const [error, setError]     = useState(null)
   const [refreshing, setRefreshing] = useState(false)
   const [lastTick, setLastTick] = useState(null)
+  const [pulse, setPulse]     = useState(false)
+  const prevLastRef = useRef(null)
 
   const load = useCallback(async () => {
     setRefreshing(true)
     try {
       const d = await api.ihsg()
+      if (prevLastRef.current != null && d.last !== prevLastRef.current) {
+        setPulse(true)
+        setTimeout(() => setPulse(false), 900)
+      }
+      prevLastRef.current = d.last
       setData(d)
       setError(null)
       setLastTick(new Date())
@@ -54,7 +61,7 @@ export default function IHSGBadge() {
 
   return (
     <div
-      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg border ${bg} transition-colors`}
+      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg border ${bg} transition-colors ${pulse ? 'ihsg-pulse' : ''}`}
       title={`Open ${fmt.price(data.open)} • High ${fmt.price(data.high)} • Low ${fmt.price(data.low)} • Update: ${lastTick?.toLocaleTimeString('id-ID')}`}
     >
       <span className="text-[10px] font-bold text-tv-muted tracking-wider">IHSG</span>
