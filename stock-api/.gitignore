@@ -13,7 +13,6 @@
 /vendor/
 
 # ── Data & generated files ───────────────────────────────────────────────────
-data/
 reports/
 static/
 

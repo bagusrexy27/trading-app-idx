@@ -7,9 +7,10 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/mux"
+	"stock-api/storage"
 )
 
-const fundamentalsDir = "./data/fundamentals"
+var fundamentalsDir = filepath.Join(storage.DataDir, "fundamentals")
 
 // GetFundamental reads ./data/fundamentals/{SYMBOL}.json and returns it.
 func GetFundamental(w http.ResponseWriter, r *http.Request) {

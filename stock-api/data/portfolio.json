@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1756620000000,
+    "symbol": "BACH",
+    "qty": 5300,
+    "buyPrice": 522.2349
+  },
+  {
+    "id": 1756620000001,
+    "symbol": "BRMS",
+    "qty": 400,
+    "buyPrice": 487.1725
+  },
+  {
+    "id": 1756620000002,
+    "symbol": "BULL",
+    "qty": 4600,
+    "buyPrice": 439.4241
+  },
+  {
+    "id": 1756620000003,
+    "symbol": "ENRG",
+    "qty": 1600,
+    "buyPrice": 1281.92
+  },
+  {
+    "id": 1756620000004,
+    "symbol": "PGAS",
+    "qty": 500,
+    "buyPrice": 1492.234
+  },
+  {
+    "id": 1756620000005,
+    "symbol": "SIDO",
+    "qty": 4400,
+    "buyPrice": 352.528
+  },
+  {
+    "id": 1756620000006,
+    "symbol": "TLKM",
+    "qty": 900,
+    "buyPrice": 2643.5889
+  },
+  {
+    "id": 1756620000007,
+    "symbol": "TPIA",
+    "qty": 1500,
+    "buyPrice": 1932.8947
+  },
+  {
+    "id": 1756620000008,
+    "symbol": "UNVR",
+    "qty": 800,
+    "buyPrice": 1725.0838
+  }
+]

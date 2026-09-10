@@ -8,14 +8,16 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
 	ledpdf "github.com/ledongthuc/pdf"
+	"stock-api/storage"
 )
 
-const reportsBase = "./data/reports"
+var reportsBase = filepath.Join(storage.DataDir, "reports")
 
 // ReportMeta describes an uploaded PDF report.
 type ReportMeta struct {
@@ -138,6 +140,12 @@ func UploadReport(w http.ResponseWriter, r *http.Request) {
 // openClaudeTerminal opens a new terminal window running Claude Code in the project directory.
 // The initial prompt directs Claude to analyse the uploaded PDF and save the result.
 func openClaudeTerminal(symbol, pdfPath string) {
+	// Local dev convenience only. On a deployed server this would be arbitrary
+	// command execution triggered by an upload, so it never runs off Windows.
+	if runtime.GOOS != "windows" {
+		return
+	}
+
 	workDir, err := filepath.Abs(".")
 	if err != nil {
 		return

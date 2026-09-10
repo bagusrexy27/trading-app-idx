@@ -17,7 +17,7 @@ import (
 	"stock-api/storage"
 )
 
-const brokerDir = "./data/broker"
+var brokerDir = filepath.Join(storage.DataDir, "broker")
 
 // BrokerHandler groups all /api/broker/* endpoints.
 type BrokerHandler struct{ mu sync.RWMutex }

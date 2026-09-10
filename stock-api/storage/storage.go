@@ -10,18 +10,29 @@ import (
 	"stock-api/models"
 )
 
-const dataDir = "./data"
+// DataDir is the root of all persisted JSON. Override with the DATA_DIR
+// environment variable (Fly.io mounts a volume at /data).
+// Note: it must be a real env var - .env is loaded from main(), which runs
+// after this package is initialised.
+var DataDir = envOr("DATA_DIR", "./data")
+
+func envOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
 
 var mu sync.RWMutex
 
 func init() {
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
+	if err := os.MkdirAll(DataDir, 0755); err != nil {
 		panic("cannot create data directory: " + err.Error())
 	}
 }
 
 func filePath(symbol string) string {
-	return filepath.Join(dataDir, symbol+".json")
+	return filepath.Join(DataDir, symbol+".json")
 }
 
 // Save writes stock data to its dedicated JSON file.
@@ -68,7 +79,7 @@ func List() ([]string, error) {
 	mu.RLock()
 	defer mu.RUnlock()
 
-	files, err := filepath.Glob(filepath.Join(dataDir, "*.json"))
+	files, err := filepath.Glob(filepath.Join(DataDir, "*.json"))
 	if err != nil {
 		return nil, err
 	}

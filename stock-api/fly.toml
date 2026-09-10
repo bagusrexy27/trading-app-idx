@@ -1,0 +1,25 @@
+app = "idx-analyzer"
+primary_region = "sin"
+
+[build]
+
+[env]
+  DATA_DIR = "/data"
+  SEED_DIR = "/app/seed-data"
+  PORT = "8080"
+  TZ = "Asia/Jakarta"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[mounts]
+  source = "idx_data"
+  destination = "/data"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

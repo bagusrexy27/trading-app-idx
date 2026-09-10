@@ -1,0 +1,8 @@
+.git
+*.exe
+*.png
+tmp/
+static/
+ui/node_modules/
+ui/dist/
+data/reports/

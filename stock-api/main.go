@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"crypto/subtle"
 	"fmt"
 	"log"
 	"net"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"stock-api/handlers"
+	"stock-api/storage"
 )
 
 // ── Request logging middleware (Gin / Fiber style with ANSI colors) ──────────
@@ -177,9 +179,56 @@ func loadEnv(path string) {
 	}
 }
 
+
+// ── Basic auth ──────────────────────────────────────────────────────────────
+
+// basicAuth guards everything when AUTH_USER and AUTH_PASS are both set.
+// Unset (the local single-user default) leaves the server open as before.
+
+
+// seedDataDir copies the snapshot baked into the image into DATA_DIR the first
+// time a fresh Fly volume is mounted. No-op locally, where SEED_DIR is unset.
+func seedDataDir() {
+	src := os.Getenv("SEED_DIR")
+	if src == "" {
+		return
+	}
+	if entries, err := os.ReadDir(storage.DataDir); err != nil || len(entries) > 0 {
+		return // already populated
+	}
+	if err := os.CopyFS(storage.DataDir, os.DirFS(src)); err != nil {
+		log.Printf("seed %s -> %s failed: %v", src, storage.DataDir, err)
+		return
+	}
+	log.Printf("seeded %s from %s", storage.DataDir, src)
+}
+func envOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
+func basicAuth(next http.Handler) http.Handler {
+	user, pass := os.Getenv("AUTH_USER"), os.Getenv("AUTH_PASS")
+	if user == "" || pass == "" {
+		return next
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u, p, ok := r.BasicAuth()
+		userOK := subtle.ConstantTimeCompare([]byte(u), []byte(user)) == 1
+		passOK := subtle.ConstantTimeCompare([]byte(p), []byte(pass)) == 1
+		if !ok || !userOK || !passOK {
+			w.Header().Set("WWW-Authenticate", `Basic realm="IDX Analyzer"`)
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
 func main() {
 	log.SetFlags(0) // ditch default 'YYYY/MM/DD HH:MM:SS' prefix — our middleware prints its own timestamp
 	loadEnv(".env")
+	seedDataDir()
 	h := handlers.New()
 	a := handlers.NewAnalysis()
 	ai := handlers.NewAI()
@@ -252,10 +301,11 @@ func main() {
 	fmt.Println(cBold + cFgCyan + "  ╭──────────────────────────────────────────────────╮" + cReset)
 	fmt.Println(cBold + cFgCyan + "  │ " + cFgMag + "IDX Stock Analyzer" + cReset + cBold + cFgCyan + " · API + UI server          │" + cReset)
 	fmt.Println(cBold + cFgCyan + "  ╰──────────────────────────────────────────────────╯" + cReset)
-	fmt.Println(cFgGray + "    server   " + cReset + "→ " + cFgGreen + "http://localhost:1111" + cReset)
-	fmt.Println(cFgGray + "    data     " + cReset + "→ ./data/")
+	fmt.Println(cFgGray + "    server   " + cReset + "→ " + cFgGreen + "http://localhost:" + envOr("PORT", "1111") + cReset)
+	fmt.Println(cFgGray + "    data     " + cReset + "→ " + storage.DataDir + "/")
 	fmt.Println(cFgGray + "    ui (dev) " + cReset + "→ " + cFgGreen + "http://localhost:5173" + cReset + cFgGray + "  (npm run dev inside ui/)" + cReset)
 	fmt.Println(cFgGray + "    logging  " + cReset + "→ enabled for /api/* (Gin-style)")
 	fmt.Println()
-	log.Fatal(http.ListenAndServe(":1111", logger(r)))
+	addr := ":" + envOr("PORT", "1111")
+	log.Fatal(http.ListenAndServe(addr, logger(basicAuth(r))))
 }

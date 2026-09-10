@@ -124,6 +124,36 @@ No database. Concurrent writes to OHLCV files are protected by `sync.RWMutex` in
 
 Defined in `ui/tailwind.config.js` under the `tv` namespace: `tv-bg` (#131722), `tv-card` (#1e222d), `tv-hover`, `tv-border`, `tv-text`, `tv-muted`, `tv-green`, `tv-red`, `tv-blue`, `tv-yellow`, `tv-purple`, `tv-input`.
 
+## Deployment (Fly.io)
+
+Single container: the Go binary serves both `/api/*` and the built UI from `./static`.
+
+```bash
+fly launch --no-deploy   # first time only; fly.toml is already committed
+fly volumes create idx_data --region sin --size 1
+fly secrets set AUTH_USER=... AUTH_PASS=...
+fly deploy
+```
+
+| File | Role |
+|---|---|
+| `stock-api/Dockerfile` | 3 stages: node builds UI → `go build` → alpine runtime |
+| `stock-api/fly.toml` | app config; volume `idx_data` mounted at `/data`, port 8080 |
+| `stock-api/.dockerignore` | keeps `data/reports/` PDFs and `node_modules` out of the image |
+
+**Env vars** (real env only — `.env` is read in `main()`, after `storage` has already initialised):
+
+| Var | Default | Notes |
+|---|---|---|
+| `DATA_DIR` | `./data` | root for OHLCV, `broker/`, `fundamentals/`, `reports/` |
+| `SEED_DIR` | *(unset)* | when set and `DATA_DIR` is empty, `seedDataDir()` copies the image snapshot in — first boot on a fresh volume |
+| `PORT` | `1111` | Fly sets 8080 |
+| `AUTH_USER` / `AUTH_PASS` | *(unset)* | both set ⇒ HTTP basic auth on every route; unset ⇒ open (local default) |
+
+**Deployment-specific behaviour:**
+- `data/` is committed to git (~4 MB OHLCV) so the image ships a snapshot. `data/reports/` stays gitignored.
+- `openClaudeTerminal` (PDF upload → Claude CLI) is gated to `runtime.GOOS == "windows"`; on the server it's a no-op, since an upload-triggered `exec` is remote code execution.
+- No scheduler: hit "Update All" from the UI, or `curl -u ... -X POST .../api/stocks/update-all`.
 ## Key constraints
 
 - **IDX only** — Yahoo Finance `.JK` suffix; prices are integers (Indonesian Rupiah, no decimals). IHSG uses `^JKSE`.

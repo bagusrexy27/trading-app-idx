@@ -1,0 +1,6456 @@
+{
+  "symbol": "BRIS",
+  "last_updated": "2026-07-10",
+  "days": [
+    {
+      "date": "2026-04-15",
+      "close": 2090,
+      "summary": [
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 474,
+          "buy_value": 99541173,
+          "sell_lots": 266,
+          "sell_value": 55709510,
+          "net_value": 43831663
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 1432,
+          "buy_value": 300347173,
+          "sell_lots": 2076,
+          "sell_value": 435231659,
+          "net_value": -134884486
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 336,
+          "buy_value": 70293080,
+          "sell_lots": 546,
+          "sell_value": 113982335,
+          "net_value": -43689255
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 5971,
+          "buy_value": 1244151360,
+          "sell_lots": 4213,
+          "sell_value": 878079179,
+          "net_value": 366072181
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 4160,
+          "buy_value": 866113480,
+          "sell_lots": 4592,
+          "sell_value": 957152321,
+          "net_value": -91038841
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 970,
+          "buy_value": 202563924,
+          "sell_lots": 1976,
+          "sell_value": 413566192,
+          "net_value": -211002268
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 222,
+          "buy_value": 46351261,
+          "sell_lots": 541,
+          "sell_value": 112745484,
+          "net_value": -66394223
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 1806,
+          "buy_value": 376806871,
+          "sell_lots": 2669,
+          "sell_value": 557534936,
+          "net_value": -180728065
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 6154,
+          "buy_value": 1286060204,
+          "sell_lots": 4962,
+          "sell_value": 1035136449,
+          "net_value": 250923755
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7534,
+          "buy_value": 1577236808,
+          "sell_lots": 5651,
+          "sell_value": 1181841048,
+          "net_value": 395395760
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2773,
+          "buy_value": 580220427,
+          "sell_lots": 3274,
+          "sell_value": 683532216,
+          "net_value": -103311789
+        }
+      ]
+    },
+    {
+      "date": "2026-04-16",
+      "close": 2080,
+      "summary": [
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 286,
+          "buy_value": 59736953,
+          "sell_lots": 274,
+          "sell_value": 57157566,
+          "net_value": 2579387
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1233,
+          "buy_value": 257225033,
+          "sell_lots": 946,
+          "sell_value": 196896649,
+          "net_value": 60328384
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7283,
+          "buy_value": 1513201993,
+          "sell_lots": 5233,
+          "sell_value": 1086545495,
+          "net_value": 426656498
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2837,
+          "buy_value": 588846948,
+          "sell_lots": 5401,
+          "sell_value": 1119669521,
+          "net_value": -530822573
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 5299,
+          "buy_value": 1101665470,
+          "sell_lots": 8882,
+          "sell_value": 1849298565,
+          "net_value": -747633095
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 2334,
+          "buy_value": 486410995,
+          "sell_lots": 2966,
+          "sell_value": 613873930,
+          "net_value": -127462935
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 2829,
+          "buy_value": 586023276,
+          "sell_lots": 2112,
+          "sell_value": 440238762,
+          "net_value": 145784514
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2362,
+          "buy_value": 489493148,
+          "sell_lots": 2608,
+          "sell_value": 541257066,
+          "net_value": -51763918
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7611,
+          "buy_value": 1587127260,
+          "sell_lots": 7137,
+          "sell_value": 1481945907,
+          "net_value": 105181353
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 3825,
+          "buy_value": 796040322,
+          "sell_lots": 3752,
+          "sell_value": 783664476,
+          "net_value": 12375846
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1481,
+          "buy_value": 307646647,
+          "sell_lots": 829,
+          "sell_value": 172994298,
+          "net_value": 134652349
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 446,
+          "buy_value": 92709531,
+          "sell_lots": 688,
+          "sell_value": 143382568,
+          "net_value": -50673037
+        }
+      ]
+    },
+    {
+      "date": "2026-04-17",
+      "close": 2080,
+      "summary": [
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5628,
+          "buy_value": 1169832061,
+          "sell_lots": 5987,
+          "sell_value": 1239241284,
+          "net_value": -69409223
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 5261,
+          "buy_value": 1090499541,
+          "sell_lots": 3564,
+          "sell_value": 738551523,
+          "net_value": 351948018
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3574,
+          "buy_value": 743483655,
+          "sell_lots": 4430,
+          "sell_value": 917228230,
+          "net_value": -173744575
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4867,
+          "buy_value": 1012803410,
+          "sell_lots": 4099,
+          "sell_value": 856378790,
+          "net_value": 156424620
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3745,
+          "buy_value": 776758583,
+          "sell_lots": 2844,
+          "sell_value": 592687177,
+          "net_value": 184071406
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 2747,
+          "buy_value": 572398891,
+          "sell_lots": 1214,
+          "sell_value": 251694974,
+          "net_value": 320703917
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3970,
+          "buy_value": 823126051,
+          "sell_lots": 2410,
+          "sell_value": 500611164,
+          "net_value": 322514887
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3847,
+          "buy_value": 798553027,
+          "sell_lots": 2265,
+          "sell_value": 470480213,
+          "net_value": 328072814
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 1530,
+          "buy_value": 317669123,
+          "sell_lots": 2248,
+          "sell_value": 468341396,
+          "net_value": -150672273
+        }
+      ]
+    },
+    {
+      "date": "2026-04-20",
+      "close": 2040,
+      "summary": [
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 8166,
+          "buy_value": 1669570643,
+          "sell_lots": 4250,
+          "sell_value": 863173173,
+          "net_value": 806397470
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4390,
+          "buy_value": 894533353,
+          "sell_lots": 4845,
+          "sell_value": 983523659,
+          "net_value": -88990306
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 4788,
+          "buy_value": 976185742,
+          "sell_lots": 8752,
+          "sell_value": 1787295896,
+          "net_value": -811110154
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 1858,
+          "buy_value": 378202185,
+          "sell_lots": 1514,
+          "sell_value": 310125262,
+          "net_value": 68076923
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 3655,
+          "buy_value": 747747046,
+          "sell_lots": 1903,
+          "sell_value": 389123975,
+          "net_value": 358623071
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 9794,
+          "buy_value": 1993176887,
+          "sell_lots": 5007,
+          "sell_value": 1022341288,
+          "net_value": 970835599
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7174,
+          "buy_value": 1456563210,
+          "sell_lots": 1680,
+          "sell_value": 342555720,
+          "net_value": 1114007490
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 6018,
+          "buy_value": 1232794461,
+          "sell_lots": 5277,
+          "sell_value": 1081169484,
+          "net_value": 151624977
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2735,
+          "buy_value": 560689906,
+          "sell_lots": 2387,
+          "sell_value": 489098217,
+          "net_value": 71591689
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6422,
+          "buy_value": 1304267647,
+          "sell_lots": 6756,
+          "sell_value": 1374194525,
+          "net_value": -69926878
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6694,
+          "buy_value": 1371340921,
+          "sell_lots": 4831,
+          "sell_value": 986844908,
+          "net_value": 384496013
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 2253,
+          "buy_value": 458353577,
+          "sell_lots": 2143,
+          "sell_value": 438468976,
+          "net_value": 19884601
+        }
+      ]
+    },
+    {
+      "date": "2026-04-21",
+      "close": 2000,
+      "summary": [
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 4222,
+          "buy_value": 848479080,
+          "sell_lots": 8889,
+          "sell_value": 1777316730,
+          "net_value": -928837650
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 2002,
+          "buy_value": 399007951,
+          "sell_lots": 1546,
+          "sell_value": 310157734,
+          "net_value": 88850217
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 3927,
+          "buy_value": 785960805,
+          "sell_lots": 2309,
+          "sell_value": 460245275,
+          "net_value": 325715530
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6830,
+          "buy_value": 1366824832,
+          "sell_lots": 4622,
+          "sell_value": 926978820,
+          "net_value": 439846012
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 8667,
+          "buy_value": 1729175725,
+          "sell_lots": 5379,
+          "sell_value": 1079038282,
+          "net_value": 650137443
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6974,
+          "buy_value": 1394904794,
+          "sell_lots": 1608,
+          "sell_value": 322733015,
+          "net_value": 1072171779
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3370,
+          "buy_value": 675228234,
+          "sell_lots": 7313,
+          "sell_value": 1461003548,
+          "net_value": -785775314
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 7599,
+          "buy_value": 1520263125,
+          "sell_lots": 5462,
+          "sell_value": 1093164459,
+          "net_value": 427098666
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 788,
+          "buy_value": 157973990,
+          "sell_lots": 981,
+          "sell_value": 196222518,
+          "net_value": -38248528
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1450,
+          "buy_value": 289714342,
+          "sell_lots": 1726,
+          "sell_value": 345340456,
+          "net_value": -55626114
+        }
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "close": 1995,
+      "summary": [
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 6380,
+          "buy_value": 1275059278,
+          "sell_lots": 6617,
+          "sell_value": 1320338499,
+          "net_value": -45279221
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 8338,
+          "buy_value": 1665927558,
+          "sell_lots": 5071,
+          "sell_value": 1008213274,
+          "net_value": 657714284
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2127,
+          "buy_value": 425844413,
+          "sell_lots": 2290,
+          "sell_value": 457968607,
+          "net_value": -32124194
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3773,
+          "buy_value": 753763113,
+          "sell_lots": 1955,
+          "sell_value": 388417740,
+          "net_value": 365345373
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4166,
+          "buy_value": 829590821,
+          "sell_lots": 4698,
+          "sell_value": 933116795,
+          "net_value": -103525974
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3645,
+          "buy_value": 724986393,
+          "sell_lots": 2226,
+          "sell_value": 443243317,
+          "net_value": 281743076
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3665,
+          "buy_value": 733064187,
+          "sell_lots": 10141,
+          "sell_value": 2028040149,
+          "net_value": -1294975962
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2468,
+          "buy_value": 491109851,
+          "sell_lots": 1490,
+          "sell_value": 295768978,
+          "net_value": 195340873
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 664,
+          "buy_value": 131813236,
+          "sell_lots": 631,
+          "sell_value": 126477248,
+          "net_value": 5335988
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 4729,
+          "buy_value": 938767385,
+          "sell_lots": 2931,
+          "sell_value": 585409281,
+          "net_value": 353358104
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4462,
+          "buy_value": 890538889,
+          "sell_lots": 2844,
+          "sell_value": 566025533,
+          "net_value": 324513356
+        }
+      ]
+    },
+    {
+      "date": "2026-04-23",
+      "close": 1955,
+      "summary": [
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4385,
+          "buy_value": 856697614,
+          "sell_lots": 7497,
+          "sell_value": 1460787650,
+          "net_value": -604090036
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3735,
+          "buy_value": 733488109,
+          "sell_lots": 2016,
+          "sell_value": 392362271,
+          "net_value": 341125838
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 1629,
+          "buy_value": 317138614,
+          "sell_lots": 2935,
+          "sell_value": 576600730,
+          "net_value": -259462116
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3963,
+          "buy_value": 772093539,
+          "sell_lots": 4371,
+          "sell_value": 858555532,
+          "net_value": -86461993
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 2649,
+          "buy_value": 517526947,
+          "sell_lots": 1824,
+          "sell_value": 357440908,
+          "net_value": 160086039
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 170,
+          "buy_value": 33147677,
+          "sell_lots": 496,
+          "sell_value": 97038550,
+          "net_value": -63890873
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2809,
+          "buy_value": 548132015,
+          "sell_lots": 1812,
+          "sell_value": 353489420,
+          "net_value": 194642595
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2620,
+          "buy_value": 514249096,
+          "sell_lots": 1920,
+          "sell_value": 376314762,
+          "net_value": 137934334
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 6036,
+          "buy_value": 1180285970,
+          "sell_lots": 5783,
+          "sell_value": 1124968100,
+          "net_value": 55317870
+        }
+      ]
+    },
+    {
+      "date": "2026-04-24",
+      "close": 1880,
+      "summary": [
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7030,
+          "buy_value": 1316874496,
+          "sell_lots": 6781,
+          "sell_value": 1268590492,
+          "net_value": 48284004
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2375,
+          "buy_value": 448414341,
+          "sell_lots": 4464,
+          "sell_value": 837365089,
+          "net_value": -388950748
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 6255,
+          "buy_value": 1177011069,
+          "sell_lots": 5864,
+          "sell_value": 1103622938,
+          "net_value": 73388131
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4898,
+          "buy_value": 920233750,
+          "sell_lots": 3070,
+          "sell_value": 574401567,
+          "net_value": 345832183
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3098,
+          "buy_value": 582774765,
+          "sell_lots": 2736,
+          "sell_value": 516583057,
+          "net_value": 66191708
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3174,
+          "buy_value": 593754969,
+          "sell_lots": 2592,
+          "sell_value": 485185090,
+          "net_value": 108569879
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 1799,
+          "buy_value": 337757257,
+          "sell_lots": 1351,
+          "sell_value": 252760781,
+          "net_value": 84996476
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1839,
+          "buy_value": 346693176,
+          "sell_lots": 1053,
+          "sell_value": 197790717,
+          "net_value": 148902459
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3607,
+          "buy_value": 676471707,
+          "sell_lots": 2576,
+          "sell_value": 484369268,
+          "net_value": 192102439
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2277,
+          "buy_value": 428215836,
+          "sell_lots": 4344,
+          "sell_value": 819726878,
+          "net_value": -391511042
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3540,
+          "buy_value": 665130803,
+          "sell_lots": 3136,
+          "sell_value": 589305862,
+          "net_value": 75824941
+        }
+      ]
+    },
+    {
+      "date": "2026-04-27",
+      "close": 1840,
+      "summary": [
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3525,
+          "buy_value": 646182028,
+          "sell_lots": 4411,
+          "sell_value": 813397452,
+          "net_value": -167215424
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8887,
+          "buy_value": 1638618810,
+          "sell_lots": 6004,
+          "sell_value": 1103555319,
+          "net_value": 535063491
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 2364,
+          "buy_value": 433255917,
+          "sell_lots": 1707,
+          "sell_value": 314333835,
+          "net_value": 118922082
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 2649,
+          "buy_value": 489091044,
+          "sell_lots": 1714,
+          "sell_value": 315889439,
+          "net_value": 173201605
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 2819,
+          "buy_value": 520856577,
+          "sell_lots": 3565,
+          "sell_value": 656811129,
+          "net_value": -135954552
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3350,
+          "buy_value": 614436037,
+          "sell_lots": 10283,
+          "sell_value": 1901406990,
+          "net_value": -1286970953
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4112,
+          "buy_value": 756853255,
+          "sell_lots": 3257,
+          "sell_value": 601933256,
+          "net_value": 154919999
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 763,
+          "buy_value": 140226255,
+          "sell_lots": 1336,
+          "sell_value": 246906922,
+          "net_value": -106680667
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 4254,
+          "buy_value": 786363605,
+          "sell_lots": 3707,
+          "sell_value": 679040599,
+          "net_value": 107323006
+        }
+      ]
+    },
+    {
+      "date": "2026-04-28",
+      "close": 1800,
+      "summary": [
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 5685,
+          "buy_value": 1021990067,
+          "sell_lots": 5903,
+          "sell_value": 1062549978,
+          "net_value": -40559911
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 295,
+          "buy_value": 53281759,
+          "sell_lots": 353,
+          "sell_value": 63813943,
+          "net_value": -10532184
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 5666,
+          "buy_value": 1015292637,
+          "sell_lots": 3559,
+          "sell_value": 640868793,
+          "net_value": 374423844
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 6724,
+          "buy_value": 1207613284,
+          "sell_lots": 6509,
+          "sell_value": 1166264823,
+          "net_value": 41348461
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5935,
+          "buy_value": 1072795993,
+          "sell_lots": 4852,
+          "sell_value": 876065099,
+          "net_value": 196730894
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3620,
+          "buy_value": 653560443,
+          "sell_lots": 4282,
+          "sell_value": 769826620,
+          "net_value": -116266177
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2120,
+          "buy_value": 380758805,
+          "sell_lots": 2311,
+          "sell_value": 413982175,
+          "net_value": -33223370
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2404,
+          "buy_value": 433990545,
+          "sell_lots": 836,
+          "sell_value": 150785732,
+          "net_value": 283204813
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 1678,
+          "buy_value": 301769507,
+          "sell_lots": 1059,
+          "sell_value": 189688875,
+          "net_value": 112080632
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 4968,
+          "buy_value": 896629208,
+          "sell_lots": 6491,
+          "sell_value": 1171493040,
+          "net_value": -274863832
+        }
+      ]
+    },
+    {
+      "date": "2026-04-29",
+      "close": 1790,
+      "summary": [
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 1376,
+          "buy_value": 246020700,
+          "sell_lots": 1026,
+          "sell_value": 184015438,
+          "net_value": 62005262
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 613,
+          "buy_value": 109696459,
+          "sell_lots": 630,
+          "sell_value": 112262180,
+          "net_value": -2565721
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 5324,
+          "buy_value": 953993137,
+          "sell_lots": 2740,
+          "sell_value": 490863382,
+          "net_value": 463129755
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5076,
+          "buy_value": 906955299,
+          "sell_lots": 2216,
+          "sell_value": 395824212,
+          "net_value": 511131087
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 2876,
+          "buy_value": 514894029,
+          "sell_lots": 3652,
+          "sell_value": 651984625,
+          "net_value": -137090596
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 2842,
+          "buy_value": 510156972,
+          "sell_lots": 2658,
+          "sell_value": 476412033,
+          "net_value": 33744939
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 497,
+          "buy_value": 89336941,
+          "sell_lots": 749,
+          "sell_value": 134666255,
+          "net_value": -45329314
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3893,
+          "buy_value": 693675809,
+          "sell_lots": 6190,
+          "sell_value": 1113494156,
+          "net_value": -419818347
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 7989,
+          "buy_value": 1433642049,
+          "sell_lots": 6075,
+          "sell_value": 1092478786,
+          "net_value": 341163263
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 9351,
+          "buy_value": 1668765262,
+          "sell_lots": 5390,
+          "sell_value": 962559327,
+          "net_value": 706205935
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2324,
+          "buy_value": 417332247,
+          "sell_lots": 1989,
+          "sell_value": 355013389,
+          "net_value": 62318858
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 5342,
+          "buy_value": 960992566,
+          "sell_lots": 6906,
+          "sell_value": 1232812699,
+          "net_value": -271820133
+        }
+      ]
+    },
+    {
+      "date": "2026-04-30",
+      "close": 1775,
+      "summary": [
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 4165,
+          "buy_value": 741478593,
+          "sell_lots": 3419,
+          "sell_value": 607484577,
+          "net_value": 133994016
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3209,
+          "buy_value": 568841277,
+          "sell_lots": 9458,
+          "sell_value": 1678449969,
+          "net_value": -1109608692
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4822,
+          "buy_value": 855548078,
+          "sell_lots": 962,
+          "sell_value": 171012691,
+          "net_value": 684535387
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3959,
+          "buy_value": 705566202,
+          "sell_lots": 6435,
+          "sell_value": 1147500987,
+          "net_value": -441934785
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6383,
+          "buy_value": 1136029620,
+          "sell_lots": 6664,
+          "sell_value": 1185743854,
+          "net_value": -49714234
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 1630,
+          "buy_value": 289227555,
+          "sell_lots": 765,
+          "sell_value": 136141139,
+          "net_value": 153086416
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5319,
+          "buy_value": 942939933,
+          "sell_lots": 5943,
+          "sell_value": 1055655238,
+          "net_value": -112715305
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4625,
+          "buy_value": 820993204,
+          "sell_lots": 3831,
+          "sell_value": 677185948,
+          "net_value": 143807256
+        }
+      ]
+    },
+    {
+      "date": "2026-05-04",
+      "close": 1790,
+      "summary": [
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3436,
+          "buy_value": 614976307,
+          "sell_lots": 9726,
+          "sell_value": 1745801881,
+          "net_value": -1130825574
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4470,
+          "buy_value": 800337703,
+          "sell_lots": 2739,
+          "sell_value": 492383942,
+          "net_value": 307953761
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4048,
+          "buy_value": 728146244,
+          "sell_lots": 5314,
+          "sell_value": 953847848,
+          "net_value": -225701604
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 5331,
+          "buy_value": 957802177,
+          "sell_lots": 5705,
+          "sell_value": 1022170104,
+          "net_value": -64367927
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 6982,
+          "buy_value": 1251396254,
+          "sell_lots": 5678,
+          "sell_value": 1020579941,
+          "net_value": 230816313
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6962,
+          "buy_value": 1252142364,
+          "sell_lots": 3923,
+          "sell_value": 703886455,
+          "net_value": 548255909
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 2942,
+          "buy_value": 525525319,
+          "sell_lots": 2305,
+          "sell_value": 412935478,
+          "net_value": 112589841
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 8802,
+          "buy_value": 1572478826,
+          "sell_lots": 4786,
+          "sell_value": 858582505,
+          "net_value": 713896321
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 558,
+          "buy_value": 99999209,
+          "sell_lots": 385,
+          "sell_value": 68989059,
+          "net_value": 31010150
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 7034,
+          "buy_value": 1259259804,
+          "sell_lots": 7365,
+          "sell_value": 1313919436,
+          "net_value": -54659632
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7751,
+          "buy_value": 1380834920,
+          "sell_lots": 3377,
+          "sell_value": 602148515,
+          "net_value": 778686405
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3177,
+          "buy_value": 571098060,
+          "sell_lots": 2863,
+          "sell_value": 514147585,
+          "net_value": 56950475
+        }
+      ]
+    },
+    {
+      "date": "2026-05-05",
+      "close": 1820,
+      "summary": [
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 5714,
+          "buy_value": 1035161228,
+          "sell_lots": 4247,
+          "sell_value": 771903281,
+          "net_value": 263257947
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 4301,
+          "buy_value": 781793045,
+          "sell_lots": 8148,
+          "sell_value": 1485349076,
+          "net_value": -703556031
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 4538,
+          "buy_value": 825679799,
+          "sell_lots": 6597,
+          "sell_value": 1203599174,
+          "net_value": -377919375
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7113,
+          "buy_value": 1299792687,
+          "sell_lots": 4501,
+          "sell_value": 816888917,
+          "net_value": 482903770
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5447,
+          "buy_value": 994559041,
+          "sell_lots": 8321,
+          "sell_value": 1520481030,
+          "net_value": -525921989
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 5758,
+          "buy_value": 1045306226,
+          "sell_lots": 6987,
+          "sell_value": 1277770975,
+          "net_value": -232464749
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3261,
+          "buy_value": 592735998,
+          "sell_lots": 4613,
+          "sell_value": 838815334,
+          "net_value": -246079336
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5739,
+          "buy_value": 1046982016,
+          "sell_lots": 4391,
+          "sell_value": 797099246,
+          "net_value": 249882770
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5308,
+          "buy_value": 962782567,
+          "sell_lots": 1403,
+          "sell_value": 255970028,
+          "net_value": 706812539
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 7348,
+          "buy_value": 1336257978,
+          "sell_lots": 4629,
+          "sell_value": 842957019,
+          "net_value": 493300959
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 2003,
+          "buy_value": 365397218,
+          "sell_lots": 1478,
+          "sell_value": 267894390,
+          "net_value": 97502828
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6916,
+          "buy_value": 1253221437,
+          "sell_lots": 5624,
+          "sell_value": 1019649060,
+          "net_value": 233572377
+        }
+      ]
+    },
+    {
+      "date": "2026-05-06",
+      "close": 1815,
+      "summary": [
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 5107,
+          "buy_value": 930956945,
+          "sell_lots": 8712,
+          "sell_value": 1584632805,
+          "net_value": -653675860
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 515,
+          "buy_value": 93753315,
+          "sell_lots": 398,
+          "sell_value": 72021970,
+          "net_value": 21731345
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 9159,
+          "buy_value": 1662735348,
+          "sell_lots": 4529,
+          "sell_value": 823670930,
+          "net_value": 839064418
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2779,
+          "buy_value": 503228878,
+          "sell_lots": 562,
+          "sell_value": 101504802,
+          "net_value": 401724076
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1723,
+          "buy_value": 311618232,
+          "sell_lots": 1103,
+          "sell_value": 200010408,
+          "net_value": 111607824
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4875,
+          "buy_value": 885688333,
+          "sell_lots": 6543,
+          "sell_value": 1193096810,
+          "net_value": -307408477
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 2768,
+          "buy_value": 500309374,
+          "sell_lots": 8183,
+          "sell_value": 1484883988,
+          "net_value": -984574614
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1028,
+          "buy_value": 186021729,
+          "sell_lots": 1033,
+          "sell_value": 186808090,
+          "net_value": -786361
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2308,
+          "buy_value": 417621001,
+          "sell_lots": 3514,
+          "sell_value": 635220330,
+          "net_value": -217599329
+        }
+      ]
+    },
+    {
+      "date": "2026-05-07",
+      "close": 1990,
+      "summary": [
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 5751,
+          "buy_value": 1139745803,
+          "sell_lots": 4248,
+          "sell_value": 842629220,
+          "net_value": 297116583
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2170,
+          "buy_value": 432780604,
+          "sell_lots": 4487,
+          "sell_value": 897043438,
+          "net_value": -464262834
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 721,
+          "buy_value": 144094277,
+          "sell_lots": 976,
+          "sell_value": 194728136,
+          "net_value": -50633859
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4549,
+          "buy_value": 902642236,
+          "sell_lots": 2725,
+          "sell_value": 543914003,
+          "net_value": 358728233
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6078,
+          "buy_value": 1204691334,
+          "sell_lots": 7503,
+          "sell_value": 1497755219,
+          "net_value": -293063885
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 3772,
+          "buy_value": 750719579,
+          "sell_lots": 1789,
+          "sell_value": 355557363,
+          "net_value": 395162216
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8965,
+          "buy_value": 1785029474,
+          "sell_lots": 2602,
+          "sell_value": 518256484,
+          "net_value": 1266772990
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4892,
+          "buy_value": 968751547,
+          "sell_lots": 5117,
+          "sell_value": 1013821277,
+          "net_value": -45069730
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 5299,
+          "buy_value": 1059361890,
+          "sell_lots": 8597,
+          "sell_value": 1706520063,
+          "net_value": -647158173
+        }
+      ]
+    },
+    {
+      "date": "2026-05-08",
+      "close": 1910,
+      "summary": [
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2268,
+          "buy_value": 431164144,
+          "sell_lots": 3242,
+          "sell_value": 617574545,
+          "net_value": -186410401
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4695,
+          "buy_value": 898064732,
+          "sell_lots": 3172,
+          "sell_value": 608405145,
+          "net_value": 289659587
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 4739,
+          "buy_value": 909205310,
+          "sell_lots": 3114,
+          "sell_value": 593931352,
+          "net_value": 315273958
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8880,
+          "buy_value": 1703190936,
+          "sell_lots": 1842,
+          "sell_value": 352547915,
+          "net_value": 1350643021
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 1830,
+          "buy_value": 349317233,
+          "sell_lots": 4144,
+          "sell_value": 790793680,
+          "net_value": -441476447
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 3772,
+          "buy_value": 722694793,
+          "sell_lots": 3946,
+          "sell_value": 751632000,
+          "net_value": -28937207
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 6207,
+          "buy_value": 1189026499,
+          "sell_lots": 6834,
+          "sell_value": 1311390170,
+          "net_value": -122363671
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5522,
+          "buy_value": 1054162971,
+          "sell_lots": 5249,
+          "sell_value": 1004548825,
+          "net_value": 49614146
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6701,
+          "buy_value": 1283920982,
+          "sell_lots": 6672,
+          "sell_value": 1277444963,
+          "net_value": 6476019
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8702,
+          "buy_value": 1669621881,
+          "sell_lots": 4478,
+          "sell_value": 854820107,
+          "net_value": 814801774
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1879,
+          "buy_value": 359667498,
+          "sell_lots": 3051,
+          "sell_value": 583878438,
+          "net_value": -224210940
+        }
+      ]
+    },
+    {
+      "date": "2026-05-11",
+      "close": 1835,
+      "summary": [
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7926,
+          "buy_value": 1451802628,
+          "sell_lots": 3578,
+          "sell_value": 655489041,
+          "net_value": 796313587
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1238,
+          "buy_value": 226588758,
+          "sell_lots": 508,
+          "sell_value": 93321189,
+          "net_value": 133267569
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 317,
+          "buy_value": 57918814,
+          "sell_lots": 522,
+          "sell_value": 96234534,
+          "net_value": -38315720
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5586,
+          "buy_value": 1023877423,
+          "sell_lots": 7855,
+          "sell_value": 1439914238,
+          "net_value": -416036815
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4723,
+          "buy_value": 864845777,
+          "sell_lots": 4454,
+          "sell_value": 818127207,
+          "net_value": 46718570
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 947,
+          "buy_value": 173573961,
+          "sell_lots": 603,
+          "sell_value": 110431564,
+          "net_value": 63142397
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 1681,
+          "buy_value": 308540963,
+          "sell_lots": 792,
+          "sell_value": 145565469,
+          "net_value": 162975494
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 2185,
+          "buy_value": 401568457,
+          "sell_lots": 3177,
+          "sell_value": 585131003,
+          "net_value": -183562546
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5033,
+          "buy_value": 928165744,
+          "sell_lots": 8663,
+          "sell_value": 1595551562,
+          "net_value": -667385818
+        }
+      ]
+    },
+    {
+      "date": "2026-05-12",
+      "close": 1885,
+      "summary": [
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 5577,
+          "buy_value": 1049114084,
+          "sell_lots": 3204,
+          "sell_value": 606344080,
+          "net_value": 442770004
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4770,
+          "buy_value": 901710771,
+          "sell_lots": 4686,
+          "sell_value": 887549519,
+          "net_value": 14161252
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4461,
+          "buy_value": 840186570,
+          "sell_lots": 2914,
+          "sell_value": 546737544,
+          "net_value": 293449026
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4051,
+          "buy_value": 762685866,
+          "sell_lots": 6928,
+          "sell_value": 1305669947,
+          "net_value": -542984081
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 2222,
+          "buy_value": 419863870,
+          "sell_lots": 5531,
+          "sell_value": 1041817490,
+          "net_value": -621953620
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3818,
+          "buy_value": 717184444,
+          "sell_lots": 3783,
+          "sell_value": 710665123,
+          "net_value": 6519321
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5454,
+          "buy_value": 1025522050,
+          "sell_lots": 5765,
+          "sell_value": 1090813592,
+          "net_value": -65291542
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2463,
+          "buy_value": 466413033,
+          "sell_lots": 2754,
+          "sell_value": 518419640,
+          "net_value": -52006607
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6486,
+          "buy_value": 1218524173,
+          "sell_lots": 4696,
+          "sell_value": 881444491,
+          "net_value": 337079682
+        }
+      ]
+    },
+    {
+      "date": "2026-05-13",
+      "close": 1830,
+      "summary": [
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 6317,
+          "buy_value": 1156798492,
+          "sell_lots": 7060,
+          "sell_value": 1291594424,
+          "net_value": -134795932
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2152,
+          "buy_value": 392645234,
+          "sell_lots": 3705,
+          "sell_value": 675941339,
+          "net_value": -283296105
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1757,
+          "buy_value": 320943809,
+          "sell_lots": 644,
+          "sell_value": 118285767,
+          "net_value": 202658042
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 767,
+          "buy_value": 140873261,
+          "sell_lots": 1537,
+          "sell_value": 282454026,
+          "net_value": -141580765
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1913,
+          "buy_value": 351506982,
+          "sell_lots": 2609,
+          "sell_value": 479299324,
+          "net_value": -127792342
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 6438,
+          "buy_value": 1176947592,
+          "sell_lots": 7259,
+          "sell_value": 1326577823,
+          "net_value": -149630231
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 2115,
+          "buy_value": 385428329,
+          "sell_lots": 2278,
+          "sell_value": 416292974,
+          "net_value": -30864645
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4659,
+          "buy_value": 853795281,
+          "sell_lots": 2196,
+          "sell_value": 403098932,
+          "net_value": 450696349
+        }
+      ]
+    },
+    {
+      "date": "2026-05-14",
+      "close": 1830,
+      "summary": [
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 4059,
+          "buy_value": 744961331,
+          "sell_lots": 5646,
+          "sell_value": 1038366338,
+          "net_value": -293405007
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 541,
+          "buy_value": 99330306,
+          "sell_lots": 546,
+          "sell_value": 100010625,
+          "net_value": -680319
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7529,
+          "buy_value": 1378122850,
+          "sell_lots": 7069,
+          "sell_value": 1287768880,
+          "net_value": 90353970
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 258,
+          "buy_value": 47057433,
+          "sell_lots": 318,
+          "sell_value": 58364354,
+          "net_value": -11306921
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 2569,
+          "buy_value": 472009116,
+          "sell_lots": 3009,
+          "sell_value": 550514131,
+          "net_value": -78505015
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7278,
+          "buy_value": 1332438572,
+          "sell_lots": 1693,
+          "sell_value": 310883892,
+          "net_value": 1021554680
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2183,
+          "buy_value": 400426220,
+          "sell_lots": 1870,
+          "sell_value": 340670189,
+          "net_value": 59756031
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 6201,
+          "buy_value": 1129160624,
+          "sell_lots": 5273,
+          "sell_value": 962570769,
+          "net_value": 166589855
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 1763,
+          "buy_value": 322616088,
+          "sell_lots": 1573,
+          "sell_value": 287820438,
+          "net_value": 34795650
+        }
+      ]
+    },
+    {
+      "date": "2026-05-15",
+      "close": 1830,
+      "summary": [
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 2946,
+          "buy_value": 536953861,
+          "sell_lots": 4854,
+          "sell_value": 889531170,
+          "net_value": -352577309
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 6920,
+          "buy_value": 1263716086,
+          "sell_lots": 5089,
+          "sell_value": 930485956,
+          "net_value": 333230130
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2901,
+          "buy_value": 529810891,
+          "sell_lots": 6451,
+          "sell_value": 1178557454,
+          "net_value": -648746563
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1802,
+          "buy_value": 330397934,
+          "sell_lots": 1136,
+          "sell_value": 208267674,
+          "net_value": 122130260
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 3574,
+          "buy_value": 656228212,
+          "sell_lots": 3860,
+          "sell_value": 709351195,
+          "net_value": -53122983
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 591,
+          "buy_value": 108243246,
+          "sell_lots": 524,
+          "sell_value": 95983751,
+          "net_value": 12259495
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5326,
+          "buy_value": 972749827,
+          "sell_lots": 6885,
+          "sell_value": 1259074238,
+          "net_value": -286324411
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2143,
+          "buy_value": 391638600,
+          "sell_lots": 1646,
+          "sell_value": 301509153,
+          "net_value": 90129447
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4208,
+          "buy_value": 767098207,
+          "sell_lots": 2248,
+          "sell_value": 411072479,
+          "net_value": 356025728
+        }
+      ]
+    },
+    {
+      "date": "2026-05-18",
+      "close": 1750,
+      "summary": [
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1357,
+          "buy_value": 237534448,
+          "sell_lots": 432,
+          "sell_value": 75513718,
+          "net_value": 162020730
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2963,
+          "buy_value": 517718004,
+          "sell_lots": 2591,
+          "sell_value": 453067950,
+          "net_value": 64650054
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 945,
+          "buy_value": 164706318,
+          "sell_lots": 779,
+          "sell_value": 136618535,
+          "net_value": 28087783
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5442,
+          "buy_value": 950061394,
+          "sell_lots": 4113,
+          "sell_value": 717648502,
+          "net_value": 232412892
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2701,
+          "buy_value": 474331394,
+          "sell_lots": 5743,
+          "sell_value": 1007230098,
+          "net_value": -532898704
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 254,
+          "buy_value": 44460645,
+          "sell_lots": 297,
+          "sell_value": 51947703,
+          "net_value": -7487058
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2824,
+          "buy_value": 492752568,
+          "sell_lots": 4150,
+          "sell_value": 729209689,
+          "net_value": -236457121
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 3458,
+          "buy_value": 602481727,
+          "sell_lots": 10119,
+          "sell_value": 1763628493,
+          "net_value": -1161146766
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2475,
+          "buy_value": 431631951,
+          "sell_lots": 1879,
+          "sell_value": 329298418,
+          "net_value": 102333533
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5563,
+          "buy_value": 972249945,
+          "sell_lots": 6854,
+          "sell_value": 1202438966,
+          "net_value": -230189021
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1309,
+          "buy_value": 228124732,
+          "sell_lots": 1305,
+          "sell_value": 227538407,
+          "net_value": 586325
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3032,
+          "buy_value": 532818884,
+          "sell_lots": 4403,
+          "sell_value": 772148394,
+          "net_value": -239329510
+        }
+      ]
+    },
+    {
+      "date": "2026-05-19",
+      "close": 1800,
+      "summary": [
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 7685,
+          "buy_value": 1388429265,
+          "sell_lots": 6861,
+          "sell_value": 1230427358,
+          "net_value": 158001907
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3934,
+          "buy_value": 709944276,
+          "sell_lots": 6210,
+          "sell_value": 1115488229,
+          "net_value": -405543953
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3153,
+          "buy_value": 570079826,
+          "sell_lots": 1784,
+          "sell_value": 320443046,
+          "net_value": 249636780
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7923,
+          "buy_value": 1432355957,
+          "sell_lots": 6351,
+          "sell_value": 1141515477,
+          "net_value": 290840480
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4719,
+          "buy_value": 852466099,
+          "sell_lots": 4594,
+          "sell_value": 822903645,
+          "net_value": 29562454
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 3583,
+          "buy_value": 647262725,
+          "sell_lots": 3184,
+          "sell_value": 574117184,
+          "net_value": 73145541
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 678,
+          "buy_value": 122117600,
+          "sell_lots": 390,
+          "sell_value": 70248165,
+          "net_value": 51869435
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3985,
+          "buy_value": 719451819,
+          "sell_lots": 2927,
+          "sell_value": 524884924,
+          "net_value": 194566895
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 6253,
+          "buy_value": 1121403152,
+          "sell_lots": 3860,
+          "sell_value": 696578304,
+          "net_value": 424824848
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 954,
+          "buy_value": 171630010,
+          "sell_lots": 934,
+          "sell_value": 167480017,
+          "net_value": 4149993
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 2581,
+          "buy_value": 462447993,
+          "sell_lots": 1317,
+          "sell_value": 237717768,
+          "net_value": 224730225
+        }
+      ]
+    },
+    {
+      "date": "2026-05-20",
+      "close": 1790,
+      "summary": [
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 6400,
+          "buy_value": 1146312254,
+          "sell_lots": 3765,
+          "sell_value": 675341407,
+          "net_value": 470970847
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 885,
+          "buy_value": 157960489,
+          "sell_lots": 1027,
+          "sell_value": 184268753,
+          "net_value": -26308264
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4146,
+          "buy_value": 740032595,
+          "sell_lots": 3716,
+          "sell_value": 663251936,
+          "net_value": 76780659
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 7880,
+          "buy_value": 1406758845,
+          "sell_lots": 6109,
+          "sell_value": 1094202239,
+          "net_value": 312556606
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 5749,
+          "buy_value": 1025901846,
+          "sell_lots": 2652,
+          "sell_value": 475849475,
+          "net_value": 550052371
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6376,
+          "buy_value": 1139279013,
+          "sell_lots": 3117,
+          "sell_value": 555724667,
+          "net_value": 583554346
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 6299,
+          "buy_value": 1123680717,
+          "sell_lots": 7043,
+          "sell_value": 1266383045,
+          "net_value": -142702328
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1189,
+          "buy_value": 212555771,
+          "sell_lots": 666,
+          "sell_value": 118824434,
+          "net_value": 93731337
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5285,
+          "buy_value": 949462103,
+          "sell_lots": 8059,
+          "sell_value": 1449703978,
+          "net_value": -500241875
+        }
+      ]
+    },
+    {
+      "date": "2026-05-21",
+      "close": 1800,
+      "summary": [
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 1042,
+          "buy_value": 188182702,
+          "sell_lots": 2469,
+          "sell_value": 444163522,
+          "net_value": -255980820
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 1087,
+          "buy_value": 196175497,
+          "sell_lots": 2191,
+          "sell_value": 394504587,
+          "net_value": -198329090
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 567,
+          "buy_value": 102032510,
+          "sell_lots": 961,
+          "sell_value": 172555840,
+          "net_value": -70523330
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 1599,
+          "buy_value": 288096197,
+          "sell_lots": 1230,
+          "sell_value": 220683139,
+          "net_value": 67413058
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 2903,
+          "buy_value": 520524259,
+          "sell_lots": 3060,
+          "sell_value": 548182424,
+          "net_value": -27658165
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8809,
+          "buy_value": 1578277923,
+          "sell_lots": 4669,
+          "sell_value": 840297297,
+          "net_value": 737980626
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3580,
+          "buy_value": 643629251,
+          "sell_lots": 4415,
+          "sell_value": 793953021,
+          "net_value": -150323770
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6266,
+          "buy_value": 1129830968,
+          "sell_lots": 8120,
+          "sell_value": 1467133612,
+          "net_value": -337302644
+        }
+      ]
+    },
+    {
+      "date": "2026-05-22",
+      "close": 1775,
+      "summary": [
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 4216,
+          "buy_value": 748647194,
+          "sell_lots": 2533,
+          "sell_value": 448700344,
+          "net_value": 299946850
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3440,
+          "buy_value": 612563085,
+          "sell_lots": 6126,
+          "sell_value": 1087714412,
+          "net_value": -475151327
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3316,
+          "buy_value": 588739498,
+          "sell_lots": 2655,
+          "sell_value": 473074667,
+          "net_value": 115664831
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 8408,
+          "buy_value": 1494894188,
+          "sell_lots": 5270,
+          "sell_value": 939699818,
+          "net_value": 555194370
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 9601,
+          "buy_value": 1703665579,
+          "sell_lots": 4855,
+          "sell_value": 862743859,
+          "net_value": 840921720
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4770,
+          "buy_value": 845519082,
+          "sell_lots": 3162,
+          "sell_value": 563626400,
+          "net_value": 281892682
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6856,
+          "buy_value": 1211264471,
+          "sell_lots": 4814,
+          "sell_value": 858465416,
+          "net_value": 352799055
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 1654,
+          "buy_value": 294129028,
+          "sell_lots": 1840,
+          "sell_value": 325728500,
+          "net_value": -31599472
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2914,
+          "buy_value": 516110634,
+          "sell_lots": 4547,
+          "sell_value": 811084150,
+          "net_value": -294973516
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 5164,
+          "buy_value": 914294567,
+          "sell_lots": 4236,
+          "sell_value": 753046616,
+          "net_value": 161247951
+        }
+      ]
+    },
+    {
+      "date": "2026-05-25",
+      "close": 1935,
+      "summary": [
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2059,
+          "buy_value": 399326740,
+          "sell_lots": 2202,
+          "sell_value": 427300698,
+          "net_value": -27973958
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 9028,
+          "buy_value": 1740547154,
+          "sell_lots": 4290,
+          "sell_value": 830296494,
+          "net_value": 910250660
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4702,
+          "buy_value": 911347559,
+          "sell_lots": 4133,
+          "sell_value": 800042727,
+          "net_value": 111304832
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 634,
+          "buy_value": 122673507,
+          "sell_lots": 1334,
+          "sell_value": 256869944,
+          "net_value": -134196437
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1646,
+          "buy_value": 317520445,
+          "sell_lots": 1279,
+          "sell_value": 247139251,
+          "net_value": 70381194
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1504,
+          "buy_value": 290790594,
+          "sell_lots": 3069,
+          "sell_value": 594256857,
+          "net_value": -303466263
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6931,
+          "buy_value": 1347742336,
+          "sell_lots": 5522,
+          "sell_value": 1069958533,
+          "net_value": 277783803
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 2463,
+          "buy_value": 476720574,
+          "sell_lots": 2258,
+          "sell_value": 437351894,
+          "net_value": 39368680
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 6010,
+          "buy_value": 1163683240,
+          "sell_lots": 7831,
+          "sell_value": 1510990743,
+          "net_value": -347307503
+        }
+      ]
+    },
+    {
+      "date": "2026-05-26",
+      "close": 1930,
+      "summary": [
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 3080,
+          "buy_value": 594613947,
+          "sell_lots": 2905,
+          "sell_value": 562463095,
+          "net_value": 32150852
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 4575,
+          "buy_value": 881224924,
+          "sell_lots": 3771,
+          "sell_value": 727243469,
+          "net_value": 153981455
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 5147,
+          "buy_value": 991253789,
+          "sell_lots": 5410,
+          "sell_value": 1040022741,
+          "net_value": -48768952
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 362,
+          "buy_value": 69865351,
+          "sell_lots": 395,
+          "sell_value": 75872631,
+          "net_value": -6007280
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1049,
+          "buy_value": 202789344,
+          "sell_lots": 562,
+          "sell_value": 108630740,
+          "net_value": 94158604
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 987,
+          "buy_value": 190232726,
+          "sell_lots": 1137,
+          "sell_value": 219796243,
+          "net_value": -29563517
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5559,
+          "buy_value": 1072711695,
+          "sell_lots": 4845,
+          "sell_value": 932524710,
+          "net_value": 140186985
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2374,
+          "buy_value": 459475135,
+          "sell_lots": 4104,
+          "sell_value": 794892673,
+          "net_value": -335417538
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 5657,
+          "buy_value": 1090525139,
+          "sell_lots": 7109,
+          "sell_value": 1373669643,
+          "net_value": -283144504
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 368,
+          "buy_value": 71030930,
+          "sell_lots": 753,
+          "sell_value": 145873617,
+          "net_value": -74842687
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4590,
+          "buy_value": 888015133,
+          "sell_lots": 6999,
+          "sell_value": 1347803857,
+          "net_value": -459788724
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3582,
+          "buy_value": 691925230,
+          "sell_lots": 4743,
+          "sell_value": 915972931,
+          "net_value": -224047701
+        }
+      ]
+    },
+    {
+      "date": "2026-05-27",
+      "close": 1930,
+      "summary": [
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3933,
+          "buy_value": 760887755,
+          "sell_lots": 2155,
+          "sell_value": 416903168,
+          "net_value": 343984587
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 2200,
+          "buy_value": 425188590,
+          "sell_lots": 3003,
+          "sell_value": 580093777,
+          "net_value": -154905187
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 414,
+          "buy_value": 80043163,
+          "sell_lots": 344,
+          "sell_value": 66396166,
+          "net_value": 13646997
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 2033,
+          "buy_value": 393651949,
+          "sell_lots": 2370,
+          "sell_value": 455885271,
+          "net_value": -62233322
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5613,
+          "buy_value": 1088403450,
+          "sell_lots": 6370,
+          "sell_value": 1226250752,
+          "net_value": -137847302
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4135,
+          "buy_value": 797620828,
+          "sell_lots": 3977,
+          "sell_value": 770654470,
+          "net_value": 26966358
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6677,
+          "buy_value": 1282985859,
+          "sell_lots": 6187,
+          "sell_value": 1196119193,
+          "net_value": 86866666
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 2364,
+          "buy_value": 454338147,
+          "sell_lots": 2817,
+          "sell_value": 544980581,
+          "net_value": -90642434
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3692,
+          "buy_value": 710978167,
+          "sell_lots": 8749,
+          "sell_value": 1684508261,
+          "net_value": -973530094
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 362,
+          "buy_value": 69719575,
+          "sell_lots": 731,
+          "sell_value": 141308426,
+          "net_value": -71588851
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 1430,
+          "buy_value": 276663869,
+          "sell_lots": 761,
+          "sell_value": 146830163,
+          "net_value": 129833706
+        }
+      ]
+    },
+    {
+      "date": "2026-05-28",
+      "close": 1930,
+      "summary": [
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6587,
+          "buy_value": 1273633054,
+          "sell_lots": 6479,
+          "sell_value": 1249074478,
+          "net_value": 24558576
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4904,
+          "buy_value": 950097823,
+          "sell_lots": 5478,
+          "sell_value": 1055333768,
+          "net_value": -105235945
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 1904,
+          "buy_value": 365868084,
+          "sell_lots": 2592,
+          "sell_value": 499874664,
+          "net_value": -134006580
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 1609,
+          "buy_value": 309431152,
+          "sell_lots": 2144,
+          "sell_value": 415779645,
+          "net_value": -106348493
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 4817,
+          "buy_value": 925070298,
+          "sell_lots": 5005,
+          "sell_value": 965886394,
+          "net_value": -40816096
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4560,
+          "buy_value": 882379986,
+          "sell_lots": 4178,
+          "sell_value": 805476562,
+          "net_value": 76903424
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1916,
+          "buy_value": 370521360,
+          "sell_lots": 2061,
+          "sell_value": 399299450,
+          "net_value": -28778090
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1919,
+          "buy_value": 371782500,
+          "sell_lots": 783,
+          "sell_value": 151321947,
+          "net_value": 220460553
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 3238,
+          "buy_value": 624572305,
+          "sell_lots": 3508,
+          "sell_value": 679546470,
+          "net_value": -54974165
+        }
+      ]
+    },
+    {
+      "date": "2026-05-29",
+      "close": 1980,
+      "summary": [
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4028,
+          "buy_value": 797444611,
+          "sell_lots": 1784,
+          "sell_value": 351568224,
+          "net_value": 445876387
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1877,
+          "buy_value": 372505468,
+          "sell_lots": 1351,
+          "sell_value": 267561724,
+          "net_value": 104943744
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 2467,
+          "buy_value": 488702836,
+          "sell_lots": 7425,
+          "sell_value": 1477284511,
+          "net_value": -988581675
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4247,
+          "buy_value": 838162991,
+          "sell_lots": 4174,
+          "sell_value": 828824626,
+          "net_value": 9338365
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 6718,
+          "buy_value": 1336593308,
+          "sell_lots": 7313,
+          "sell_value": 1441897498,
+          "net_value": -105304190
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8358,
+          "buy_value": 1657823284,
+          "sell_lots": 4587,
+          "sell_value": 912614930,
+          "net_value": 745208354
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6502,
+          "buy_value": 1292226404,
+          "sell_lots": 7384,
+          "sell_value": 1456087221,
+          "net_value": -163860817
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 2559,
+          "buy_value": 507624170,
+          "sell_lots": 2686,
+          "sell_value": 532861770,
+          "net_value": -25237600
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4353,
+          "buy_value": 862896732,
+          "sell_lots": 3528,
+          "sell_value": 698506091,
+          "net_value": 164390641
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 5106,
+          "buy_value": 1009767881,
+          "sell_lots": 3888,
+          "sell_value": 772919725,
+          "net_value": 236848156
+        }
+      ]
+    },
+    {
+      "date": "2026-06-02",
+      "close": 1945,
+      "summary": [
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 875,
+          "buy_value": 170486659,
+          "sell_lots": 822,
+          "sell_value": 159287497,
+          "net_value": 11199162
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3008,
+          "buy_value": 583755133,
+          "sell_lots": 2460,
+          "sell_value": 477033413,
+          "net_value": 106721720
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 2218,
+          "buy_value": 429422552,
+          "sell_lots": 2036,
+          "sell_value": 394080837,
+          "net_value": 35341715
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5489,
+          "buy_value": 1071150193,
+          "sell_lots": 4130,
+          "sell_value": 799487646,
+          "net_value": 271662547
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 5192,
+          "buy_value": 1014263016,
+          "sell_lots": 4532,
+          "sell_value": 879679297,
+          "net_value": 134583719
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5892,
+          "buy_value": 1150646784,
+          "sell_lots": 8270,
+          "sell_value": 1608388806,
+          "net_value": -457742022
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5119,
+          "buy_value": 994769036,
+          "sell_lots": 7196,
+          "sell_value": 1396495362,
+          "net_value": -401726326
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 10123,
+          "buy_value": 1965121074,
+          "sell_lots": 3558,
+          "sell_value": 695364025,
+          "net_value": 1269757049
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5280,
+          "buy_value": 1022767554,
+          "sell_lots": 4098,
+          "sell_value": 794521828,
+          "net_value": 228245726
+        }
+      ]
+    },
+    {
+      "date": "2026-06-03",
+      "close": 1885,
+      "summary": [
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5605,
+          "buy_value": 1061396795,
+          "sell_lots": 6783,
+          "sell_value": 1282322712,
+          "net_value": -220925917
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5009,
+          "buy_value": 943425331,
+          "sell_lots": 8537,
+          "sell_value": 1615733379,
+          "net_value": -672308048
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1763,
+          "buy_value": 332846543,
+          "sell_lots": 1396,
+          "sell_value": 263605829,
+          "net_value": 69240714
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5500,
+          "buy_value": 1040281238,
+          "sell_lots": 5104,
+          "sell_value": 961445037,
+          "net_value": 78836201
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3362,
+          "buy_value": 631739215,
+          "sell_lots": 6825,
+          "sell_value": 1292364354,
+          "net_value": -660625139
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 7118,
+          "buy_value": 1338701886,
+          "sell_lots": 4248,
+          "sell_value": 802347539,
+          "net_value": 536354347
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 4933,
+          "buy_value": 926125531,
+          "sell_lots": 7981,
+          "sell_value": 1505593868,
+          "net_value": -579468337
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4251,
+          "buy_value": 804515892,
+          "sell_lots": 3067,
+          "sell_value": 576627471,
+          "net_value": 227888421
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 5093,
+          "buy_value": 960126754,
+          "sell_lots": 4915,
+          "sell_value": 929071956,
+          "net_value": 31054798
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4781,
+          "buy_value": 902626357,
+          "sell_lots": 2998,
+          "sell_value": 566786283,
+          "net_value": 335840074
+        }
+      ]
+    },
+    {
+      "date": "2026-06-04",
+      "close": 1890,
+      "summary": [
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 4185,
+          "buy_value": 788805795,
+          "sell_lots": 3786,
+          "sell_value": 715433050,
+          "net_value": 73372745
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4838,
+          "buy_value": 917321738,
+          "sell_lots": 3897,
+          "sell_value": 738388308,
+          "net_value": 178933430
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 3507,
+          "buy_value": 664239401,
+          "sell_lots": 2724,
+          "sell_value": 514518184,
+          "net_value": 149721217
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 7968,
+          "buy_value": 1499268792,
+          "sell_lots": 5658,
+          "sell_value": 1070299572,
+          "net_value": 428969220
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 1847,
+          "buy_value": 349857712,
+          "sell_lots": 2628,
+          "sell_value": 497168331,
+          "net_value": -147310619
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5827,
+          "buy_value": 1095833835,
+          "sell_lots": 6373,
+          "sell_value": 1201700120,
+          "net_value": -105866285
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5126,
+          "buy_value": 971756600,
+          "sell_lots": 7506,
+          "sell_value": 1423922766,
+          "net_value": -452166166
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 2672,
+          "buy_value": 504730887,
+          "sell_lots": 7617,
+          "sell_value": 1438783748,
+          "net_value": -934052861
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4705,
+          "buy_value": 886023836,
+          "sell_lots": 2851,
+          "sell_value": 536448016,
+          "net_value": 349575820
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6100,
+          "buy_value": 1157775077,
+          "sell_lots": 7676,
+          "sell_value": 1452148054,
+          "net_value": -294372977
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 6980,
+          "buy_value": 1319370598,
+          "sell_lots": 7720,
+          "sell_value": 1453776288,
+          "net_value": -134405690
+        }
+      ]
+    },
+    {
+      "date": "2026-06-05",
+      "close": 1765,
+      "summary": [
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1871,
+          "buy_value": 331642180,
+          "sell_lots": 3576,
+          "sell_value": 631271055,
+          "net_value": -299628875
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1307,
+          "buy_value": 230883318,
+          "sell_lots": 718,
+          "sell_value": 126468979,
+          "net_value": 104414339
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 818,
+          "buy_value": 145097626,
+          "sell_lots": 402,
+          "sell_value": 71153823,
+          "net_value": 73943803
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 6300,
+          "buy_value": 1114064075,
+          "sell_lots": 3611,
+          "sell_value": 636006504,
+          "net_value": 478057571
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1338,
+          "buy_value": 235169246,
+          "sell_lots": 996,
+          "sell_value": 175074028,
+          "net_value": 60095218
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 4481,
+          "buy_value": 793743848,
+          "sell_lots": 3977,
+          "sell_value": 700430904,
+          "net_value": 93312944
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 3080,
+          "buy_value": 545397641,
+          "sell_lots": 9230,
+          "sell_value": 1636684431,
+          "net_value": -1091286790
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 1823,
+          "buy_value": 321781235,
+          "sell_lots": 2503,
+          "sell_value": 441827380,
+          "net_value": -120046145
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 1210,
+          "buy_value": 213797862,
+          "sell_lots": 1971,
+          "sell_value": 347226064,
+          "net_value": -133428202
+        }
+      ]
+    },
+    {
+      "date": "2026-06-08",
+      "close": 1615,
+      "summary": [
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3345,
+          "buy_value": 539492717,
+          "sell_lots": 2792,
+          "sell_value": 452093048,
+          "net_value": 87399669
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 1629,
+          "buy_value": 263489484,
+          "sell_lots": 1512,
+          "sell_value": 243775502,
+          "net_value": 19713982
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6918,
+          "buy_value": 1112862505,
+          "sell_lots": 7044,
+          "sell_value": 1134074688,
+          "net_value": -21212183
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 1809,
+          "buy_value": 293140750,
+          "sell_lots": 1765,
+          "sell_value": 285089359,
+          "net_value": 8051391
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 720,
+          "buy_value": 115948696,
+          "sell_lots": 1834,
+          "sell_value": 296484935,
+          "net_value": -180536239
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1113,
+          "buy_value": 178886553,
+          "sell_lots": 1079,
+          "sell_value": 173551384,
+          "net_value": 5335169
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3771,
+          "buy_value": 609156183,
+          "sell_lots": 4486,
+          "sell_value": 725428136,
+          "net_value": -116271953
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5884,
+          "buy_value": 948813081,
+          "sell_lots": 5957,
+          "sell_value": 960050989,
+          "net_value": -11237908
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7046,
+          "buy_value": 1141724032,
+          "sell_lots": 7690,
+          "sell_value": 1243360073,
+          "net_value": -101636041
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 392,
+          "buy_value": 63330173,
+          "sell_lots": 906,
+          "sell_value": 145919981,
+          "net_value": -82589808
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3133,
+          "buy_value": 507771391,
+          "sell_lots": 1857,
+          "sell_value": 299673010,
+          "net_value": 208098381
+        }
+      ]
+    },
+    {
+      "date": "2026-06-09",
+      "close": 1840,
+      "summary": [
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1101,
+          "buy_value": 202172099,
+          "sell_lots": 1257,
+          "sell_value": 231153879,
+          "net_value": -28981780
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2594,
+          "buy_value": 476064347,
+          "sell_lots": 2603,
+          "sell_value": 480321275,
+          "net_value": -4256928
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 1904,
+          "buy_value": 349393411,
+          "sell_lots": 3764,
+          "sell_value": 695271024,
+          "net_value": -345877613
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5462,
+          "buy_value": 1004501175,
+          "sell_lots": 4338,
+          "sell_value": 794403156,
+          "net_value": 210098019
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 2139,
+          "buy_value": 394094797,
+          "sell_lots": 1162,
+          "sell_value": 214594126,
+          "net_value": 179500671
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5419,
+          "buy_value": 997872853,
+          "sell_lots": 1137,
+          "sell_value": 209912724,
+          "net_value": 787960129
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 737,
+          "buy_value": 135607915,
+          "sell_lots": 320,
+          "sell_value": 59005234,
+          "net_value": 76602681
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1410,
+          "buy_value": 258958664,
+          "sell_lots": 1390,
+          "sell_value": 255321669,
+          "net_value": 3636995
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 5315,
+          "buy_value": 981602713,
+          "sell_lots": 8843,
+          "sell_value": 1633957606,
+          "net_value": -652354893
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5592,
+          "buy_value": 1026659311,
+          "sell_lots": 6708,
+          "sell_value": 1233663712,
+          "net_value": -207004401
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 1662,
+          "buy_value": 304551179,
+          "sell_lots": 1726,
+          "sell_value": 318404396,
+          "net_value": -13853217
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 571,
+          "buy_value": 104805049,
+          "sell_lots": 598,
+          "sell_value": 109566063,
+          "net_value": -4761014
+        }
+      ]
+    },
+    {
+      "date": "2026-06-10",
+      "close": 1850,
+      "summary": [
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6537,
+          "buy_value": 1209480599,
+          "sell_lots": 6512,
+          "sell_value": 1202527122,
+          "net_value": 6953477
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 3492,
+          "buy_value": 644799691,
+          "sell_lots": 4184,
+          "sell_value": 770955200,
+          "net_value": -126155509
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2839,
+          "buy_value": 525314306,
+          "sell_lots": 3548,
+          "sell_value": 653220412,
+          "net_value": -127906106
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5315,
+          "buy_value": 982484308,
+          "sell_lots": 5692,
+          "sell_value": 1056113966,
+          "net_value": -73629658
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3230,
+          "buy_value": 600053097,
+          "sell_lots": 5209,
+          "sell_value": 960483639,
+          "net_value": -360430542
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6970,
+          "buy_value": 1286471371,
+          "sell_lots": 7846,
+          "sell_value": 1446469647,
+          "net_value": -159998276
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 394,
+          "buy_value": 73036572,
+          "sell_lots": 371,
+          "sell_value": 68882528,
+          "net_value": 4154044
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2657,
+          "buy_value": 493654031,
+          "sell_lots": 3961,
+          "sell_value": 733669997,
+          "net_value": -240015966
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 636,
+          "buy_value": 117075976,
+          "sell_lots": 614,
+          "sell_value": 113518647,
+          "net_value": 3557329
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 4763,
+          "buy_value": 885071548,
+          "sell_lots": 3481,
+          "sell_value": 647071522,
+          "net_value": 238000026
+        }
+      ]
+    },
+    {
+      "date": "2026-06-11",
+      "close": 1795,
+      "summary": [
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 618,
+          "buy_value": 110893701,
+          "sell_lots": 614,
+          "sell_value": 110677543,
+          "net_value": 216158
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3752,
+          "buy_value": 671556954,
+          "sell_lots": 9457,
+          "sell_value": 1700716296,
+          "net_value": -1029159342
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1790,
+          "buy_value": 322219848,
+          "sell_lots": 1070,
+          "sell_value": 192958292,
+          "net_value": 129261556
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8078,
+          "buy_value": 1456812461,
+          "sell_lots": 5316,
+          "sell_value": 956030083,
+          "net_value": 500782378
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5808,
+          "buy_value": 1046424410,
+          "sell_lots": 3530,
+          "sell_value": 630730113,
+          "net_value": 415694297
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5814,
+          "buy_value": 1038827169,
+          "sell_lots": 5033,
+          "sell_value": 901804389,
+          "net_value": 137022780
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1828,
+          "buy_value": 327284751,
+          "sell_lots": 3305,
+          "sell_value": 591362514,
+          "net_value": -264077763
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 6788,
+          "buy_value": 1219568594,
+          "sell_lots": 3917,
+          "sell_value": 702677797,
+          "net_value": 516890797
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5502,
+          "buy_value": 988446963,
+          "sell_lots": 5646,
+          "sell_value": 1009675891,
+          "net_value": -21228928
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 6027,
+          "buy_value": 1076459229,
+          "sell_lots": 6918,
+          "sell_value": 1244664597,
+          "net_value": -168205368
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 4564,
+          "buy_value": 821307910,
+          "sell_lots": 6283,
+          "sell_value": 1128675233,
+          "net_value": -307367323
+        }
+      ]
+    },
+    {
+      "date": "2026-06-12",
+      "close": 1870,
+      "summary": [
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6523,
+          "buy_value": 1219119927,
+          "sell_lots": 3790,
+          "sell_value": 706887648,
+          "net_value": 512232279
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 613,
+          "buy_value": 114874659,
+          "sell_lots": 348,
+          "sell_value": 65154852,
+          "net_value": 49719807
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 7401,
+          "buy_value": 1388537866,
+          "sell_lots": 4680,
+          "sell_value": 878419981,
+          "net_value": 510117885
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5098,
+          "buy_value": 957422750,
+          "sell_lots": 4144,
+          "sell_value": 775482748,
+          "net_value": 181940002
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 5926,
+          "buy_value": 1105266963,
+          "sell_lots": 7097,
+          "sell_value": 1328201982,
+          "net_value": -222935019
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5058,
+          "buy_value": 946957845,
+          "sell_lots": 4802,
+          "sell_value": 894299946,
+          "net_value": 52657899
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 3272,
+          "buy_value": 613653131,
+          "sell_lots": 4469,
+          "sell_value": 837617457,
+          "net_value": -223964326
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3728,
+          "buy_value": 699614405,
+          "sell_lots": 4563,
+          "sell_value": 850995376,
+          "net_value": -151380971
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5619,
+          "buy_value": 1046617546,
+          "sell_lots": 3044,
+          "sell_value": 568864122,
+          "net_value": 477753424
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3720,
+          "buy_value": 696736558,
+          "sell_lots": 4717,
+          "sell_value": 883434458,
+          "net_value": -186697900
+        }
+      ]
+    },
+    {
+      "date": "2026-06-15",
+      "close": 1875,
+      "summary": [
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 978,
+          "buy_value": 184099130,
+          "sell_lots": 1809,
+          "sell_value": 338240792,
+          "net_value": -154141662
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 6779,
+          "buy_value": 1266342114,
+          "sell_lots": 3733,
+          "sell_value": 700397154,
+          "net_value": 565944960
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 5416,
+          "buy_value": 1010858324,
+          "sell_lots": 9330,
+          "sell_value": 1753167749,
+          "net_value": -742309425
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2052,
+          "buy_value": 386261824,
+          "sell_lots": 1847,
+          "sell_value": 345461028,
+          "net_value": 40800796
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 300,
+          "buy_value": 56523636,
+          "sell_lots": 306,
+          "sell_value": 57466380,
+          "net_value": -942744
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3587,
+          "buy_value": 673967592,
+          "sell_lots": 1899,
+          "sell_value": 354983549,
+          "net_value": 318984043
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 517,
+          "buy_value": 96717233,
+          "sell_lots": 618,
+          "sell_value": 116121565,
+          "net_value": -19404332
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 315,
+          "buy_value": 58859182,
+          "sell_lots": 312,
+          "sell_value": 58718738,
+          "net_value": 140444
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 9960,
+          "buy_value": 1864034814,
+          "sell_lots": 4655,
+          "sell_value": 873289360,
+          "net_value": 990745454
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5662,
+          "buy_value": 1064008562,
+          "sell_lots": 5670,
+          "sell_value": 1064749059,
+          "net_value": -740497
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6779,
+          "buy_value": 1275563221,
+          "sell_lots": 6177,
+          "sell_value": 1161744521,
+          "net_value": 113818700
+        }
+      ]
+    },
+    {
+      "date": "2026-06-17",
+      "close": 1850,
+      "summary": [
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 6925,
+          "buy_value": 1286473887,
+          "sell_lots": 6520,
+          "sell_value": 1206472273,
+          "net_value": 80001614
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2491,
+          "buy_value": 462953548,
+          "sell_lots": 4508,
+          "sell_value": 832970358,
+          "net_value": -370016810
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2248,
+          "buy_value": 414392459,
+          "sell_lots": 4347,
+          "sell_value": 803479301,
+          "net_value": -389086842
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6315,
+          "buy_value": 1165898740,
+          "sell_lots": 3838,
+          "sell_value": 707100287,
+          "net_value": 458798453
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 1866,
+          "buy_value": 346635536,
+          "sell_lots": 2776,
+          "sell_value": 513946967,
+          "net_value": -167311431
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4930,
+          "buy_value": 907612067,
+          "sell_lots": 7422,
+          "sell_value": 1367750018,
+          "net_value": -460137951
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 6830,
+          "buy_value": 1266559479,
+          "sell_lots": 8034,
+          "sell_value": 1493510081,
+          "net_value": -226950602
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 551,
+          "buy_value": 102004232,
+          "sell_lots": 896,
+          "sell_value": 166498059,
+          "net_value": -64493827
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 7126,
+          "buy_value": 1318956170,
+          "sell_lots": 4250,
+          "sell_value": 784226166,
+          "net_value": 534730004
+        }
+      ]
+    },
+    {
+      "date": "2026-06-18",
+      "close": 1800,
+      "summary": [
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3260,
+          "buy_value": 587803669,
+          "sell_lots": 2675,
+          "sell_value": 481588408,
+          "net_value": 106215261
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 7163,
+          "buy_value": 1287684091,
+          "sell_lots": 7075,
+          "sell_value": 1274529934,
+          "net_value": 13154157
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 10058,
+          "buy_value": 1813915085,
+          "sell_lots": 4128,
+          "sell_value": 745608940,
+          "net_value": 1068306145
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 5177,
+          "buy_value": 931832521,
+          "sell_lots": 4041,
+          "sell_value": 727555155,
+          "net_value": 204277366
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 7265,
+          "buy_value": 1302343403,
+          "sell_lots": 3834,
+          "sell_value": 692334878,
+          "net_value": 610008525
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 312,
+          "buy_value": 56376745,
+          "sell_lots": 492,
+          "sell_value": 88547951,
+          "net_value": -32171206
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 8588,
+          "buy_value": 1539914994,
+          "sell_lots": 5862,
+          "sell_value": 1057873808,
+          "net_value": 482041186
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 7111,
+          "buy_value": 1282643304,
+          "sell_lots": 7336,
+          "sell_value": 1314627836,
+          "net_value": -31984532
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7364,
+          "buy_value": 1331599372,
+          "sell_lots": 5571,
+          "sell_value": 1002127770,
+          "net_value": 329471602
+        }
+      ]
+    },
+    {
+      "date": "2026-06-19",
+      "close": 1835,
+      "summary": [
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3002,
+          "buy_value": 552561634,
+          "sell_lots": 3850,
+          "sell_value": 707810581,
+          "net_value": -155248947
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2102,
+          "buy_value": 384782629,
+          "sell_lots": 746,
+          "sell_value": 137522805,
+          "net_value": 247259824
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1794,
+          "buy_value": 327823399,
+          "sell_lots": 1075,
+          "sell_value": 197237885,
+          "net_value": 130585514
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 3347,
+          "buy_value": 615793343,
+          "sell_lots": 6066,
+          "sell_value": 1111850168,
+          "net_value": -496056825
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 4187,
+          "buy_value": 771097745,
+          "sell_lots": 6355,
+          "sell_value": 1161277478,
+          "net_value": -390179733
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5594,
+          "buy_value": 1022464962,
+          "sell_lots": 9154,
+          "sell_value": 1677573973,
+          "net_value": -655109011
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 694,
+          "buy_value": 127441912,
+          "sell_lots": 667,
+          "sell_value": 122964427,
+          "net_value": 4477485
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 268,
+          "buy_value": 49080355,
+          "sell_lots": 344,
+          "sell_value": 63130303,
+          "net_value": -14049948
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 5273,
+          "buy_value": 967041181,
+          "sell_lots": 4127,
+          "sell_value": 754969173,
+          "net_value": 212072008
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 4759,
+          "buy_value": 873592365,
+          "sell_lots": 2660,
+          "sell_value": 488029730,
+          "net_value": 385562635
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2564,
+          "buy_value": 471121033,
+          "sell_lots": 2615,
+          "sell_value": 481711895,
+          "net_value": -10590862
+        }
+      ]
+    },
+    {
+      "date": "2026-06-22",
+      "close": 1770,
+      "summary": [
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 1449,
+          "buy_value": 256496028,
+          "sell_lots": 2164,
+          "sell_value": 383233135,
+          "net_value": -126737107
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7085,
+          "buy_value": 1260200358,
+          "sell_lots": 5428,
+          "sell_value": 956909178,
+          "net_value": 303291180
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2470,
+          "buy_value": 439168485,
+          "sell_lots": 1393,
+          "sell_value": 246162923,
+          "net_value": 193005562
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 1874,
+          "buy_value": 331641793,
+          "sell_lots": 2293,
+          "sell_value": 403890211,
+          "net_value": -72248418
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2778,
+          "buy_value": 490383748,
+          "sell_lots": 8017,
+          "sell_value": 1417406062,
+          "net_value": -927022314
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4149,
+          "buy_value": 733951634,
+          "sell_lots": 9108,
+          "sell_value": 1613491629,
+          "net_value": -879539995
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5135,
+          "buy_value": 910832375,
+          "sell_lots": 6370,
+          "sell_value": 1129842983,
+          "net_value": -219010608
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 3964,
+          "buy_value": 698761341,
+          "sell_lots": 3768,
+          "sell_value": 670253490,
+          "net_value": 28507851
+        }
+      ]
+    },
+    {
+      "date": "2026-06-23",
+      "close": 1770,
+      "summary": [
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4058,
+          "buy_value": 718295253,
+          "sell_lots": 2296,
+          "sell_value": 405666680,
+          "net_value": 312628573
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3304,
+          "buy_value": 587407171,
+          "sell_lots": 7265,
+          "sell_value": 1285714272,
+          "net_value": -698307101
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7792,
+          "buy_value": 1383535709,
+          "sell_lots": 4417,
+          "sell_value": 782283609,
+          "net_value": 601252100
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5395,
+          "buy_value": 958028755,
+          "sell_lots": 5057,
+          "sell_value": 894628758,
+          "net_value": 63399997
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 3654,
+          "buy_value": 647773124,
+          "sell_lots": 4356,
+          "sell_value": 769133352,
+          "net_value": -121360228
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 5254,
+          "buy_value": 927969049,
+          "sell_lots": 3292,
+          "sell_value": 581604689,
+          "net_value": 346364360
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4278,
+          "buy_value": 758838468,
+          "sell_lots": 5019,
+          "sell_value": 887619117,
+          "net_value": -128780649
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 931,
+          "buy_value": 164797229,
+          "sell_lots": 1709,
+          "sell_value": 302204116,
+          "net_value": -137406887
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 1671,
+          "buy_value": 294793994,
+          "sell_lots": 3361,
+          "sell_value": 593052415,
+          "net_value": -298258421
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 2576,
+          "buy_value": 456534043,
+          "sell_lots": 3316,
+          "sell_value": 584429316,
+          "net_value": -127895273
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 8456,
+          "buy_value": 1492117674,
+          "sell_lots": 6237,
+          "sell_value": 1106816956,
+          "net_value": 385300718
+        }
+      ]
+    },
+    {
+      "date": "2026-06-24",
+      "close": 1700,
+      "summary": [
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1845,
+          "buy_value": 313881331,
+          "sell_lots": 2221,
+          "sell_value": 376161646,
+          "net_value": -62280315
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5146,
+          "buy_value": 876537751,
+          "sell_lots": 4665,
+          "sell_value": 789500179,
+          "net_value": 87037572
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 365,
+          "buy_value": 62181697,
+          "sell_lots": 666,
+          "sell_value": 113757324,
+          "net_value": -51575627
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7666,
+          "buy_value": 1298309639,
+          "sell_lots": 4927,
+          "sell_value": 835702249,
+          "net_value": 462607390
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 6373,
+          "buy_value": 1088673444,
+          "sell_lots": 3853,
+          "sell_value": 655775987,
+          "net_value": 432897457
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 528,
+          "buy_value": 90061210,
+          "sell_lots": 557,
+          "sell_value": 94309127,
+          "net_value": -4247917
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8403,
+          "buy_value": 1432530963,
+          "sell_lots": 4787,
+          "sell_value": 810775078,
+          "net_value": 621755885
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1974,
+          "buy_value": 334934932,
+          "sell_lots": 2031,
+          "sell_value": 344637076,
+          "net_value": -9702144
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2199,
+          "buy_value": 374063007,
+          "sell_lots": 6202,
+          "sell_value": 1054267122,
+          "net_value": -680204115
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 399,
+          "buy_value": 67868138,
+          "sell_lots": 246,
+          "sell_value": 42022156,
+          "net_value": 25845982
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3050,
+          "buy_value": 518806075,
+          "sell_lots": 7174,
+          "sell_value": 1214106653,
+          "net_value": -695300578
+        }
+      ]
+    },
+    {
+      "date": "2026-06-25",
+      "close": 1785,
+      "summary": [
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1018,
+          "buy_value": 182090907,
+          "sell_lots": 1021,
+          "sell_value": 181877222,
+          "net_value": 213685
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8024,
+          "buy_value": 1430654001,
+          "sell_lots": 3126,
+          "sell_value": 560099255,
+          "net_value": 870554746
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 8016,
+          "buy_value": 1426891492,
+          "sell_lots": 4798,
+          "sell_value": 859822879,
+          "net_value": 567068613
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 396,
+          "buy_value": 70537125,
+          "sell_lots": 438,
+          "sell_value": 77803887,
+          "net_value": -7266762
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5168,
+          "buy_value": 921817623,
+          "sell_lots": 5629,
+          "sell_value": 1005371926,
+          "net_value": -83554303
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 277,
+          "buy_value": 49226678,
+          "sell_lots": 793,
+          "sell_value": 141934107,
+          "net_value": -92707429
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 2772,
+          "buy_value": 492486448,
+          "sell_lots": 1700,
+          "sell_value": 304182810,
+          "net_value": 188303638
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4834,
+          "buy_value": 866620566,
+          "sell_lots": 2676,
+          "sell_value": 478479829,
+          "net_value": 388140737
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 7844,
+          "buy_value": 1396987460,
+          "sell_lots": 6337,
+          "sell_value": 1129209439,
+          "net_value": 267778021
+        }
+      ]
+    },
+    {
+      "date": "2026-06-26",
+      "close": 1730,
+      "summary": [
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1948,
+          "buy_value": 335740223,
+          "sell_lots": 3035,
+          "sell_value": 525746361,
+          "net_value": -190006138
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3582,
+          "buy_value": 618295402,
+          "sell_lots": 5856,
+          "sell_value": 1013405198,
+          "net_value": -395109796
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3987,
+          "buy_value": 692566005,
+          "sell_lots": 2128,
+          "sell_value": 367873383,
+          "net_value": 324692622
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1149,
+          "buy_value": 198578199,
+          "sell_lots": 1130,
+          "sell_value": 195858987,
+          "net_value": 2719212
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 6473,
+          "buy_value": 1115940603,
+          "sell_lots": 5754,
+          "sell_value": 991510739,
+          "net_value": 124429864
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 6900,
+          "buy_value": 1196082349,
+          "sell_lots": 3734,
+          "sell_value": 643658873,
+          "net_value": 552423476
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2108,
+          "buy_value": 365989875,
+          "sell_lots": 1084,
+          "sell_value": 187374616,
+          "net_value": 178615259
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5172,
+          "buy_value": 897609556,
+          "sell_lots": 6844,
+          "sell_value": 1180669065,
+          "net_value": -283059509
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2449,
+          "buy_value": 425120624,
+          "sell_lots": 3897,
+          "sell_value": 675052715,
+          "net_value": -249932091
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 1559,
+          "buy_value": 269930708,
+          "sell_lots": 1097,
+          "sell_value": 190245501,
+          "net_value": 79685207
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 9005,
+          "buy_value": 1563008453,
+          "sell_lots": 5249,
+          "sell_value": 908164453,
+          "net_value": 654844000
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2270,
+          "buy_value": 391254094,
+          "sell_lots": 6783,
+          "sell_value": 1172133743,
+          "net_value": -780879649
+        }
+      ]
+    },
+    {
+      "date": "2026-06-29",
+      "close": 1705,
+      "summary": [
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 3522,
+          "buy_value": 598993439,
+          "sell_lots": 5037,
+          "sell_value": 858420377,
+          "net_value": -259426938
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5129,
+          "buy_value": 873560158,
+          "sell_lots": 5864,
+          "sell_value": 997943573,
+          "net_value": -124383415
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 243,
+          "buy_value": 41322309,
+          "sell_lots": 273,
+          "sell_value": 46467845,
+          "net_value": -5145536
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 4067,
+          "buy_value": 693767426,
+          "sell_lots": 8482,
+          "sell_value": 1446379467,
+          "net_value": -752612041
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 4614,
+          "buy_value": 786136974,
+          "sell_lots": 3377,
+          "sell_value": 574154073,
+          "net_value": 211982901
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8053,
+          "buy_value": 1378312007,
+          "sell_lots": 4222,
+          "sell_value": 719838293,
+          "net_value": 658473714
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7101,
+          "buy_value": 1215720716,
+          "sell_lots": 3364,
+          "sell_value": 573497105,
+          "net_value": 642223611
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1126,
+          "buy_value": 191506551,
+          "sell_lots": 1390,
+          "sell_value": 236901255,
+          "net_value": -45394704
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1953,
+          "buy_value": 334480449,
+          "sell_lots": 1031,
+          "sell_value": 175506005,
+          "net_value": 158974444
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 5443,
+          "buy_value": 925112278,
+          "sell_lots": 7047,
+          "sell_value": 1201470583,
+          "net_value": -276358305
+        }
+      ]
+    },
+    {
+      "date": "2026-06-30",
+      "close": 1705,
+      "summary": [
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 932,
+          "buy_value": 158456262,
+          "sell_lots": 2375,
+          "sell_value": 406879322,
+          "net_value": -248423060
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 799,
+          "buy_value": 136907412,
+          "sell_lots": 926,
+          "sell_value": 157093798,
+          "net_value": -20186386
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 5161,
+          "buy_value": 877560959,
+          "sell_lots": 6718,
+          "sell_value": 1140461259,
+          "net_value": -262900300
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5437,
+          "buy_value": 923418558,
+          "sell_lots": 4776,
+          "sell_value": 818067793,
+          "net_value": 105350765
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3572,
+          "buy_value": 606819527,
+          "sell_lots": 3592,
+          "sell_value": 614977363,
+          "net_value": -8157836
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 5573,
+          "buy_value": 947036787,
+          "sell_lots": 2778,
+          "sell_value": 473009244,
+          "net_value": 474027543
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 6396,
+          "buy_value": 1087427479,
+          "sell_lots": 8466,
+          "sell_value": 1441206473,
+          "net_value": -353778994
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6092,
+          "buy_value": 1037722644,
+          "sell_lots": 7687,
+          "sell_value": 1314117095,
+          "net_value": -276394451
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5160,
+          "buy_value": 876168088,
+          "sell_lots": 5596,
+          "sell_value": 954053303,
+          "net_value": -77885215
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 9316,
+          "buy_value": 1596073195,
+          "sell_lots": 2742,
+          "sell_value": 467823563,
+          "net_value": 1128249632
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3056,
+          "buy_value": 523183663,
+          "sell_lots": 2313,
+          "sell_value": 395529407,
+          "net_value": 127654256
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 4377,
+          "buy_value": 746826647,
+          "sell_lots": 2956,
+          "sell_value": 504841000,
+          "net_value": 241985647
+        }
+      ]
+    },
+    {
+      "date": "2026-07-01",
+      "close": 1665,
+      "summary": [
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 256,
+          "buy_value": 42560788,
+          "sell_lots": 348,
+          "sell_value": 58096482,
+          "net_value": -15535694
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5323,
+          "buy_value": 884950667,
+          "sell_lots": 6960,
+          "sell_value": 1162225550,
+          "net_value": -277274883
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3751,
+          "buy_value": 627442972,
+          "sell_lots": 2493,
+          "sell_value": 414732842,
+          "net_value": 212710130
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 1753,
+          "buy_value": 291044157,
+          "sell_lots": 1517,
+          "sell_value": 252866624,
+          "net_value": 38177533
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 7390,
+          "buy_value": 1236332573,
+          "sell_lots": 4448,
+          "sell_value": 743736465,
+          "net_value": 492596108
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4667,
+          "buy_value": 780902869,
+          "sell_lots": 6103,
+          "sell_value": 1015760173,
+          "net_value": -234857304
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 6631,
+          "buy_value": 1100898051,
+          "sell_lots": 6846,
+          "sell_value": 1141607084,
+          "net_value": -40709033
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 9904,
+          "buy_value": 1644860151,
+          "sell_lots": 3524,
+          "sell_value": 584797369,
+          "net_value": 1060062782
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2070,
+          "buy_value": 345003728,
+          "sell_lots": 5325,
+          "sell_value": 883113667,
+          "net_value": -538109939
+        }
+      ]
+    },
+    {
+      "date": "2026-07-02",
+      "close": 1690,
+      "summary": [
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5665,
+          "buy_value": 954979418,
+          "sell_lots": 6582,
+          "sell_value": 1115948254,
+          "net_value": -160968836
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3140,
+          "buy_value": 531935104,
+          "sell_lots": 10420,
+          "sell_value": 1769552452,
+          "net_value": -1237617348
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2275,
+          "buy_value": 382665233,
+          "sell_lots": 3945,
+          "sell_value": 665533208,
+          "net_value": -282867975
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6086,
+          "buy_value": 1029405932,
+          "sell_lots": 6875,
+          "sell_value": 1162299215,
+          "net_value": -132893283
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 5466,
+          "buy_value": 922986180,
+          "sell_lots": 6674,
+          "sell_value": 1123384327,
+          "net_value": -200398147
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 3942,
+          "buy_value": 667441621,
+          "sell_lots": 3560,
+          "sell_value": 603173893,
+          "net_value": 64267728
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3438,
+          "buy_value": 578385840,
+          "sell_lots": 2595,
+          "sell_value": 438335027,
+          "net_value": 140050813
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 4149,
+          "buy_value": 701274260,
+          "sell_lots": 3877,
+          "sell_value": 655802154,
+          "net_value": 45472106
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 9704,
+          "buy_value": 1636684653,
+          "sell_lots": 3737,
+          "sell_value": 631580210,
+          "net_value": 1005104443
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 5261,
+          "buy_value": 889289173,
+          "sell_lots": 6945,
+          "sell_value": 1175200004,
+          "net_value": -285910831
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 5938,
+          "buy_value": 1000344540,
+          "sell_lots": 6408,
+          "sell_value": 1082606225,
+          "net_value": -82261685
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 2349,
+          "buy_value": 397171936,
+          "sell_lots": 1536,
+          "sell_value": 260002780,
+          "net_value": 137169156
+        }
+      ]
+    },
+    {
+      "date": "2026-07-03",
+      "close": 1720,
+      "summary": [
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1069,
+          "buy_value": 184421019,
+          "sell_lots": 1298,
+          "sell_value": 224137504,
+          "net_value": -39716485
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 1642,
+          "buy_value": 282184550,
+          "sell_lots": 3426,
+          "sell_value": 589295255,
+          "net_value": -307110705
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1018,
+          "buy_value": 174303687,
+          "sell_lots": 2342,
+          "sell_value": 402632124,
+          "net_value": -228328437
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 3912,
+          "buy_value": 675372957,
+          "sell_lots": 3377,
+          "sell_value": 579029207,
+          "net_value": 96343750
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 6185,
+          "buy_value": 1062225404,
+          "sell_lots": 6598,
+          "sell_value": 1130881956,
+          "net_value": -68656552
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2517,
+          "buy_value": 434698554,
+          "sell_lots": 2137,
+          "sell_value": 367879896,
+          "net_value": 66818658
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 1372,
+          "buy_value": 235569260,
+          "sell_lots": 1244,
+          "sell_value": 213589064,
+          "net_value": 21980196
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3988,
+          "buy_value": 686018404,
+          "sell_lots": 3501,
+          "sell_value": 604468827,
+          "net_value": 81549577
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 1102,
+          "buy_value": 189729544,
+          "sell_lots": 2250,
+          "sell_value": 385571529,
+          "net_value": -195841985
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 446,
+          "buy_value": 76739533,
+          "sell_lots": 479,
+          "sell_value": 82383363,
+          "net_value": -5643830
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5050,
+          "buy_value": 872923166,
+          "sell_lots": 1402,
+          "sell_value": 241002896,
+          "net_value": 631920270
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 3062,
+          "buy_value": 527362340,
+          "sell_lots": 3369,
+          "sell_value": 582283031,
+          "net_value": -54920691
+        }
+      ]
+    },
+    {
+      "date": "2026-07-06",
+      "close": 1835,
+      "summary": [
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1222,
+          "buy_value": 224273360,
+          "sell_lots": 803,
+          "sell_value": 146656551,
+          "net_value": 77616809
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5644,
+          "buy_value": 1036000002,
+          "sell_lots": 8590,
+          "sell_value": 1568768866,
+          "net_value": -532768864
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 5155,
+          "buy_value": 948566870,
+          "sell_lots": 3144,
+          "sell_value": 579690679,
+          "net_value": 368876191
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3589,
+          "buy_value": 659555771,
+          "sell_lots": 1779,
+          "sell_value": 326964616,
+          "net_value": 332591155
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 3807,
+          "buy_value": 700478570,
+          "sell_lots": 5606,
+          "sell_value": 1030033602,
+          "net_value": -329555032
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2524,
+          "buy_value": 463939043,
+          "sell_lots": 2017,
+          "sell_value": 371665933,
+          "net_value": 92273110
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3405,
+          "buy_value": 626231463,
+          "sell_lots": 3654,
+          "sell_value": 673716184,
+          "net_value": -47484721
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3936,
+          "buy_value": 721231216,
+          "sell_lots": 5644,
+          "sell_value": 1039646571,
+          "net_value": -318415355
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 2705,
+          "buy_value": 495639077,
+          "sell_lots": 2715,
+          "sell_value": 496573475,
+          "net_value": -934398
+        }
+      ]
+    },
+    {
+      "date": "2026-07-07",
+      "close": 1800,
+      "summary": [
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5391,
+          "buy_value": 973201950,
+          "sell_lots": 5719,
+          "sell_value": 1026315433,
+          "net_value": -53113483
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 7402,
+          "buy_value": 1327622879,
+          "sell_lots": 4630,
+          "sell_value": 837416142,
+          "net_value": 490206737
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8510,
+          "buy_value": 1534473056,
+          "sell_lots": 5746,
+          "sell_value": 1035248340,
+          "net_value": 499224716
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 1549,
+          "buy_value": 279118578,
+          "sell_lots": 2075,
+          "sell_value": 373160192,
+          "net_value": -94041614
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 1575,
+          "buy_value": 284340759,
+          "sell_lots": 1789,
+          "sell_value": 320926715,
+          "net_value": -36585956
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 1622,
+          "buy_value": 290914823,
+          "sell_lots": 2216,
+          "sell_value": 399615261,
+          "net_value": -108700438
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 2272,
+          "buy_value": 409901319,
+          "sell_lots": 1256,
+          "sell_value": 226796007,
+          "net_value": 183105312
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 267,
+          "buy_value": 47903226,
+          "sell_lots": 345,
+          "sell_value": 62366757,
+          "net_value": -14463531
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 851,
+          "buy_value": 153467274,
+          "sell_lots": 419,
+          "sell_value": 75441501,
+          "net_value": 78025773
+        }
+      ]
+    },
+    {
+      "date": "2026-07-08",
+      "close": 1770,
+      "summary": [
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 2635,
+          "buy_value": 464489530,
+          "sell_lots": 2064,
+          "sell_value": 363578423,
+          "net_value": 100911107
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 4347,
+          "buy_value": 765635891,
+          "sell_lots": 5392,
+          "sell_value": 957439545,
+          "net_value": -191803654
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 1904,
+          "buy_value": 336386799,
+          "sell_lots": 1261,
+          "sell_value": 222373123,
+          "net_value": 114013676
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 4116,
+          "buy_value": 730123439,
+          "sell_lots": 1244,
+          "sell_value": 220410044,
+          "net_value": 509713395
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 1585,
+          "buy_value": 279587917,
+          "sell_lots": 1715,
+          "sell_value": 305031599,
+          "net_value": -25443682
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 2246,
+          "buy_value": 396775146,
+          "sell_lots": 6686,
+          "sell_value": 1185047891,
+          "net_value": -788272745
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 2340,
+          "buy_value": 414543215,
+          "sell_lots": 4768,
+          "sell_value": 844050788,
+          "net_value": -429507573
+        },
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 1479,
+          "buy_value": 262344183,
+          "sell_lots": 2011,
+          "sell_value": 357537983,
+          "net_value": -95193800
+        }
+      ]
+    },
+    {
+      "date": "2026-07-09",
+      "close": 1735,
+      "summary": [
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 978,
+          "buy_value": 169465968,
+          "sell_lots": 1439,
+          "sell_value": 248847509,
+          "net_value": -79381541
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6971,
+          "buy_value": 1207486995,
+          "sell_lots": 1479,
+          "sell_value": 256267289,
+          "net_value": 951219706
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 6113,
+          "buy_value": 1057346502,
+          "sell_lots": 8593,
+          "sell_value": 1483649839,
+          "net_value": -426303337
+        },
+        {
+          "broker": "LG",
+          "name": "Trimegah Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 7731,
+          "buy_value": 1344901388,
+          "sell_lots": 6072,
+          "sell_value": 1051108386,
+          "net_value": 293793002
+        },
+        {
+          "broker": "PD",
+          "name": "Indo Premier Sekuritas",
+          "type": "L",
+          "buy_lots": 3054,
+          "buy_value": 529999086,
+          "sell_lots": 5010,
+          "sell_value": 867118293,
+          "net_value": -337119207
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6846,
+          "buy_value": 1192203078,
+          "sell_lots": 3317,
+          "sell_value": 573859845,
+          "net_value": 618343233
+        },
+        {
+          "broker": "CC",
+          "name": "Mandiri Sekuritas",
+          "type": "L",
+          "buy_lots": 5466,
+          "buy_value": 945643851,
+          "sell_lots": 6036,
+          "sell_value": 1042505842,
+          "net_value": -96861991
+        },
+        {
+          "broker": "HD",
+          "name": "Henan Putihrai Sekuritas",
+          "type": "L",
+          "buy_lots": 3868,
+          "buy_value": 668453163,
+          "sell_lots": 4417,
+          "sell_value": 768780645,
+          "net_value": -100327482
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 816,
+          "buy_value": 141774600,
+          "sell_lots": 1056,
+          "sell_value": 183190002,
+          "net_value": -41415402
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5562,
+          "buy_value": 961426922,
+          "sell_lots": 2594,
+          "sell_value": 448139824,
+          "net_value": 513287098
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5332,
+          "buy_value": 927704817,
+          "sell_lots": 7323,
+          "sell_value": 1270971635,
+          "net_value": -343266818
+        }
+      ]
+    },
+    {
+      "date": "2026-07-10",
+      "close": 1740,
+      "summary": [
+        {
+          "broker": "AK",
+          "name": "UBS Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 978,
+          "buy_value": 169669252,
+          "sell_lots": 1066,
+          "sell_value": 185810697,
+          "net_value": -16141445
+        },
+        {
+          "broker": "SS",
+          "name": "Stockbit Sekuritas Digital",
+          "type": "L",
+          "buy_lots": 3896,
+          "buy_value": 679631020,
+          "sell_lots": 6691,
+          "sell_value": 1164419906,
+          "net_value": -484788886
+        },
+        {
+          "broker": "KZ",
+          "name": "CLSA Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 9796,
+          "buy_value": 1712859608,
+          "sell_lots": 4611,
+          "sell_value": 799754578,
+          "net_value": 913105030
+        },
+        {
+          "broker": "ZP",
+          "name": "Maybank Sekuritas Indonesia",
+          "type": "L",
+          "buy_lots": 3775,
+          "buy_value": 658017181,
+          "sell_lots": 2606,
+          "sell_value": 451514020,
+          "net_value": 206503161
+        },
+        {
+          "broker": "YU",
+          "name": "CGS-CIMB Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 5392,
+          "buy_value": 941854298,
+          "sell_lots": 3639,
+          "sell_value": 633580136,
+          "net_value": 308274162
+        },
+        {
+          "broker": "CG",
+          "name": "Citigroup Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 3107,
+          "buy_value": 543234991,
+          "sell_lots": 4126,
+          "sell_value": 720028181,
+          "net_value": -176793190
+        },
+        {
+          "broker": "DR",
+          "name": "Valbury Asia Sekuritas",
+          "type": "L",
+          "buy_lots": 1805,
+          "buy_value": 313166479,
+          "sell_lots": 2229,
+          "sell_value": 386283127,
+          "net_value": -73116648
+        },
+        {
+          "broker": "NI",
+          "name": "BNI Sekuritas",
+          "type": "L",
+          "buy_lots": 9143,
+          "buy_value": 1588978909,
+          "sell_lots": 4429,
+          "sell_value": 767397769,
+          "net_value": 821581140
+        },
+        {
+          "broker": "BK",
+          "name": "J.P. Morgan Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 6802,
+          "buy_value": 1188214787,
+          "sell_lots": 5942,
+          "sell_value": 1030830058,
+          "net_value": 157384729
+        },
+        {
+          "broker": "DB",
+          "name": "Deutsche Bank AG",
+          "type": "F",
+          "buy_lots": 3948,
+          "buy_value": 685529006,
+          "sell_lots": 4808,
+          "sell_value": 836419716,
+          "net_value": -150890710
+        },
+        {
+          "broker": "YP",
+          "name": "Mirae Asset Sekuritas Indonesia",
+          "type": "F",
+          "buy_lots": 8737,
+          "buy_value": 1523943035,
+          "sell_lots": 1786,
+          "sell_value": 310533180,
+          "net_value": 1213409855
+        }
+      ]
+    }
+  ]
+}
