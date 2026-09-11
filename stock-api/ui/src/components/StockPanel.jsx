@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, lazy, Suspense, memo } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, lazy, Suspense, memo } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import Overview from './Overview'
@@ -39,6 +39,19 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(null)
   const hasDataRef = useRef(false)
+
+  // The tab bar sticks directly under the header, whose height changes as it
+  // wraps on narrow screens. Measured on every commit + on resize rather than
+  // with a ResizeObserver: RO delivery is tied to a rendering opportunity, so it
+  // goes stale in embedded/background frames.
+  const headerRef = useRef(null)
+  const [headerH, setHeaderH] = useState(0)
+  useLayoutEffect(() => {
+    const measure = () => setHeaderH(headerRef.current?.offsetHeight ?? 0)
+    measure()
+    window.addEventListener("resize", measure)
+    return () => window.removeEventListener("resize", measure)
+  })
 
   // Core + SMA untuk chart permanen di-load awal.
   // Jangan set loading=true kalau data sudah ada — itu unmount ChartPane & reset zoom.
@@ -192,10 +205,10 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
       : { wrap: 'bg-tv-yellow/5 border-tv-yellow/20', text: 'text-tv-yellow' }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       {/* ── Header ─────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 glass border-b border-tv-border">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
+      <div ref={headerRef} className="sticky top-0 z-20 glass border-b border-tv-border">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-3 sm:px-5 py-2.5 sm:py-3">
           <div className="flex items-center gap-2">
             <span className="text-xl font-extrabold tracking-tight">{symbol}</span>
             <span className="text-[10px] text-tv-muted bg-tv-bg border border-tv-border px-2 py-0.5 rounded">
@@ -213,7 +226,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
             </div>
           </div>
 
-          <div className="hidden sm:flex items-center gap-3 text-[11px] text-tv-muted border-l border-tv-border pl-4">
+          <div className="hidden xl:flex items-center gap-3 text-[11px] text-tv-muted border-l border-tv-border pl-4">
             <span>O <b className="text-tv-text">{fmt.price(p.open)}</b></span>
             <span>H <b className="text-tv-green">{fmt.price(p.high)}</b></span>
             <span>L <b className="text-tv-red">{fmt.price(p.low)}</b></span>
@@ -230,10 +243,10 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
             <button
               onClick={() => setAutoRefresh(v => !v)}
               title={autoRefresh ? 'Disable auto-refresh' : 'Auto-refresh every 15 min'}
-              className={`hidden sm:flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg border transition-all
+              className={`hidden lg:flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg border transition-all
                 ${autoRefresh
-                  ? 'bg-tv-green/10 border-tv-green/30 text-tv-green'
-                  : 'bg-tv-bg border-tv-border text-tv-muted hover:text-tv-text'}`}
+                  ? "bg-tv-green/10 border-tv-green/30 text-tv-green"
+                  : "bg-tv-bg border-tv-border text-tv-muted hover:text-tv-text"}`}
             >
               Auto
             </button>
@@ -241,7 +254,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
               onClick={handleAI}
               disabled={aiLoading}
               className="px-3 py-1.5 text-xs font-medium rounded-lg bg-tv-purple/10 border border-tv-purple/30
-                text-tv-purple hover:bg-tv-purple/20 transition-all disabled:opacity-40 hidden sm:flex"
+                text-tv-purple hover:bg-tv-purple/20 transition-all disabled:opacity-40 hidden lg:flex"
             >
               {aiLoading ? 'Analyzing…' : 'AI write-up'}
             </button>
@@ -274,7 +287,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
 
         {/* Verdict strip */}
         {dec && (
-          <div className={`flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-2.5 border-t ${verdictTone.wrap}`}>
+          <div className={`flex flex-wrap items-center gap-x-5 gap-y-2 px-3 sm:px-5 py-2 sm:py-2.5 border-t ${verdictTone.wrap}`}>
             <span className={`text-sm font-extrabold tracking-wide ${verdictTone.text}`}>
               {verdictLabel}
             </span>
@@ -316,7 +329,10 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
       </div>
 
       {/* Panel tabs */}
-      <div className="flex border-b border-tv-border px-4 flex-shrink-0 glass">
+      <div
+        className="sticky z-10 flex border-b border-tv-border px-2 sm:px-4 glass overflow-x-auto"
+        style={{ top: headerH }}
+      >
         {PANELS.map(t => (
           <button
             key={t.id}
@@ -331,8 +347,8 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
         ))}
       </div>
 
-      <div className="flex-1 overflow-auto">
-        <div key={tab} className="animate-slide-up h-full">
+      <div className="flex-1">
+        <div key={tab} className="animate-slide-up">
           {(() => {
             const extrasReady = (TAB_NEEDS[tab] || []).every(k => data[k] !== undefined)
             return (

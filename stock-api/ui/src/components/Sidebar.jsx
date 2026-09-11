@@ -32,10 +32,9 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`flex flex-shrink-0 glass border-r border-tv-border z-40
-          ${mobileDrawer
-            ? 'fixed inset-y-0 left-0 md:relative'
-            : 'relative'}`}
+        className={`flex flex-shrink-0 glass border-r border-tv-border z-40 transition-transform
+          fixed inset-y-0 left-0 md:relative md:translate-x-0
+          ${mobileDrawer ? "translate-x-0" : "-translate-x-full"}`}
         style={{ width: open ? RAIL_W + PANEL_W : RAIL_W }}
       >
         {/* ── Icon rail (selalu 60px) ─────────────────────────────── */}

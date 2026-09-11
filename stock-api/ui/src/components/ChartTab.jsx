@@ -183,6 +183,10 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
       },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.05, bottom: 0.28 } },
       timeScale: { borderVisible: false, rightOffset: 3, minBarSpacing: 2 },
+      // The compact chart sits inside the page's scroll flow, so it must not
+      // swallow the wheel — that would trap the user's scroll on the chart.
+      // Zoom there by dragging the time/price axis instead.
+      handleScale: { mouseWheel: !compact },
       localization: { priceFormatter: v => fmt.price(v) },
     })
 
@@ -432,15 +436,15 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   const today     = prices.length >= 1 ? prices[prices.length - 1] : null
 
   return (
-    <div className={compact ? 'px-5 py-3 space-y-2' : 'p-4 space-y-3'}>
+    <div className={compact ? 'px-3 sm:px-5 py-3 space-y-2' : 'p-4 space-y-3'}>
 
       {/* ── Range selector + SMA legend ───────────────────────────── */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         {RANGES.map(r => (
           <button
             key={r}
             onClick={() => setRange(r)}
-            className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors
+            className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-colors
               ${range === r
                 ? 'bg-tv-blue text-white'
                 : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
@@ -451,7 +455,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         <button
           onClick={() => setShowFib(v => !v)}
           title="Fibonacci retracement (swing high–low 100 bar terakhir)"
-          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all
+          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
             ${showFib
               ? 'bg-tv-yellow/15 text-tv-yellow border border-tv-yellow/40 shadow-[0_0_12px_rgba(245,185,80,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
@@ -461,7 +465,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         <button
           onClick={() => setAvwapOn(v => !v)}
           title="Anchored VWAP — aktifkan lalu klik candle untuk set anchor, atau pakai preset"
-          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all
+          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
             ${avwapOn
               ? 'bg-tv-blue/15 text-tv-blue border border-tv-blue/40 shadow-[0_0_12px_rgba(41,182,246,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
@@ -471,7 +475,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         <button
           onClick={() => setShowFvg(v => !v)}
           title="Fair Value Gap zones — gap 3-candle; kotak amber = iFVG (inverted)"
-          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all
+          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
             ${showFvg
               ? 'bg-tv-purple/15 text-tv-purple border border-tv-purple/40 shadow-[0_0_12px_rgba(167,139,250,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
@@ -481,7 +485,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         <button
           onClick={() => setShowProj(v => !v)}
           title="Proyeksi: jalur rencana Decision Engine (entry → TP) + kerucut ATR. Skenario, bukan ramalan harga."
-          className={`px-3 py-1 text-xs font-semibold rounded-md transition-all
+          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
             ${showProj
               ? 'bg-tv-green/15 text-tv-green border border-tv-green/40 shadow-[0_0_12px_rgba(38,166,154,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
@@ -518,8 +522,8 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
       )}
 
       {/* ── Chart card: candlestick + SMA + volume dalam satu canvas ── */}
-      <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan p-3">
-        <div className={compact ? 'relative h-[clamp(240px,34vh,380px)]' : 'relative'} style={compact ? undefined : { height: 500 }}>
+      <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan p-2 sm:p-3">
+        <div className={compact ? 'relative h-[200px] sm:h-[clamp(240px,34vh,380px)]' : 'relative'} style={compact ? undefined : { height: 500 }}>
           <div ref={containerRef} className="absolute inset-0" />
           <div
             ref={tooltipRef}

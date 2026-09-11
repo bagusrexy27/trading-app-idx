@@ -61,7 +61,7 @@ export default function IHSGBadge() {
 
   return (
     <div
-      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg border ${bg} transition-colors ${pulse ? 'ihsg-pulse' : ''}`}
+      className={`flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 py-1.5 rounded-lg border ${bg} transition-colors ${pulse ? 'ihsg-pulse' : ''}`}
       title={`Open ${fmt.price(data.open)} • High ${fmt.price(data.high)} • Low ${fmt.price(data.low)} • Update: ${lastTick?.toLocaleTimeString('id-ID')}`}
     >
       <span className="text-[10px] font-bold text-tv-muted tracking-wider">IHSG</span>
@@ -79,7 +79,7 @@ export default function IHSGBadge() {
       </span>
 
       {data.delayed && (
-        <span className="text-[9px] text-tv-muted border border-tv-border px-1.5 py-0.5 rounded-full">
+        <span className="hidden sm:inline text-[9px] text-tv-muted border border-tv-border px-1.5 py-0.5 rounded-full">
           ~15m delay
         </span>
       )}
