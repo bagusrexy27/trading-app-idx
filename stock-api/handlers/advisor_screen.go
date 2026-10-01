@@ -11,12 +11,12 @@ import (
 
 // screenFilters holds query params for /api/advisor/screen.
 type screenFilters struct {
-	Mode           string
-	MinTurnover    float64
-	MinRR          float64
-	MinConfidence  int
-	SyariahOnly    bool
-	IncludeLowRR   bool
+	Mode          string
+	MinTurnover   float64
+	MinRR         float64
+	MinConfidence int
+	SyariahOnly   bool
+	IncludeLowRR  bool
 }
 
 func parseScreenFilters(r *http.Request) screenFilters {
@@ -65,6 +65,7 @@ type screenRow struct {
 	TurnoverBn  float64              `json:"turnover_bn"`
 	Syariah     bool                 `json:"syariah"`
 	Note        string               `json:"note,omitempty"`
+	Calibration *calibrationFor      `json:"calibration,omitempty"` // measured history for this score + regime
 }
 
 // filterScreenRows applies mode and quality gates to ranked rows.
@@ -107,6 +108,7 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	calib, regime := currentCalibration()
 	rows := make([]screenRow, 0, len(symbols))
 	scanned := 0
 	for _, sym := range symbols {
@@ -136,6 +138,7 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 			Stop: dec.StopLoss, Target: dec.TakeProfit[0].Price, RiskReward: dec.RiskReward,
 			Probability: dec.Probability, TurnoverBn: analysis.R2(turnover),
 			Syariah: isSyariah(sym), Note: dec.Note,
+			Calibration: lookupCalibration(calib, regime, sym, dec.Score),
 		})
 	}
 
@@ -152,14 +155,15 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 	out := filterScreenRows(rows, f)
 
 	respond(w, 200, true, "", map[string]interface{}{
-		"mode":            f.Mode,
-		"min_turnover":    f.MinTurnover,
-		"min_rr":          f.MinRR,
-		"min_confidence":  f.MinConfidence,
-		"syariah":         f.SyariahOnly,
-		"include_low_rr":  f.IncludeLowRR,
-		"scanned":         scanned,
-		"matched":         len(out),
-		"results":         out,
+		"mode":           f.Mode,
+		"min_turnover":   f.MinTurnover,
+		"min_rr":         f.MinRR,
+		"min_confidence": f.MinConfidence,
+		"syariah":        f.SyariahOnly,
+		"include_low_rr": f.IncludeLowRR,
+		"regime":         regime, // IHSG vs SMA50: up | down | unknown
+		"scanned":        scanned,
+		"matched":        len(out),
+		"results":        out,
 	})
 }

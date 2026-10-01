@@ -31,10 +31,14 @@ export default function Sidebar({
         <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={onCloseMobile} />
       )}
 
+      {/* Off-canvas on mobile via transform, so `invisible` too — a translated
+          drawer is still focusable and still read by screen readers. visibility
+          transitions discretely, so it flips only once the slide-out ends. */}
       <aside
-        className={`flex flex-shrink-0 glass border-r border-tv-border z-40 transition-transform
-          fixed inset-y-0 left-0 md:relative md:translate-x-0
-          ${mobileDrawer ? "translate-x-0" : "-translate-x-full"}`}
+        className={`flex flex-shrink-0 glass border-r border-tv-border z-40
+          transition-[transform,visibility] duration-200
+          fixed inset-y-0 left-0 md:relative md:translate-x-0 md:visible
+          ${mobileDrawer ? "translate-x-0" : "-translate-x-full invisible"}`}
         style={{ width: open ? RAIL_W + PANEL_W : RAIL_W }}
       >
         {/* ── Icon rail (selalu 60px) ─────────────────────────────── */}

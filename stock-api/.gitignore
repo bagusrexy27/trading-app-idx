@@ -13,8 +13,12 @@
 /vendor/
 
 # ── Data & generated files ───────────────────────────────────────────────────
+# data/ itself is committed (OHLCV snapshot ships in the image), but not these:
+# personal holdings, and broker summaries that only ever come from POST /mock.
 reports/
 static/
+data/portfolio.json
+data/broker/
 
 # ── Air (live-reload) ────────────────────────────────────────────────────────
 tmp/

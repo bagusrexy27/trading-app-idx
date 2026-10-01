@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
-import { fmt, colorOf } from '../utils'
+import { fmt, colorOf, calibShort } from '../utils'
 import { IconSharia } from './icons'
 
 // Alasan satu baris: pakai note dari engine kalau ada; kalau tidak, rakit dari
-// trend / structure / volume_state / probability — tanpa teks dikarang di frontend.
+// trend / structure / volume_state / rekam jejak historis — tanpa teks dikarang di frontend.
 function reasonOf(r) {
   if (r.note) return r.note
   const bits = []
   if (r.trend?.overall) bits.push(r.trend.overall)
   if (r.structure) bits.push(r.structure)
   if (r.volume_state) bits.push(`Vol ${r.volume_state}`)
-  if (r.probability?.bullish != null) bits.push(`Bull ${r.probability.bullish}%`)
+  if (calibShort(r.calibration)) bits.push(calibShort(r.calibration))
   return bits.join(' · ') || '—'
 }
 

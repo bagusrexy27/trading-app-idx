@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -179,12 +180,7 @@ func loadEnv(path string) {
 	}
 }
 
-
-// ── Basic auth ──────────────────────────────────────────────────────────────
-
-// basicAuth guards everything when AUTH_USER and AUTH_PASS are both set.
-// Unset (the local single-user default) leaves the server open as before.
-
+// ── Data seeding ────────────────────────────────────────────────────────────
 
 // seedDataDir copies the snapshot baked into the image into DATA_DIR the first
 // time a fresh Fly volume is mounted. No-op locally, where SEED_DIR is unset.
@@ -193,7 +189,14 @@ func seedDataDir() {
 	if src == "" {
 		return
 	}
-	if entries, err := os.ReadDir(storage.DataDir); err != nil || len(entries) > 0 {
+	// Look for OHLCV, not for an empty directory: a freshly created Fly volume
+	// is ext4, so it already holds lost+found and would never look "empty".
+	existing, err := filepath.Glob(filepath.Join(storage.DataDir, "*.json"))
+	if err != nil {
+		log.Printf("seed: cannot scan %s: %v", storage.DataDir, err)
+		return
+	}
+	if len(existing) > 0 {
 		return // already populated
 	}
 	if err := os.CopyFS(storage.DataDir, os.DirFS(src)); err != nil {
@@ -202,15 +205,16 @@ func seedDataDir() {
 	}
 	log.Printf("seeded %s from %s", storage.DataDir, src)
 }
-func envOr(key, fallback string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return fallback
-}
+
+// ── Basic auth ──────────────────────────────────────────────────────────────
+
+// basicAuth guards everything when AUTH_USER and AUTH_PASS are both set.
+// Unset (the local single-user default) leaves the server open as before —
+// loudly, because an open server also exposes every DELETE and the PDF upload.
 func basicAuth(next http.Handler) http.Handler {
 	user, pass := os.Getenv("AUTH_USER"), os.Getenv("AUTH_PASS")
 	if user == "" || pass == "" {
+		log.Printf("%s⚠ AUTH_USER/AUTH_PASS unset — every route is open, including DELETE and report upload%s", cFgYellow, cReset)
 		return next
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -225,6 +229,7 @@ func basicAuth(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
 func main() {
 	log.SetFlags(0) // ditch default 'YYYY/MM/DD HH:MM:SS' prefix — our middleware prints its own timestamp
 	loadEnv(".env")
@@ -285,6 +290,7 @@ func main() {
 	api.HandleFunc("/analysis/{symbol}/backtest", bt.Backtest).Methods("GET")
 	api.HandleFunc("/overview", a.Overview).Methods("GET")
 	api.HandleFunc("/advisor/screen", a.AdvisorScreen).Methods("GET")
+	api.HandleFunc("/calibration", a.Calibration).Methods("GET")
 	api.HandleFunc("/session", a.Session).Methods("GET")
 	api.HandleFunc("/ihsg", h.IHSG).Methods("GET")
 
@@ -301,11 +307,11 @@ func main() {
 	fmt.Println(cBold + cFgCyan + "  ╭──────────────────────────────────────────────────╮" + cReset)
 	fmt.Println(cBold + cFgCyan + "  │ " + cFgMag + "IDX Stock Analyzer" + cReset + cBold + cFgCyan + " · API + UI server          │" + cReset)
 	fmt.Println(cBold + cFgCyan + "  ╰──────────────────────────────────────────────────╯" + cReset)
-	fmt.Println(cFgGray + "    server   " + cReset + "→ " + cFgGreen + "http://localhost:" + envOr("PORT", "1111") + cReset)
+	fmt.Println(cFgGray + "    server   " + cReset + "→ " + cFgGreen + "http://localhost:" + storage.EnvOr("PORT", "1111") + cReset)
 	fmt.Println(cFgGray + "    data     " + cReset + "→ " + storage.DataDir + "/")
 	fmt.Println(cFgGray + "    ui (dev) " + cReset + "→ " + cFgGreen + "http://localhost:5173" + cReset + cFgGray + "  (npm run dev inside ui/)" + cReset)
 	fmt.Println(cFgGray + "    logging  " + cReset + "→ enabled for /api/* (Gin-style)")
 	fmt.Println()
-	addr := ":" + envOr("PORT", "1111")
+	addr := ":" + storage.EnvOr("PORT", "1111")
 	log.Fatal(http.ListenAndServe(addr, logger(basicAuth(r))))
 }

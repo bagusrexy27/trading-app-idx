@@ -44,7 +44,7 @@ func BacktestDecisionWithBroker(prices []models.StockPrice, brokerDays []BrokerD
 
 	i := 60
 	for i < n-1 {
-		dec := DecisionEngineWithBroker(prices[:i+1], brokerDays)
+		dec := DecisionEngineWithBroker(prices[:i+1], brokerDaysUpTo(brokerDays, prices[i].Date))
 		if dec.Signal != "STRONG_BUY" && dec.Signal != "BUY" {
 			i++
 			continue
@@ -122,4 +122,15 @@ func BacktestDecisionWithBroker(prices []models.StockPrice, brokerDays []BrokerD
 		res.AvgRR = R2(rrSum / float64(len(res.Trades)))
 	}
 	return res
+}
+
+// brokerDaysUpTo drops broker days after date so a replay cannot see the future.
+func brokerDaysUpTo(days []BrokerDay, date string) []BrokerDay {
+	out := days[:0:0]
+	for _, d := range days {
+		if d.Date <= date {
+			out = append(out, d)
+		}
+	}
+	return out
 }

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-**IDX Stock Analyzer** — Full-stack technical analysis platform for Indonesian (IDX) stocks. Go backend (Gorilla Mux) fetches Yahoo Finance data and runs 15+ technical indicators, a rule-based advisor/decision engine, and a local AI write-up; React + Vite frontend renders a watchlist landing page, charts, advisor verdicts, market screener, portfolio, and a candle-prediction practice game.
+**IDX Stock Analyzer** — Full-stack technical analysis platform for Indonesian (IDX) stocks. Go backend (Gorilla Mux) fetches Yahoo Finance data and runs 15+ technical indicators, a rule-based advisor/decision engine, and a local AI write-up; React + Vite frontend renders a decision-board landing page, charts, advisor verdicts, market screener, portfolio, and a candle-prediction practice game.
 
 All code lives in `stock-api/`. Run all commands from that directory unless noted.
 
@@ -16,10 +16,11 @@ go build -o stock-api.exe .   # Build binary
 ./stock-api.exe               # Run server on :1111 (also serves UI from ./static)
 go build ./...                # Compile-check all packages
 go vet ./...                  # Vet code
-go test ./analysis/           # Advisor unit tests
+go test ./...                 # All tests (analysis/ + handlers/)
+go test ./analysis/ -run TestDecision   # Single test by name
 ```
 
-`main.go` calls `loadEnv(".env")` on startup (best-effort, no error if missing). No env vars are currently consumed — `.env` exists for future hooks.
+`main.go` calls `loadEnv(".env")` on startup (best-effort, never overrides real env). Env vars are listed under Deployment below — note `DATA_DIR` must be a real env var (`storage.DataDir` initialises before `.env` loads).
 
 ### Frontend (React + Vite) — run from `stock-api/ui/`
 ```bash
@@ -50,10 +51,16 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `analysis/bandar.go` | Bandarmology (broker accumulation/distribution) analysis over broker-summary data |
 | `analysis/advisor.go` | Rule-based price-action decision engine — verdict `STRONG_BUY \| BUY \| WAIT \| AVOID \| REDUCE` with confidence, stop/target, Indonesian action text; tests in `advisor_test.go` |
 | `analysis/advisor_backtest.go` | Backtests the advisor's signals over history |
+| `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP, bull/side/bear probability. Low-confidence results downgrade to WAIT. Separate from (and newer than) the Advisor's if/else tree. `DecisionEngineWithBroker` folds in broker data |
+| `analysis/decision_backtest.go` | Backtests the decision engine |
+| `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50): plan = entry next open, WIN if TP1 before stop within 20 bars. `Decision.Probability` is only a formula of the score — this table is the measured counterpart |
+| `analysis/fvg.go` | Fair Value Gap detection (also feeds decision engine confluence) |
 | `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate` |
 | `handlers/analysis.go` | All `/api/analysis/*` endpoints (calls `analysis.*`) |
-| `handlers/advisor.go` | Advisor + advisor-backtest endpoints for one symbol |
-| `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs advisor across all stocks, returns ranked candidates (`?mode=buy&min_turnover=`) |
+| `handlers/advisor.go` | Advisor, decision, and their backtest endpoints for one symbol |
+| `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true`) |
+| `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar changes; fetches `^JKSE` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
+| `handlers/syariah.go` | Hardcoded ISSI syariah symbol set (`isSyariah`) — edit manually when OJK's DES list changes |
 | `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative analysis (no external LLM); uses signals, indicators, pattern detection, and uploaded reports text |
 | `handlers/backtest.go` | `GET /api/analysis/{symbol}/backtest` — simulates BUY/SELL on composite-signal change at next open; returns trades + summary |
 | `handlers/ihsg.go` | `GET /api/ihsg` — fetches `^JKSE` (Jakarta Composite Index) via the same fetcher |
@@ -66,8 +73,8 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 - Stocks: `GET/POST /api/stocks`, `POST /api/stocks/update-all`, `GET/DELETE /api/stocks/{symbol}`, `GET /api/stocks/{symbol}/latest`, `POST /api/stocks/{symbol}/update`, `GET /api/stocks/{symbol}/export.csv`
 - Reports: `GET/POST /api/stocks/{symbol}/reports`, `DELETE /api/stocks/{symbol}/reports/{id}`
 - Fundamental: `GET/POST /api/stocks/{symbol}/fundamental`
-- Analysis (`/api/analysis/{symbol}/*`): `summary`, `indicators`, `signals`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `pivots`, `amd`, `adline`, `cmf`, `mfi`, `advisor`, `advisor-backtest`, `ai`, `backtest`
-- Market: `GET /api/overview`, `GET /api/advisor/screen`, `GET /api/session`, `GET /api/ihsg`
+- Analysis (`/api/analysis/{symbol}/*`): `summary`, `indicators`, `signals`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `fvg`, `avwap`, `pivots`, `amd`, `adline`, `cmf`, `mfi`, `advisor`, `advisor-backtest`, `decision`, `decision-backtest`, `ai`, `backtest`
+- Market: `GET /api/overview`, `GET /api/advisor/screen`, `GET /api/calibration`, `GET /api/session`, `GET /api/ihsg`
 - Broker: `GET/DELETE /api/broker/{symbol}`, `GET /api/broker/{symbol}/summary`, `POST /api/broker/{symbol}/mock`
 
 **Incremental fetching** (`doUpdate`): reads last saved date, requests from `lastDate+1`, dedupes by date string, appends and re-sorts.
@@ -78,15 +85,15 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 
 ### Frontend (React)
 
-Views (in `App.jsx`): `watchlist` (default) | `home` (StockPanel) | `overview` | `session` | `advisor` | `portfolio` | `practice`. All views except StockPanel are code-split via `React.lazy` + `Suspense`; heavy StockPanel tabs (ChartTab, Indicators) are also lazy.
+Views (in `App.jsx`): `today` (DecisionBoard, default) | `stock` (StockPanel) | `overview` | `session` | `advisor` | `portfolio` | `practice`. All views except StockPanel are code-split via `React.lazy` + `Suspense`; heavy StockPanel tabs (ChartTab, Indicators) are also lazy. View is mirrored into `history.state`; legacy names `watchlist`/`home` are migrated to `today`/`stock`.
 
 ```
 App.jsx                       ← global state (stocks[], selected, view, toast); mounts useAlertChecker + IHSGBadge
 ├── Sidebar.jsx               ← slim nav hub: stock list + search + "Update All" + view switcher
-├── Watchlist.jsx             ← (view=watchlist, DEFAULT) centered landing view, JII syariah quick-add picks
-├── StockPanel.jsx            ← (view=home) tab container; lazy per-tab data fetch with TabLoading spinner
+├── DecisionBoard.jsx         ← (view=today, DEFAULT) landing board of tracked stocks
+├── StockPanel.jsx            ← (view=stock) tab container; lazy per-tab data fetch with TabLoading spinner
 │   ├── Overview.jsx          ← change cards, 52-week range, volume, MA, RSI bar
-│   ├── ChartTab.jsx          ← ApexCharts candlestick + SMA20/50 + volume; toggleable indicators, Fibonacci overlay, TradingView-style wheel zoom/pan (rAF-throttled, animations off)
+│   ├── ChartTab.jsx          ← lightweight-charts candlestick + SMA + volume; FVG/Fib zones drawn via custom primitives in `components/chart/`
 │   ├── Indicators.jsx        ← RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku
 │   ├── Advisor.jsx           ← "Saran" tab: advisor verdict banner + backtest stats
 │   ├── RiskCalc.jsx          ← position sizing / stop-loss helper
@@ -105,9 +112,9 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 
 **`utils.js`** — `fmt.price/pct/vol`, `colorOf`/`signalStyle` Tailwind helpers, `APEX_DARK` shared ApexCharts theme.
 
-**Chart alignment** — indicator series (SMA, Bollinger, etc.) have fewer points than raw prices. Components build a `date → value` Map from indicator data, then map over the full price array using `map[p.date] ?? null` so all ApexCharts series share equal-length arrays.
+**Charting libs** — ChartTab uses `lightweight-charts` v5 (series primitives for zone overlays); Indicators, Practice, IHSGChart etc. still use ApexCharts with animations off.
 
-**Chart performance** — ApexCharts animations are disabled and wheel-zoom events are rAF-throttled in ChartTab; re-enabling animations brings back severe zoom/pan lag. A migration of ChartTab to `lightweight-charts` has been scoped (native 60fps zoom/pan) but not implemented.
+**Chart alignment (ApexCharts)** — indicator series (SMA, Bollinger, etc.) have fewer points than raw prices. Components build a `date → value` Map from indicator data, then map over the full price array using `map[p.date] ?? null` so all ApexCharts series share equal-length arrays.
 
 ### Data & storage
 

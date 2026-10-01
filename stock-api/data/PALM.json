@@ -1,7 +1,7 @@
 {
   "symbol": "PALM",
   "exchange": "JKT",
-  "last_updated": "2026-09-08",
+  "last_updated": "2026-09-18",
   "prices": [
     {
       "date": "2025-05-14",
@@ -2558,10 +2558,74 @@
     {
       "date": "2026-09-08",
       "open": 294,
+      "high": 296,
+      "low": 286,
+      "close": 296,
+      "volume": 365600
+    },
+    {
+      "date": "2026-09-09",
+      "open": 298,
+      "high": 302,
+      "low": 294,
+      "close": 298,
+      "volume": 101800
+    },
+    {
+      "date": "2026-09-10",
+      "open": 294,
+      "high": 298,
+      "low": 290,
+      "close": 294,
+      "volume": 383200
+    },
+    {
+      "date": "2026-09-11",
+      "open": 292,
+      "high": 294,
+      "low": 290,
+      "close": 294,
+      "volume": 59100
+    },
+    {
+      "date": "2026-09-14",
+      "open": 294,
+      "high": 296,
+      "low": 288,
+      "close": 294,
+      "volume": 130200
+    },
+    {
+      "date": "2026-09-15",
+      "open": 294,
+      "high": 296,
+      "low": 290,
+      "close": 294,
+      "volume": 60800
+    },
+    {
+      "date": "2026-09-16",
+      "open": 294,
       "high": 294,
       "low": 286,
-      "close": 294,
-      "volume": 278800
+      "close": 290,
+      "volume": 829800
+    },
+    {
+      "date": "2026-09-17",
+      "open": 290,
+      "high": 290,
+      "low": 286,
+      "close": 290,
+      "volume": 30400
+    },
+    {
+      "date": "2026-09-18",
+      "open": 288,
+      "high": 290,
+      "low": 288,
+      "close": 290,
+      "volume": 6000
     }
   ]
 }

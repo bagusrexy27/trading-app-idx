@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef, lazy, Suspense, memo } from 'react'
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, lazy, Suspense, memo } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import Overview from './Overview'
@@ -46,12 +46,14 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   // goes stale in embedded/background frames.
   const headerRef = useRef(null)
   const [headerH, setHeaderH] = useState(0)
-  useLayoutEffect(() => {
-    const measure = () => setHeaderH(headerRef.current?.offsetHeight ?? 0)
-    measure()
-    window.addEventListener("resize", measure)
-    return () => window.removeEventListener("resize", measure)
-  })
+  const measureHeader = useCallback(() => setHeaderH(headerRef.current?.offsetHeight ?? 0), [])
+  // Re-measure every commit (no dep array) — but register the listener once,
+  // or every render tears it down and re-adds it.
+  useLayoutEffect(measureHeader)
+  useEffect(() => {
+    window.addEventListener('resize', measureHeader)
+    return () => window.removeEventListener('resize', measureHeader)
+  }, [])
 
   // Core + SMA untuk chart permanen di-load awal.
   // Jangan set loading=true kalau data sudah ada — itu unmount ChartPane & reset zoom.
@@ -243,7 +245,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
             <button
               onClick={() => setAutoRefresh(v => !v)}
               title={autoRefresh ? 'Disable auto-refresh' : 'Auto-refresh every 15 min'}
-              className={`hidden lg:flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg border transition-all
+              className={`hidden sm:flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg border transition-all
                 ${autoRefresh
                   ? "bg-tv-green/10 border-tv-green/30 text-tv-green"
                   : "bg-tv-bg border-tv-border text-tv-muted hover:text-tv-text"}`}
@@ -254,7 +256,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
               onClick={handleAI}
               disabled={aiLoading}
               className="px-3 py-1.5 text-xs font-medium rounded-lg bg-tv-purple/10 border border-tv-purple/30
-                text-tv-purple hover:bg-tv-purple/20 transition-all disabled:opacity-40 hidden lg:flex"
+                text-tv-purple hover:bg-tv-purple/20 transition-all disabled:opacity-40 hidden sm:flex"
             >
               {aiLoading ? 'Analyzing…' : 'AI write-up'}
             </button>

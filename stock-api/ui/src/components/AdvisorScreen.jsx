@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
-import { fmt } from '../utils'
+import { fmt, calibShort, REGIME_LABEL } from '../utils'
 
 const SIGNAL = {
   STRONG_BUY:  { label: 'STRONG BUY',  icon: '🚀', badge: 'bg-tv-green/15 text-tv-green border-tv-green/40', bar: 'bg-tv-green' },
@@ -55,7 +55,11 @@ function Card({ r, onSelect }) {
         </span>
         <Chip>{r.structure}</Chip>
         <Chip>Vol {r.volume_state}</Chip>
-        <Chip tone="text-tv-green">Naik {r.probability?.bullish}%</Chip>
+        {calibShort(r.calibration) && (
+          <span title={`Skor ${r.calibration.score_lo}–${r.calibration.score_hi}, ${REGIME_LABEL[r.calibration.regime]}: rencana kena TP1 sebelum stop dalam ${r.calibration.horizon} hari bursa. Rata-rata hasil ${fmt.pct(r.calibration.avg_pnl_pct)}/trade.`}>
+            <Chip tone={r.calibration.avg_pnl_pct > 0 ? 'text-tv-green' : 'text-tv-red'}>{calibShort(r.calibration)}</Chip>
+          </span>
+        )}
         {r.syariah && <Chip tone="text-tv-green">☪ Syariah</Chip>}
       </div>
 
@@ -157,6 +161,12 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
           ↻ Refresh
         </button>
       </div>
+
+      {data?.regime === 'down' && !loading && (
+        <div className="text-xs text-tv-red bg-tv-red/10 border border-tv-red/30 rounded-lg px-3 py-2 mb-3">
+          ⚠️ {REGIME_LABEL.down} (pasar sedang turun). Secara historis, sinyal BUY di kondisi ini rata-rata <b>rugi</b>. Lebih aman tahan dulu atau pakai posisi kecil.
+        </div>
+      )}
 
       {/* Summary line */}
       {data && !loading && (

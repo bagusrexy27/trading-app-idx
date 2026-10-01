@@ -1,7 +1,7 @@
 {
   "symbol": "BKSL",
   "exchange": "JKT",
-  "last_updated": "2026-09-08",
+  "last_updated": "2026-09-18",
   "prices": [
     {
       "date": "2025-07-07",
@@ -2297,7 +2297,71 @@
       "high": 76,
       "low": 74,
       "close": 74,
-      "volume": 47986400
+      "volume": 115801400
+    },
+    {
+      "date": "2026-09-09",
+      "open": 74,
+      "high": 75,
+      "low": 73,
+      "close": 73,
+      "volume": 129629500
+    },
+    {
+      "date": "2026-09-10",
+      "open": 73,
+      "high": 74,
+      "low": 72,
+      "close": 72,
+      "volume": 149240900
+    },
+    {
+      "date": "2026-09-11",
+      "open": 71,
+      "high": 72,
+      "low": 70,
+      "close": 71,
+      "volume": 95369000
+    },
+    {
+      "date": "2026-09-14",
+      "open": 71,
+      "high": 72,
+      "low": 66,
+      "close": 69,
+      "volume": 235682900
+    },
+    {
+      "date": "2026-09-15",
+      "open": 69,
+      "high": 71,
+      "low": 68,
+      "close": 69,
+      "volume": 94900900
+    },
+    {
+      "date": "2026-09-16",
+      "open": 69,
+      "high": 71,
+      "low": 68,
+      "close": 68,
+      "volume": 70701100
+    },
+    {
+      "date": "2026-09-17",
+      "open": 68,
+      "high": 70,
+      "low": 67,
+      "close": 68,
+      "volume": 76219600
+    },
+    {
+      "date": "2026-09-18",
+      "open": 69,
+      "high": 69,
+      "low": 67,
+      "close": 67,
+      "volume": 23067900
     }
   ]
 }

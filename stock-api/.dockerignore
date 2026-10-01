@@ -5,4 +5,10 @@ tmp/
 static/
 ui/node_modules/
 ui/dist/
+
+# Never bake local secrets or personal/synthetic state into the seed snapshot.
+.env
+*.env
 data/reports/
+data/portfolio.json
+data/broker/

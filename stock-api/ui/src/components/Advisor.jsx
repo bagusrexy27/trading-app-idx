@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
-import { fmt } from '../utils'
+import { fmt, REGIME_LABEL } from '../utils'
 
 const SIGNAL = {
   STRONG_BUY:  { label: 'STRONG BUY',  text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
@@ -31,6 +31,30 @@ function Pill({ label, value, tone = 'text-tv-text' }) {
   )
 }
 
+// Rekam jejak nyata: seberapa sering rencana dengan skor & kondisi IHSG serupa
+// berhasil di masa lalu (replay semua saham, tanpa look-ahead).
+function CalibCard({ c }) {
+  const good = c.avg_pnl_pct > 0
+  return (
+    <div className={`bg-tv-card border rounded-xl p-4 ${good ? 'border-tv-border' : 'border-tv-red/40'}`}>
+      <div className="text-xs font-bold text-tv-muted uppercase mb-2">Rekam jejak historis</div>
+      <p className="text-sm leading-relaxed">
+        Skor {c.score_lo}–{c.score_hi} saat {REGIME_LABEL[c.regime]}: dari <b>{c.samples.toLocaleString('id-ID')}</b> kasus serupa,
+        rencana kena TP1 sebelum stop <b className={good ? 'text-tv-green' : 'text-tv-red'}>{Math.round(c.win_rate)}%</b> dalam {c.horizon} hari bursa.
+        Rata-rata hasil <b className={good ? 'text-tv-green' : 'text-tv-red'}>{fmt.pct(c.avg_pnl_pct)}</b> per trade.
+      </p>
+      {c.stock?.samples > 0 && (
+        <p className="text-xs text-tv-muted mt-1.5">
+          Saham ini sendiri: {c.stock.samples} hari sinyal beli, {Math.round(c.stock.win_rate)}% kena TP, rata-rata {fmt.pct(c.stock.avg_pnl_pct)}.
+        </p>
+      )}
+      {!good && <p className="text-xs text-tv-red mt-1.5">⚠️ Rata-rata historis negatif — setup seperti ini belum terbukti menguntungkan.</p>}
+      {!c.reliable && <p className="text-xs text-tv-yellow mt-1.5">Sampel sedikit — angka ini belum bisa dipercaya.</p>}
+      <p className="text-[10px] text-tv-muted mt-2">Data ±1,5 tahun; hari-hari berurutan saling tumpang-tindih, jadi jumlah kasus terlihat lebih besar dari aslinya. Bukan jaminan.</p>
+    </div>
+  )
+}
+
 export default function Advisor({ symbol, decisionData }) {
   const [dec, setDec]         = useState(null)
   const [bt, setBt]           = useState(null)
@@ -43,11 +67,11 @@ export default function Advisor({ symbol, decisionData }) {
     setLoading(true); setError(null)
 
     const loadDec = decisionData?.decision
-      ? Promise.resolve({ decision: decisionData.decision, syariah: decisionData.syariah })
+      ? Promise.resolve({ decision: decisionData.decision, syariah: decisionData.syariah, calibration: decisionData.calibration })
       : api.analysis.decision(symbol)
 
     loadDec
-      .then(r => { if (alive) setDec({ ...r.decision, syariah: r.syariah }) })
+      .then(r => { if (alive) setDec({ ...r.decision, syariah: r.syariah, calibration: r.calibration }) })
       .catch(e => { if (alive) setError(e.message) })
       .finally(() => { if (alive) setLoading(false) })
 
@@ -129,8 +153,11 @@ export default function Advisor({ symbol, decisionData }) {
         )}
       </div>
 
+      {dec.calibration?.samples > 0 && <CalibCard c={dec.calibration} />}
+
       <div className="bg-tv-card border border-tv-border rounded-xl p-4">
-        <div className="text-xs font-bold text-tv-muted uppercase mb-3">Scenario probability</div>
+        <div className="text-xs font-bold text-tv-muted uppercase mb-1">Arah skor</div>
+        <p className="text-[10px] text-tv-muted mb-3">Diturunkan dari skor (rumus), bukan peluang terukur. Lihat rekam jejak historis di atas.</p>
         <div className="flex h-2.5 rounded-full overflow-hidden bg-tv-bg">
           <div className="bg-tv-green" style={{ width: `${dec.probability.bullish}%` }} />
           <div className="bg-tv-yellow" style={{ width: `${dec.probability.sideways}%` }} />

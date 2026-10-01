@@ -56,3 +56,10 @@ export const APEX_DARK = {
   legend:  { show: false },
   dataLabels: { enabled: false },
 }
+
+// Rekam jejak historis Decision Engine (dari /api/calibration, terlampir di
+// decision & screen). Ini frekuensi nyata, beda dengan `probability` (rumus skor).
+export const REGIME_LABEL = { up: 'IHSG di atas MA50', down: 'IHSG di bawah MA50', unknown: 'kondisi IHSG tidak diketahui' }
+
+export const calibShort = (c) =>
+  c?.samples ? `Historis ${Math.round(c.win_rate)}% kena TP (n=${c.samples})` : null

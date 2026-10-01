@@ -43,9 +43,21 @@ curl -s "http://localhost:1111/api/advisor/screen?mode=buy&min_turnover=2"
 curl -s "http://localhost:1111/api/advisor/screen?mode=all&min_turnover=2"
 ```
 
-Field per row: `symbol, close, signal, score, confidence, trend, structure,
-volume_state, entry_low, entry_high, entry_ideal, stop, target, risk_reward,
-probability{up,side,down}, turnover_bn, syariah`.
+Field per row: `symbol, close, signal, score, confidence, trend{long,medium,short,overall},
+structure, volume_state, entry_low, entry_high, entry_ideal, stop, target, risk_reward,
+probability{bullish,sideways,bearish}, turnover_bn, syariah, note, calibration`.
+Top-level: `regime` (`up` = IHSG di atas MA50, `down` = di bawah, `unknown`).
+
+**`probability` JANGAN ditampilkan sebagai peluang** — itu cuma rumus dari skor,
+bukan frekuensi terukur. Yang terukur ada di `calibration`:
+- `win_rate`, `samples`, `avg_pnl_pct` — dari semua kasus historis dengan skor
+  `score_lo`–`score_hi` di regime yang sama: % rencana yang kena TP1 sebelum stop
+  dalam `horizon` (20) hari bursa, dan rata-rata hasil per trade.
+- `reliable` = false → sampel < 30, sebut "belum bisa dipercaya".
+- `stock{samples,win_rate,avg_pnl_pct}` — rekam jejak saham itu sendiri (hari sinyal beli).
+
+Win rate tinggi belum tentu untung (TP bisa lebih dekat dari stop) — yang menentukan
+`avg_pnl_pct`. Negatif = setup ini secara historis rugi.
 
 Dari hasil `mode=all`, ambil yang `signal` = `SELL` atau `STRONG_SELL` untuk bagian
 warning (engine pakai skala STRONG_BUY/BUY/WAIT/SELL/STRONG_SELL).
@@ -72,7 +84,10 @@ report: "Sentimen berita: tidak tersedia (search gagal)". Jangan mengarang berit
 
 Format:
 
-1. **Konteks pasar** — 1 baris: IHSG hari ini (nilai + arah) dari langkah 1.
+1. **Konteks pasar** — 1 baris: IHSG hari ini (nilai + arah) dari langkah 1, plus
+   `regime` dari screener. Kalau `regime` = `down`: tulis tegas di awal report —
+   "IHSG di bawah MA50; secara historis sinyal BUY di kondisi ini rata-rata rugi
+   (cek `GET /api/calibration` → `buy_calls.down.avg_pnl_pct`). Sikap default: tahan / posisi kecil." 
 2. **Sentimen berita (dari langkah 4)** — 3 baris, satu per kategori:
    - `🇮🇩 Domestik: [Bullish/Netral/Bearish]` — 1 kalimat faktor utama (mis. "asing net sell Rp3,4 T 5 hari, transisi Gubernur BI").
    - `🌏 Global: [label]` — 1 kalimat (mis. "pasar wait-and-see jelang FOMC Fed").
@@ -81,7 +96,9 @@ Format:
    urut dari terbaik. Per saham satu blok ringkas:
    - `SYMBOL` — signal (STRONG_BUY/BUY) · skor X/100 · confidence Y% · 🕌 kalau syariah
    - Entry: `entry_low`–`entry_high` (ideal `entry_ideal`) · Stop: `stop` · Target: `target` · RR 1:`risk_reward`
-   - Probabilitas besok: Naik `up`% / Sideways `side`% / Turun `down`%
+   - Rekam jejak: kena TP `calibration.win_rate`% dari `calibration.samples` kasus serupa,
+     rata-rata `calibration.avg_pnl_pct`%/trade · saham ini sendiri: `calibration.stock.win_rate`%
+     (n=`calibration.stock.samples`). Tandai ⚠️ kalau `avg_pnl_pct` < 0 atau `reliable` false.
    - 1 baris alasan: dari trend + structure + volume_state (terjemahkan ke bahasa awam,
      mis. "struktur naik (higher-high), volume konfirmasi").
 4. **⚠️ Perhatian (SELL/STRONG_SELL)** — daftar symbol yang sinyalnya jelek, 1 baris each
@@ -92,9 +109,9 @@ Format:
    condong risk-on/risk-off/hati-hati, dan saran sikap (mis. "selektif, utamakan RR
    tinggi + confidence tinggi; kurangi posisi kalau IHSG tembus support X"). Jangan
    generik — sebut angka/faktor konkret dari data hari ini.
-6. Tutup: 1 baris disclaimer — ini analisa probabilistik dari data Yahoo (delay) +
+6. Tutup: 1 baris disclaimer — rekam jejak dari ±1,5 tahun data Yahoo (delay) +
    rangkuman berita publik, bukan kepastian; selalu pakai stop-loss.
 
-Harga IDX = integer rupiah, tanpa desimal. Ranking sudah dari backend — jangan
-diurut ulang. Kalau `matched` = 0, bilang tidak ada setup BUY layak hari ini
+Harga IDX = integer rupiah, tanpa desimal. Ranking sudah dari backend (skor) — jangan
+diurut ulang, tapi kandidat dengan `calibration.avg_pnl_pct` negatif wajib diberi ⚠️. Kalau `matched` = 0, bilang tidak ada setup BUY layak hari ini
 (pasar lagi lesu) dan tetap tampilkan bagian warning.

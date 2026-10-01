@@ -1,7 +1,7 @@
 {
   "symbol": "MEDS",
   "exchange": "JKT",
-  "last_updated": "2026-09-08",
+  "last_updated": "2026-09-18",
   "prices": [
     {
       "date": "2025-05-14",
@@ -2559,9 +2559,73 @@
       "date": "2026-09-08",
       "open": 105,
       "high": 126,
-      "low": 105,
-      "close": 110,
-      "volume": 1199580600
+      "low": 101,
+      "close": 103,
+      "volume": 1368457700
+    },
+    {
+      "date": "2026-09-09",
+      "open": 103,
+      "high": 110,
+      "low": 91,
+      "close": 92,
+      "volume": 334138100
+    },
+    {
+      "date": "2026-09-10",
+      "open": 93,
+      "high": 95,
+      "low": 88,
+      "close": 89,
+      "volume": 140304700
+    },
+    {
+      "date": "2026-09-11",
+      "open": 88,
+      "high": 89,
+      "low": 84,
+      "close": 86,
+      "volume": 51662200
+    },
+    {
+      "date": "2026-09-14",
+      "open": 87,
+      "high": 91,
+      "low": 79,
+      "close": 82,
+      "volume": 204115100
+    },
+    {
+      "date": "2026-09-15",
+      "open": 83,
+      "high": 86,
+      "low": 81,
+      "close": 82,
+      "volume": 53134700
+    },
+    {
+      "date": "2026-09-16",
+      "open": 82,
+      "high": 83,
+      "low": 80,
+      "close": 81,
+      "volume": 30968600
+    },
+    {
+      "date": "2026-09-17",
+      "open": 81,
+      "high": 97,
+      "low": 81,
+      "close": 86,
+      "volume": 562853100
+    },
+    {
+      "date": "2026-09-18",
+      "open": 86,
+      "high": 87,
+      "low": 82,
+      "close": 82,
+      "volume": 37818600
     }
   ]
 }

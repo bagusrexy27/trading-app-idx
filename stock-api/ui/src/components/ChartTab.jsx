@@ -184,9 +184,15 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
       rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.05, bottom: 0.28 } },
       timeScale: { borderVisible: false, rightOffset: 3, minBarSpacing: 2 },
       // The compact chart sits inside the page's scroll flow, so it must not
-      // swallow the wheel — that would trap the user's scroll on the chart.
-      // Zoom there by dragging the time/price axis instead.
+      // swallow the wheel or a vertical swipe — that would trap the user's
+      // scroll on the chart. Zoom/pan there via the time/price axis or a
+      // horizontal drag instead.
+      // handleScroll matters as much as handleScale: lightweight-charts
+      // preventDefault()s a wheel event as soon as EITHER axis is handled, so a
+      // trackpad's slightly-diagonal scroll (deltaX !== 0) is eaten unless
+      // handleScroll.mouseWheel is off too; vertTouchDrag does the same on touch.
       handleScale: { mouseWheel: !compact },
+      handleScroll: { mouseWheel: !compact, vertTouchDrag: !compact },
       localization: { priceFormatter: v => fmt.price(v) },
     })
 

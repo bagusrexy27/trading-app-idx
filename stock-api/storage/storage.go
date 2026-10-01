@@ -14,9 +14,10 @@ import (
 // environment variable (Fly.io mounts a volume at /data).
 // Note: it must be a real env var - .env is loaded from main(), which runs
 // after this package is initialised.
-var DataDir = envOr("DATA_DIR", "./data")
+var DataDir = EnvOr("DATA_DIR", "./data")
 
-func envOr(key, fallback string) string {
+// EnvOr returns the environment variable key, or fallback when it is unset or empty.
+func EnvOr(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
 	}

@@ -38,11 +38,13 @@ func (h *AnalysisHandler) Decision(w http.ResponseWriter, r *http.Request) {
 	}
 	brokerDays := LoadBrokerDays(symbol)
 	d := analysis.DecisionEngineWithBroker(prices, brokerDays)
+	c, regime := currentCalibration()
 
 	respond(w, 200, true, "", map[string]interface{}{
-		"symbol":   symbol,
-		"decision": d,
-		"syariah":  isSyariah(symbol),
+		"symbol":      symbol,
+		"decision":    d,
+		"syariah":     isSyariah(symbol),
+		"calibration": lookupCalibration(c, regime, symbol, d.Score),
 	})
 }
 
