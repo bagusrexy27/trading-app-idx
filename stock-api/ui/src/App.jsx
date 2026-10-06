@@ -12,6 +12,7 @@ const Portfolio      = lazy(() => import('./components/Portfolio'))
 const AdvisorScreen  = lazy(() => import('./components/AdvisorScreen'))
 const DecisionBoard  = lazy(() => import('./components/DecisionBoard'))
 const Practice       = lazy(() => import('./components/Practice'))
+const Glossary       = lazy(() => import('./components/Glossary'))
 
 const ViewLoading = () => (
   <div className="flex items-center justify-center h-full text-tv-muted">
@@ -22,7 +23,7 @@ const ViewLoading = () => (
 export default function App() {
   const [stocks, setStocks]       = useState([])
   const [selected, setSelected]   = useState(null)
-  const [view, setView]           = useState('today') // today | stock | overview | session | advisor | portfolio | practice
+  const [view, setView]           = useState('today') // today | stock | overview | session | advisor | portfolio | practice | kamus
   const [showAdd, setShowAdd]     = useState(false)
   const [showAlerts, setShowAlerts] = useState(false)
   const [loading, setLoading]     = useState(true)
@@ -144,6 +145,7 @@ export default function App() {
         onViewAdvisor={()   => navigate('advisor', selected)}
         onViewPortfolio={() => navigate('portfolio', selected)}
         onViewPractice={()  => navigate('practice', selected)}
+        onViewGlossary={()  => navigate('kamus', selected)}
         onOpenAlerts={() => setShowAlerts(true)}
       />
 
@@ -171,6 +173,8 @@ export default function App() {
               <Portfolio showToast={showToast} />
             ) : view === 'practice' ? (
               <Practice stocks={stocks} />
+            ) : view === 'kamus' ? (
+              <Glossary />
             ) : view === 'stock' && selected ? (
               <StockPanel
                 key={selected}

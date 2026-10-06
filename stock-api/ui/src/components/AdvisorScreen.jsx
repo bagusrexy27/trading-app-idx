@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
 import { fmt, calibShort, REGIME_LABEL } from '../utils'
+import { tip } from '../glossary'
 
 const SIGNAL = {
   STRONG_BUY:  { label: 'STRONG BUY',  icon: '🚀', badge: 'bg-tv-green/15 text-tv-green border-tv-green/40', bar: 'bg-tv-green' },
@@ -65,10 +66,10 @@ function Card({ r, onSelect }) {
 
       {/* mini trade plan */}
       <div className="grid grid-cols-4 gap-2 text-center mb-3">
-        <div><div className="text-[9px] text-tv-muted uppercase">Entry</div><div className="text-xs font-bold tabular-nums">{fmt.price(r.entry_low)}–{fmt.price(r.entry_high)}</div></div>
-        <div><div className="text-[9px] text-tv-muted uppercase">Stop</div><div className="text-xs font-bold tabular-nums text-tv-red">{fmt.price(r.stop)}</div></div>
-        <div><div className="text-[9px] text-tv-muted uppercase">TP1</div><div className="text-xs font-bold tabular-nums text-tv-green">{fmt.price(r.target)}</div></div>
-        <div><div className="text-[9px] text-tv-muted uppercase">R/R</div><div className={`text-xs font-bold ${r.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-yellow'}`}>1:{r.risk_reward?.toFixed(1)}</div></div>
+        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('entry')}>Entry</div><div className="text-xs font-bold tabular-nums">{fmt.price(r.entry_low)}–{fmt.price(r.entry_high)}</div></div>
+        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('stop')}>Stop</div><div className="text-xs font-bold tabular-nums text-tv-red">{fmt.price(r.stop)}</div></div>
+        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('target')}>TP1</div><div className="text-xs font-bold tabular-nums text-tv-green">{fmt.price(r.target)}</div></div>
+        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('rr')}>R/R</div><div className={`text-xs font-bold ${r.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-yellow'}`}>1:{r.risk_reward?.toFixed(1)}</div></div>
       </div>
 
       {r.note && (

@@ -222,3 +222,10 @@ body::after {
 .stagger-3 { animation-delay: 0.19s; }
 .stagger-4 { animation-delay: 0.26s; }
 .stagger-5 { animation-delay: 0.33s; }
+
+/* Ombak Meter — wave layers slide left; SVG is 200% wide so -50% loops seamlessly */
+@keyframes waveShift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.wave-layer { animation: waveShift var(--wave-dur, 12s) linear infinite; }

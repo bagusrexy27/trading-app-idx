@@ -71,6 +71,21 @@ func avgVol(prices []models.StockPrice, n int) int64 {
 	return sum / int64(n)
 }
 
+// avgTurnoverBn — rata-rata close×volume n bar terakhir, dalam miliar rupiah.
+func avgTurnoverBn(prices []models.StockPrice, n int) float64 {
+	if n > len(prices) {
+		n = len(prices)
+	}
+	if n == 0 {
+		return 0
+	}
+	var sum float64
+	for _, p := range prices[len(prices)-n:] {
+		sum += p.Close * float64(p.Volume)
+	}
+	return sum / float64(n) / 1e9
+}
+
 func trendLabel(close, sma20, sma50 float64) string {
 	if sma20 == 0 || sma50 == 0 {
 		return "insufficient_data"
@@ -124,7 +139,7 @@ func (h *AnalysisHandler) Summary(w http.ResponseWriter, r *http.Request) {
 		if ref == 0 {
 			return
 		}
-		return analysis.R2(latest.Close - ref), analysis.R2((latest.Close-ref)/ref*100)
+		return analysis.R2(latest.Close - ref), analysis.R2((latest.Close - ref) / ref * 100)
 	}
 	c1, p1 := pctChange(1)
 	c5, p5 := pctChange(5)
@@ -189,8 +204,8 @@ func (h *AnalysisHandler) Summary(w http.ResponseWriter, r *http.Request) {
 		"52_week": map[string]interface{}{
 			"high":          hi52,
 			"low":           lo52,
-			"pct_from_high": analysis.R2((latest.Close-hi52)/hi52*100),
-			"pct_from_low":  analysis.R2((latest.Close-lo52)/lo52*100),
+			"pct_from_high": analysis.R2((latest.Close - hi52) / hi52 * 100),
+			"pct_from_low":  analysis.R2((latest.Close - lo52) / lo52 * 100),
 		},
 		"volume": map[string]interface{}{
 			"current": latest.Volume, "avg_20d": vol20, "ratio_vs_avg": volRatio,
@@ -527,8 +542,8 @@ func (h *AnalysisHandler) Stochastic(w http.ResponseWriter, r *http.Request) {
 		pts = pts[len(pts)-limit:]
 	}
 	respond(w, 200, true, "", map[string]interface{}{
-		"symbol": symbol,
-		"params": map[string]int{"k": k, "d": d},
+		"symbol":     symbol,
+		"params":     map[string]int{"k": k, "d": d},
 		"overbought": 80, "oversold": 20,
 		"count": len(pts), "data": pts,
 	})
@@ -811,6 +826,8 @@ type overviewItem struct {
 	Score    int     `json:"score"`
 	MaxScore int     `json:"max_score"`
 	VolRatio float64 `json:"vol_ratio"`
+	// Rata-rata nilai transaksi harian 20 hari (miliar Rp) — ukuran kotak heatmap.
+	TurnoverBn float64 `json:"turnover_bn"`
 }
 
 func (h *AnalysisHandler) Overview(w http.ResponseWriter, r *http.Request) {
@@ -866,18 +883,19 @@ func (h *AnalysisHandler) Overview(w http.ResponseWriter, r *http.Request) {
 			dec := analysis.DecisionEngine(prices)
 
 			ch <- res{ok: true, item: overviewItem{
-				Symbol:   sym,
-				Close:    latest.Close,
-				Date:     latest.Date,
-				Pct1D:    pct(1),
-				Pct5D:    pct(5),
-				Pct1M:    pct(22),
-				RSI:      rsi14,
-				Trend:    trendLabel(latest.Close, sma20, sma50),
-				Signal:   dec.Signal,
-				Score:    dec.Score,
-				MaxScore: 100,
-				VolRatio: volRatio,
+				Symbol:     sym,
+				Close:      latest.Close,
+				Date:       latest.Date,
+				Pct1D:      pct(1),
+				Pct5D:      pct(5),
+				Pct1M:      pct(22),
+				RSI:        rsi14,
+				Trend:      trendLabel(latest.Close, sma20, sma50),
+				Signal:     dec.Signal,
+				Score:      dec.Score,
+				MaxScore:   100,
+				VolRatio:   volRatio,
+				TurnoverBn: analysis.R2(avgTurnoverBn(prices, 20)),
 			}}
 		}()
 	}
@@ -905,7 +923,7 @@ func (h *AnalysisHandler) Overview(w http.ResponseWriter, r *http.Request) {
 
 type candlePattern struct {
 	Name        string `json:"name"`
-	Type        string `json:"type"`        // bullish | bearish | neutral
+	Type        string `json:"type"` // bullish | bearish | neutral
 	Description string `json:"description"`
 }
 
@@ -1003,9 +1021,9 @@ func detectPattern(prices []models.StockPrice) candlePattern {
 
 	// Harami (inside candle)
 	prevBodyHigh := math.Max(prev.Open, prev.Close)
-	prevBodyLow  := math.Min(prev.Open, prev.Close)
-	curBodyHigh  := math.Max(cur.Open, cur.Close)
-	curBodyLow   := math.Min(cur.Open, cur.Close)
+	prevBodyLow := math.Min(prev.Open, prev.Close)
+	curBodyHigh := math.Max(cur.Open, cur.Close)
+	curBodyLow := math.Min(cur.Open, cur.Close)
 	if curBodyHigh < prevBodyHigh && curBodyLow > prevBodyLow {
 		prevBullish := prev.Close >= prev.Open
 		if !prevBullish && bullish {

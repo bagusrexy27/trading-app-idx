@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, calibShort } from '../utils'
 import { IconSharia } from './icons'
+import OmbakMeter from './OmbakMeter'
+import { tip } from '../glossary'
 
 // Alasan satu baris: pakai note dari engine kalau ada; kalau tidak, rakit dari
 // trend / structure / volume_state / rekam jejak historis — tanpa teks dikarang di frontend.
@@ -74,7 +76,7 @@ function TickerCard({ r, onSelect }) {
               </span>
             )}
             {r.risk_reward > 0 && (
-              <span className="text-[10px] text-tv-muted tabular-nums">R:R 1:{r.risk_reward.toFixed(1)}</span>
+              <span className="text-[10px] text-tv-muted tabular-nums" title={tip('rr')}>R:R 1:{r.risk_reward.toFixed(1)}</span>
             )}
           </div>
           <div className="text-[11px] text-tv-muted truncate mt-0.5" title={reasonOf(r)}>{reasonOf(r)}</div>
@@ -109,6 +111,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
   const [sort, setSort] = useState('score') // score | rr | volume
   const [shariaOnly, setShariaOnly] = useState(false)
   const [error, setError] = useState(null)
+  const [regime, setRegime] = useState('unknown')
 
   const sparkBySym = useMemo(() => {
     const m = {}
@@ -120,9 +123,10 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
     let alive = true
     setLoading(true); setError(null)
     // mode=all + minTurnover=0 supaya saham tidak likuid tetap muncul di "stay away"
-    api.advisorScreen('all', 0)
+    api.advisorScreen({ mode: 'all', minTurnover: 0 })
       .then(d => {
         if (!alive) return
+        setRegime(d?.regime || 'unknown')
         const merged = (d?.results || []).map(r => ({
           ...r,
           sparkline: sparkBySym[r.symbol]?.sparkline,
@@ -218,6 +222,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
         </div>
       ) : (
         <>
+          <OmbakMeter regime={regime} buy={buy.length} wait={waiting.length} sell={avoid.length} />
           <div className="grid md:grid-cols-2 gap-6">
             <Column
               title="Worth buying"

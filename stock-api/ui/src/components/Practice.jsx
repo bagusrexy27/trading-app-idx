@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
 import { api } from '../api'
 import { fmt, APEX_DARK } from '../utils'
+import { DEFAULT_SCORE, DAILY_GOAL, BADGES, nextScore, dayStr, liveDayStreak } from '../practiceScore'
 
 const ReactApexChart = lazy(() => import('react-apexcharts'))
 
@@ -11,9 +12,10 @@ const ReactApexChart = lazy(() => import('react-apexcharts'))
 
 const SCORE_KEY = 'idx_practice_v1'
 const WINDOW = 60          // candle yang ditampilkan
+// merge dengan default: skor lama (tanpa field streak harian/badge) tetap terbaca
 const loadScore = () => {
-  try { return JSON.parse(localStorage.getItem(SCORE_KEY)) || { total: 0, correct: 0, streak: 0, best: 0 } }
-  catch { return { total: 0, correct: 0, streak: 0, best: 0 } }
+  try { return { ...DEFAULT_SCORE, ...JSON.parse(localStorage.getItem(SCORE_KEY)) } }
+  catch { return { ...DEFAULT_SCORE } }
 }
 
 // ── mini indicator math (client-side, cukup untuk edukasi) ──────────────────
@@ -130,13 +132,17 @@ export default function Practice({ stocks = [] }) {
   const [phase, setPhase]     = useState('load') // load | guess | reveal
   const [guess, setGuess]     = useState(null)   // 'up' | 'down'
   const [err, setErr]         = useState(null)
+  const [earned, setEarned]   = useState([])     // badge baru dari tebakan terakhir
 
   const eligible = useMemo(() => stocks.filter(s => (s.data_points || 0) >= WINDOW + 30), [stocks])
 
-  const saveScore = (s) => { setScore(s); localStorage.setItem(SCORE_KEY, JSON.stringify(s)) }
+  const saveScore = (s) => {
+    setScore(s)
+    try { localStorage.setItem(SCORE_KEY, JSON.stringify(s)) } catch { /* private mode: skor cuma di memori */ }
+  }
 
   const newRound = async () => {
-    setPhase('load'); setGuess(null); setErr(null)
+    setPhase('load'); setGuess(null); setErr(null); setEarned([])
     try {
       if (!eligible.length) throw new Error('Butuh minimal 1 saham dengan ≥90 hari data — tambah saham dulu di Watchlist.')
       const pick = eligible[Math.floor(Math.random() * eligible.length)]
@@ -165,13 +171,12 @@ export default function Practice({ stocks = [] }) {
     const up = round.answerBar.close > lastClose
     // seri (close sama persis) tidak dihitung salah — dianggap benar apa pun tebakannya
     const correct = tie || (dir === 'up') === up
-    const streak = correct ? score.streak + 1 : 0
-    saveScore({
-      total: score.total + 1,
-      correct: score.correct + (correct ? 1 : 0),
-      streak,
-      best: Math.max(score.best, streak),
-    })
+    // konsensus sinyal dihitung dari bar sebelum tebakan — tidak bocor jawaban
+    const konsensus = analysis?.konsensus
+    const followed = konsensus != null && konsensus !== 'netral' && (dir === 'up') === (konsensus === 'naik')
+    const next = nextScore(score, { correct, followed, today: dayStr() })
+    saveScore(next.score)
+    setEarned(next.earned)
     setPhase('reveal')
   }
 
@@ -199,6 +204,9 @@ export default function Practice({ stocks = [] }) {
 
   const correct = phase === 'reveal' && guess != null && analysis != null && (analysis.tie || (guess === 'up') === analysis.up)
   const accuracy = score.total > 0 ? (score.correct / score.total) * 100 : 0
+  const today = dayStr()
+  const roundsToday = score.day === today ? score.dayRounds : 0
+  const dayStreak = liveDayStreak(score, today)
 
   // ── chart series ───────────────────────────────────────────────────────────
   const series = useMemo(() => {
@@ -247,6 +255,34 @@ export default function Practice({ stocks = [] }) {
             <div className={`text-base font-extrabold tabular-nums ${c.tone}`}>{c.val}</div>
           </div>
         ))}
+      </div>
+
+      {/* ── target harian + streak harian + badge ─────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-5 px-1 text-[11px]">
+        <div className="flex items-center gap-3">
+          <span className="text-tv-muted" title={`Target ${DAILY_GOAL} ronde per hari`}>
+            <span className="text-sm tracking-[0.15em] text-tv-blue">
+              {'●'.repeat(Math.min(roundsToday, DAILY_GOAL))}
+              <span className="text-tv-border">{'●'.repeat(Math.max(DAILY_GOAL - roundsToday, 0))}</span>
+            </span>
+            <span className="ml-1.5 tabular-nums">{Math.min(roundsToday, DAILY_GOAL)}/{DAILY_GOAL} hari ini</span>
+          </span>
+          <span className="text-tv-muted" title={`Hari beruntun mencapai target · terbaik ${score.bestDayStreak}`}>
+            📅 streak <b className="text-tv-text tabular-nums">{dayStreak}</b> hari
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {BADGES.map(b => {
+            const got = score.badges.includes(b.id)
+            return (
+              <span key={b.id} title={`${b.nama} — ${b.syarat}${got ? ' ✓' : ''}`}
+                className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold
+                  ${got ? 'border-tv-purple/40 bg-tv-purple/10 text-tv-text' : 'border-tv-border text-tv-muted opacity-50 grayscale'}`}>
+                {b.emoji} {b.nama}
+              </span>
+            )
+          })}
+        </div>
       </div>
 
       {err && (
@@ -312,6 +348,19 @@ export default function Practice({ stocks = [] }) {
                   {correct && score.streak > 1 && <span className="ml-1">· streak {score.streak} 🔥</span>}
                 </div>
               </div>
+
+              {earned.length > 0 && (
+                <div className="pop-in rounded-xl border border-tv-purple/40 bg-tv-purple/10 px-4 py-2.5 text-center text-xs font-bold">
+                  {earned.map(id => BADGES.find(b => b.id === id)).map(b => (
+                    <div key={b.id}>🏅 Badge baru: {b.emoji} {b.nama} <span className="font-normal text-tv-muted">— {b.syarat}</span></div>
+                  ))}
+                </div>
+              )}
+              {roundsToday === DAILY_GOAL && (
+                <div className="pop-in text-center text-[11px] text-tv-blue">
+                  ✅ Target {DAILY_GOAL} ronde hari ini tercapai · streak {dayStreak} hari
+                </div>
+              )}
 
               {/* anatomi candle jawaban — kenapa hijau/merah ≠ naik/turun */}
               {analysis.divergence && (

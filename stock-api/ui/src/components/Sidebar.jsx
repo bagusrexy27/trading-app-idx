@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fmt } from '../utils'
 import {
-  IconToday, IconMarket, IconSession, IconScreener, IconPortfolio, IconPractice,
+  IconToday, IconMarket, IconSession, IconScreener, IconPortfolio, IconPractice, IconBook,
   IconAlerts, IconPlus, IconChevronLeft, IconChevronRight, IconWatchlist,
 } from './icons'
 
@@ -14,7 +14,7 @@ const PANEL_W = 232
 export default function Sidebar({
   stocks, selected, activeView, loading, panelOpen, onPanelOpenChange,
   onSelect, onAdd, onUpdateAll, onOpenAlerts,
-  onViewToday, onViewOverview, onViewSession, onViewAdvisor, onViewPortfolio, onViewPractice,
+  onViewToday, onViewOverview, onViewSession, onViewAdvisor, onViewPortfolio, onViewPractice, onViewGlossary,
   mobileDrawer, onCloseMobile,
 }) {
   const [search, setSearch] = useState('')
@@ -54,6 +54,7 @@ export default function Sidebar({
             <RailBtn icon={<IconScreener />} label="Screen" active={activeView === 'advisor'} onClick={() => { onViewAdvisor(); onCloseMobile?.() }} />
             <RailBtn icon={<IconPortfolio />} label="Port" active={activeView === 'portfolio'} onClick={() => { onViewPortfolio(); onCloseMobile?.() }} />
             <RailBtn icon={<IconPractice />} label="Drill" active={activeView === 'practice'} onClick={() => { onViewPractice(); onCloseMobile?.() }} />
+            <RailBtn icon={<IconBook />} label="Kamus" active={activeView === 'kamus'} onClick={() => { onViewGlossary(); onCloseMobile?.() }} />
           </nav>
 
           <div className="py-2 flex flex-col items-center gap-1 border-t border-tv-border">

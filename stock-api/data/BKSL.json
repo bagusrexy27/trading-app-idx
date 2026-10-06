@@ -1,7 +1,7 @@
 {
   "symbol": "BKSL",
   "exchange": "JKT",
-  "last_updated": "2026-09-18",
+  "last_updated": "2026-10-06",
   "prices": [
     {
       "date": "2025-07-07",
@@ -2359,9 +2359,105 @@
       "date": "2026-09-18",
       "open": 69,
       "high": 69,
+      "low": 66,
+      "close": 69,
+      "volume": 150880400
+    },
+    {
+      "date": "2026-09-21",
+      "open": 70,
+      "high": 70,
       "low": 67,
-      "close": 67,
-      "volume": 23067900
+      "close": 68,
+      "volume": 79252400
+    },
+    {
+      "date": "2026-09-22",
+      "open": 68,
+      "high": 69,
+      "low": 63,
+      "close": 64,
+      "volume": 141137100
+    },
+    {
+      "date": "2026-09-23",
+      "open": 64,
+      "high": 71,
+      "low": 63,
+      "close": 68,
+      "volume": 278989300
+    },
+    {
+      "date": "2026-09-24",
+      "open": 69,
+      "high": 69,
+      "low": 64,
+      "close": 66,
+      "volume": 88339700
+    },
+    {
+      "date": "2026-09-25",
+      "open": 66,
+      "high": 66,
+      "low": 63,
+      "close": 64,
+      "volume": 101340000
+    },
+    {
+      "date": "2026-09-28",
+      "open": 63,
+      "high": 63,
+      "low": 55,
+      "close": 55,
+      "volume": 434973500
+    },
+    {
+      "date": "2026-09-29",
+      "open": 54,
+      "high": 56,
+      "low": 51,
+      "close": 55,
+      "volume": 364496500
+    },
+    {
+      "date": "2026-09-30",
+      "open": 56,
+      "high": 60,
+      "low": 56,
+      "close": 57,
+      "volume": 209609800
+    },
+    {
+      "date": "2026-10-01",
+      "open": 57,
+      "high": 58,
+      "low": 55,
+      "close": 56,
+      "volume": 61989800
+    },
+    {
+      "date": "2026-10-02",
+      "open": 56,
+      "high": 57,
+      "low": 54,
+      "close": 56,
+      "volume": 124974900
+    },
+    {
+      "date": "2026-10-05",
+      "open": 56,
+      "high": 58,
+      "low": 56,
+      "close": 57,
+      "volume": 70074700
+    },
+    {
+      "date": "2026-10-06",
+      "open": 58,
+      "high": 59,
+      "low": 57,
+      "close": 59,
+      "volume": 49131300
     }
   ]
 }

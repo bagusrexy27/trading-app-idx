@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
 import IHSGChart from './IHSGChart'
+import MarketHeatmap from './MarketHeatmap'
+import WeeklyRecap from './WeeklyRecap'
+import Term from './Term'
 
 const SIGNAL_ORDER = ['STRONG_BUY', 'BUY', 'NEUTRAL', 'SELL', 'STRONG_SELL']
 
@@ -19,11 +22,11 @@ const COLUMNS = [
   { label: '1D%',      key: 'pct_1d'                },
   { label: '5D%',      key: 'pct_5d'                },
   { label: '1M%',      key: 'pct_1m'                },
-  { label: 'RSI',      key: 'rsi'                   },
-  { label: 'Trend',    key: 'trend',     center: true },
-  { label: 'Vol/Avg',  key: 'vol_ratio'             },
-  { label: 'Signal',   key: 'signal'                },
-  { label: 'Score',    key: 'score'                 },
+  { label: 'RSI',      key: 'rsi',       term: 'rsi'      },
+  { label: 'Trend',    key: 'trend',     center: true, term: 'trend' },
+  { label: 'Vol/Avg',  key: 'vol_ratio', term: 'volratio' },
+  { label: 'Signal',   key: 'signal',    term: 'sinyal'   },
+  { label: 'Score',    key: 'score',     term: 'skor'     },
 ]
 
 function trendInfo(trend) {
@@ -43,6 +46,7 @@ export default function MarketOverview({ onSelectStock, showToast }) {
   const [loading, setLoading] = useState(true)
   const [sortKey, setSortKey] = useState('score')
   const [sortDir, setSortDir] = useState(-1) // -1 = desc
+  const [mode, setMode]       = useState('table') // table | map | recap
 
   const load = useCallback(() => {
     setLoading(true)
@@ -123,6 +127,21 @@ export default function MarketOverview({ onSelectStock, showToast }) {
           Belum ada saham. Tambahkan saham dari sidebar.
         </div>
       ) : (
+        <>
+        <div className="flex rounded-lg border border-tv-border overflow-hidden w-fit mb-4">
+          {[['table', 'Tabel'], ['map', 'Peta'], ['recap', 'Rekap Mingguan']].map(([k, label]) => (
+            <button key={k} onClick={() => setMode(k)}
+              className={`px-3.5 py-1.5 text-xs font-semibold transition-colors
+                ${mode === k ? 'bg-tv-blue text-white' : 'text-tv-muted hover:text-tv-text'}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+        {mode === 'map' ? (
+          <MarketHeatmap items={items} onSelectStock={onSelectStock} />
+        ) : mode === 'recap' ? (
+          <WeeklyRecap items={items} onSelectStock={onSelectStock} />
+        ) : (
         <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -137,7 +156,7 @@ export default function MarketOverview({ onSelectStock, showToast }) {
                         ${col.left ? 'text-left' : col.center ? 'text-center' : 'text-right'}
                         ${sortKey === col.key ? 'text-tv-blue' : 'text-tv-muted'}`}
                     >
-                      {col.label}{sortKey === col.key ? (sortDir < 0 ? ' ↓' : ' ↑') : ''}
+                      {col.term ? <Term k={col.term}>{col.label}</Term> : col.label}{sortKey === col.key ? (sortDir < 0 ? ' ↓' : ' ↑') : ''}
                     </th>
                   ))}
                 </tr>
@@ -199,6 +218,8 @@ export default function MarketOverview({ onSelectStock, showToast }) {
             </table>
           </div>
         </div>
+        )}
+        </>
       )}
     </div>
   )

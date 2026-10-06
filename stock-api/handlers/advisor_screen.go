@@ -119,11 +119,7 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 		scanned++
 
 		n := len(d.Prices)
-		var sum float64
-		for i := n - 20; i < n; i++ {
-			sum += d.Prices[i].Close * float64(d.Prices[i].Volume)
-		}
-		turnover := sum / 20 / 1e9
+		turnover := avgTurnoverBn(d.Prices, 20)
 		if turnover < f.MinTurnover {
 			continue
 		}
