@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api'
 import { fmt, colorOf } from '../utils'
+import MoneyInput from './MoneyInput'
 
 const STORAGE_KEY = 'idx_portfolio_v1'
 
@@ -15,6 +16,7 @@ export default function Portfolio({ showToast }) {
   const [positions, setPositions] = useState(loadPositions)
   const [prices, setPrices]       = useState({})
   const [showAdd, setShowAdd]     = useState(false)
+  const [editing, setEditing]     = useState(null)
 
   // Fetch latest prices for all held symbols
   const refreshPrices = useCallback(async () => {
@@ -39,8 +41,17 @@ export default function Portfolio({ showToast }) {
     showToast(`✓ ${pos.symbol} ditambahkan ke portfolio`)
   }
 
-  const removePosition = (id) => {
-    const next = positions.filter(p => p.id !== id)
+  const updatePosition = (pos) => {
+    const next = positions.map(p => p.id === editing.id ? { ...p, ...pos } : p)
+    setPositions(next)
+    savePositions(next)
+    setEditing(null)
+    showToast(`✓ ${pos.symbol} diperbarui`)
+  }
+
+  const removePosition = (pos) => {
+    if (!confirm(`Hapus ${pos.symbol} dari portfolio?`)) return
+    const next = positions.filter(p => p.id !== pos.id)
     setPositions(next)
     savePositions(next)
   }
@@ -183,8 +194,9 @@ export default function Portfolio({ showToast }) {
                   <td className={`px-3 py-2.5 text-xs tabular-nums font-bold ${colorOf(pos.pnlPct)}`}>
                     {pos.pnlPct >= 0 ? '+' : ''}{pos.pnlPct.toFixed(2)}%
                   </td>
-                  <td className="px-3 py-2.5">
-                    <button onClick={() => removePosition(pos.id)} className="text-tv-muted hover:text-tv-red transition-colors text-xs">✕</button>
+                  <td className="px-3 py-2.5 whitespace-nowrap">
+                    <button onClick={() => setEditing(pos)} title="Edit" className="text-tv-muted hover:text-tv-blue transition-colors text-sm px-1">✎</button>
+                    <button onClick={() => removePosition(pos)} title="Hapus" className="text-tv-muted hover:text-tv-red transition-colors text-sm px-1">🗑</button>
                   </td>
                 </tr>
               ))}
@@ -193,44 +205,50 @@ export default function Portfolio({ showToast }) {
         </div>
       )}
 
-      {showAdd && <AddPositionModal onAdd={addPosition} onClose={() => setShowAdd(false)} />}
+      {showAdd && <PositionModal onSave={addPosition} onClose={() => setShowAdd(false)} />}
+      {editing && <PositionModal initial={editing} onSave={updatePosition} onClose={() => setEditing(null)} />}
     </div>
   )
 }
 
-function AddPositionModal({ onAdd, onClose }) {
-  const [symbol, setSymbol] = useState('')
-  const [lots,   setLots]   = useState('')
-  const [avg,    setAvg]    = useState('')
+function PositionModal({ initial, onSave, onClose }) {
+  const [symbol, setSymbol] = useState(initial?.symbol ?? '')
+  const [lots,   setLots]   = useState(initial ? String(initial.qty / 100) : '')
+  const [avg,    setAvg]    = useState(initial ? String(initial.buyPrice) : '')
 
   const handle = (e) => {
     e.preventDefault()
-    if (!symbol || !lots || !avg) return
+    if (!symbol.trim() || !(+lots > 0) || !(+avg > 0)) return
     // 1 lot = 100 lembar; avg price boleh desimal (mis. 615.02)
-    onAdd({ symbol: symbol.toUpperCase(), qty: +lots * 100, buyPrice: +avg })
+    onSave({ symbol: symbol.trim().toUpperCase(), qty: +lots * 100, buyPrice: +avg })
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 animate-fade-in"
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="bg-tv-card border border-tv-border rounded-2xl p-6 w-80 animate-slide-up shadow-2xl">
-        <div className="text-sm font-bold mb-4">Tambah Posisi</div>
+        <div className="text-sm font-bold mb-4">{initial ? 'Edit Posisi' : 'Tambah Posisi'}</div>
         <form onSubmit={handle} className="space-y-3">
           {[
             { label: 'Kode Saham',            value: symbol, set: setSymbol, type: 'text',   ph: 'BBCA' },
             { label: 'Balance (Lot)',         value: lots,   set: setLots,   type: 'number', ph: '39' },
-            { label: 'Harga Rata-rata (Avg)', value: avg,    set: setAvg,    type: 'number', ph: '615.02' },
+            { label: 'Harga Rata-rata (Avg)', value: avg,    set: setAvg,    type: 'money',  ph: '615,02' },
           ].map(f => (
             <div key={f.label}>
               <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1">{f.label}</label>
-              <input
-                type={f.type}
-                step={f.type === 'number' ? 'any' : undefined}
-                value={f.value}
-                onChange={e => f.set(e.target.value)}
-                placeholder={f.ph}
-                className="w-full bg-tv-input border border-tv-border rounded-lg px-3 py-2 text-sm outline-none focus:border-tv-blue transition-colors"
-              />
+              {f.type === 'money' ? (
+                <MoneyInput decimals value={f.value} onChange={f.set} placeholder={f.ph}
+                  className="w-full bg-tv-input border border-tv-border rounded-lg px-3 py-2 text-sm outline-none focus:border-tv-blue transition-colors" />
+              ) : (
+                <input
+                  type={f.type}
+                  step={f.type === 'number' ? 'any' : undefined}
+                  value={f.value}
+                  onChange={e => f.set(e.target.value)}
+                  placeholder={f.ph}
+                  className="w-full bg-tv-input border border-tv-border rounded-lg px-3 py-2 text-sm outline-none focus:border-tv-blue transition-colors"
+                />
+              )}
             </div>
           ))}
           <div className="flex gap-2 pt-2">
@@ -240,7 +258,7 @@ function AddPositionModal({ onAdd, onClose }) {
             </button>
             <button type="submit"
               className="flex-1 py-2 text-xs rounded-lg bg-tv-blue text-white font-semibold hover:bg-tv-blue/80 transition-colors">
-              Tambah
+              {initial ? 'Simpan' : 'Tambah'}
             </button>
           </div>
         </form>

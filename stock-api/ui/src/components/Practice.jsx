@@ -1,17 +1,27 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
 import { api } from '../api'
 import { fmt, APEX_DARK } from '../utils'
-import { DEFAULT_SCORE, DAILY_GOAL, BADGES, nextScore, dayStr, liveDayStreak } from '../practiceScore'
+import MoneyInput from './MoneyInput'
+import { DEFAULT_SCORE, DAILY_GOAL, BADGES, nextScore, dayStr, liveDayStreak, simulateTrade } from '../practiceScore'
 
 const ReactApexChart = lazy(() => import('react-apexcharts'))
 
-// ── Latihan Prediksi Candle ──────────────────────────────────────────────────
-// Game: chart historis acak (saham & tanggal disembunyikan), tebak arah candle
-// besok, lalu dibedah: apa kata trend / RSI / pola candle — belajar dari tiap
-// tebakan. Skor & streak tersimpan di localStorage.
+// ── Latihan Trading Plan ─────────────────────────────────────────────────────
+// Game: chart historis acak (saham & tanggal disembunyikan), user pasang
+// Entry / TP / SL, lalu HORIZON candle berikutnya dibuka: TP kena duluan = benar.
+// Dinilai juga dalam R (untung ÷ risiko) supaya TP mepet + SL jauh tidak "menang".
+// Skor & streak tersimpan di localStorage.
 
-const SCORE_KEY = 'idx_practice_v1'
+const SCORE_KEY = 'idx_practice_v2'   // v1 = game tebak arah, aturannya beda — statistik dimulai ulang
 const WINDOW = 60          // candle yang ditampilkan
+const HORIZON = 10         // candle masa depan untuk menjalankan trade
+const RESULT_TEXT = {
+  tp: ['✅ TP KENA — BENAR', 'text-tv-green', 'border-tv-green/40 bg-tv-green/5'],
+  sl: ['❌ KENA SL — SALAH', 'text-tv-red', 'border-tv-red/40 bg-tv-red/5'],
+  timeout: [`⏳ ${HORIZON} HARI HABIS — TP tidak kena`, 'text-tv-yellow', 'border-tv-yellow/40 bg-tv-yellow/5'],
+  unfilled: ['🚫 ORDER TIDAK TERISI', 'text-tv-muted', 'border-tv-border bg-tv-bg'],
+}
+const fmtR = r => `${r >= 0 ? '+' : ''}${r.toFixed(2)}R`
 // merge dengan default: skor lama (tanpa field streak harian/badge) tetap terbaca
 const loadScore = () => {
   try { return { ...DEFAULT_SCORE, ...JSON.parse(localStorage.getItem(SCORE_KEY)) } }
@@ -128,11 +138,12 @@ function buildSignals(bars) {
 
 export default function Practice({ stocks = [] }) {
   const [score, setScore]     = useState(loadScore)
-  const [round, setRound]     = useState(null)   // { symbol, bars, answerBar, futureBars }
+  const [round, setRound]     = useState(null)   // { symbol, bars, futureBars }
   const [phase, setPhase]     = useState('load') // load | guess | reveal
-  const [guess, setGuess]     = useState(null)   // 'up' | 'down'
+  const [plan, setPlan]       = useState({ entry: '', tp: '', sl: '' })
+  const [trade, setTrade]     = useState(null)   // hasil simulateTrade
   const [err, setErr]         = useState(null)
-  const [earned, setEarned]   = useState([])     // badge baru dari tebakan terakhir
+  const [earned, setEarned]   = useState([])     // badge baru dari trade terakhir
 
   const eligible = useMemo(() => stocks.filter(s => (s.data_points || 0) >= WINDOW + 30), [stocks])
 
@@ -142,115 +153,111 @@ export default function Practice({ stocks = [] }) {
   }
 
   const newRound = async () => {
-    setPhase('load'); setGuess(null); setErr(null); setEarned([])
+    setPhase('load'); setTrade(null); setErr(null); setEarned([])
     try {
       if (!eligible.length) throw new Error('Butuh minimal 1 saham dengan ≥90 hari data — tambah saham dulu di Watchlist.')
       const pick = eligible[Math.floor(Math.random() * eligible.length)]
       const resp = await api.stocks.get(pick.symbol, 2000)
       const all = resp?.prices || []
-      if (all.length < WINDOW + 10) throw new Error(`Data ${pick.symbol} kurang panjang, coba lagi.`)
-      // titik potong acak: sisakan ≥4 bar masa depan untuk konteks reveal
-      const cut = WINDOW + Math.floor(Math.random() * (all.length - WINDOW - 4))
-      setRound({
-        symbol: pick.symbol,
-        bars: all.slice(cut - WINDOW, cut),
-        answerBar: all[cut],
-        futureBars: all.slice(cut + 1, cut + 4),
-      })
+      if (all.length < WINDOW + HORIZON) throw new Error(`Data ${pick.symbol} kurang panjang, coba lagi.`)
+      // titik potong acak: sisakan HORIZON bar masa depan untuk menjalankan trade
+      const cut = WINDOW + Math.floor(Math.random() * (all.length - WINDOW - HORIZON + 1))
+      const bars = all.slice(cut - WINDOW, cut)
+      const last = bars[bars.length - 1].close
+      setRound({ symbol: pick.symbol, bars, futureBars: all.slice(cut, cut + HORIZON) })
+      // default: entry di close terakhir, SL -3%, TP +6% (R/R 1:2) — tinggal digeser
+      setPlan({ entry: last, sl: Math.round(last * 0.97), tp: Math.round(last * 1.06) })
       setPhase('guess')
     } catch (e) { setErr(e.message); setPhase('guess') }
   }
 
   useEffect(() => { newRound() }, [])   // first round on mount
 
-  const answer = (dir) => {
-    if (phase !== 'guess' || !round) return
-    setGuess(dir)
-    const lastClose = round.bars[round.bars.length - 1].close
-    const tie = round.answerBar.close === lastClose
-    const up = round.answerBar.close > lastClose
-    // seri (close sama persis) tidak dihitung salah — dianggap benar apa pun tebakannya
-    const correct = tie || (dir === 'up') === up
-    // konsensus sinyal dihitung dari bar sebelum tebakan — tidak bocor jawaban
-    const konsensus = analysis?.konsensus
-    const followed = konsensus != null && konsensus !== 'netral' && (dir === 'up') === (konsensus === 'naik')
-    const next = nextScore(score, { correct, followed, today: dayStr() })
-    saveScore(next.score)
-    setEarned(next.earned)
+  const entry = Number(plan.entry), tp = Number(plan.tp), sl = Number(plan.sl)
+  const planErr = !(entry > 0 && tp > 0 && sl > 0) ? 'Isi Entry, TP, dan SL dengan harga.'
+    : !(sl < entry && entry < tp) ? 'Harus SL < Entry < TP (ini latihan beli/long).'
+    : null
+  const rr = planErr ? null : (tp - entry) / (entry - sl)
+
+  const submit = () => {
+    if (phase !== 'guess' || !round || planErr) return
+    const t = simulateTrade(round.bars[round.bars.length - 1].close, round.futureBars, { entry, tp, sl })
+    setTrade(t)
+    // order tidak terisi = tidak ada trade → tidak dinilai
+    if (t.result !== 'unfilled') {
+      // konsensus sinyal dihitung dari bar sebelum entry — tidak bocor jawaban
+      const next = nextScore(score, { correct: t.result === 'tp', followed: analysis?.konsensus === 'naik', r: t.r, today: dayStr() })
+      saveScore(next.score)
+      setEarned(next.earned)
+    }
     setPhase('reveal')
   }
 
   // ── derived (analisis edukatif) ────────────────────────────────────────────
   const analysis = useMemo(() => {
     if (!round) return null
-    const last = round.bars[round.bars.length - 1].close
-    const a = round.answerBar
-    const up = a.close > last
-    const tie = a.close === last
-    const chg = (a.close / last - 1) * 100
-    // anatomi candle jawaban: gap open + pergerakan intraday
-    const gap = a.open - last
-    const gapPct = (gap / last) * 100
-    const intraday = a.close - a.open
-    const candleGreen = a.close > a.open
-    // divergensi: warna candle ≠ arah close-to-close (biang "kok hijau tapi salah?")
-    const divergence = !tie && candleGreen !== up && intraday !== 0
     const signals = buildSignals(round.bars)
     const naik = signals.filter(s => s.arah === 'naik').length
     const turun = signals.filter(s => s.arah === 'turun').length
     const konsensus = naik > turun ? 'naik' : turun > naik ? 'turun' : 'netral'
-    return { up, tie, chg, lastClose: last, gap, gapPct, intraday, candleGreen, divergence, signals, naik, turun, konsensus }
+    return { lastClose: round.bars[round.bars.length - 1].close, signals, naik, turun, konsensus }
   }, [round])
 
-  const correct = phase === 'reveal' && guess != null && analysis != null && (analysis.tie || (guess === 'up') === analysis.up)
+  // arah "sebenarnya" untuk menilai sinyal: TP = naik, SL = turun, timeout = tanda R
+  const actual = !trade || trade.result === 'unfilled' ? null
+    : trade.result === 'tp' ? 'naik' : trade.result === 'sl' ? 'turun' : trade.r >= 0 ? 'naik' : 'turun'
   const accuracy = score.total > 0 ? (score.correct / score.total) * 100 : 0
   const today = dayStr()
   const roundsToday = score.day === today ? score.dayRounds : 0
   const dayStreak = liveDayStreak(score, today)
 
   // ── chart series ───────────────────────────────────────────────────────────
-  const series = useMemo(() => {
-    if (!round) return []
-    const shown = phase === 'reveal'
-      ? [...round.bars, round.answerBar, ...round.futureBars]
-      : round.bars
-    return [{
-      data: shown.map((b, i) => ({ x: i, y: [b.open, b.high, b.low, b.close] })),
-    }]
-  }, [round, phase])
+  const shown = useMemo(() => !round ? [] : phase === 'reveal' ? [...round.bars, ...round.futureBars] : round.bars, [round, phase])
+  const series = useMemo(() => [{
+    data: shown.map((b, i) => ({ x: i, y: [b.open, b.high, b.low, b.close] })),
+  }], [shown])
 
-  const chartOpts = useMemo(() => ({
-    ...APEX_DARK,
-    chart: { ...APEX_DARK.chart, type: 'candlestick', height: 340, toolbar: { show: false }, animations: { enabled: true, speed: 350 } },
-    plotOptions: { candlestick: { colors: { upward: '#2ebd85', downward: '#f6465d' } } },
-    // sembunyikan tanggal supaya tidak bisa "hafal" — sumbu pakai index
-    xaxis: { type: 'numeric', labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
-    yaxis: { labels: { style: { colors: '#8a8f98', fontSize: '10px' }, formatter: v => fmt.price(v) } },
-    grid: { borderColor: 'rgba(255,255,255,0.06)' },
-    tooltip: { theme: 'dark' },
-    annotations: phase === 'reveal' && round ? {
-      xaxis: [{ x: WINDOW - 0.5, borderColor: '#5e6ad2', strokeDashArray: 4, label: { text: 'tebakanmu di sini', orientation: 'horizontal', style: { background: '#5e6ad2', color: '#fff', fontSize: '9px' } } }],
-    } : {},
-  }), [phase, round])
+  const chartOpts = useMemo(() => {
+    const line = (y, text, color) => ({ y, borderColor: color, strokeDashArray: 4, label: { text: `${text} ${fmt.price(y)}`, position: 'left', textAnchor: 'start', style: { background: color, color: '#fff', fontSize: '9px' } } })
+    const lines = planErr ? [] : [line(tp, 'TP', '#2ebd85'), line(entry, 'Entry', '#5e6ad2'), line(sl, 'SL', '#f6465d')]
+    // rentang sumbu Y ikut mencakup garis TP/SL supaya tetap terlihat walau di luar range harga
+    const lows = shown.map(b => b.low), highs = shown.map(b => b.high)
+    const lo = Math.min(...lows, ...(planErr ? [] : [sl])), hi = Math.max(...highs, ...(planErr ? [] : [tp]))
+    const pad = (hi - lo) * 0.04
+    return {
+      ...APEX_DARK,
+      chart: { ...APEX_DARK.chart, type: 'candlestick', height: 340, toolbar: { show: false }, animations: { enabled: true, speed: 350 } },
+      plotOptions: { candlestick: { colors: { upward: '#2ebd85', downward: '#f6465d' } } },
+      // sembunyikan tanggal supaya tidak bisa "hafal" — sumbu pakai index
+      xaxis: { type: 'numeric', labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
+      yaxis: { min: lo - pad, max: hi + pad, labels: { style: { colors: '#8a8f98', fontSize: '10px' }, formatter: v => fmt.price(v) } },
+      grid: { borderColor: 'rgba(255,255,255,0.06)' },
+      tooltip: { theme: 'dark' },
+      annotations: {
+        yaxis: lines,
+        xaxis: phase === 'reveal' ? [{ x: WINDOW - 0.5, borderColor: '#8a8f98', strokeDashArray: 2, label: { text: 'plan dipasang di sini', orientation: 'horizontal', style: { background: '#2a2e39', color: '#fff', fontSize: '9px' } } }] : [],
+      },
+    }
+  }, [phase, shown, planErr, entry, tp, sl])
 
   return (
     <div className="p-5 sm:p-8 max-w-4xl mx-auto">
       {/* ── Hero + skor ────────────────────────────────────── */}
       <div className="text-center mb-5 animate-fade-in">
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-          <span className="float-y">🎮</span> <span className="text-gradient-animate">Latihan Prediksi</span>
+          <span className="float-y">🎮</span> <span className="text-gradient-animate">Latihan Trading Plan</span>
         </h1>
-        <p className="text-xs text-tv-muted mt-1.5">Chart asli IDX, saham & tanggal dirahasiakan. Tebak arah candle besok — lalu pelajari kenapa.</p>
+        <p className="text-xs text-tv-muted mt-1.5">Chart asli IDX, saham & tanggal dirahasiakan. Pasang Entry, TP, dan SL — lalu lihat {HORIZON} hari berikutnya.</p>
       </div>
 
       <div className="grid grid-cols-4 gap-2 mb-5">
         {[
-          { label: 'Akurasi', val: `${accuracy.toFixed(0)}%`, tone: accuracy >= 55 ? 'text-tv-green' : accuracy >= 45 ? 'text-tv-yellow' : 'text-tv-red' },
+          { label: 'TP kena', val: `${accuracy.toFixed(0)}%`, tone: 'text-tv-text', title: 'Persentase trade yang kena TP duluan' },
           { label: 'Benar', val: `${score.correct}/${score.total}`, tone: 'text-tv-text' },
-          { label: 'Streak', val: `${score.streak} 🔥`, tone: 'text-tv-text' },
-          { label: 'Best', val: score.best, tone: 'text-tv-purple' },
+          { label: 'Total R', val: fmtR(score.totalR), tone: score.totalR >= 0 ? 'text-tv-green' : 'text-tv-red', title: 'Jumlah untung/rugi dalam satuan risiko. +1R = untung sebesar jarak Entry→SL' },
+          { label: 'Streak', val: `${score.streak} 🔥`, tone: 'text-tv-text', title: `Terbaik ${score.best}` },
         ].map(c => (
-          <div key={c.label} className="bg-tv-card border border-tv-border rounded-xl px-3 py-2.5 text-center">
+          <div key={c.label} title={c.title} className="bg-tv-card border border-tv-border rounded-xl px-3 py-2.5 text-center">
             <div className="text-[9px] text-tv-muted uppercase font-bold">{c.label}</div>
             <div className={`text-base font-extrabold tabular-nums ${c.tone}`}>{c.val}</div>
           </div>
@@ -298,7 +305,7 @@ export default function Practice({ stocks = [] }) {
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-tv-muted">
               {phase === 'reveal' && round
-                ? <>📌 Jawaban: <span className="text-tv-blue">{round.symbol}</span> · {round.answerBar.date}</>
+                ? <>📌 Jawaban: <span className="text-tv-blue">{round.symbol}</span> · {round.futureBars[0].date}</>
                 : <>Saham: <span className="text-tv-purple">???</span> · Periode: <span className="text-tv-purple">???</span></>}
             </span>
             <span className="text-[10px] text-tv-muted">{WINDOW} candle terakhir</span>
@@ -312,40 +319,61 @@ export default function Practice({ stocks = [] }) {
             </Suspense>
           )}
 
-          {/* ── tombol tebak / hasil ──────────────────────────── */}
-          {phase === 'guess' && (
+          {/* ── form plan / hasil ──────────────────────────────── */}
+          {phase === 'guess' && round && (
             <>
-              <div className="flex items-center justify-center gap-3 mt-4">
-                <button onClick={() => answer('up')}
-                  className="flex-1 max-w-[220px] py-3.5 rounded-xl font-extrabold text-sm border-2 border-tv-green/40 bg-tv-green/10 text-tv-green
-                    transition-all duration-200 hover:bg-tv-green/20 hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(46,189,133,0.3)] active:scale-95">
-                  📈 NAIK
-                </button>
-                <button onClick={() => answer('down')}
-                  className="flex-1 max-w-[220px] py-3.5 rounded-xl font-extrabold text-sm border-2 border-tv-red/40 bg-tv-red/10 text-tv-red
-                    transition-all duration-200 hover:bg-tv-red/20 hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(246,70,93,0.3)] active:scale-95">
-                  📉 TURUN
-                </button>
+              <div className="grid grid-cols-3 gap-2 mt-4">
+                {[
+                  { key: 'entry', label: 'Entry (beli)', tone: 'text-tv-blue border-tv-blue/40' },
+                  { key: 'tp', label: 'Take Profit', tone: 'text-tv-green border-tv-green/40' },
+                  { key: 'sl', label: 'Stop Loss', tone: 'text-tv-red border-tv-red/40' },
+                ].map(f => (
+                  <label key={f.key} className="text-[10px] font-bold text-tv-muted uppercase">
+                    {f.label}
+                    <MoneyInput value={plan[f.key]}
+                      onChange={v => setPlan(p => ({ ...p, [f.key]: v }))}
+                      className={`mt-1 w-full bg-tv-input border rounded-lg px-3 py-2 text-sm font-bold tabular-nums ${f.tone}`} />
+                    {f.key !== 'entry' && entry > 0 && Number(plan[f.key]) > 0 && (
+                      <span className="block mt-0.5 font-normal normal-case tabular-nums">
+                        {((Number(plan[f.key]) / entry - 1) * 100).toFixed(1)}% dari entry
+                      </span>
+                    )}
+                  </label>
+                ))}
               </div>
-              <p className="text-[10px] text-tv-muted text-center mt-2">
-                Yang dinilai: <b className="text-tv-text">close besok vs close terakhir</b> — bukan warna candle. Candle hijau bisa tetap "turun" kalau open-nya gap ke bawah.
+              <div className="text-[11px] text-center mt-2 text-tv-muted">
+                Close terakhir <b className="text-tv-text">{fmt.price(analysis.lastClose)}</b>
+                {rr != null && <> · R/R <b className={rr >= 1.5 ? 'text-tv-green' : rr >= 1 ? 'text-tv-yellow' : 'text-tv-red'}>1 : {rr.toFixed(2)}</b></>}
+                {planErr && <div className="text-tv-red mt-1">{planErr}</div>}
+              </div>
+              <button onClick={submit} disabled={!!planErr}
+                className="w-full mt-3 py-3.5 rounded-xl font-extrabold text-sm border-2 border-tv-blue/40 bg-tv-blue/10 text-tv-blue
+                  transition-all duration-200 hover:bg-tv-blue/20 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none">
+                ▶ Jalankan {HORIZON} hari ke depan
+              </button>
+              <p className="text-[10px] text-tv-muted text-center mt-2 leading-relaxed">
+                <b className="text-tv-text">Benar</b> = harga menyentuh TP sebelum SL dalam {HORIZON} hari.
+                Entry di bawah harga sekarang = tunggu harga turun ke situ; di atas = beli saat tembus. Kalau tidak pernah tersentuh, order tidak terisi (tidak dinilai).
+                {' '}<b className="text-tv-text">R</b> = untung ÷ risiko: TP mepet + SL jauh mungkin sering "benar", tapi Total R-nya bisa minus.
               </p>
             </>
           )}
 
-          {phase === 'reveal' && analysis && (
+          {phase === 'reveal' && analysis && trade && (
             <div className="mt-4 space-y-3 animate-slide-up">
               {/* hasil */}
-              <div className={`pop-in rounded-xl border-2 p-4 text-center ${correct ? 'border-tv-green/40 bg-tv-green/5' : 'border-tv-red/40 bg-tv-red/5'}`}>
-                <div className={`text-xl font-extrabold ${correct ? 'text-tv-green' : 'text-tv-red'}`}>
-                  {analysis.tie ? '🤝 SERI — dihitung benar' : correct ? '✅ BENAR!' : '❌ SALAH'}
+              <div className={`pop-in rounded-xl border-2 p-4 text-center ${RESULT_TEXT[trade.result][2]}`}>
+                <div className={`text-xl font-extrabold ${RESULT_TEXT[trade.result][1]}`}>
+                  {RESULT_TEXT[trade.result][0]}
+                  {trade.result !== 'unfilled' && <span className="ml-2 tabular-nums">{fmtR(trade.r)}</span>}
                 </div>
-                <div className="text-xs text-tv-muted mt-1">
-                  {analysis.tie
-                    ? <>Close sama persis ({fmt.price(analysis.lastClose)})</>
-                    : <>Besoknya {analysis.up ? 'NAIK' : 'TURUN'} <b className={analysis.up ? 'text-tv-green' : 'text-tv-red'}>{analysis.chg >= 0 ? '+' : ''}{analysis.chg.toFixed(2)}%</b>
-                      {' '}(close {fmt.price(analysis.lastClose)} → {fmt.price(round.answerBar.close)})</>}
-                  {correct && score.streak > 1 && <span className="ml-1">· streak {score.streak} 🔥</span>}
+                <div className="text-xs text-tv-muted mt-1 leading-relaxed">
+                  {trade.result === 'unfilled'
+                    ? <>Harga tidak pernah menyentuh entry {fmt.price(entry)} dalam {HORIZON} hari — tidak ada trade, skor tidak berubah.</>
+                    : <>Terisi hari ke-{trade.fillIdx + 1} di {fmt.price(trade.fillPrice)}
+                      {' '}→ {trade.result === 'timeout' ? `ditutup di close hari ke-${HORIZON}` : `${trade.result === 'tp' ? 'TP' : 'SL'} kena hari ke-${trade.exitIdx + 1}`} di {fmt.price(trade.exitPrice)}
+                      {' '}(<b className={trade.exitPrice >= trade.fillPrice ? 'text-tv-green' : 'text-tv-red'}>{trade.exitPrice >= trade.fillPrice ? '+' : ''}{((trade.exitPrice / trade.fillPrice - 1) * 100).toFixed(2)}%</b>)
+                      {trade.result === 'tp' && score.streak > 1 && <span className="ml-1">· streak {score.streak} 🔥</span>}</>}
                 </div>
               </div>
 
@@ -362,30 +390,17 @@ export default function Practice({ stocks = [] }) {
                 </div>
               )}
 
-              {/* anatomi candle jawaban — kenapa hijau/merah ≠ naik/turun */}
-              {analysis.divergence && (
-                <div className="rounded-xl border border-tv-yellow/40 bg-tv-yellow/5 p-3 text-[11px] leading-relaxed">
-                  <b className="text-tv-yellow">⚠️ Candle-nya {analysis.candleGreen ? 'HIJAU' : 'MERAH'} tapi dinilai {analysis.up ? 'NAIK' : 'TURUN'} — ini bukan bug.</b>{' '}
-                  <span className="text-tv-muted">
-                    Harga open {analysis.gap > 0 ? 'gap NAIK' : 'gap TURUN'} <b className="text-tv-text">{analysis.gapPct >= 0 ? '+' : ''}{analysis.gapPct.toFixed(2)}%</b> dari close kemarin
-                    ({fmt.price(analysis.lastClose)} → open {fmt.price(round.answerBar.open)}), lalu intraday bergerak {analysis.intraday > 0 ? 'naik' : 'turun'} {fmt.price(Math.abs(analysis.intraday))}.
-                    Warna candle = open→close <i>hari itu</i>; penilaian = close→close <i>antar hari</i>. Dua hal berbeda — gap yang menentukan.
-                  </span>
-                </div>
-              )}
-
               {/* bedah analisis — tiap sinyal dinilai benar/salah */}
               <div className="bg-tv-bg border border-tv-border rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold text-tv-muted uppercase">🔬 Bedah: {analysis.signals.length} sinyal sebelum candle ini</span>
+                  <span className="text-[10px] font-bold text-tv-muted uppercase">🔬 Bedah: {analysis.signals.length} sinyal saat plan dipasang</span>
                   <span className="text-[10px] text-tv-muted">
                     konsensus: <b className={analysis.konsensus === 'naik' ? 'text-tv-green' : analysis.konsensus === 'turun' ? 'text-tv-red' : 'text-tv-yellow'}>{analysis.konsensus.toUpperCase()}</b> ({analysis.naik}↑ {analysis.turun}↓)
                   </span>
                 </div>
                 <div className="space-y-1.5">
                   {analysis.signals.map(s => {
-                    const actual = analysis.up ? 'naik' : 'turun'
-                    const hit = analysis.tie ? null : s.arah === 'netral' ? null : s.arah === actual
+                    const hit = actual == null || s.arah === 'netral' ? null : s.arah === actual
                     return (
                       <div key={s.nama} className="flex items-start gap-2 bg-tv-card rounded-lg px-3 py-2 border border-tv-border text-[11px]">
                         <span className="w-5 text-center shrink-0">{hit == null ? '·' : hit ? '✓' : '✗'}</span>
@@ -400,11 +415,12 @@ export default function Practice({ stocks = [] }) {
                 </div>
                 <p className="text-[11px] text-tv-muted mt-3 leading-relaxed">
                   {analysis.konsensus !== 'netral'
-                    ? <>Mayoritas sinyal bilang <b className="text-tv-text">{analysis.konsensus}</b>{!analysis.tie && ((analysis.konsensus === 'naik') === analysis.up
+                    ? <>Mayoritas sinyal bilang <b className="text-tv-text">{analysis.konsensus}</b>{actual != null && (analysis.konsensus === actual
                         ? <> — dan pasar menurutinya. Begini rasanya trading <i>dengan</i> konfluensi.</>
-                        : <> — tapi pasar melawan. Ini pelajaran penting: sinyal = probabilitas, bukan kepastian.</>)}</>
-                    : <>Sinyal berimbang — arah harian nyaris koin lempar; di sinilah trader disiplin memilih <i>tidak trading</i>.</>}
-                  {' '}Satu candle = noise; yang menghasilkan uang adalah <b className="text-tv-text">probabilitas + risk management</b>. Akurasi 55% dengan R/R 1:2 sudah sangat profitable.
+                        : <> — tapi pasar melawan. Ini pelajaran penting: sinyal = probabilitas, bukan kepastian.</>)}
+                        {analysis.konsensus === 'turun' && <> Beli saat mayoritas sinyal turun = melawan arus.</>}</>
+                    : <>Sinyal berimbang — di sinilah trader disiplin sering memilih <i>tidak trading</i>.</>}
+                  {' '}Satu trade = noise; yang menghasilkan uang adalah <b className="text-tv-text">probabilitas + risk management</b>. TP kena 40% saja sudah untung kalau R/R-nya 1:2.
                 </p>
               </div>
 

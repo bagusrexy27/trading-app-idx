@@ -51,15 +51,15 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `analysis/bandar.go` | Bandarmology (broker accumulation/distribution) analysis over broker-summary data |
 | `analysis/advisor.go` | Rule-based price-action decision engine — verdict `STRONG_BUY \| BUY \| WAIT \| AVOID \| REDUCE` with confidence, stop/target, Indonesian action text; tests in `advisor_test.go` |
 | `analysis/advisor_backtest.go` | Backtests the advisor's signals over history |
-| `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP, bull/side/bear probability. Low-confidence results downgrade to WAIT. Separate from (and newer than) the Advisor's if/else tree. `DecisionEngineWithBroker` folds in broker data |
+| `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP. Low-confidence results downgrade to WAIT. Separate from (and newer than) the Advisor's if/else tree. `DecisionEngineWithBroker` folds in broker data |
 | `analysis/decision_backtest.go` | Backtests the decision engine |
-| `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50): plan = entry next open, WIN if TP1 before stop within 20 bars. `Decision.Probability` is only a formula of the score — this table is the measured counterpart |
+| `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50): plan = entry next open, WIN if TP1 before stop within 20 bars. Also the **projection**: per regime × 5/10/20-bar horizon × score bucket, % of cases ending Bullish/Sideways/Bearish (move beyond 0.5 × ATR% × √h) + p10–p90 range — the only bull/side/bear odds in the app (`Projection.jsx`) |
 | `analysis/fvg.go` | Fair Value Gap detection (also feeds decision engine confluence) |
 | `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate` |
 | `handlers/analysis.go` | All `/api/analysis/*` endpoints (calls `analysis.*`) |
 | `handlers/advisor.go` | Advisor, decision, and their backtest endpoints for one symbol |
 | `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true`) |
-| `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar changes; fetches `^JKSE` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
+| `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar or stock count changes; fetches `^JKSE` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
 | `handlers/syariah.go` | Hardcoded ISSI syariah symbol set (`isSyariah`) — edit manually when OJK's DES list changes |
 | `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative analysis (no external LLM); uses signals, indicators, pattern detection, and uploaded reports text |
 | `handlers/backtest.go` | `GET /api/analysis/{symbol}/backtest` — simulates BUY/SELL on composite-signal change at next open; returns trades + summary |

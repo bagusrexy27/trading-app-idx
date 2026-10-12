@@ -18,8 +18,20 @@ curl -s http://localhost:1111/api/ihsg
 ```
 
 - Sukses → lanjut (pakai juga angka IHSG ini sebagai konteks pasar di report).
-- Gagal/refused → server mati. Bilang ke user: jalankan `./stock-api.exe` dari
-  `stock-api/` dulu, lalu stop. Jangan lanjut.
+- Gagal/refused → server mati. Nyalakan sendiri, jangan nanya user:
+
+  ```bash
+  cmd //c start "IDX Backend :1111" //d "D:\Code\trading-app-idx\stock-api" cmd //k air
+  curl -s --retry 45 --retry-connrefused --retry-delay 2 --retry-all-errors http://localhost:1111/api/ihsg
+  ```
+
+  Backend saja (tanpa frontend/browser), di jendela terminal sendiri, jadi prosesnya
+  tetap hidup walau giliran ini selesai. Curl menunggu ±90 detik
+  sampai `air` selesai compile. Sukses → lanjut. Masih gagal → bilang ke user cek
+  jendela "IDX Backend :1111" (biasanya error compile atau `air` belum terpasang),
+  lalu stop.
+  <!-- ponytail: jangan pakai run_in_background untuk stock-api.exe — di-kill tiap giliran. `cmd start` aman karena jendela terpisah. -->
+  
 
 ## Langkah 1b — Luncurkan 3 subagent riset makro (paralel, background)
 
@@ -75,16 +87,18 @@ curl -s "http://localhost:1111/api/advisor/screen?mode=all&min_turnover=2"
 
 Field per row: `symbol, close, signal, score, confidence, trend{long,medium,short,overall},
 structure, volume_state, entry_low, entry_high, entry_ideal, stop, target, risk_reward,
-probability{bullish,sideways,bearish}, turnover_bn, syariah, note, calibration`.
+turnover_bn, syariah, note, calibration`.
 Top-level: `regime` (`up` = IHSG di atas MA50, `down` = di bawah, `unknown`).
 
-**`probability` JANGAN ditampilkan sebagai peluang** — itu cuma rumus dari skor,
-bukan frekuensi terukur. Yang terukur ada di `calibration`:
+Yang terukur ada di `calibration`:
 - `win_rate`, `samples`, `avg_pnl_pct` — dari semua kasus historis dengan skor
   `score_lo`–`score_hi` di regime yang sama: % rencana yang kena TP1 sebelum stop
   dalam `horizon` (20) hari bursa, dan rata-rata hasil per trade.
 - `reliable` = false → sampel < 30, sebut "belum bisa dipercaya".
 - `stock{samples,win_rate,avg_pnl_pct}` — rekam jejak saham itu sendiri (hari sinyal beli).
+- `projection[]` — per `horizon` (5/10/20 hari bursa): `bullish/sideways/bearish` (% kasus
+  serupa yang naik/datar/turun melewati `threshold_pct`, ambang sesuai volatilitas saham),
+  `band_pct` = [p10, p25, median, p75, p90] hasil dalam %, `samples`, `reliable`.
 
 Win rate tinggi belum tentu untung (TP bisa lebih dekat dari stop) — yang menentukan
 `avg_pnl_pct`. Negatif = setup ini secara historis rugi.
@@ -133,6 +147,8 @@ Format:
    - Rekam jejak: kena TP `calibration.win_rate`% dari `calibration.samples` kasus serupa,
      rata-rata `calibration.avg_pnl_pct`%/trade · saham ini sendiri: `calibration.stock.win_rate`%
      (n=`calibration.stock.samples`). Tandai ⚠️ kalau `avg_pnl_pct` < 0 atau `reliable` false.
+   - Proyeksi 20 hari (`projection` horizon 20): Bullish X% · Sideways Y% · Bearish Z% ·
+     8 dari 10 kasus `band_pct[0]`% s/d `band_pct[4]`% (≈ harga dari `close`). Bearish > Bullish → ⚠️.
    - `📰 Berita:` dari langkah 3b (label + 1 kalimat). Negatif → ⚠️.
    - 1 baris alasan: dari trend + structure + volume_state (terjemahkan ke bahasa awam,
      mis. "struktur naik (higher-high), volume konfirmasi").

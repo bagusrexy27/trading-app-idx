@@ -12,8 +12,8 @@ import (
 // Weighted multi-factor scoring engine. Unlike the Advisor (hard if/else price
 // action tree), this scores every factor 0–100, combines them with fixed
 // weights, and outputs a transparent decision: 5-level signal, numeric
-// confidence, multi-timeframe trend, S/R zones, entry zone, tiered take
-// profit, and a bullish/sideways/bearish probability distribution.
+// confidence, multi-timeframe trend, S/R zones, entry zone, and tiered take
+// profit. Bull/side/bear odds are measured, not formulated — see calibration.go.
 //
 // Weights:
 //   Market Structure 23% · Trend EMA 16% · Money Flow 10% · Volume 10%
@@ -50,12 +50,6 @@ type TPLevel struct {
 	Portion string  `json:"portion"`
 }
 
-type Probability struct {
-	Bullish  int `json:"bullish"`
-	Sideways int `json:"sideways"`
-	Bearish  int `json:"bearish"`
-}
-
 // FactorScore is one row of the transparent scoring breakdown.
 type FactorScore struct {
 	Name   string `json:"name"`
@@ -78,7 +72,6 @@ type Decision struct {
 	StopLoss        float64       `json:"stop_loss"`
 	TakeProfit      []TPLevel     `json:"take_profit"`
 	RiskReward      float64       `json:"risk_reward"`
-	Probability     Probability   `json:"probability"`
 	Components      []FactorScore `json:"components"`
 	Note            string        `json:"note,omitempty"` // set when the signal was gated down
 }
@@ -556,11 +549,6 @@ func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay
 		signal = "WAIT"
 	}
 
-	// Probability distribution (always sums to 100).
-	sideways := 20 + int(math.Round((50-math.Abs(total-50))*0.4))
-	bullish := int(math.Round(float64(100-sideways) * total / 100))
-	bearish := 100 - sideways - bullish
-
 	return Decision{
 		Signal:          signal,
 		Confidence:      confidence,
@@ -575,7 +563,6 @@ func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay
 		StopLoss:        stop,
 		TakeProfit:      tp,
 		RiskReward:      R2(rr),
-		Probability:     Probability{Bullish: bullish, Sideways: sideways, Bearish: bearish},
 		Components:      comps,
 		Note:            note,
 	}

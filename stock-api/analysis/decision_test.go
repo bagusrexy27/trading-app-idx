@@ -32,9 +32,6 @@ func synthPrices(n int) []models.StockPrice {
 func TestDecisionEngineInvariants(t *testing.T) {
 	d := DecisionEngine(synthPrices(120))
 
-	if got := d.Probability.Bullish + d.Probability.Sideways + d.Probability.Bearish; got != 100 {
-		t.Errorf("probability must sum to 100, got %d", got)
-	}
 	valid := map[string]bool{"STRONG_BUY": true, "BUY": true, "WAIT": true, "SELL": true, "STRONG_SELL": true}
 	if !valid[d.Signal] {
 		t.Errorf("invalid signal %q", d.Signal)

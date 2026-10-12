@@ -4,6 +4,7 @@ import { api } from '../api'
 import { fmt } from '../utils'
 import { FVGZonesPrimitive } from './chart/FVGZonesPrimitive'
 import { FibZonesPrimitive } from './chart/FibZonesPrimitive'
+import { HorizonToggle, pickProj } from './Projection'
 
 // Batas atas proyeksi, dalam hari bursa. Panjang sebenarnya dihitung per saham
 // dari jarak target dibagi ATR — kalau dipatok tetap, semua saham tampil dengan
@@ -54,7 +55,8 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   const [showFvg, setShowFvg] = useState(false)
   const [fvgZones, setFvgZones] = useState(null) // 3 zona FVG/iFVG terdekat dari API
   const [showProj, setShowProj] = useState(false)
-  const [proj, setProj] = useState(null)         // Decision dari API (entry/stop/TP)
+  const [proj, setProj] = useState(null)         // Decision dari API (entry/stop/TP) + calibration
+  const [projH, setProjH] = useState(20)         // horizon kerucut terukur (hari bursa)
   // Indicator visibility toggles — klik legend untuk on/off
   const [showSma20, setShowSma20] = useState(true)
   const [showSma50, setShowSma50] = useState(true)
@@ -80,7 +82,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     if (!showProj || proj || !symbol) return
     let alive = true
     api.analysis.decision(symbol)
-      .then(r => { if (alive) setProj(r.decision) })
+      .then(r => { if (alive) setProj({ ...r.decision, calibration: r.calibration }) })
       .catch(() => { if (alive) setShowProj(false) })
     return () => { alive = false }
   }, [showProj, proj, symbol])
@@ -152,8 +154,11 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   const fvgPrimRef   = useRef(null)
   const fibPrimRef   = useRef(null)
   const planRef      = useRef(null)   // garis rencana: close → entry → TP1 → TP2
-  const coneUpRef    = useRef(null)   // batas atas kerucut ATR
+  const coneUpRef    = useRef(null)   // kerucut terukur: p90 / p10 (8 dari 10 kasus)
   const coneLoRef    = useRef(null)
+  const coneInUpRef  = useRef(null)   // p75 / p25 (separuh kasus)
+  const coneInLoRef  = useRef(null)
+  const coneMidRef   = useRef(null)   // median
   const stopLineRef  = useRef(null)
   const avwapRef     = useRef(null)
   const avwapOnRef   = useRef(false)  // dibaca handler klik (dibuat sekali di init)
@@ -238,9 +243,16 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
       color: PROJ_CONE + '80', lineWidth: 1, lineStyle: LineStyle.Dotted,
       priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
     })
-    planRef.current   = plan
-    coneUpRef.current = coneUp
-    coneLoRef.current = coneLo
+    const coneLine = (alpha, style) => chart.addSeries(LineSeries, {
+      color: PROJ_CONE + alpha, lineWidth: 1, lineStyle: style,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+    })
+    planRef.current     = plan
+    coneUpRef.current   = coneUp
+    coneLoRef.current   = coneLo
+    coneInUpRef.current = coneLine('c0', LineStyle.Solid)
+    coneInLoRef.current = coneLine('c0', LineStyle.Solid)
+    coneMidRef.current  = coneLine('ff', LineStyle.LargeDashed)
 
     const avwap = chart.addSeries(LineSeries, {
       color: AVWAP_COLOR, lineWidth: 2,
@@ -380,15 +392,16 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   // ── Proyeksi: jalur rencana + kerucut ATR ────────────────────────────
   useEffect(() => {
     const plan = planRef.current, up = coneUpRef.current, lo = coneLoRef.current
+    const cones = [lo, coneInLoRef.current, coneMidRef.current, coneInUpRef.current, up] // p10 … p90
     const candle = candleRef.current
-    if (!plan || !up || !lo || !candle) return
+    if (!plan || cones.some(c => !c) || !candle) return
 
     if (stopLineRef.current) {
       candle.removePriceLine(stopLineRef.current)
       stopLineRef.current = null
     }
     if (!showProj || !proj || !prices.length) {
-      plan.setData([]); up.setData([]); lo.setData([])
+      plan.setData([]); cones.forEach(c => c.setData([]))
       return
     }
 
@@ -406,8 +419,9 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     const tp1Bar = tp[0] ? Math.min(PROJ_MAX - 1, entryBar + barsFor(entry, tp[0].price)) : 0
     const tp2Bar = tp[1] ? Math.min(PROJ_MAX, tp1Bar + barsFor(tp[0].price, tp[1].price)) : 0
 
+    const pr = pickProj(proj.calibration, projH)
     const horizon = Math.max(entryBar, tp1Bar, tp2Bar) + 1
-    const fut = futureDates(last.date, horizon)
+    const fut = futureDates(last.date, Math.max(horizon, pr ? projH : 0))
     const at = b => fut[Math.min(b, fut.length) - 1]
 
     // Jalur rencana: harga sekarang → entry → TP1 → TP2 (yang tersedia saja).
@@ -416,18 +430,16 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     if (tp[1] && tp2Bar > tp1Bar)   pts.push({ time: at(tp2Bar), value: tp[1].price })
     plan.setData(pts)
 
-    // Kerucut melebar sebagai akar waktu, bukan linear — itu cara jujur
-    // menggambar ketidakpastian yang menumpuk. Garis lurus akan menyiratkan
-    // kepastian arah yang tidak dimiliki engine ini.
-    const cu = [{ time: last.date, value: last.close }]
-    const cl = [{ time: last.date, value: last.close }]
-    fut.forEach((d, i) => {
-      const w = atr14 * Math.sqrt(i + 1)
-      cu.push({ time: d, value: last.close + w })
-      cl.push({ time: d, value: Math.max(1, last.close - w) })
+    // Kerucut terukur: persentil hasil kasus historis serupa di hari ke-projH,
+    // ditarik mundur ke hari ke-t dengan akar waktu (ketidakpastian menumpuk
+    // seperti √t, bukan linear). Tanpa data kalibrasi → kerucut tidak digambar.
+    cones.forEach((c, q) => {
+      if (!pr) { c.setData([]); return }
+      c.setData([{ time: last.date, value: last.close }, ...fut.slice(0, projH).map((d, i) => ({
+        time: d,
+        value: Math.max(1, last.close * (1 + pr.band_pct[q] / 100 * Math.sqrt((i + 1) / projH))),
+      }))])
     })
-    up.setData(cu)
-    lo.setData(cl)
 
     if (proj.stop_loss) {
       stopLineRef.current = candle.createPriceLine({
@@ -436,7 +448,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         axisLabelVisible: true, title: 'Stop',
       })
     }
-  }, [showProj, proj, prices, atr14])
+  }, [showProj, proj, projH, prices, atr14])
 
   const yesterday = prices.length >= 2 ? prices[prices.length - 2] : null
   const today     = prices.length >= 1 ? prices[prices.length - 1] : null
@@ -490,7 +502,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         </button>
         <button
           onClick={() => setShowProj(v => !v)}
-          title="Proyeksi: jalur rencana Decision Engine (entry → TP) + kerucut ATR. Skenario, bukan ramalan harga."
+          title="Proyeksi: jalur rencana Decision Engine (entry → TP) + kerucut terukur dari kasus historis serupa. Skenario, bukan ramalan harga."
           className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
             ${showProj
               ? 'bg-tv-green/15 text-tv-green border border-tv-green/40 shadow-[0_0_12px_rgba(38,166,154,0.25)]'
@@ -498,6 +510,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         >
           ⤳ Projection
         </button>
+        {showProj && <HorizonToggle value={projH} onChange={setProjH} />}
         {avwapOn && (
           <span className="flex items-center gap-1 text-[10px]">
             {[['low', 'Low'], ['high', 'High'], ['vol', 'Vol×']].map(([k, lbl]) => (
@@ -593,9 +606,9 @@ const GLOSSARY = [
     how: 'Ini skenario, BUKAN ramalan. Artinya "kalau rencana ini berjalan, jalurnya kira-kira begini" — bukan "harga akan ke sini".',
   },
   {
-    icon: '⋯', color: 'text-tv-muted', term: 'Kerucut ATR',
-    what: 'Dua garis titik-titik yang melebar ke kanan, dihitung dari rata-rata rentang gerak harian (ATR).',
-    how: 'Menunjukkan seberapa lebar harga wajar bergerak ke depan. Makin jauh ke depan makin melebar, karena makin jauh makin tidak pasti.',
+    icon: '⋯', color: 'text-tv-muted', term: 'Kerucut proyeksi',
+    what: 'Garis abu-abu yang melebar ke kanan, diukur dari kasus historis dengan skor & kondisi IHSG serupa. Titik-titik luar = 8 dari 10 kasus berakhir di dalamnya, garis dalam = separuh kasus, putus-putus tengah = nilai tengah.',
+    how: 'Menunjukkan ke mana harga biasanya bergerak dalam 5/10/20 hari bursa — bukan ke mana harga PASTI pergi. Kalau nilai tengahnya miring ke bawah, kasus serupa dulu lebih sering turun.',
   },
 ]
 

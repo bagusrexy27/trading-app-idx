@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { api } from '../api'
 import { fmt, calibShort, REGIME_LABEL } from '../utils'
 import { tip } from '../glossary'
+import { HorizonToggle, ScenarioBar, pickProj, projEdge } from './Projection'
 
 const SIGNAL = {
   STRONG_BUY:  { label: 'STRONG BUY',  icon: '🚀', badge: 'bg-tv-green/15 text-tv-green border-tv-green/40', bar: 'bg-tv-green' },
@@ -30,8 +31,9 @@ function Chip({ children, tone = 'text-tv-muted' }) {
 const trendToneOf = (t) =>
   t?.includes('Bullish') ? 'text-tv-green' : t?.includes('Bearish') ? 'text-tv-red' : 'text-tv-yellow'
 
-function Card({ r, onSelect }) {
+function Card({ r, h, onSelect }) {
   const v = SIGNAL[r.signal] || SIGNAL.WAIT
+  const p = pickProj(r.calibration, h)
   return (
     <button
       onClick={() => onSelect(r.symbol)}
@@ -72,6 +74,13 @@ function Card({ r, onSelect }) {
         <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('rr')}>R/R</div><div className={`text-xs font-bold ${r.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-yellow'}`}>1:{r.risk_reward?.toFixed(1)}</div></div>
       </div>
 
+      {p && (
+        <div className="mb-3" title={`Dari ${p.samples} kasus serupa, ${h} hari bursa kemudian. Ambang ±${p.threshold_pct.toFixed(1)}% sesuai gerak wajar saham ini. 8 dari 10 kasus: ${fmt.pct(p.band_pct[0])} s/d ${fmt.pct(p.band_pct[4])}.`}>
+          <div className="text-[9px] text-tv-muted uppercase mb-1">Proyeksi {h} hari (terukur{p.reliable ? '' : ', sampel sedikit'})</div>
+          <ScenarioBar p={p} compact />
+        </div>
+      )}
+
       {r.note && (
         <p className="text-[10px] text-tv-yellow/90 mb-2 leading-snug border-l-2 border-tv-yellow/40 pl-2">
           {r.note}
@@ -99,6 +108,8 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
   const [minRR, setMinRR]         = useState(0)
   const [minConfidence, setMinConfidence] = useState(0)
   const [trendFilter, setTrendFilter] = useState('') // '' | 'Bullish' | 'Bearish'
+  const [horizon, setHorizon] = useState(20)
+  const [sortBy, setSortBy]   = useState('score') // 'score' (backend) | 'proj'
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
   const [reloadKey, setReloadKey] = useState(0)
@@ -126,6 +137,9 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
     (!volFilter || r.volume_state === volFilter) &&
     (!trendFilter || r.trend?.overall?.includes(trendFilter))
   )
+  if (sortBy === 'proj') {
+    results.sort((a, b) => projEdge(pickProj(b.calibration, horizon)) - projEdge(pickProj(a.calibration, horizon)))
+  }
 
   return (
     <div className="p-4 sm:p-6 max-w-5xl mx-auto">
@@ -133,7 +147,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       <div className="mb-5">
         <h1 className="text-xl font-extrabold flex items-center gap-2">🧭 Advisor Screener</h1>
         <p className="text-xs text-tv-muted mt-1">
-          Decision Engine ke semua saham: skor berbobot 11 faktor (struktur, trend, money flow, volume, S/R, momentum, ADX, candle, R/R, FVG, bandarmology). Diurutkan dari skor tertinggi.
+          Decision Engine ke semua saham: skor berbobot 11 faktor (struktur, trend, money flow, volume, S/R, momentum, ADX, candle, R/R, FVG, bandarmology). Diurutkan dari skor tertinggi, atau dari proyeksi terbaik (Bullish% − Bearish% terukur).
         </p>
       </div>
 
@@ -154,6 +168,8 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
         <Select label="Volume" value={volFilter} onChange={setVolFilter} strings options={[['', 'Semua'], ['Above Average', 'Di atas rata²'], ['Normal', 'Normal'], ['Below Average', 'Di bawah rata²']]} />
         <Select label="R/R" value={minRR} onChange={setMinRR} options={[[0, '≥1 (default)'], [1.5, '≥1.5'], [2, '≥2'], [3, '≥3']]} />
         <Select label="Trend" value={trendFilter} onChange={setTrendFilter} strings options={[['', 'Semua'], ['Bullish', 'Bullish'], ['Bearish', 'Bearish'], ['Sideways', 'Sideways']]} />
+        <Select label="Urutkan" value={sortBy} onChange={setSortBy} strings options={[['score', 'Skor'], ['proj', 'Proyeksi terbaik']]} />
+        <HorizonToggle value={horizon} onChange={setHorizon} />
         <button onClick={() => setSyariahOnly(s => !s)}
           className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${syariahOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}>
           ☪ Syariah aja
@@ -186,7 +202,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
         </div>
       ) : results.length ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {results.map(r => <Card key={r.symbol} r={r} onSelect={onSelectStock} />)}
+          {results.map(r => <Card key={r.symbol} r={r} h={horizon} onSelect={onSelectStock} />)}
         </div>
       ) : (
         <div className="text-center py-16 px-6">

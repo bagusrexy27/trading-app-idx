@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api'
+import MoneyInput from './MoneyInput'
 
 const STORAGE_KEY = 'idx_alerts_v1'
 const ALERT_TYPES = [
@@ -154,7 +155,7 @@ export default function AlertsPanel({ stocks, onClose }) {
               {ALERT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
             </select>
             {needsValue && (
-              <input type="number" value={value} onChange={e => setValue(e.target.value)}
+              <MoneyInput value={value} onChange={setValue}
                 placeholder="Harga target"
                 className="w-full bg-tv-card border border-tv-border rounded-lg px-2 py-1.5 text-xs outline-none focus:border-tv-blue" />
             )}

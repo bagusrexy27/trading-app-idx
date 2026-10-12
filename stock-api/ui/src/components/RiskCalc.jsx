@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { fmt } from '../utils'
+import MoneyInput from './MoneyInput'
 
 export default function RiskCalc({ data }) {
   const lastClose = data?.summary?.price?.close ?? 0
@@ -54,7 +55,7 @@ export default function RiskCalc({ data }) {
       <div className="bg-tv-card border border-tv-border rounded-xl p-4 grid grid-cols-3 gap-4">
         <div>
           <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Modal (Rp)</label>
-          <input type="number" value={modal} onChange={e => setModal(e.target.value)} className={inputCls} />
+          <MoneyInput value={modal} onChange={setModal} className={inputCls} />
         </div>
         <div>
           <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Risk / Trade %</label>
@@ -62,7 +63,7 @@ export default function RiskCalc({ data }) {
         </div>
         <div>
           <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Harga Entry</label>
-          <input type="number" value={entry} onChange={e => setEntry(e.target.value)} className={inputCls} />
+          <MoneyInput value={entry} onChange={setEntry} className={inputCls} />
         </div>
       </div>
 
@@ -157,7 +158,7 @@ function AvgCalc({ lastClose, inputCls }) {
         </div>
         <div>
           <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Harga Avg Sekarang</label>
-          <input type="number" value={curAvg} onChange={e => setCurAvg(e.target.value)} placeholder="cth: 487.17" className={inputCls} />
+          <MoneyInput decimals value={curAvg} onChange={setCurAvg} placeholder="cth: 487,17" className={inputCls} />
         </div>
       </div>
 
@@ -170,7 +171,7 @@ function AvgCalc({ lastClose, inputCls }) {
           </div>
           <div>
             <label className="text-[10px] text-tv-muted uppercase font-bold block mb-1.5">Harga Beli {buys.length > 1 ? `#${i + 1}` : 'Baru'}</label>
-            <input type="number" value={b.price} onChange={e => setBuy(i, 'price', e.target.value)} placeholder="harga" className={inputCls} />
+            <MoneyInput value={b.price} onChange={v => setBuy(i, 'price', v)} placeholder="harga" className={inputCls} />
           </div>
         </div>
       ))}

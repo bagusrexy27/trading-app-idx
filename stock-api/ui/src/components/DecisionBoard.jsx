@@ -1,19 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
-import { fmt, colorOf, calibShort } from '../utils'
+import { fmt, colorOf, calibShort, REGIME_LABEL } from '../utils'
 import { IconSharia } from './icons'
 import OmbakMeter from './OmbakMeter'
 import { tip } from '../glossary'
+import { ScenarioBar, pickProj } from './Projection'
+
+// Kolom beli memakai gerbang yang sama dengan screener mode=buy
+// (handlers/advisor_screen.go): R/R ≥ 1 dan transaksi ≥ 2 M/hari. Saham yang
+// BUY tapi tidak lolos jatuh ke "menunggu", bukan ke "hindari".
+const MIN_RR = 1, MIN_TURNOVER_BN = 2
+const isBuy = r => (r.signal === 'BUY' || r.signal === 'STRONG_BUY') && r.risk_reward >= MIN_RR && r.turnover_bn >= MIN_TURNOVER_BN
 
 // Alasan satu baris: pakai note dari engine kalau ada; kalau tidak, rakit dari
-// trend / structure / volume_state / rekam jejak historis — tanpa teks dikarang di frontend.
+// trend / structure / volume_state — tanpa teks dikarang di frontend.
 function reasonOf(r) {
   if (r.note) return r.note
   const bits = []
   if (r.trend?.overall) bits.push(r.trend.overall)
   if (r.structure) bits.push(r.structure)
   if (r.volume_state) bits.push(`Vol ${r.volume_state}`)
-  if (calibShort(r.calibration)) bits.push(calibShort(r.calibration))
   return bits.join(' · ') || '—'
 }
 
@@ -46,6 +52,8 @@ function TickerCard({ r, onSelect }) {
   const pct = r.change_pct
   const pos = (pct ?? 0) >= 0
   const buyish = r.signal === 'BUY' || r.signal === 'STRONG_BUY'
+  const c = r.calibration
+  const proj = buyish ? pickProj(c, 20) : null
   return (
     <button
       onClick={() => onSelect(r.symbol)}
@@ -56,7 +64,7 @@ function TickerCard({ r, onSelect }) {
         <span className="font-extrabold text-sm tracking-tight group-hover:text-tv-blue transition-colors">{r.symbol}</span>
         {r.syariah && (
           <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-tv-green border border-tv-green/30 bg-tv-green/10 px-1.5 py-0.5 rounded">
-            <IconSharia /> Sharia
+            <IconSharia /> Syariah
           </span>
         )}
         <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded border
@@ -80,9 +88,21 @@ function TickerCard({ r, onSelect }) {
             )}
           </div>
           <div className="text-[11px] text-tv-muted truncate mt-0.5" title={reasonOf(r)}>{reasonOf(r)}</div>
+          {buyish && calibShort(c) && (
+            <div className={`text-[10px] mt-0.5 ${c.avg_pnl_pct > 0 ? 'text-tv-green' : 'text-tv-red'}`}
+              title={`Skor ${c.score_lo}–${c.score_hi} saat ${REGIME_LABEL[c.regime] ?? 'semua kondisi IHSG'}: rencana kena TP1 sebelum stop dalam ${c.horizon} hari bursa.`}>
+              {c.avg_pnl_pct > 0 ? '' : '⚠️ '}{calibShort(c)} · rata-rata {fmt.pct(c.avg_pnl_pct)}/trade
+            </div>
+          )}
         </div>
         <Sparkline data={r.sparkline} positive={pos} />
       </div>
+      {proj && (
+        <div className="mt-2" title={`Dari ${proj.samples} kasus serupa, 20 hari bursa kemudian. 8 dari 10 kasus: ${fmt.pct(proj.band_pct[0])} s/d ${fmt.pct(proj.band_pct[4])}.`}>
+          <div className="text-[9px] text-tv-muted uppercase mb-0.5">Proyeksi 20 hari (terukur)</div>
+          <ScenarioBar p={proj} compact />
+        </div>
+      )}
     </button>
   )
 }
@@ -106,57 +126,57 @@ function Column({ title, tone, rows, onSelect, empty }) {
 }
 
 export default function DecisionBoard({ stocks = [], loading: stocksLoading, onSelect, onAdd, onUpdateAll }) {
-  const [rows, setRows] = useState([])
+  const [screen, setScreen] = useState([])
   const [loading, setLoading] = useState(true)
   const [sort, setSort] = useState('score') // score | rr | volume
   const [shariaOnly, setShariaOnly] = useState(false)
   const [error, setError] = useState(null)
   const [regime, setRegime] = useState('unknown')
 
-  const sparkBySym = useMemo(() => {
-    const m = {}
-    for (const s of stocks) m[s.symbol] = { sparkline: s.sparkline, change_pct: s.change_pct, syariah: s.syariah }
-    return m
-  }, [stocks])
-
+  // Fetch sekali setelah daftar saham termuat, dan ulang tiap daftar berubah
+  // (tambah / hapus / update). Sparkline digabung terpisah — tidak memicu fetch.
   useEffect(() => {
+    if (stocksLoading) return
     let alive = true
     setLoading(true); setError(null)
-    // mode=all + minTurnover=0 supaya saham tidak likuid tetap muncul di "stay away"
+    // mode=all + minTurnover=0 supaya saham tidak likuid tetap muncul di "hindari";
+    // kolom beli disaring sendiri dengan isBuy.
     api.advisorScreen({ mode: 'all', minTurnover: 0 })
       .then(d => {
         if (!alive) return
         setRegime(d?.regime || 'unknown')
-        const merged = (d?.results || []).map(r => ({
-          ...r,
-          sparkline: sparkBySym[r.symbol]?.sparkline,
-          change_pct: sparkBySym[r.symbol]?.change_pct,
-          // syariah dari screen; fallback ke stocks list kalau ada
-          syariah: r.syariah || !!sparkBySym[r.symbol]?.syariah,
-        }))
-        setRows(merged)
+        setScreen(d?.results || [])
       })
       .catch(e => { if (alive) setError(e.message) })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
-  }, [sparkBySym])
+  }, [stocks, stocksLoading])
 
+  const rows = useMemo(() => {
+    const bySym = Object.fromEntries(stocks.map(s => [s.symbol, s]))
+    return screen.map(r => ({
+      ...r,
+      sparkline: bySym[r.symbol]?.sparkline,
+      change_pct: bySym[r.symbol]?.change_pct,
+      // syariah dari screen; fallback ke stocks list kalau ada
+      syariah: r.syariah || !!bySym[r.symbol]?.syariah,
+    }))
+  }, [screen, stocks])
+
+  // 'score' = urutan backend apa adanya (skor → keyakinan → R/R), sama dengan screener.
   const sorted = useMemo(() => {
-    let list = shariaOnly ? rows.filter(r => r.syariah) : rows.slice()
-    list.sort((a, b) => {
-      if (sort === 'rr') return (b.risk_reward || 0) - (a.risk_reward || 0)
-      if (sort === 'volume') return (b.turnover_bn || 0) - (a.turnover_bn || 0)
-      return (b.score || 0) - (a.score || 0)
-    })
+    const list = shariaOnly ? rows.filter(r => r.syariah) : rows.slice()
+    if (sort === 'rr') list.sort((a, b) => (b.risk_reward || 0) - (a.risk_reward || 0))
+    if (sort === 'volume') list.sort((a, b) => (b.turnover_bn || 0) - (a.turnover_bn || 0))
     return list
   }, [rows, sort, shariaOnly])
 
-  const buy = sorted.filter(r => r.signal === 'BUY' || r.signal === 'STRONG_BUY')
+  const buy = sorted.filter(isBuy)
   const buySyms = new Set(buy.map(r => r.symbol))
-  // Stay away: SELL/STRONG_SELL atau skor <40 — exclude yang sudah di kolom buy
+  // Hindari: SELL/STRONG_SELL atau skor <40. Urut skor terendah dulu, kecuali user memilih urutan lain.
   const avoid = sorted
     .filter(r => !buySyms.has(r.symbol) && (r.signal === 'SELL' || r.signal === 'STRONG_SELL' || (r.score ?? 100) < 40))
-    .sort((a, b) => (a.score || 0) - (b.score || 0))
+  if (sort === 'score') avoid.reverse()
   const avoidSyms = new Set(avoid.map(r => r.symbol))
   const waiting = sorted.filter(r => !buySyms.has(r.symbol) && !avoidSyms.has(r.symbol))
 
@@ -166,9 +186,9 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
     <div className="p-5 sm:p-7 max-w-6xl mx-auto">
       <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Today</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">Hari Ini</h1>
           <p className="text-xs text-tv-muted mt-1">
-            Ranked from the Decision Engine across your watchlist.
+            Peringkat Decision Engine untuk semua saham yang kamu lacak. Kolom beli hanya setup dengan R/R ≥ {MIN_RR} dan transaksi ≥ {MIN_TURNOVER_BN} M/hari.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -177,32 +197,32 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
             onChange={e => setSort(e.target.value)}
             className="bg-tv-input border border-tv-border rounded-lg px-2.5 py-1.5 text-xs text-tv-text outline-none"
           >
-            <option value="score">Sort: Score</option>
-            <option value="rr">Sort: R:R</option>
-            <option value="volume">Sort: Volume</option>
+            <option value="score">Urut: Skor</option>
+            <option value="rr">Urut: R:R</option>
+            <option value="volume">Urut: Likuiditas</option>
           </select>
           <button
             onClick={() => setShariaOnly(v => !v)}
             className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all inline-flex items-center gap-1
               ${shariaOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}
           >
-            <IconSharia /> Sharia
+            <IconSharia /> Syariah
           </button>
           <button onClick={onAdd}
             className="px-3 py-1.5 text-xs font-bold rounded-lg bg-tv-accent text-white hover:bg-tv-accent/80 transition-all">
-            + Add
+            + Tambah
           </button>
           {stocks.length > 0 && (
             <button onClick={onUpdateAll}
               className="px-3 py-1.5 text-xs font-medium rounded-lg border border-tv-border text-tv-muted hover:text-tv-blue hover:border-tv-blue/40 transition-all">
-              Update all
+              Update semua
             </button>
           )}
         </div>
       </div>
 
       {error && (
-        <div className="mb-4 text-sm text-tv-red border border-tv-red/30 bg-tv-red/10 rounded-xl px-4 py-3">{error}</div>
+        <div className="mb-4 text-sm text-tv-red border border-tv-red/30 bg-tv-red/10 rounded-xl px-4 py-3">Gagal memuat screener: {error}</div>
       )}
 
       {busy ? (
@@ -216,41 +236,42 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
         </div>
       ) : stocks.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-sm font-semibold">Watchlist is empty</p>
-          <p className="text-xs text-tv-muted mt-1 mb-4">Add a ticker to see ranked buy / avoid columns.</p>
-          <button onClick={onAdd} className="px-4 py-2 text-xs font-bold rounded-lg bg-tv-accent text-white">+ Add stock</button>
+          <p className="text-sm font-semibold">Belum ada saham yang dilacak</p>
+          <p className="text-xs text-tv-muted mt-1 mb-4">Tambah saham untuk melihat kolom beli / hindari.</p>
+          <button onClick={onAdd} className="px-4 py-2 text-xs font-bold rounded-lg bg-tv-accent text-white">+ Tambah saham</button>
         </div>
-      ) : (
+      ) : error ? null : (
         <>
           <OmbakMeter regime={regime} buy={buy.length} wait={waiting.length} sell={avoid.length} />
           <div className="grid md:grid-cols-2 gap-6">
             <Column
-              title="Worth buying"
+              title="Layak dibeli"
               tone="text-tv-green"
               rows={buy}
               onSelect={onSelect}
-              empty="No BUY setups right now."
+              empty={`Belum ada setup beli yang layak (R/R ≥ ${MIN_RR}, likuid).`}
             />
             <Column
-              title="Stay away today"
+              title="Hindari hari ini"
               tone="text-tv-red"
               rows={avoid}
               onSelect={onSelect}
-              empty="Nothing flagged to avoid."
+              empty="Tidak ada yang perlu dihindari."
             />
           </div>
           {waiting.length > 0 && (
-            <button
-              onClick={() => onSelect(waiting[0].symbol)}
-              className="mt-5 w-full text-left px-4 py-3 rounded-xl border border-tv-border bg-tv-card/60
-                text-xs text-tv-muted hover:text-tv-text hover:border-tv-accent/40 transition-all"
-            >
-              <span className="font-semibold text-tv-text">{waiting.length} tickers waiting</span>
-              <span className="ml-2">
-                {waiting.slice(0, 8).map(r => r.symbol).join(' · ')}
-                {waiting.length > 8 ? '…' : ''}
-              </span>
-            </button>
+            <div className="mt-5 px-4 py-3 rounded-xl border border-tv-border bg-tv-card/60 text-xs text-tv-muted">
+              <span className="font-semibold text-tv-text mr-2">{waiting.length} saham menunggu</span>
+              {waiting.map(r => (
+                <button key={r.symbol} onClick={() => onSelect(r.symbol)}
+                  title={r.signal === 'BUY' || r.signal === 'STRONG_BUY'
+                    ? `${r.signal.replace('_', ' ')} tapi R/R ${r.risk_reward?.toFixed(1)} · likuiditas ${r.turnover_bn} M/hari`
+                    : r.signal}
+                  className="mr-2 hover:text-tv-blue transition-colors">
+                  {r.symbol}
+                </button>
+              ))}
+            </div>
           )}
         </>
       )}

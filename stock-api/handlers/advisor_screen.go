@@ -47,25 +47,24 @@ func parseScreenFilters(r *http.Request) screenFilters {
 
 // screenRow is one ranked screener result.
 type screenRow struct {
-	Symbol      string               `json:"symbol"`
-	Close       float64              `json:"close"`
-	Signal      string               `json:"signal"`
-	Score       int                  `json:"score"`
-	Confidence  int                  `json:"confidence"`
-	Trend       analysis.TrendSet    `json:"trend"`
-	Structure   string               `json:"structure"`
-	VolumeState string               `json:"volume_state"`
-	EntryLow    float64              `json:"entry_low"`
-	EntryHigh   float64              `json:"entry_high"`
-	EntryIdeal  float64              `json:"entry_ideal"`
-	Stop        float64              `json:"stop"`
-	Target      float64              `json:"target"`
-	RiskReward  float64              `json:"risk_reward"`
-	Probability analysis.Probability `json:"probability"`
-	TurnoverBn  float64              `json:"turnover_bn"`
-	Syariah     bool                 `json:"syariah"`
-	Note        string               `json:"note,omitempty"`
-	Calibration *calibrationFor      `json:"calibration,omitempty"` // measured history for this score + regime
+	Symbol      string            `json:"symbol"`
+	Close       float64           `json:"close"`
+	Signal      string            `json:"signal"`
+	Score       int               `json:"score"`
+	Confidence  int               `json:"confidence"`
+	Trend       analysis.TrendSet `json:"trend"`
+	Structure   string            `json:"structure"`
+	VolumeState string            `json:"volume_state"`
+	EntryLow    float64           `json:"entry_low"`
+	EntryHigh   float64           `json:"entry_high"`
+	EntryIdeal  float64           `json:"entry_ideal"`
+	Stop        float64           `json:"stop"`
+	Target      float64           `json:"target"`
+	RiskReward  float64           `json:"risk_reward"`
+	TurnoverBn  float64           `json:"turnover_bn"`
+	Syariah     bool              `json:"syariah"`
+	Note        string            `json:"note,omitempty"`
+	Calibration *calibrationFor   `json:"calibration,omitempty"` // measured history for this score + regime
 }
 
 // filterScreenRows applies mode and quality gates to ranked rows.
@@ -132,9 +131,9 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 			Trend: dec.Trend, Structure: dec.MarketStructure.State, VolumeState: dec.Volume.Status,
 			EntryLow: dec.EntryZone.Buy[0], EntryHigh: dec.EntryZone.Buy[1], EntryIdeal: dec.EntryZone.Ideal,
 			Stop: dec.StopLoss, Target: dec.TakeProfit[0].Price, RiskReward: dec.RiskReward,
-			Probability: dec.Probability, TurnoverBn: analysis.R2(turnover),
-			Syariah: isSyariah(sym), Note: dec.Note,
-			Calibration: lookupCalibration(calib, regime, sym, dec.Score),
+			TurnoverBn: analysis.R2(turnover),
+			Syariah:    isSyariah(sym), Note: dec.Note,
+			Calibration: lookupCalibration(calib, regime, sym, dec.Score, d.Prices),
 		})
 	}
 

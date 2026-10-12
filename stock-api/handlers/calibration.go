@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -12,7 +13,8 @@ import (
 )
 
 // calibCache holds the Decision Engine calibration table. It is rebuilt when
-// the newest stored bar changes (i.e. after an update), ~2s for ~80 stocks.
+// the newest stored bar or the number of stocks changes (update / add / remove),
+// ~2s for ~80 stocks.
 //
 // ponytail: global lock, rebuild blocks concurrent callers — fine single-user.
 // If the IHSG fetch fails the table is built without regimes and the key is
@@ -43,6 +45,8 @@ func currentCalibration() (*analysis.Calibration, string) {
 		}
 	}
 
+	key += "|" + strconv.Itoa(len(series)) // a newly added stock with old data must still trigger a rebuild
+
 	calibCache.mu.Lock()
 	defer calibCache.mu.Unlock()
 	if calibCache.c != nil && calibCache.key == key {
@@ -69,22 +73,27 @@ func currentCalibration() (*analysis.Calibration, string) {
 // calibrationFor is the per-stock view attached to decision/screen rows.
 type calibrationFor struct {
 	*analysis.CalibLookup
-	Stock *analysis.CalibStat `json:"stock,omitempty"` // this stock's own score ≥ 60 days
+	Stock      *analysis.CalibStat `json:"stock,omitempty"`      // this stock's own score ≥ 60 days
+	Projection []analysis.ProjView `json:"projection,omitempty"` // measured bull/side/bear per horizon
 }
 
-func lookupCalibration(c *analysis.Calibration, regime, symbol string, score int) *calibrationFor {
+func lookupCalibration(c *analysis.Calibration, regime, symbol string, score int, prices []models.StockPrice) *calibrationFor {
 	l := c.Lookup(score, regime)
 	if l == nil {
 		return nil
 	}
-	return &calibrationFor{CalibLookup: l, Stock: c.PerSymbol[symbol]}
+	out := &calibrationFor{CalibLookup: l, Stock: c.PerSymbol[symbol]}
+	if atr := analysis.ATR(prices, 14); len(atr) > 0 {
+		out.Projection = c.Project(score, regime, atr[len(atr)-1].Value/prices[len(prices)-1].Close*100)
+	}
+	return out
 }
 
 // Calibration — GET /api/calibration
 //
 // Historical outcome table of the Decision Engine: per score bucket and IHSG
 // regime, how often the plan (entry next open → TP1 before stop, 20 bars)
-// actually worked. This is the measured counterpart of Decision.Probability.
+// actually worked, plus the bull/side/bear projection per horizon.
 func (h *AnalysisHandler) Calibration(w http.ResponseWriter, r *http.Request) {
 	c, regime := currentCalibration()
 	if c == nil {

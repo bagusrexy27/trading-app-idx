@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
 import { fmt, REGIME_LABEL } from '../utils'
+import { ProjectionCard } from './Projection'
 
 const SIGNAL = {
   STRONG_BUY:  { label: 'STRONG BUY',  text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
@@ -67,11 +68,11 @@ export default function Advisor({ symbol, decisionData }) {
     setLoading(true); setError(null)
 
     const loadDec = decisionData?.decision
-      ? Promise.resolve({ decision: decisionData.decision, syariah: decisionData.syariah, calibration: decisionData.calibration })
+      ? Promise.resolve({ decision: decisionData.decision, syariah: decisionData.syariah, calibration: decisionData.calibration, close: decisionData.close })
       : api.analysis.decision(symbol)
 
     loadDec
-      .then(r => { if (alive) setDec({ ...r.decision, syariah: r.syariah, calibration: r.calibration }) })
+      .then(r => { if (alive) setDec({ ...r.decision, syariah: r.syariah, calibration: r.calibration, close: r.close }) })
       .catch(e => { if (alive) setError(e.message) })
       .finally(() => { if (alive) setLoading(false) })
 
@@ -155,20 +156,7 @@ export default function Advisor({ symbol, decisionData }) {
 
       {dec.calibration?.samples > 0 && <CalibCard c={dec.calibration} />}
 
-      <div className="bg-tv-card border border-tv-border rounded-xl p-4">
-        <div className="text-xs font-bold text-tv-muted uppercase mb-1">Arah skor</div>
-        <p className="text-[10px] text-tv-muted mb-3">Diturunkan dari skor (rumus), bukan peluang terukur. Lihat rekam jejak historis di atas.</p>
-        <div className="flex h-2.5 rounded-full overflow-hidden bg-tv-bg">
-          <div className="bg-tv-green" style={{ width: `${dec.probability.bullish}%` }} />
-          <div className="bg-tv-yellow" style={{ width: `${dec.probability.sideways}%` }} />
-          <div className="bg-tv-red" style={{ width: `${dec.probability.bearish}%` }} />
-        </div>
-        <div className="flex justify-between text-[11px] mt-1">
-          <span className="text-tv-green">Bullish {dec.probability.bullish}%</span>
-          <span className="text-tv-yellow">Sideways {dec.probability.sideways}%</span>
-          <span className="text-tv-red">Bearish {dec.probability.bearish}%</span>
-        </div>
-      </div>
+      {dec.close > 0 && <ProjectionCard calibration={dec.calibration} close={dec.close} />}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Pill label="Long trend" value={dec.trend.long} tone={trendToneOf(dec.trend.long)} />
