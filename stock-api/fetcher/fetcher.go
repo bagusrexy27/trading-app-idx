@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -131,4 +132,59 @@ func Fetch(symbol string, from time.Time) ([]models.StockPrice, string, error) {
 	}
 
 	return prices, exchange, nil
+}
+
+// DividendEvent is one cash dividend as Yahoo reports it: Date is the EX date.
+type DividendEvent struct {
+	Date   string  `json:"date"` // YYYY-MM-DD (ex date)
+	Amount float64 `json:"amount"`
+}
+
+// FetchDividends returns the last ~3 years of dividends for an IDX stock,
+// oldest first. Yahoo only lists a dividend once its ex date has passed.
+func FetchDividends(symbol string) ([]DividendEvent, error) {
+	url := fmt.Sprintf(
+		"https://query1.finance.yahoo.com/v8/finance/chart/%s?range=3y&interval=1mo&events=div",
+		toYahooSymbol(symbol),
+	)
+	client := &http.Client{Timeout: 30 * time.Second}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; idx-stock-api/1.0)")
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("yahoo finance returned HTTP %d for %s", resp.StatusCode, symbol)
+	}
+
+	var cr struct {
+		Chart struct {
+			Result []struct {
+				Events struct {
+					Dividends map[string]struct {
+						Amount float64 `json:"amount"`
+						Date   int64   `json:"date"`
+					} `json:"dividends"`
+				} `json:"events"`
+			} `json:"result"`
+		} `json:"chart"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&cr); err != nil {
+		return nil, fmt.Errorf("decode response: %w", err)
+	}
+	if len(cr.Chart.Result) == 0 {
+		return nil, nil
+	}
+	jkt := time.FixedZone("WIB", 7*3600)
+	out := make([]DividendEvent, 0, len(cr.Chart.Result[0].Events.Dividends))
+	for _, d := range cr.Chart.Result[0].Events.Dividends {
+		out = append(out, DividendEvent{Date: time.Unix(d.Date, 0).In(jkt).Format("2006-01-02"), Amount: d.Amount})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Date < out[j].Date })
+	return out, nil
 }

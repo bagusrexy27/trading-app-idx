@@ -85,6 +85,10 @@ export const api = {
   session:  () => req('/session'),
   ihsg:     () => req('/ihsg'),
   calibration: () => req('/calibration'),
+  dividends: {
+    list: (refresh) => req(`/dividends${refresh ? '?refresh=1' : ''}`),
+    save: (list) => req('/dividends', { method: 'POST', body: JSON.stringify(list) }),
+  },
   broker: {
     get:     (s)            => req(`/broker/${s}`),
     summary: (s, lookback, top) => req(`/broker/${s}/summary?lookback=${lookback ?? 20}&top=${top ?? 5}`),

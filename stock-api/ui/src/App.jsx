@@ -9,6 +9,7 @@ import { api } from './api'
 const MarketOverview = lazy(() => import('./components/MarketOverview'))
 const SessionPrep    = lazy(() => import('./components/SessionPrep'))
 const Portfolio      = lazy(() => import('./components/Portfolio'))
+const Dividends      = lazy(() => import('./components/Dividends'))
 const AdvisorScreen  = lazy(() => import('./components/AdvisorScreen'))
 const DecisionBoard  = lazy(() => import('./components/DecisionBoard'))
 const Practice       = lazy(() => import('./components/Practice'))
@@ -23,7 +24,7 @@ const ViewLoading = () => (
 export default function App() {
   const [stocks, setStocks]       = useState([])
   const [selected, setSelected]   = useState(null)
-  const [view, setView]           = useState('today') // today | stock | overview | session | advisor | portfolio | practice | kamus
+  const [view, setView]           = useState('today') // today | stock | overview | session | advisor | portfolio | dividends | practice | kamus
   const [showAdd, setShowAdd]     = useState(false)
   const [showAlerts, setShowAlerts] = useState(false)
   const [loading, setLoading]     = useState(true)
@@ -94,6 +95,12 @@ export default function App() {
   }, [showToast])
 
   useEffect(() => { loadStocks() }, [loadStocks])
+  // Backend auto-updates from Yahoo every 15 min in market hours; re-read the
+  // local list so prices move without a reload. Cheap: no Yahoo call here.
+  useEffect(() => {
+    const id = setInterval(loadStocks, 5 * 60 * 1000)
+    return () => clearInterval(id)
+  }, [loadStocks])
   useAlertChecker(stocks)
 
   const handleAdded = (symbol) => {
@@ -144,6 +151,7 @@ export default function App() {
         onViewSession={()   => navigate('session', selected)}
         onViewAdvisor={()   => navigate('advisor', selected)}
         onViewPortfolio={() => navigate('portfolio', selected)}
+        onViewDividends={() => navigate('dividends', selected)}
         onViewPractice={()  => navigate('practice', selected)}
         onViewGlossary={()  => navigate('kamus', selected)}
         onOpenAlerts={() => setShowAlerts(true)}
@@ -171,6 +179,8 @@ export default function App() {
               <AdvisorScreen onSelectStock={handleSelectStock} showToast={showToast} />
             ) : view === 'portfolio' ? (
               <Portfolio showToast={showToast} />
+            ) : view === 'dividends' ? (
+              <Dividends stocks={stocks} onSelectStock={handleSelectStock} showToast={showToast} />
             ) : view === 'practice' ? (
               <Practice stocks={stocks} />
             ) : view === 'kamus' ? (

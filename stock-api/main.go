@@ -234,6 +234,7 @@ func main() {
 	log.SetFlags(0) // ditch default 'YYYY/MM/DD HH:MM:SS' prefix — our middleware prints its own timestamp
 	loadEnv(".env")
 	seedDataDir()
+	handlers.StartAutoUpdate()
 	h := handlers.New()
 	a := handlers.NewAnalysis()
 	ai := handlers.NewAI()
@@ -257,6 +258,8 @@ func main() {
 	api.HandleFunc("/stocks/{symbol}/reports/{id}", handlers.DeleteReport).Methods("DELETE")
 	api.HandleFunc("/stocks/{symbol}/fundamental", handlers.GetFundamental).Methods("GET")
 	api.HandleFunc("/stocks/{symbol}/fundamental", handlers.SaveFundamental).Methods("POST")
+	api.HandleFunc("/dividends", handlers.GetDividends).Methods("GET")
+	api.HandleFunc("/dividends", handlers.SaveDividends).Methods("POST")
 
 	// ── Analysis endpoints ────────────────────────────────────────────────────
 	api.HandleFunc("/analysis/{symbol}/summary", a.Summary).Methods("GET")

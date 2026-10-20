@@ -68,6 +68,7 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `handlers/broker.go` | Broker-summary data CRUD under `./data/broker/{SYMBOL}.json`; includes `/mock` generator for test data |
 | `handlers/reports.go` | PDF research reports — list/upload/delete under `./data/reports/{SYMBOL}/`; uses `github.com/ledongthuc/pdf` for text extraction (consumed by AI handler). **Gotcha:** upload also spawns a Claude Code terminal (`openClaudeTerminal`) that analyzes the PDF and writes `./data/fundamentals/{SYMBOL}.json` |
 | `handlers/fundamental.go` | Read/write arbitrary JSON to `./data/fundamentals/{SYMBOL}.json` |
+| `handlers/dividends.go` | Dividend calendar: Yahoo dividend history for all tracked stocks (`fetcher.FetchDividends`, cached 24h in `data/dividends/yahoo.json`) → `riwayat` rows + `perkiraan` (last 12 months projected +1y, specials >3× median skipped). Manual official announcements in `data/dividends/calendar.json` suppress nearby projections |
 
 **Routes** (registered in `main.go`):
 
@@ -75,6 +76,7 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 - Reports: `GET/POST /api/stocks/{symbol}/reports`, `DELETE /api/stocks/{symbol}/reports/{id}`
 - Fundamental: `GET/POST /api/stocks/{symbol}/fundamental`
 - Analysis (`/api/analysis/{symbol}/*`): `summary`, `indicators`, `signals`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `fvg`, `avwap`, `pivots`, `amd`, `adline`, `cmf`, `mfi`, `advisor`, `advisor-backtest`, `decision`, `decision-backtest`, `ai`, `backtest`
+- Dividends: `GET /api/dividends` (`?refresh=1` re-fetches Yahoo), `POST /api/dividends` (replaces manual entries)
 - Market: `GET /api/overview`, `GET /api/advisor/screen`, `GET /api/calibration`, `GET /api/session`, `GET /api/ihsg`
 - Broker: `GET/DELETE /api/broker/{symbol}`, `GET /api/broker/{symbol}/summary`, `POST /api/broker/{symbol}/mock`
 
@@ -86,7 +88,7 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 
 ### Frontend (React)
 
-Views (in `App.jsx`): `today` (DecisionBoard, default) | `stock` (StockPanel) | `overview` | `session` | `advisor` | `portfolio` | `practice`. All views except StockPanel are code-split via `React.lazy` + `Suspense`; heavy StockPanel tabs (ChartTab, Indicators) are also lazy. View is mirrored into `history.state`; legacy names `watchlist`/`home` are migrated to `today`/`stock`.
+Views (in `App.jsx`): `today` (DecisionBoard, default) | `stock` (StockPanel) | `overview` | `session` | `advisor` | `portfolio` | `dividends` | `practice` | `kamus`. All views except StockPanel are code-split via `React.lazy` + `Suspense`; heavy StockPanel tabs (ChartTab, Indicators) are also lazy. View is mirrored into `history.state`; legacy names `watchlist`/`home` are migrated to `today`/`stock`.
 
 ```
 App.jsx                       ← global state (stocks[], selected, view, toast); mounts useAlertChecker + IHSGBadge
@@ -103,6 +105,7 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 ├── SessionPrep.jsx           ← (view=session) trading-session prep
 ├── AdvisorScreen.jsx         ← (view=advisor) market-wide advisor screener (ranked BUY candidates)
 ├── Portfolio.jsx             ← (view=portfolio) holdings tracker; input form matches IDX broker reporting format
+├── Dividends.jsx             ← (view=dividends) dividend calendar by month; ⭐ + est. payout for Portfolio holdings (reads its localStorage)
 ├── Practice.jsx              ← (view=practice) "Latihan" candle-prediction practice game
 ├── AlertsPanel.jsx           ← modal; exports useAlertChecker (5-min poll, mounted in App)
 ├── IHSGBadge.jsx             ← header badge; polls /api/ihsg every 60s (backend caches 60s)
@@ -122,6 +125,7 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 | Path | Content |
 |---|---|
 | `./data/{SYMBOL}.json` | OHLCV time series — `StockData` struct, `prices` always sorted by date string (lex-sort is correct for `YYYY-MM-DD`) |
+| `./data/dividends/` | `yahoo.json` (auto cache) + `calendar.json` (manual announcements). Subdir on purpose: `storage.List` treats every `data/*.json` as a stock |
 | `./data/fundamentals/{SYMBOL}.json` | Fundamental analysis JSON — written by the Claude Code terminal spawned on PDF upload; Laporan tab only reads it |
 | `./data/reports/{SYMBOL}/{timestamp}_{filename}.pdf` | Uploaded PDF research reports; AI handler reads text from these |
 | `./data/broker/{SYMBOL}.json` | Broker-summary (bandarmology) data; `/mock` endpoint can generate test data |

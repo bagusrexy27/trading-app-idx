@@ -291,19 +291,24 @@ func (h *Handler) UpdateAllStocks(w http.ResponseWriter, r *http.Request) {
 		respond(w, 500, false, err.Error(), nil)
 		return
 	}
+	results := updateAll(symbols)
+	respond(w, 200, true, fmt.Sprintf("updated %d stocks", len(results)), results)
+}
+
+type updateResult struct {
+	Symbol string `json:"symbol"`
+	Added  int    `json:"added"`
+	Total  int    `json:"total"`
+	Status string `json:"status"`
+}
+
+// updateAll runs doUpdate for every symbol; shared by the endpoint and the auto-updater.
+func updateAll(symbols []string) []updateResult {
 	sort.Strings(symbols)
-
-	type Result struct {
-		Symbol string `json:"symbol"`
-		Added  int    `json:"added"`
-		Total  int    `json:"total"`
-		Status string `json:"status"`
-	}
-
-	results := make([]Result, 0, len(symbols))
+	results := make([]updateResult, 0, len(symbols))
 	for _, sym := range symbols {
 		added, data, msg, err := doUpdate(sym)
-		res := Result{Symbol: sym}
+		res := updateResult{Symbol: sym}
 		if err != nil {
 			res.Status = "error: " + err.Error()
 		} else {
@@ -313,8 +318,7 @@ func (h *Handler) UpdateAllStocks(w http.ResponseWriter, r *http.Request) {
 		}
 		results = append(results, res)
 	}
-
-	respond(w, 200, true, fmt.Sprintf("updated %d stocks", len(results)), results)
+	return results
 }
 
 // ─── DELETE /api/stocks/{symbol} ─────────────────────────────────────────────
