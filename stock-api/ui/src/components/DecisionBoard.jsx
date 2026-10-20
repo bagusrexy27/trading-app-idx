@@ -138,7 +138,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
   const [index, setIndex] = useState('') // '' | 'idx30' | 'lq45'
   const [error, setError] = useState(null)
   const [regime, setRegime] = useState('unknown')
-  const [indexInfo, setIndexInfo] = useState({ stale: false, until: '' })
+  const [indexInfo, setIndexInfo] = useState({ stale: false, until: '', sharia: false, shariaUntil: '' })
 
   // Fetch sekali setelah daftar saham termuat, dan ulang tiap daftar berubah
   // (tambah / hapus / update). Sparkline digabung terpisah — tidak memicu fetch.
@@ -152,7 +152,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
       .then(d => {
         if (!alive) return
         setRegime(d?.regime || 'unknown')
-        setIndexInfo({ stale: !!d?.index_stale, until: d?.index_until || '' })
+        setIndexInfo({ stale: !!d?.index_stale, until: d?.index_until || '', sharia: !!d?.syariah_stale, shariaUntil: d?.syariah_until || '' })
         setScreen(d?.results || [])
       })
       .catch(e => { if (alive) setError(e.message) })
@@ -262,6 +262,11 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
           {index && indexInfo.stale && (
             <div className="text-xs text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/30 rounded-lg px-3 py-2 mb-3">
               ⚠️ Daftar IDX30/LQ45 berlaku s/d {indexInfo.until}. BEI sudah ganti periode, jadi filter ini mungkin sudah basi (edit handlers/indices.go).
+            </div>
+          )}
+          {shariaOnly && indexInfo.sharia && (
+            <div className="text-xs text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/30 rounded-lg px-3 py-2 mb-3">
+              ⚠️ Daftar syariah (DES OJK) berlaku s/d {indexInfo.shariaUntil}. OJK sudah terbitkan periode baru, jadi label ☪ mungkin sudah basi (edit handlers/syariah.go).
             </div>
           )}
           <OmbakMeter regime={regime} buy={buy.length} wait={waiting.length} sell={avoid.length} />

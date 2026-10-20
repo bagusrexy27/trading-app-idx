@@ -41,12 +41,34 @@ func filePath(symbol string) string {
 func Save(data *models.StockData) error {
 	mu.Lock()
 	defer mu.Unlock()
+	return WriteJSON(filePath(data.Symbol), data)
+}
 
-	b, err := json.MarshalIndent(data, "", "  ")
+// WriteJSON writes v as indented JSON atomically: a temp file in the same
+// directory, then rename. A crash mid-write leaves the old file intact instead
+// of a truncated one. Creates the parent directory if needed.
+func WriteJSON(path string, v any) error {
+	b, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		return fmt.Errorf("marshal: %w", err)
 	}
-	return os.WriteFile(filePath(data.Symbol), b, 0644)
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+	tmp, err := os.CreateTemp(dir, ".tmp-*")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmp.Name()) // no-op after a successful rename
+	if _, err := tmp.Write(b); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmp.Name(), path)
 }
 
 // Load reads a stock's JSON file. Returns nil, nil if not found.

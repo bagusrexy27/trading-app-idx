@@ -64,14 +64,7 @@ func (h *BrokerHandler) load(symbol string) (*analysis.BrokerData, error) {
 func (h *BrokerHandler) save(data *analysis.BrokerData) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	if err := os.MkdirAll(brokerDir, 0755); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(brokerPath(data.Symbol), b, 0644)
+	return storage.WriteJSON(brokerPath(data.Symbol), data)
 }
 
 // ── GET /api/broker/{symbol} ─────────────────────────────────────────────────

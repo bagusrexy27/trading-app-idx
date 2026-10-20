@@ -51,13 +51,13 @@ Konfigurasi di `fly.toml`: app `idx-analyzer`, region utama `sin`, volume `idx_d
 
 ### Peringatan auth
 
-`basicAuth` **gagal-terbuka**. Kalau `AUTH_USER` atau `AUTH_PASS` kosong, server tetap jalan tanpa autentikasi dan hanya mencetak peringatan kuning saat startup:
+Di Fly (`FLY_APP_NAME` ter-set otomatis), `basicAuth` **gagal-tertutup**: kalau `AUTH_USER` atau `AUTH_PASS` kosong, server menolak start:
 
 ```
-⚠ AUTH_USER/AUTH_PASS unset — every route is open, including DELETE and report upload
+AUTH_USER/AUTH_PASS unset on Fly — refusing to start an open server
 ```
 
-Bukan `log.Fatal`. Salah ketik nama secret (`AUTH_PAS=...`) menghasilkan server yang terbuka di hostname publik, di mana siapa pun bisa memanggil `DELETE /api/stocks/{symbol}`, `POST /api/stocks/update-all`, dan `POST /api/stocks/{symbol}/reports`. Verifikasi setelah deploy:
+Jadi salah ketik nama secret (`AUTH_PAS=...`) menghasilkan deploy yang gagal health check, bukan server terbuka di hostname publik. Lokal (tanpa `FLY_APP_NAME`) tetap terbuka dengan peringatan kuning, seperti sebelumnya. Verifikasi setelah deploy:
 
 ```bash
 fly secrets list                                        # harus ada DUA baris

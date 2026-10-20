@@ -109,11 +109,7 @@ func yahooDividends(force bool) (yahooDivCache, error) {
 	wg.Wait()
 
 	c = yahooDivCache{UpdatedAt: time.Now().Format(time.RFC3339), Items: fresh}
-	if err := os.MkdirAll(filepath.Dir(yahooDivPath), 0755); err == nil {
-		if out, err := json.MarshalIndent(c, "", "  "); err == nil {
-			_ = os.WriteFile(yahooDivPath, out, 0644)
-		}
-	}
+	_ = storage.WriteJSON(yahooDivPath, c) // cache only: next call refetches on failure
 	return c, nil
 }
 
@@ -274,16 +270,7 @@ func SaveDividends(w http.ResponseWriter, r *http.Request) {
 	}
 	sort.SliceStable(list, func(i, j int) bool { return dividendKey(list[i]) < dividendKey(list[j]) })
 
-	if err := os.MkdirAll(filepath.Dir(dividendsPath), 0755); err != nil {
-		respond(w, 500, false, err.Error(), nil)
-		return
-	}
-	out, err := json.MarshalIndent(list, "", "  ")
-	if err != nil {
-		respond(w, 500, false, err.Error(), nil)
-		return
-	}
-	if err := os.WriteFile(dividendsPath, out, 0644); err != nil {
+	if err := storage.WriteJSON(dividendsPath, list); err != nil {
 		respond(w, 500, false, err.Error(), nil)
 		return
 	}

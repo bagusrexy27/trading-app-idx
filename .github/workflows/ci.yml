@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stock-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: stock-api/go.mod
+          cache-dependency-path: stock-api/go.sum
+      - name: gofmt
+        run: |
+          out=$(gofmt -l .)
+          if [ -n "$out" ]; then echo "Run gofmt -w on:"; echo "$out"; exit 1; fi
+      - run: go vet ./...
+      - run: go test ./...
+
+  ui:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stock-api/ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20 # same as the Dockerfile
+          cache: npm
+          cache-dependency-path: stock-api/ui/package-lock.json
+      - run: npm ci --legacy-peer-deps # react-apexcharts peer conflict, see CLAUDE.md
+      - run: npm run build

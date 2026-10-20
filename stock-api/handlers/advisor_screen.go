@@ -171,6 +171,8 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 		"index":          f.Index,
 		"index_stale":    indexStale(time.Now()), // daftar IDX30/LQ45 lewat periode
 		"index_until":    indexValidUntil,
+		"syariah_stale":  syariahStale(time.Now()), // DES OJK lewat periode
+		"syariah_until":  syariahValidUntil,
 		"include_low_rr": f.IncludeLowRR,
 		"regime":         regime, // IHSG vs SMA50: up | down | unknown
 		"scanned":        scanned,

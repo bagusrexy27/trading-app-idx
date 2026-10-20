@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -132,6 +133,10 @@ func (h *Handler) AddStock(w http.ResponseWriter, r *http.Request) {
 	symbol := canonicalSymbol(req.Symbol)
 	if symbol == "" {
 		respond(w, 400, false, "symbol is required", nil)
+		return
+	}
+	if !reSymbol.MatchString(symbol) {
+		respond(w, 400, false, "kode saham tidak valid", nil)
 		return
 	}
 
@@ -445,4 +450,18 @@ func (h *Handler) ExportCSV(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s,%.0f,%.0f,%.0f,%.0f,%d\n",
 			p.Date, p.Open, p.High, p.Low, p.Close, p.Volume)
 	}
+}
+
+var reSymbol = regexp.MustCompile(`^[A-Za-z0-9]{1,12}(\.[Jj][Kk])?$`)
+
+// ValidateSymbol rejects a {symbol} path var that isn't a plain ticker, so it
+// can never smuggle path separators into filepath.Join(dataDir, symbol+".json").
+func ValidateSymbol(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if s, ok := mux.Vars(r)["symbol"]; ok && !reSymbol.MatchString(s) {
+			respond(w, 400, false, "kode saham tidak valid", nil)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }

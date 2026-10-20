@@ -46,19 +46,8 @@ func SaveFundamental(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := os.MkdirAll(fundamentalsDir, 0755); err != nil {
-		respond(w, 500, false, err.Error(), nil)
-		return
-	}
-
 	path := filepath.Join(fundamentalsDir, symbol+".json")
-	out, err := json.MarshalIndent(body, "", "  ")
-	if err != nil {
-		respond(w, 500, false, err.Error(), nil)
-		return
-	}
-
-	if err := os.WriteFile(path, out, 0644); err != nil {
+	if err := storage.WriteJSON(path, body); err != nil {
 		respond(w, 500, false, err.Error(), nil)
 		return
 	}

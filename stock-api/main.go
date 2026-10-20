@@ -206,6 +206,14 @@ func seedDataDir() {
 	log.Printf("seeded %s from %s", storage.DataDir, src)
 }
 
+// limitBody caps request bodies; the largest legit one is a PDF report (32 MB form).
+func limitBody(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Body = http.MaxBytesReader(w, r.Body, 40<<20)
+		next.ServeHTTP(w, r)
+	})
+}
+
 // ── Basic auth ──────────────────────────────────────────────────────────────
 
 // basicAuth guards everything when AUTH_USER and AUTH_PASS are both set.
@@ -213,6 +221,10 @@ func seedDataDir() {
 // loudly, because an open server also exposes every DELETE and the PDF upload.
 func basicAuth(next http.Handler) http.Handler {
 	user, pass := os.Getenv("AUTH_USER"), os.Getenv("AUTH_PASS")
+	if (user == "" || pass == "") && os.Getenv("FLY_APP_NAME") != "" {
+		// Public hostname: a typo'd secret name must not ship an open server.
+		log.Fatal("AUTH_USER/AUTH_PASS unset on Fly — refusing to start an open server (fly secrets set AUTH_USER=... AUTH_PASS=...)")
+	}
 	if user == "" || pass == "" {
 		log.Printf("%s⚠ AUTH_USER/AUTH_PASS unset — every route is open, including DELETE and report upload%s", cFgYellow, cReset)
 		return next
@@ -243,6 +255,7 @@ func main() {
 
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
+	api.Use(handlers.ValidateSymbol)
 
 	// ── Stock data endpoints ──────────────────────────────────────────────────
 	api.HandleFunc("/stocks", h.ListStocks).Methods("GET")
@@ -315,6 +328,14 @@ func main() {
 	fmt.Println(cFgGray + "    ui (dev) " + cReset + "→ " + cFgGreen + "http://localhost:5173" + cReset + cFgGray + "  (npm run dev inside ui/)" + cReset)
 	fmt.Println(cFgGray + "    logging  " + cReset + "→ enabled for /api/* (Gin-style)")
 	fmt.Println()
-	addr := ":" + storage.EnvOr("PORT", "1111")
-	log.Fatal(http.ListenAndServe(addr, logger(basicAuth(r))))
+	srv := &http.Server{
+		Addr:              ":" + storage.EnvOr("PORT", "1111"),
+		Handler:           logger(basicAuth(limitBody(r))),
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       2 * time.Minute, // PDF upload
+		// ponytail: generous because update-all walks ~90 stocks sequentially; shrink if it goes async.
+		WriteTimeout: 10 * time.Minute,
+		IdleTimeout:  2 * time.Minute,
+	}
+	log.Fatal(srv.ListenAndServe())
 }

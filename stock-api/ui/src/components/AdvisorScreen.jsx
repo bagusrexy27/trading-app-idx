@@ -189,6 +189,12 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
         </div>
       )}
 
+      {syariahOnly && data?.syariah_stale && (
+        <div className="text-xs text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/30 rounded-lg px-3 py-2 mb-3">
+          ⚠️ Daftar syariah (DES OJK) berlaku s/d {data.syariah_until}. OJK sudah terbitkan periode baru, jadi label ☪ mungkin sudah basi (edit handlers/syariah.go).
+        </div>
+      )}
+
       {data?.regime === 'down' && !loading && (
         <div className="text-xs text-tv-red bg-tv-red/10 border border-tv-red/30 rounded-lg px-3 py-2 mb-3">
           ⚠️ {REGIME_LABEL.down} (pasar sedang turun). Secara historis, sinyal BUY di kondisi ini rata-rata <b>rugi</b>. Lebih aman tahan dulu atau pakai posisi kecil.

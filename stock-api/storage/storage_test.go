@@ -20,3 +20,21 @@ func TestListSkipsNonTickerFiles(t *testing.T) {
 		t.Fatalf("want [BBCA], got %v (%v)", got, err)
 	}
 }
+
+func TestWriteJSONAtomicReplace(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "sub", "x.json")
+	if err := WriteJSON(path, map[string]int{"a": 1}); err != nil {
+		t.Fatal(err)
+	}
+	if err := WriteJSON(path, map[string]int{"a": 2}); err != nil { // overwrite existing
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(path)
+	if string(b) != "{\n  \"a\": 2\n}" {
+		t.Fatalf("got %q", b)
+	}
+	left, _ := filepath.Glob(filepath.Join(filepath.Dir(path), ".tmp-*"))
+	if len(left) != 0 {
+		t.Fatalf("temp files left behind: %v", left)
+	}
+}

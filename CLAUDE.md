@@ -17,7 +17,7 @@ go build -o stock-api.exe .   # Build binary
 go build ./...                # Compile-check all packages
 go vet ./...                  # Vet code
 go test ./...                 # All tests (analysis/ + handlers/)
-go test ./analysis/ -run TestDecision   # Single test by name
+go test ./analysis/ -run TestDecision   # Single test by name (analysis tests read frozen OHLCV from analysis/testdata/, never ./data)
 ```
 
 `main.go` calls `loadEnv(".env")` on startup (best-effort, never overrides real env). Env vars are listed under Deployment below — note `DATA_DIR` must be a real env var (`storage.DataDir` initialises before `.env` loads).
@@ -61,7 +61,8 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `handlers/advisor.go` | Advisor, decision, and their backtest endpoints for one symbol |
 | `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true`) |
 | `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar or stock count changes; fetches `^JKSE` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
-| `handlers/syariah.go` | Hardcoded ISSI syariah symbol set (`isSyariah`) — edit manually when OJK's DES list changes |
+| `handlers/syariah.go` | Syariah set = OJK DES Periode I 2026 Lampiran I (622 stocks, `isSyariah`); `syariahValidUntil` drives `syariah_stale` in the screen response + UI warning. Replace from the next DES PDF (±1 Dec / ±1 Jun) |
+| `handlers/indices.go` | IDX30/LQ45 sets + `indexValidUntil` (BEI re-evaluates quarterly, announced ~late Jan/Apr/Jul/Oct) |
 | `handlers/indices.go` | Hardcoded IDX30/LQ45 constituent sets (`isIDX30`/`isLQ45`) → `idx30`/`lq45` on stock list + screen rows; screen filter `?index=idx30\|lq45`. BEI re-evaluates quarterly (Feb/May/Aug/Nov) — edit manually |
 | `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative analysis (no external LLM); uses signals, indicators, pattern detection, and uploaded reports text |
 | `handlers/backtest.go` | `GET /api/analysis/{symbol}/backtest` — simulates BUY/SELL on composite-signal change at next open; returns trades + summary |
@@ -83,7 +84,9 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 
 **Incremental fetching** (`doUpdate`): reads last saved date, requests from `lastDate+1`, dedupes by date string, appends and re-sorts.
 
-**Symbols** stored without `.JK` (e.g. `BBCA`). `canonicalSymbol()` strips `.JK` from user input; fetcher re-adds it internally.
+**Symbols** stored without `.JK` (e.g. `BBCA`). `canonicalSymbol()` strips `.JK` from user input; fetcher re-adds it internally. `ValidateSymbol` middleware (on `/api`) and `AddStock` reject anything but `[A-Za-z0-9]{1,12}(.JK)?`, so `{symbol}` can never carry path separators into `filepath.Join`. Persisted JSON goes through `storage.WriteJSON` (temp file + rename).
+
+**Server limits** — `http.Server` timeouts (WriteTimeout 10 min because update-all is sequential) and a 40 MB body cap (`limitBody`).
 
 **API envelope** — every endpoint returns `{ "success": bool, "message": "...", "data": {...} }`. Helper `respond(w, status, ok, msg, data)`.
 
@@ -161,7 +164,7 @@ fly deploy
 | `DATA_DIR` | `./data` | root for OHLCV, `broker/`, `fundamentals/`, `reports/` |
 | `SEED_DIR` | *(unset)* | when set and `DATA_DIR` is empty, `seedDataDir()` copies the image snapshot in — first boot on a fresh volume |
 | `PORT` | `1111` | Fly sets 8080 |
-| `AUTH_USER` / `AUTH_PASS` | *(unset)* | both set ⇒ HTTP basic auth on every route; unset ⇒ open (local default) |
+| `AUTH_USER` / `AUTH_PASS` | *(unset)* | both set ⇒ HTTP basic auth on every route; unset ⇒ open locally, but **refuses to start on Fly** (`FLY_APP_NAME` set) |
 
 **Deployment-specific behaviour:**
 - `data/` is committed to git (~4 MB OHLCV) so the image ships a snapshot. `data/reports/` stays gitignored.
