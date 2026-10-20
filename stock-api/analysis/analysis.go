@@ -370,12 +370,12 @@ func ADX(prices []models.StockPrice, period int) []ADXPoint {
 	}
 
 	n := len(prices)
-	plusDM  := make([]float64, n-1)
+	plusDM := make([]float64, n-1)
 	minusDM := make([]float64, n-1)
-	tr      := make([]float64, n-1)
+	tr := make([]float64, n-1)
 
 	for i := 1; i < n; i++ {
-		upMove   := prices[i].High - prices[i-1].High
+		upMove := prices[i].High - prices[i-1].High
 		downMove := prices[i-1].Low - prices[i].Low
 		if upMove > downMove && upMove > 0 {
 			plusDM[i-1] = upMove
@@ -402,7 +402,7 @@ func ADX(prices []models.StockPrice, period int) []ADXPoint {
 	// first DI values
 	pDI := 100 * pDM14 / atr14
 	mDI := 100 * mDM14 / atr14
-	dx  := 0.0
+	dx := 0.0
 	if pDI+mDI > 0 {
 		dx = 100 * math.Abs(pDI-mDI) / (pDI + mDI)
 	}
@@ -487,16 +487,16 @@ func SAR(prices []models.StockPrice) []Point {
 	const afInit, afStep, afMax = 0.02, 0.02, 0.2
 
 	// Determine initial trend from first 2 bars
-	bull  := prices[1].Close >= prices[0].Close
-	sar   := prices[0].Low
+	bull := prices[1].Close >= prices[0].Close
+	sar := prices[0].Low
 	if !bull {
 		sar = prices[0].High
 	}
-	ep  := prices[0].High
+	ep := prices[0].High
 	if !bull {
 		ep = prices[0].Low
 	}
-	af  := afInit
+	af := afInit
 
 	out := make([]Point, 0, len(prices))
 	out = append(out, Point{Date: prices[0].Date, Value: R2(sar)})
@@ -566,8 +566,12 @@ type IchimokuPoint struct {
 func ichimokuMid(prices []models.StockPrice, start, end int) float64 {
 	hi, lo := prices[start].High, prices[start].Low
 	for i := start + 1; i <= end; i++ {
-		if prices[i].High > hi { hi = prices[i].High }
-		if prices[i].Low  < lo { lo = prices[i].Low  }
+		if prices[i].High > hi {
+			hi = prices[i].High
+		}
+		if prices[i].Low < lo {
+			lo = prices[i].Low
+		}
 	}
 	return R2((hi + lo) / 2)
 }
@@ -580,9 +584,9 @@ func Ichimoku(prices []models.StockPrice) []IchimokuPoint {
 	out := make([]IchimokuPoint, 0, len(prices)-51)
 	for i := 51; i < len(prices); i++ {
 		tenkan := ichimokuMid(prices, i-8, i)
-		kijun  := ichimokuMid(prices, i-25, i)
-		spanA  := R2((tenkan + kijun) / 2)
-		spanB  := ichimokuMid(prices, i-51, i)
+		kijun := ichimokuMid(prices, i-25, i)
+		spanA := R2((tenkan + kijun) / 2)
+		spanB := ichimokuMid(prices, i-51, i)
 		chikou := prices[i].Close
 		// Chikou is plotted 26 bars back; we return current close for alignment
 		_ = chikou
@@ -674,15 +678,15 @@ func Fibonacci(prices []models.StockPrice, lookback int) FibLevels {
 	if uptrend {
 		return FibLevels{
 			High: R2(hi), Low: R2(lo),
-			L0: R2(hi), L236: R2(hi-0.236*rng), L382: R2(hi-0.382*rng),
-			L500: R2(hi-0.500*rng), L618: R2(hi-0.618*rng), L786: R2(hi-0.786*rng),
+			L0: R2(hi), L236: R2(hi - 0.236*rng), L382: R2(hi - 0.382*rng),
+			L500: R2(hi - 0.500*rng), L618: R2(hi - 0.618*rng), L786: R2(hi - 0.786*rng),
 			L100: R2(lo),
 		}
 	}
 	return FibLevels{
 		High: R2(hi), Low: R2(lo),
-		L0: R2(lo), L236: R2(lo+0.236*rng), L382: R2(lo+0.382*rng),
-		L500: R2(lo+0.500*rng), L618: R2(lo+0.618*rng), L786: R2(lo+0.786*rng),
+		L0: R2(lo), L236: R2(lo + 0.236*rng), L382: R2(lo + 0.382*rng),
+		L500: R2(lo + 0.500*rng), L618: R2(lo + 0.618*rng), L786: R2(lo + 0.786*rng),
 		L100: R2(hi),
 	}
 }
@@ -724,14 +728,14 @@ func AVWAP(prices []models.StockPrice, anchorDate string) []AVWAPPoint {
 // ── Pivot Points (Standard) ───────────────────────────────────────────────────
 
 type PivotLevels struct {
-	Date   string  `json:"date"`
-	Pivot  float64 `json:"pivot"`
-	R1     float64 `json:"r1"`
-	R2     float64 `json:"r2"`
-	R3     float64 `json:"r3"`
-	S1     float64 `json:"s1"`
-	S2     float64 `json:"s2"`
-	S3     float64 `json:"s3"`
+	Date  string  `json:"date"`
+	Pivot float64 `json:"pivot"`
+	R1    float64 `json:"r1"`
+	R2    float64 `json:"r2"`
+	R3    float64 `json:"r3"`
+	S1    float64 `json:"s1"`
+	S2    float64 `json:"s2"`
+	S3    float64 `json:"s3"`
 }
 
 // Pivots computes standard pivot points from the most recent complete bar.
@@ -740,7 +744,7 @@ func Pivots(prices []models.StockPrice) PivotLevels {
 		return PivotLevels{}
 	}
 	prev := prices[len(prices)-2]
-	cur  := prices[len(prices)-1]
+	cur := prices[len(prices)-1]
 	h, l, c := prev.High, prev.Low, prev.Close
 	p := R2((h + l + c) / 3)
 	rng := h - l

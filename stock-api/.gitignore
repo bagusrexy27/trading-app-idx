@@ -40,3 +40,6 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Dividend cache (rebuilt from Yahoo every 24h)
+data/dividends/yahoo.json

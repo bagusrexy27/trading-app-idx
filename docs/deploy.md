@@ -108,13 +108,13 @@ Buka `https://<app>.fly.dev` — UI harus tampil. Kalau yang keluar `404 page no
 
 ## Refresh data
 
-Tidak ada scheduler. Data hanya sesegar "Update All" terakhir:
+Server punya auto-update in-process: refresh penuh saat boot, lalu tiap 15 menit di jam bursa (09:00–16:15 WIB, hari bursa). Di Fly ini hanya jalan selama mesin bangun — dengan `auto_stop_machines` mesin tidur saat sepi, jadi data bisa tertinggal sampai ada pengunjung (yang memicu boot + refresh). Refresh manual:
 
 ```bash
 curl -u user:pass -X POST https://<app>.fly.dev/api/stocks/update-all
 ```
 
-Atau tekan **Update All** di sidebar UI. Endpoint ini menarik seluruh watchlist secara berurutan dari Yahoo Finance, jadi bisa berjalan puluhan detik. Kalau butuh otomatis, jalankan curl di atas dari cron eksternal — jangan tambahkan scheduler in-process, karena mesin Fly-nya memang dibiarkan tidur.
+Atau tekan **Update All** di sidebar UI. Endpoint ini menarik seluruh watchlist secara berurutan dari Yahoo Finance, jadi bisa berjalan puluhan detik. Kalau butuh data segar walau tidak ada pengunjung, jalankan curl di atas dari cron eksternal — itu juga membangunkan mesin (dan memicu refresh boot). Catatan: setiap cold start = refresh penuh ~90 panggilan Yahoo.
 
 ---
 
@@ -168,4 +168,4 @@ docker run --rm -p 8080:8080 \
 
 - **`openClaudeTerminal()`** (upload PDF → CLI Claude Code) digerbangi `runtime.GOOS == "windows"`, jadi no-op di runtime Alpine. Ini disengaja: `os/exec` yang dipicu upload adalah eksekusi kode remote. Jangan pernah jalankan build Windows-nya dengan port terekspos.
 - **Tidak ada generator data broker.** `POST /api/broker/{symbol}/mock` menghasilkan data sintetis tanpa penanda. `data/broker/` di-ignore git dan Docker supaya angka karangan tidak pernah tampil sebagai data pasar di server.
-- **Tidak ada scheduler, tidak ada worker, tidak ada cache di luar proses.** Cache IHSG 60 detik ada di memori dan hilang setiap mesin tidur.
+- **Satu goroutine auto-update, tidak ada worker atau cache di luar proses.** Cache IHSG 60 detik, kalibrasi, dan jadwal auto-update ada di memori dan hilang setiap mesin tidur.

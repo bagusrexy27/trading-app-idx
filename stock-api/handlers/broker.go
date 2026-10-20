@@ -28,14 +28,15 @@ func brokerPath(symbol string) string {
 	return filepath.Join(brokerDir, symbol+".json")
 }
 
-// LoadBrokerDays reads broker summary history for a symbol (nil slice if missing).
+// LoadBrokerDays reads broker summary history for the decision engine (nil if
+// missing). Mock data is skipped: synthetic flows must never move a real signal.
 func LoadBrokerDays(symbol string) []analysis.BrokerDay {
 	b, err := os.ReadFile(brokerPath(symbol))
 	if err != nil {
 		return nil
 	}
 	var d analysis.BrokerData
-	if err := json.Unmarshal(b, &d); err != nil {
+	if err := json.Unmarshal(b, &d); err != nil || d.Source == "mock" {
 		return nil
 	}
 	return d.Days
@@ -203,20 +204,20 @@ type brokerProfile struct {
 // Representative IDX broker codes. Realistic names — but the numbers are SYNTHETIC.
 var mockBrokers = []brokerProfile{
 	{"YP", "Mirae Asset Sekuritas Indonesia", "F", +0.55},
-	{"KZ", "CLSA Sekuritas Indonesia",         "F", +0.30},
-	{"BK", "J.P. Morgan Sekuritas Indonesia",  "F", +0.15},
-	{"AK", "UBS Sekuritas Indonesia",          "F", -0.10},
-	{"DB", "Deutsche Bank AG",                 "F", +0.05},
-	{"CG", "Citigroup Sekuritas Indonesia",    "F", -0.20},
-	{"YU", "CGS-CIMB Sekuritas Indonesia",     "F", +0.10},
-	{"CC", "Mandiri Sekuritas",                "L", +0.20},
-	{"PD", "Indo Premier Sekuritas",           "L", -0.35},
-	{"DR", "Valbury Asia Sekuritas",           "L", -0.15},
-	{"LG", "Trimegah Sekuritas Indonesia",     "L", +0.10},
-	{"ZP", "Maybank Sekuritas Indonesia",      "L", -0.05},
-	{"NI", "BNI Sekuritas",                    "L", +0.15},
-	{"SS", "Stockbit Sekuritas Digital",       "L", -0.40},
-	{"HD", "Henan Putihrai Sekuritas",         "L", +0.05},
+	{"KZ", "CLSA Sekuritas Indonesia", "F", +0.30},
+	{"BK", "J.P. Morgan Sekuritas Indonesia", "F", +0.15},
+	{"AK", "UBS Sekuritas Indonesia", "F", -0.10},
+	{"DB", "Deutsche Bank AG", "F", +0.05},
+	{"CG", "Citigroup Sekuritas Indonesia", "F", -0.20},
+	{"YU", "CGS-CIMB Sekuritas Indonesia", "F", +0.10},
+	{"CC", "Mandiri Sekuritas", "L", +0.20},
+	{"PD", "Indo Premier Sekuritas", "L", -0.35},
+	{"DR", "Valbury Asia Sekuritas", "L", -0.15},
+	{"LG", "Trimegah Sekuritas Indonesia", "L", +0.10},
+	{"ZP", "Maybank Sekuritas Indonesia", "L", -0.05},
+	{"NI", "BNI Sekuritas", "L", +0.15},
+	{"SS", "Stockbit Sekuritas Digital", "L", -0.40},
+	{"HD", "Henan Putihrai Sekuritas", "L", +0.05},
 }
 
 // generateMockBrokerData — deterministic mock data per symbol.
@@ -264,7 +265,7 @@ func generateMockBrokerData(symbol string, prices []models.StockPrice) *analysis
 			buyPx := scale * (1 + (rng.Float64()*0.01 - 0.005))
 			sellPx := scale * (1 + (rng.Float64()*0.01 - 0.005))
 
-			buyVal := int64(float64(buyLots) * 100 * buyPx)   // 1 lot = 100 shares
+			buyVal := int64(float64(buyLots) * 100 * buyPx) // 1 lot = 100 shares
 			sellVal := int64(float64(sellLots) * 100 * sellPx)
 
 			entries = append(entries, analysis.BrokerEntry{
@@ -289,6 +290,7 @@ func generateMockBrokerData(symbol string, prices []models.StockPrice) *analysis
 	return &analysis.BrokerData{
 		Symbol:      symbol,
 		LastUpdated: time.Now().Format("2006-01-02"),
+		Source:      "mock",
 		Days:        days,
 	}
 }

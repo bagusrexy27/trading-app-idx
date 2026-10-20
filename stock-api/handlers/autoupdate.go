@@ -31,9 +31,14 @@ func StartAutoUpdate() {
 }
 
 func runAutoUpdate(reason string) {
+	if !updateMu.TryLock() {
+		logf("auto-update (%s): skipped, an update is already running", reason)
+		return
+	}
+	defer updateMu.Unlock()
 	symbols, err := storage.List()
 	if err != nil {
-		log.Printf("auto-update (%s): %v", reason, err)
+		logf("auto-update (%s): %v", reason, err)
 		return
 	}
 	start := time.Now()
@@ -44,8 +49,13 @@ func runAutoUpdate(reason string) {
 			failed++
 		}
 	}
-	log.Printf("auto-update (%s): %d stocks, %d new bars, %d errors, %s",
+	logf("auto-update (%s): %d stocks, %d new bars, %d errors, %s",
 		reason, len(symbols), added, failed, time.Since(start).Round(time.Second))
+}
+
+// logf prefixes a WIB clock time: main.go clears log flags for its own request log.
+func logf(format string, args ...any) {
+	log.Printf(time.Now().In(wib).Format("15:04:05")+" "+format, args...)
 }
 
 // inMarketWindow: Mon–Fri 09:00–16:15 WIB. The extra 15 min after the 16:00

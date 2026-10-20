@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -291,7 +292,9 @@ func (h *Handler) UpdateAllStocks(w http.ResponseWriter, r *http.Request) {
 		respond(w, 500, false, err.Error(), nil)
 		return
 	}
+	updateMu.Lock()
 	results := updateAll(symbols)
+	updateMu.Unlock()
 	respond(w, 200, true, fmt.Sprintf("updated %d stocks", len(results)), results)
 }
 
@@ -302,7 +305,12 @@ type updateResult struct {
 	Status string `json:"status"`
 }
 
+// updateMu serialises full refreshes: the endpoint waits its turn, the
+// auto-updater skips a tick instead of racing it (doUpdate is load→fetch→save).
+var updateMu sync.Mutex
+
 // updateAll runs doUpdate for every symbol; shared by the endpoint and the auto-updater.
+// Callers must hold updateMu.
 func updateAll(symbols []string) []updateResult {
 	sort.Strings(symbols)
 	results := make([]updateResult, 0, len(symbols))

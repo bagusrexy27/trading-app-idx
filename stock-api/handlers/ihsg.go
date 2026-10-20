@@ -14,26 +14,26 @@ import (
 // (data is delayed ~15 minutes on the free Yahoo endpoint).
 
 type ihsgCache struct {
-	mu       sync.Mutex
-	payload  ihsgPayload
-	fetched  time.Time
+	mu      sync.Mutex
+	payload ihsgPayload
+	fetched time.Time
 }
 
 type ihsgPayload struct {
-	Symbol     string              `json:"symbol"`      // "^JKSE"
-	Exchange   string              `json:"exchange"`
-	Last       float64             `json:"last"`        // latest close
-	PrevClose  float64             `json:"prev_close"`  // previous trading day close
-	Change     float64             `json:"change"`      // last - prev
-	ChangePct  float64             `json:"change_pct"`  // (last - prev) / prev * 100
-	Open       float64             `json:"open"`
-	High       float64             `json:"high"`
-	Low        float64             `json:"low"`
-	Volume     int64               `json:"volume"`
-	Date       string              `json:"date"`        // YYYY-MM-DD of latest bar
-	History    []models.StockPrice `json:"history"`     // last ~30 bars for sparkline
-	FetchedAt  string              `json:"fetched_at"`
-	Delayed    bool                `json:"delayed"`     // true = Yahoo free tier (~15min delay)
+	Symbol    string              `json:"symbol"` // "^JKSE"
+	Exchange  string              `json:"exchange"`
+	Last      float64             `json:"last"`       // latest close
+	PrevClose float64             `json:"prev_close"` // previous trading day close
+	Change    float64             `json:"change"`     // last - prev
+	ChangePct float64             `json:"change_pct"` // (last - prev) / prev * 100
+	Open      float64             `json:"open"`
+	High      float64             `json:"high"`
+	Low       float64             `json:"low"`
+	Volume    int64               `json:"volume"`
+	Date      string              `json:"date"`    // YYYY-MM-DD of latest bar
+	History   []models.StockPrice `json:"history"` // last ~30 bars for sparkline
+	FetchedAt string              `json:"fetched_at"`
+	Delayed   bool                `json:"delayed"` // true = Yahoo free tier (~15min delay)
 }
 
 var ihsgStore = &ihsgCache{}

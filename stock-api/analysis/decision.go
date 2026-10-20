@@ -76,6 +76,10 @@ type Decision struct {
 	Note            string        `json:"note,omitempty"` // set when the signal was gated down
 }
 
+// BuyScore is the minimum decision score for a BUY call. Calibration buckets
+// "buy calls" by the same line, so change it here only.
+const BuyScore = 60
+
 // Calibration knobs. These are tuned against IDX behaviour (crash gaps leave
 // swing levels stranded far above price), not universal constants — adjust
 // them if the engine starts over- or under-rating stretched setups.
@@ -321,7 +325,7 @@ func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay
 			resistances = append(resistances, lv)
 		}
 	}
-	sortDesc(supports)  // nearest support first
+	sortDesc(supports)   // nearest support first
 	sortAsc(resistances) // nearest resistance first
 	if len(supports) > 3 {
 		supports = supports[:3]
@@ -523,7 +527,7 @@ func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay
 	switch {
 	case score >= 75:
 		signal = "STRONG_BUY"
-	case score >= 60:
+	case score >= BuyScore:
 		signal = "BUY"
 	case score < 25:
 		signal = "STRONG_SELL"

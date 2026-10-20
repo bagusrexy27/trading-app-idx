@@ -235,7 +235,7 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 			if !ok {
 				continue
 			}
-			if dec.Score >= 60 {
+			if dec.Score >= BuyScore {
 				if c.PerSymbol[sym] == nil {
 					c.PerSymbol[sym] = &CalibStat{}
 				}
@@ -246,7 +246,7 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 					c.Buckets[k][b] = &CalibStat{}
 				}
 				c.Buckets[k][b].add(result, pnl)
-				if dec.Score >= 60 {
+				if dec.Score >= BuyScore {
 					c.BuyCalls[k].add(result, pnl)
 				}
 			}

@@ -1,2 +1,9 @@
 stock-api/.env
 .env
+
+# Local Claude Code settings & stray artifacts
+.claude/settings.local.json
+stock-api/.claude/settings.local.json
+/dssa_raw.json
+/Codetrading-app-idxdssa_raw.json
+stock-api/Screenshot*.png

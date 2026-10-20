@@ -55,7 +55,8 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `analysis/decision_backtest.go` | Backtests the decision engine |
 | `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50): plan = entry next open, WIN if TP1 before stop within 20 bars. Also the **projection**: per regime × 5/10/20-bar horizon × score bucket, % of cases ending Bullish/Sideways/Bearish (move beyond 0.5 × ATR% × √h) + p10–p90 range — the only bull/side/bear odds in the app (`Projection.jsx`) |
 | `analysis/fvg.go` | Fair Value Gap detection (also feeds decision engine confluence) |
-| `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate` |
+| `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate`, `updateAll` (guarded by `updateMu`) |
+| `handlers/autoupdate.go` | `StartAutoUpdate` (called from `main`): boot refresh + 15-min refresh in market hours |
 | `handlers/analysis.go` | All `/api/analysis/*` endpoints (calls `analysis.*`) |
 | `handlers/advisor.go` | Advisor, decision, and their backtest endpoints for one symbol |
 | `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true`) |
@@ -65,7 +66,7 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative analysis (no external LLM); uses signals, indicators, pattern detection, and uploaded reports text |
 | `handlers/backtest.go` | `GET /api/analysis/{symbol}/backtest` — simulates BUY/SELL on composite-signal change at next open; returns trades + summary |
 | `handlers/ihsg.go` | `GET /api/ihsg` — fetches `^JKSE` (Jakarta Composite Index) via the same fetcher |
-| `handlers/broker.go` | Broker-summary data CRUD under `./data/broker/{SYMBOL}.json`; includes `/mock` generator for test data |
+| `handlers/broker.go` | Broker-summary data CRUD under `./data/broker/{SYMBOL}.json`; includes `/mock` generator for test data. Mock files carry `"source": "mock"` and `LoadBrokerDays` ignores them, so synthetic flows never reach the decision engine |
 | `handlers/reports.go` | PDF research reports — list/upload/delete under `./data/reports/{SYMBOL}/`; uses `github.com/ledongthuc/pdf` for text extraction (consumed by AI handler). **Gotcha:** upload also spawns a Claude Code terminal (`openClaudeTerminal`) that analyzes the PDF and writes `./data/fundamentals/{SYMBOL}.json` |
 | `handlers/fundamental.go` | Read/write arbitrary JSON to `./data/fundamentals/{SYMBOL}.json` |
 | `handlers/dividends.go` | Dividend calendar: Yahoo dividend history for all tracked stocks (`fetcher.FetchDividends`, cached 24h in `data/dividends/yahoo.json`) → `riwayat` rows + `perkiraan` (last 12 months projected +1y, specials >3× median skipped). Manual official announcements in `data/dividends/calendar.json` suppress nearby projections |
@@ -165,7 +166,7 @@ fly deploy
 **Deployment-specific behaviour:**
 - `data/` is committed to git (~4 MB OHLCV) so the image ships a snapshot. `data/reports/` stays gitignored.
 - `openClaudeTerminal` (PDF upload → Claude CLI) is gated to `runtime.GOOS == "windows"`; on the server it's a no-op, since an upload-triggered `exec` is remote code execution.
-- No scheduler: hit "Update All" from the UI, or `curl -u ... -X POST .../api/stocks/update-all`.
+- In-process auto-update (`handlers/autoupdate.go`): full refresh at boot, then every 15 min on IDX trading days 09:00–16:15 WIB (holiday = `^JKSE` has no bar today). Shares `updateMu` with `POST /api/stocks/update-all` (endpoint waits, auto tick skips). On Fly it only runs while the machine is awake, and every cold start triggers a full refresh.
 ## Key constraints
 
 - **IDX only** — Yahoo Finance `.JK` suffix; prices are integers (Indonesian Rupiah, no decimals). IHSG uses `^JKSE`.

@@ -59,10 +59,10 @@ type AMDBarPhase struct {
 
 // AMDResult is the full AMD analysis response for a symbol.
 type AMDResult struct {
-	Zones        []AMDZone    `json:"zones"`
+	Zones        []AMDZone     `json:"zones"`
 	BarPhases    []AMDBarPhase `json:"bar_phases"`
-	CurrentZone  *AMDZone     `json:"current_zone"`  // most recent/active zone, nil if none
-	CurrentPhase string       `json:"current_phase"` // phase of the last labelled bar
+	CurrentZone  *AMDZone      `json:"current_zone"`  // most recent/active zone, nil if none
+	CurrentPhase string        `json:"current_phase"` // phase of the last labelled bar
 }
 
 // ── AMD ───────────────────────────────────────────────────────────────────────
@@ -85,10 +85,10 @@ func AMD(prices []models.StockPrice, accumPeriod, lookback int) AMDResult {
 	}
 
 	const (
-		accumThreshold = 5.0  // max H−L range % for accumulation
-		minManipBreak  = 0.3  // min % spike beyond range to count as manipulation
-		manipWindow    = 5    // bars after accumulation to look for stop hunt
-		distribBars    = 25   // bars after manipulation to track distribution
+		accumThreshold = 5.0 // max H−L range % for accumulation
+		minManipBreak  = 0.3 // min % spike beyond range to count as manipulation
+		manipWindow    = 5   // bars after accumulation to look for stop hunt
+		distribBars    = 25  // bars after manipulation to track distribution
 	)
 
 	barPhases := make([]AMDBarPhase, n)

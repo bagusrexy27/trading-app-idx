@@ -25,8 +25,8 @@ type AdvisorBacktestResult struct {
 	Total         int            `json:"total"` // closed trades
 	Wins          int            `json:"wins"`
 	Losses        int            `json:"losses"`
-	OpenTrades    int            `json:"open_trades"`    // still running at end of data
-	WinRate       float64        `json:"win_rate"`       // % of closed trades
+	OpenTrades    int            `json:"open_trades"` // still running at end of data
+	WinRate       float64        `json:"win_rate"`    // % of closed trades
 	AvgWinPct     float64        `json:"avg_win_pct"`
 	AvgLossPct    float64        `json:"avg_loss_pct"`
 	ExpectancyPct float64        `json:"expectancy_pct"` // mean PnL per closed trade

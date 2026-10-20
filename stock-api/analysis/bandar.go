@@ -14,14 +14,14 @@ import "sort"
 //   BrokerData — root file: symbol + history slice
 
 type BrokerEntry struct {
-	Code      string `json:"broker"`     // e.g. "YP"
-	Name      string `json:"name"`       // e.g. "Mirae Asset Sekuritas"
-	Type      string `json:"type"`       // "F" foreign | "L" local
+	Code      string `json:"broker"` // e.g. "YP"
+	Name      string `json:"name"`   // e.g. "Mirae Asset Sekuritas"
+	Type      string `json:"type"`   // "F" foreign | "L" local
 	BuyLots   int64  `json:"buy_lots"`
-	BuyValue  int64  `json:"buy_value"`  // IDR
+	BuyValue  int64  `json:"buy_value"` // IDR
 	SellLots  int64  `json:"sell_lots"`
 	SellValue int64  `json:"sell_value"`
-	NetValue  int64  `json:"net_value"`  // Buy − Sell
+	NetValue  int64  `json:"net_value"` // Buy − Sell
 }
 
 type BrokerDay struct {
@@ -33,6 +33,7 @@ type BrokerDay struct {
 type BrokerData struct {
 	Symbol      string      `json:"symbol"`
 	LastUpdated string      `json:"last_updated"`
+	Source      string      `json:"source,omitempty"` // "mock" = synthetic, viewer-only
 	Days        []BrokerDay `json:"days"`
 }
 
@@ -46,13 +47,13 @@ type FlowDay struct {
 
 // BrokerAggregate — totals per broker over a lookback window.
 type BrokerAggregate struct {
-	Code     string `json:"broker"`
-	Name     string `json:"name"`
-	Type     string `json:"type"`
-	BuyVal   int64  `json:"buy_value"`
-	SellVal  int64  `json:"sell_value"`
-	NetVal   int64  `json:"net_value"`
-	Days     int    `json:"days_active"`
+	Code    string `json:"broker"`
+	Name    string `json:"name"`
+	Type    string `json:"type"`
+	BuyVal  int64  `json:"buy_value"`
+	SellVal int64  `json:"sell_value"`
+	NetVal  int64  `json:"net_value"`
+	Days    int    `json:"days_active"`
 }
 
 // ── Aggregation ──────────────────────────────────────────────────────────────
@@ -167,8 +168,10 @@ func FlowSeries(days []BrokerDay) []FlowDay {
 // broker flow over `lookback` days. Positive = accumulation, negative = distribution.
 //
 // Heuristic:
-//   60% weight on cumulative foreign net (smart-money proxy)
-//   40% weight on top-5 vs bottom-5 broker net imbalance
+//
+//	60% weight on cumulative foreign net (smart-money proxy)
+//	40% weight on top-5 vs bottom-5 broker net imbalance
+//
 // Result is normalized against the total absolute flow over the window so the
 // score stays in the −100..+100 range.
 func BandarScore(days []BrokerDay, lookback int) float64 {

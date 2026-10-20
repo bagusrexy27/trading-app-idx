@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"stock-api/models"
@@ -88,7 +89,13 @@ func List() ([]string, error) {
 	symbols := make([]string, 0, len(files))
 	for _, f := range files {
 		base := filepath.Base(f)
-		symbols = append(symbols, base[:len(base)-5]) // strip .json
+		sym := base[:len(base)-5] // strip .json
+		// Tickers are stored uppercase (BBCA.json); anything else in the data
+		// root (e.g. portfolio.json) is not a stock.
+		if sym == "" || sym != strings.ToUpper(sym) {
+			continue
+		}
+		symbols = append(symbols, sym)
 	}
 	return symbols, nil
 }

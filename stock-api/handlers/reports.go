@@ -58,7 +58,10 @@ func ListReports(w http.ResponseWriter, r *http.Request) {
 		if e.IsDir() || !strings.HasSuffix(strings.ToLower(e.Name()), ".pdf") {
 			continue
 		}
-		info, _ := e.Info()
+		info, err := e.Info()
+		if err != nil { // deleted between ReadDir and Info
+			continue
+		}
 		// stored filename: {timestamp}_{originalname}
 		originalName := e.Name()
 		if idx := strings.Index(e.Name(), "_"); idx != -1 {

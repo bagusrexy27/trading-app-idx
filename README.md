@@ -25,7 +25,7 @@ go build -o stock-api.exe .
 ./stock-api.exe
 ```
 
-Buka **http://localhost:1111**. Repo sudah membawa snapshot OHLCV di `stock-api/data/`, jadi watchlist langsung terisi — klik **Update All** di sidebar untuk menarik bar terbaru.
+Buka **http://localhost:1111**. Repo sudah membawa snapshot OHLCV di `stock-api/data/`, jadi watchlist langsung terisi — server otomatis menarik bar terbaru saat start dan tiap 15 menit di jam bursa (tombol **Update All** di sidebar untuk refresh manual).
 
 ### Mode development (hot-reload)
 

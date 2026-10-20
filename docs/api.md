@@ -111,7 +111,7 @@ curl -X POST localhost:1111/api/stocks \
 
 ### `POST /stocks/update-all`
 
-Menjalankan update inkremental untuk setiap simbol dan mengembalikan satu baris hasil per saham (jumlah bar baru atau pesan error per simbol). Ini satu-satunya mekanisme refresh — tidak ada scheduler.
+Menjalankan update inkremental untuk setiap simbol dan mengembalikan satu baris hasil per saham (jumlah bar baru atau pesan error per simbol). Server juga menjalankan refresh yang sama secara otomatis (saat start, lalu tiap 15 menit di jam bursa — lihat `handlers/autoupdate.go`). Kalau refresh otomatis sedang berjalan, request ini menunggu sampai selesai.
 
 ```bash
 curl -X POST localhost:1111/api/stocks/update-all

@@ -116,9 +116,15 @@ func (h *BacktestHandler) Backtest(w http.ResponseWriter, r *http.Request) {
 	sumRet, best, worst := 0.0, trades[0].ReturnPct, trades[0].ReturnPct
 	for _, t := range trades {
 		sumRet += t.ReturnPct
-		if t.Win { wins++ }
-		if t.ReturnPct > best { best = t.ReturnPct }
-		if t.ReturnPct < worst { worst = t.ReturnPct }
+		if t.Win {
+			wins++
+		}
+		if t.ReturnPct > best {
+			best = t.ReturnPct
+		}
+		if t.ReturnPct < worst {
+			worst = t.ReturnPct
+		}
 	}
 	n := float64(len(trades))
 

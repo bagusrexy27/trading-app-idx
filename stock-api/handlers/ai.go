@@ -59,22 +59,28 @@ func (h *AIHandler) Analyze(w http.ResponseWriter, r *http.Request) {
 		stochK, stochD = s.K, s.D
 	}
 
-	sma20  := lastPoint(analysis.SMA(prices, 20))
-	sma50  := lastPoint(analysis.SMA(prices, 50))
+	sma20 := lastPoint(analysis.SMA(prices, 20))
+	sma50 := lastPoint(analysis.SMA(prices, 50))
 	sma200 := lastPoint(analysis.SMA(prices, 200))
 
 	pct1d, pct5d, pct1m := 0.0, 0.0, 0.0
 	if len(prices) > 1 {
 		ref := prices[len(prices)-2].Close
-		if ref > 0 { pct1d = analysis.R2((latest.Close-ref)/ref*100) }
+		if ref > 0 {
+			pct1d = analysis.R2((latest.Close - ref) / ref * 100)
+		}
 	}
 	if len(prices) > 5 {
 		ref := prices[len(prices)-6].Close
-		if ref > 0 { pct5d = analysis.R2((latest.Close-ref)/ref*100) }
+		if ref > 0 {
+			pct5d = analysis.R2((latest.Close - ref) / ref * 100)
+		}
 	}
 	if len(prices) > 22 {
 		ref := prices[len(prices)-23].Close
-		if ref > 0 { pct1m = analysis.R2((latest.Close-ref)/ref*100) }
+		if ref > 0 {
+			pct1m = analysis.R2((latest.Close - ref) / ref * 100)
+		}
 	}
 
 	vol20 := avgVol(prices, 20)
@@ -83,7 +89,7 @@ func (h *AIHandler) Analyze(w http.ResponseWriter, r *http.Request) {
 		volRatio = analysis.R2(float64(latest.Volume) / float64(vol20))
 	}
 
-	sig     := calcSignals(prices)
+	sig := calcSignals(prices)
 	pattern := detectPattern(prices)
 	reports := GetReportsText(symbol)
 
@@ -127,10 +133,10 @@ func generateLocalAnalysis(
 	var sb strings.Builder
 	f := func(v float64) string { return fmt.Sprintf("%.0f", v) }
 
-	above20  := sma20 > 0 && close > sma20
-	above50  := sma50 > 0 && close > sma50
+	above20 := sma20 > 0 && close > sma20
+	above50 := sma50 > 0 && close > sma50
 	above200 := sma200 > 0 && close > sma200
-	golden   := sma20 > 0 && sma50 > 0 && sma20 >= sma50
+	golden := sma20 > 0 && sma50 > 0 && sma20 >= sma50
 
 	// ── 1. Kondisi Tren ───────────────────────────────────────────────
 
@@ -185,8 +191,14 @@ func generateLocalAnalysis(
 	} else if pct1d <= -3 {
 		sb.WriteString(fmt.Sprintf(" Penurunan tajam %.1f%% hari ini — potensi overselling atau distribusi.", pct1d))
 	}
-	s5 := ""; if pct5d > 0 { s5 = "+" }
-	s1m := ""; if pct1m > 0 { s1m = "+" }
+	s5 := ""
+	if pct5d > 0 {
+		s5 = "+"
+	}
+	s1m := ""
+	if pct1m > 0 {
+		s1m = "+"
+	}
 	sb.WriteString(fmt.Sprintf(" (5H: %s%.1f%%, 1B: %s%.1f%%)", s5, pct5d, s1m, pct1m))
 
 	// ── 2. Konfluensi Sinyal ──────────────────────────────────────────
@@ -198,9 +210,11 @@ func generateLocalAnalysis(
 
 	// RSI
 	if rsiVal <= 35 {
-		bullCount++; bullFactors = append(bullFactors, fmt.Sprintf("RSI oversold (%.1f)", rsiVal))
+		bullCount++
+		bullFactors = append(bullFactors, fmt.Sprintf("RSI oversold (%.1f)", rsiVal))
 	} else if rsiVal >= 65 {
-		bearCount++; bearFactors = append(bearFactors, fmt.Sprintf("RSI overbought (%.1f)", rsiVal))
+		bearCount++
+		bearFactors = append(bearFactors, fmt.Sprintf("RSI overbought (%.1f)", rsiVal))
 	} else if rsiVal > 50 {
 		bullCount++
 	} else {
@@ -209,16 +223,20 @@ func generateLocalAnalysis(
 
 	// MACD histogram
 	if histVal > 0 {
-		bullCount++; bullFactors = append(bullFactors, "MACD histogram positif")
+		bullCount++
+		bullFactors = append(bullFactors, "MACD histogram positif")
 	} else {
-		bearCount++; bearFactors = append(bearFactors, "MACD histogram negatif")
+		bearCount++
+		bearFactors = append(bearFactors, "MACD histogram negatif")
 	}
 
 	// Bollinger %B
 	if percentB <= 20 {
-		bullCount++; bullFactors = append(bullFactors, fmt.Sprintf("harga di lower Bollinger (%%B %.0f%%)", percentB))
+		bullCount++
+		bullFactors = append(bullFactors, fmt.Sprintf("harga di lower Bollinger (%%B %.0f%%)", percentB))
 	} else if percentB >= 80 {
-		bearCount++; bearFactors = append(bearFactors, fmt.Sprintf("harga di upper Bollinger (%%B %.0f%%)", percentB))
+		bearCount++
+		bearFactors = append(bearFactors, fmt.Sprintf("harga di upper Bollinger (%%B %.0f%%)", percentB))
 	} else if percentB > 50 {
 		bullCount++
 	} else {
@@ -227,9 +245,11 @@ func generateLocalAnalysis(
 
 	// Stochastic
 	if stochK <= 25 {
-		bullCount++; bullFactors = append(bullFactors, fmt.Sprintf("Stochastic oversold (%%K %.0f)", stochK))
+		bullCount++
+		bullFactors = append(bullFactors, fmt.Sprintf("Stochastic oversold (%%K %.0f)", stochK))
 	} else if stochK >= 75 {
-		bearCount++; bearFactors = append(bearFactors, fmt.Sprintf("Stochastic overbought (%%K %.0f)", stochK))
+		bearCount++
+		bearFactors = append(bearFactors, fmt.Sprintf("Stochastic overbought (%%K %.0f)", stochK))
 	} else if stochK > stochD {
 		bullCount++
 	} else {
@@ -238,28 +258,46 @@ func generateLocalAnalysis(
 
 	// SMA position
 	if above20 && above50 {
-		bullCount++; bullFactors = append(bullFactors, "harga di atas SMA20 dan SMA50")
+		bullCount++
+		bullFactors = append(bullFactors, "harga di atas SMA20 dan SMA50")
 	} else if !above20 && !above50 {
-		bearCount++; bearFactors = append(bearFactors, "harga di bawah SMA20 dan SMA50")
+		bearCount++
+		bearFactors = append(bearFactors, "harga di bawah SMA20 dan SMA50")
 	}
 
 	switch {
 	case bullCount >= 4:
 		sb.WriteString(fmt.Sprintf("Konfluensi bullish kuat: %d/%d indikator sependapat positif.", bullCount, bullCount+bearCount))
-		if len(bullFactors) > 0 { sb.WriteString(" Pendukung: " + strings.Join(bullFactors, ", ") + ".") }
-		if len(bearFactors) > 0 { sb.WriteString(" Catatan: " + strings.Join(bearFactors, ", ") + ".") }
+		if len(bullFactors) > 0 {
+			sb.WriteString(" Pendukung: " + strings.Join(bullFactors, ", ") + ".")
+		}
+		if len(bearFactors) > 0 {
+			sb.WriteString(" Catatan: " + strings.Join(bearFactors, ", ") + ".")
+		}
 	case bearCount >= 4:
 		sb.WriteString(fmt.Sprintf("Konfluensi bearish: %d/%d indikator menekan.", bearCount, bullCount+bearCount))
-		if len(bearFactors) > 0 { sb.WriteString(" Penekan: " + strings.Join(bearFactors, ", ") + ".") }
-		if len(bullFactors) > 0 { sb.WriteString(" Satu-satunya positif: " + strings.Join(bullFactors, ", ") + ".") }
+		if len(bearFactors) > 0 {
+			sb.WriteString(" Penekan: " + strings.Join(bearFactors, ", ") + ".")
+		}
+		if len(bullFactors) > 0 {
+			sb.WriteString(" Satu-satunya positif: " + strings.Join(bullFactors, ", ") + ".")
+		}
 	case bullCount > bearCount:
 		sb.WriteString(fmt.Sprintf("Sinyal campuran, kecenderungan bullish (%d vs %d).", bullCount, bearCount))
-		if len(bullFactors) > 0 { sb.WriteString(" Positif: " + strings.Join(bullFactors, ", ") + ".") }
-		if len(bearFactors) > 0 { sb.WriteString(" Negatif: " + strings.Join(bearFactors, ", ") + ".") }
+		if len(bullFactors) > 0 {
+			sb.WriteString(" Positif: " + strings.Join(bullFactors, ", ") + ".")
+		}
+		if len(bearFactors) > 0 {
+			sb.WriteString(" Negatif: " + strings.Join(bearFactors, ", ") + ".")
+		}
 	case bearCount > bullCount:
 		sb.WriteString(fmt.Sprintf("Sinyal campuran, kecenderungan bearish (%d vs %d).", bearCount, bullCount))
-		if len(bearFactors) > 0 { sb.WriteString(" Negatif: " + strings.Join(bearFactors, ", ") + ".") }
-		if len(bullFactors) > 0 { sb.WriteString(" Positif: " + strings.Join(bullFactors, ", ") + ".") }
+		if len(bearFactors) > 0 {
+			sb.WriteString(" Negatif: " + strings.Join(bearFactors, ", ") + ".")
+		}
+		if len(bullFactors) > 0 {
+			sb.WriteString(" Positif: " + strings.Join(bullFactors, ", ") + ".")
+		}
 	default:
 		sb.WriteString("Indikator terbagi rata — pasar dalam kondisi tidak pasti, hindari posisi agresif.")
 	}
@@ -277,7 +315,10 @@ func generateLocalAnalysis(
 
 	sb.WriteString("\n\n**Level Kunci**\n")
 
-	type lvl struct{ name string; val float64 }
+	type lvl struct {
+		name string
+		val  float64
+	}
 	allLevels := []lvl{
 		{"Bollinger Lower", lower},
 		{"SMA200", sma200},
@@ -289,7 +330,9 @@ func generateLocalAnalysis(
 
 	var supports, resistances []string
 	for _, l := range allLevels {
-		if l.val <= 0 { continue }
+		if l.val <= 0 {
+			continue
+		}
 		gap := (close - l.val) / close * 100
 		if gap > 0.5 {
 			supports = append(supports, fmt.Sprintf("%s %s (%.1f%%)", l.name, f(l.val), -gap))
@@ -297,13 +340,21 @@ func generateLocalAnalysis(
 			resistances = append(resistances, fmt.Sprintf("%s %s (+%.1f%%)", l.name, f(l.val), -gap))
 		}
 	}
-	if len(supports) > 3    { supports = supports[:3] }
-	if len(resistances) > 3 { resistances = resistances[:3] }
+	if len(supports) > 3 {
+		supports = supports[:3]
+	}
+	if len(resistances) > 3 {
+		resistances = resistances[:3]
+	}
 
 	supStr := "area bawah (data terbatas)"
-	if len(supports) > 0 { supStr = strings.Join(supports, " → ") }
+	if len(supports) > 0 {
+		supStr = strings.Join(supports, " → ")
+	}
 	resStr := "area atas (data terbatas)"
-	if len(resistances) > 0 { resStr = strings.Join(resistances, " → ") }
+	if len(resistances) > 0 {
+		resStr = strings.Join(resistances, " → ")
+	}
 
 	sb.WriteString(fmt.Sprintf("Support: %s\nResistance: %s", supStr, resStr))
 
@@ -313,17 +364,27 @@ func generateLocalAnalysis(
 
 	// Stop & target dari Bollinger band
 	stopLoss := lower * 0.99
-	if stopLoss <= 0 { stopLoss = close * 0.95 }
+	if stopLoss <= 0 {
+		stopLoss = close * 0.95
+	}
 	t1 := middle
-	if t1 <= close { t1 = close * 1.03 }
+	if t1 <= close {
+		t1 = close * 1.03
+	}
 	t2 := upper
-	if t2 <= t1   { t2 = close * 1.06 }
+	if t2 <= t1 {
+		t2 = close * 1.06
+	}
 
 	rr := 0.0
-	if close-stopLoss > 0 { rr = (t1 - close) / (close - stopLoss) }
+	if close-stopLoss > 0 {
+		rr = (t1 - close) / (close - stopLoss)
+	}
 
 	nearSup := "support terdekat"
-	if len(supports) > 0 { nearSup = supports[0] }
+	if len(supports) > 0 {
+		nearSup = supports[0]
+	}
 
 	switch signal {
 	case "STRONG_BUY", "STRONG BUY":

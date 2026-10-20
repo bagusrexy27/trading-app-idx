@@ -1,6 +1,6 @@
 # Arsitektur
 
-Monolit satu proses: Go menyajikan `/api/*` dan file statis hasil build React dari `./static`. Tidak ada database, tidak ada scheduler, tidak ada layanan eksternal selain Yahoo Finance.
+Monolit satu proses: Go menyajikan `/api/*` dan file statis hasil build React dari `./static`. Tidak ada database dan tidak ada layanan eksternal selain Yahoo Finance. Satu goroutine latar (`handlers/autoupdate.go`) menyegarkan data saat jam bursa.
 
 Semua kode di `stock-api/`.
 
@@ -108,7 +108,7 @@ Advisor sengaja dipertahankan karena keluarannya bisa dibaca sebagai penalaran, 
 
 `doUpdate()` (`handlers/handlers.go`) membaca tanggal tersimpan terakhir, meminta Yahoo mulai `lastDate+1`, mendedup berdasarkan string tanggal, menambahkan, lalu mengurutkan ulang. `POST /api/stocks/update-all` melakukannya untuk seluruh watchlist.
 
-Tidak ada scheduler. Update dipicu manual dari tombol **Update All** di UI, atau lewat curl.
+Update otomatis in-process (`handlers/autoupdate.go`): sekali saat server start, lalu tiap 15 menit di hari bursa 09:00–16:15 WIB. Hari libur terdeteksi dari `^JKSE` yang tidak punya bar hari ini. Tombol **Update All** dan curl tetap bisa dipakai; keduanya berbagi `updateMu`, jadi tidak pernah jalan bersamaan (endpoint menunggu, tick otomatis dilewati).
 
 ### Daftar syariah
 
@@ -176,7 +176,7 @@ Namespace `tv` di `ui/tailwind.config.js`: `tv-bg` (#131722), `tv-card` (#1e222d
 | **Auth gagal-terbuka** | `basicAuth` hanya aktif kalau `AUTH_USER` **dan** `AUTH_PASS` terisi. Kalau salah satu kosong, server jalan terbuka dan hanya mencetak peringatan kuning saat startup — bukan `log.Fatal`. Lupa `fly secrets set` berarti seluruh route, termasuk DELETE dan upload, terbuka |
 | **Upload PDF memicu `os/exec`** | `openClaudeTerminal()` membuka terminal Claude Code untuk menganalisa PDF dan menulis `data/fundamentals/{SYMBOL}.json`. Digerbangi `runtime.GOOS == "windows"` sehingga no-op di server — karena upload yang memicu exec adalah jalur eksekusi kode remote. Jangan pernah jalankan versi Windows-nya dengan port terbuka |
 | **Endpoint AI lokal** | `/api/analysis/{symbol}/ai` berbasis aturan, tanpa panggilan LLM eksternal. Narasi dibentuk dari sinyal, indikator, deteksi pola, dan teks laporan PDF yang diekstrak |
-| **Tanpa scheduler** | Data hanya sesegar "Update All" terakhir. Di Fly dengan `auto_stop_machines`, tidak ada proses latar yang menyegarkan apa pun |
+| **Scheduler in-process** | Lokal: data segar tiap 15 menit di jam bursa tanpa klik. Di Fly dengan `auto_stop_machines`, scheduler hanya jalan selama mesin bangun, dan setiap cold start memicu refresh penuh (~90 panggilan Yahoo) |
 | **Yahoo Finance tak resmi** | Tanpa kontrak, tanpa SLA, rate limit tak terdokumentasi. `User-Agent` wajib. Perubahan bentuk response akan merusak `fetcher` tanpa peringatan |
 | **Daftar syariah manual** | Snapshot hardcoded, butuh edit + rebuild setiap review DES |
 | **Dua mesin keputusan** | Decision engine dan Advisor bisa tidak sepakat untuk simbol yang sama. Itu disengaja (beda metode), tapi berarti ada dua jalur yang harus dipelihara dan dua backtest yang harus dibaca |
