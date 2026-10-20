@@ -64,6 +64,7 @@ function Card({ r, h, onSelect }) {
           </span>
         )}
         {r.syariah && <Chip tone="text-tv-green">☪ Syariah</Chip>}
+        {(r.idx30 || r.lq45) && <Chip tone="text-tv-blue">{r.idx30 ? 'IDX30' : 'LQ45'}</Chip>}
       </div>
 
       {/* mini trade plan */}
@@ -102,6 +103,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
   const [mode, setMode]       = useState('buy')
   const [minTurn, setMinTurn] = useState(2)
   const [syariahOnly, setSyariahOnly] = useState(false)
+  const [index, setIndex] = useState('') // '' | 'idx30' | 'lq45'
   const [maxPrice, setMaxPrice]   = useState(0)   // 0 = semua
   const [minScore, setMinScore]   = useState(0)
   const [volFilter, setVolFilter] = useState('')  // '' = semua
@@ -123,12 +125,13 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       minRR: minRR || undefined,
       minConfidence: minConfidence || undefined,
       syariah: syariahOnly || undefined,
+      index: index || undefined,
     })
       .then(d => { if (alive) setData(d) })
       .catch(e => { if (alive) showToast?.(e.message, 'error') })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
-  }, [mode, minTurn, minRR, minConfidence, syariahOnly, reloadKey, showToast])
+  }, [mode, minTurn, minRR, minConfidence, syariahOnly, index, reloadKey, showToast])
 
   // Filter harga/skor/volume/trend tetap di client — backend sudah handle R/R, keyakinan, syariah.
   const results = (data?.results ?? []).filter(r =>
@@ -167,6 +170,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
         <Select label="Keyakinan" value={minConfidence} onChange={setMinConfidence} options={[[0, 'Semua'], [50, '≥50%'], [60, '≥60%'], [70, '≥70%']]} />
         <Select label="Volume" value={volFilter} onChange={setVolFilter} strings options={[['', 'Semua'], ['Above Average', 'Di atas rata²'], ['Normal', 'Normal'], ['Below Average', 'Di bawah rata²']]} />
         <Select label="R/R" value={minRR} onChange={setMinRR} options={[[0, '≥1 (default)'], [1.5, '≥1.5'], [2, '≥2'], [3, '≥3']]} />
+        <Select label="Indeks" value={index} onChange={setIndex} strings options={[['', 'Semua'], ['lq45', 'LQ45'], ['idx30', 'IDX30']]} />
         <Select label="Trend" value={trendFilter} onChange={setTrendFilter} strings options={[['', 'Semua'], ['Bullish', 'Bullish'], ['Bearish', 'Bearish'], ['Sideways', 'Sideways']]} />
         <Select label="Urutkan" value={sortBy} onChange={setSortBy} strings options={[['score', 'Skor'], ['proj', 'Proyeksi terbaik']]} />
         <HorizonToggle value={horizon} onChange={setHorizon} />
@@ -178,6 +182,12 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
           ↻ Refresh
         </button>
       </div>
+
+      {index && data?.index_stale && (
+        <div className="text-xs text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/30 rounded-lg px-3 py-2 mb-3">
+          ⚠️ Daftar IDX30/LQ45 berlaku s/d {data.index_until}. BEI sudah ganti periode, jadi filter ini mungkin sudah basi (edit handlers/indices.go).
+        </div>
+      )}
 
       {data?.regime === 'down' && !loading && (
         <div className="text-xs text-tv-red bg-tv-red/10 border border-tv-red/30 rounded-lg px-3 py-2 mb-3">

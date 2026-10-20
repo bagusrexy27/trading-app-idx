@@ -61,6 +61,7 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true`) |
 | `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar or stock count changes; fetches `^JKSE` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
 | `handlers/syariah.go` | Hardcoded ISSI syariah symbol set (`isSyariah`) — edit manually when OJK's DES list changes |
+| `handlers/indices.go` | Hardcoded IDX30/LQ45 constituent sets (`isIDX30`/`isLQ45`) → `idx30`/`lq45` on stock list + screen rows; screen filter `?index=idx30\|lq45`. BEI re-evaluates quarterly (Feb/May/Aug/Nov) — edit manually |
 | `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative analysis (no external LLM); uses signals, indicators, pattern detection, and uploaded reports text |
 | `handlers/backtest.go` | `GET /api/analysis/{symbol}/backtest` — simulates BUY/SELL on composite-signal change at next open; returns trades + summary |
 | `handlers/ihsg.go` | `GET /api/ihsg` — fetches `^JKSE` (Jakarta Composite Index) via the same fetcher |

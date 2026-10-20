@@ -69,6 +69,8 @@ func (h *Handler) ListStocks(w http.ResponseWriter, r *http.Request) {
 		ChangePct   float64   `json:"change_pct,omitempty"`
 		Sparkline   []float64 `json:"sparkline,omitempty"`
 		Syariah     bool      `json:"syariah"`
+		IDX30       bool      `json:"idx30"`
+		LQ45        bool      `json:"lq45"`
 	}
 
 	list := make([]Summary, 0, len(symbols))
@@ -83,6 +85,8 @@ func (h *Handler) ListStocks(w http.ResponseWriter, r *http.Request) {
 			LastUpdated: d.LastUpdated,
 			DataPoints:  len(d.Prices),
 			Syariah:     isSyariah(sym),
+			IDX30:       isIDX30(sym),
+			LQ45:        isLQ45(sym),
 		}
 		if len(d.Prices) > 0 {
 			s.OldestDate = d.Prices[0].Date

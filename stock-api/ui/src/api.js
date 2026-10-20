@@ -78,6 +78,7 @@ export const api = {
     if (opts.minRR != null && opts.minRR > 0) p.set('min_rr', String(opts.minRR))
     if (opts.minConfidence != null && opts.minConfidence > 0) p.set('min_confidence', String(opts.minConfidence))
     if (opts.syariah) p.set('syariah', 'true')
+    if (opts.index) p.set('index', opts.index)
     if (opts.includeLowRR) p.set('include_low_rr', 'true')
     return req(`/advisor/screen?${p}`)
   },

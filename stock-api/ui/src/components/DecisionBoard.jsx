@@ -67,6 +67,11 @@ function TickerCard({ r, onSelect }) {
             <IconSharia /> Syariah
           </span>
         )}
+        {(r.idx30 || r.lq45) && (
+          <span className="text-[9px] font-bold text-tv-blue border border-tv-blue/30 bg-tv-blue/10 px-1.5 py-0.5 rounded">
+            {r.idx30 ? 'IDX30' : 'LQ45'}
+          </span>
+        )}
         <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded border
           ${buyish ? 'text-tv-green border-tv-green/30 bg-tv-green/10' : 'text-tv-red border-tv-red/30 bg-tv-red/10'}`}>
           {r.signal?.replace(/_/g, ' ')}
@@ -130,8 +135,10 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
   const [loading, setLoading] = useState(true)
   const [sort, setSort] = useState('score') // score | rr | volume
   const [shariaOnly, setShariaOnly] = useState(false)
+  const [index, setIndex] = useState('') // '' | 'idx30' | 'lq45'
   const [error, setError] = useState(null)
   const [regime, setRegime] = useState('unknown')
+  const [indexInfo, setIndexInfo] = useState({ stale: false, until: '' })
 
   // Fetch sekali setelah daftar saham termuat, dan ulang tiap daftar berubah
   // (tambah / hapus / update). Sparkline digabung terpisah — tidak memicu fetch.
@@ -145,6 +152,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
       .then(d => {
         if (!alive) return
         setRegime(d?.regime || 'unknown')
+        setIndexInfo({ stale: !!d?.index_stale, until: d?.index_until || '' })
         setScreen(d?.results || [])
       })
       .catch(e => { if (alive) setError(e.message) })
@@ -165,11 +173,11 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
 
   // 'score' = urutan backend apa adanya (skor → keyakinan → R/R), sama dengan screener.
   const sorted = useMemo(() => {
-    const list = shariaOnly ? rows.filter(r => r.syariah) : rows.slice()
+    const list = rows.filter(r => (!shariaOnly || r.syariah) && (!index || r[index]))
     if (sort === 'rr') list.sort((a, b) => (b.risk_reward || 0) - (a.risk_reward || 0))
     if (sort === 'volume') list.sort((a, b) => (b.turnover_bn || 0) - (a.turnover_bn || 0))
     return list
-  }, [rows, sort, shariaOnly])
+  }, [rows, sort, shariaOnly, index])
 
   const buy = sorted.filter(isBuy)
   const buySyms = new Set(buy.map(r => r.symbol))
@@ -200,6 +208,15 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
             <option value="score">Urut: Skor</option>
             <option value="rr">Urut: R:R</option>
             <option value="volume">Urut: Likuiditas</option>
+          </select>
+          <select
+            value={index}
+            onChange={e => setIndex(e.target.value)}
+            className="bg-tv-input border border-tv-border rounded-lg px-2.5 py-1.5 text-xs text-tv-text outline-none"
+          >
+            <option value="">Indeks: Semua</option>
+            <option value="lq45">LQ45</option>
+            <option value="idx30">IDX30</option>
           </select>
           <button
             onClick={() => setShariaOnly(v => !v)}
@@ -242,6 +259,11 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
         </div>
       ) : error ? null : (
         <>
+          {index && indexInfo.stale && (
+            <div className="text-xs text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/30 rounded-lg px-3 py-2 mb-3">
+              ⚠️ Daftar IDX30/LQ45 berlaku s/d {indexInfo.until}. BEI sudah ganti periode, jadi filter ini mungkin sudah basi (edit handlers/indices.go).
+            </div>
+          )}
           <OmbakMeter regime={regime} buy={buy.length} wait={waiting.length} sell={avoid.length} />
           <div className="grid md:grid-cols-2 gap-6">
             <Column

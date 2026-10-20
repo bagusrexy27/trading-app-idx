@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
+	"time"
 
 	"stock-api/analysis"
 	"stock-api/storage"
@@ -16,6 +18,7 @@ type screenFilters struct {
 	MinRR         float64
 	MinConfidence int
 	SyariahOnly   bool
+	Index         string // "" | "idx30" | "lq45"
 	IncludeLowRR  bool
 }
 
@@ -41,6 +44,7 @@ func parseScreenFilters(r *http.Request) screenFilters {
 		}
 	}
 	f.SyariahOnly = r.URL.Query().Get("syariah") == "true"
+	f.Index = strings.ToLower(r.URL.Query().Get("index"))
 	f.IncludeLowRR = r.URL.Query().Get("include_low_rr") == "true"
 	return f
 }
@@ -63,6 +67,8 @@ type screenRow struct {
 	RiskReward  float64           `json:"risk_reward"`
 	TurnoverBn  float64           `json:"turnover_bn"`
 	Syariah     bool              `json:"syariah"`
+	IDX30       bool              `json:"idx30"`
+	LQ45        bool              `json:"lq45"`
 	Note        string            `json:"note,omitempty"`
 	Calibration *calibrationFor   `json:"calibration,omitempty"` // measured history for this score + regime
 }
@@ -75,6 +81,9 @@ func filterScreenRows(rows []screenRow, f screenFilters) []screenRow {
 			continue
 		}
 		if f.SyariahOnly && !row.Syariah {
+			continue
+		}
+		if (f.Index == "idx30" && !row.IDX30) || (f.Index == "lq45" && !row.LQ45) {
 			continue
 		}
 		if f.MinConfidence > 0 && row.Confidence < f.MinConfidence {
@@ -100,6 +109,10 @@ func filterScreenRows(rows []screenRow, f screenFilters) []screenRow {
 // IDR/day) filters out illiquid names (default 2).
 func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) {
 	f := parseScreenFilters(r)
+	if !validIndex(f.Index) {
+		respond(w, 400, false, "index harus idx30 atau lq45", nil)
+		return
+	}
 
 	symbols, err := storage.List()
 	if err != nil {
@@ -132,7 +145,7 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 			EntryLow: dec.EntryZone.Buy[0], EntryHigh: dec.EntryZone.Buy[1], EntryIdeal: dec.EntryZone.Ideal,
 			Stop: dec.StopLoss, Target: dec.TakeProfit[0].Price, RiskReward: dec.RiskReward,
 			TurnoverBn: analysis.R2(turnover),
-			Syariah:    isSyariah(sym), Note: dec.Note,
+			Syariah:    isSyariah(sym), IDX30: isIDX30(sym), LQ45: isLQ45(sym), Note: dec.Note,
 			Calibration: lookupCalibration(calib, regime, sym, dec.Score, d.Prices),
 		})
 	}
@@ -155,6 +168,9 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 		"min_rr":         f.MinRR,
 		"min_confidence": f.MinConfidence,
 		"syariah":        f.SyariahOnly,
+		"index":          f.Index,
+		"index_stale":    indexStale(time.Now()), // daftar IDX30/LQ45 lewat periode
+		"index_until":    indexValidUntil,
 		"include_low_rr": f.IncludeLowRR,
 		"regime":         regime, // IHSG vs SMA50: up | down | unknown
 		"scanned":        scanned,

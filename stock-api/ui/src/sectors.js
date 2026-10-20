@@ -2,16 +2,17 @@
 // Hardcode, sama seperti handlers/syariah.go: EDIT manual saat menambah saham.
 // Saham yang tidak terdaftar di sini masuk "Lainnya".
 const SECTORS = {
-  'Bank':                  ['BBCA', 'BMRI', 'BRIS'],
-  'Batu Bara':             ['AADI', 'ADRO', 'ADMR', 'PTBA', 'HRUM', 'BUMI', 'BYAN', 'DEWA', 'TOBA', 'DSSA'],
-  'Logam & Mineral':       ['ANTM', 'INCO', 'MBMA', 'MDKA', 'NICL', 'TINS', 'BRMS'],
-  'Energi & Migas':        ['MEDC', 'ENRG', 'PGAS', 'RAJA', 'RATU', 'AKRA', 'ESSA'],
-  'Konsumer & Ritel':      ['ICBP', 'INDF', 'MYOR', 'UNVR', 'AISA', 'FORE', 'BELL', 'MAPI', 'ACES'],
+  'Bank':                  ['BBCA', 'BMRI', 'BRIS', 'BBRI', 'BBNI', 'BBTN'],
+  'Batu Bara':             ['AADI', 'ADRO', 'ADMR', 'PTBA', 'HRUM', 'BUMI', 'BYAN', 'DEWA', 'TOBA', 'DSSA', 'INDY', 'ITMG'],
+  'Logam & Mineral':       ['ANTM', 'INCO', 'MBMA', 'MDKA', 'NICL', 'TINS', 'BRMS', 'AMMN', 'NCKL'],
+  'Energi & Migas':        ['MEDC', 'ENRG', 'PGAS', 'RAJA', 'RATU', 'AKRA', 'ESSA', 'PGEO', 'CUAN'],
+  'Konsumer & Ritel':      ['ICBP', 'INDF', 'MYOR', 'UNVR', 'AISA', 'FORE', 'BELL', 'MAPI', 'ACES', 'AMRT', 'HRTA'],
   'Kesehatan':             ['KLBF', 'SIDO'],
-  'Agri':                  ['AALI', 'SIMP', 'CPIN'],
-  'Telko & Tekno':         ['TLKM', 'EXCL', 'ISAT', 'INET'],
+  'Agri':                  ['AALI', 'SIMP', 'CPIN', 'JPFA'],
+  'Telko & Tekno':         ['TLKM', 'EXCL', 'ISAT', 'INET', 'EMTK', 'GOTO', 'WIFI'],
+  'Media':                 ['SCMA'],
   'Properti':              ['CTRA', 'BSDE', 'BKSL', 'KOTA', 'BUVA', 'SSIA'],
-  'Industri Dasar':        ['SMGR', 'TPIA', 'BRPT'],
+  'Industri Dasar':        ['SMGR', 'TPIA', 'BRPT', 'INKP'],
   'Otomotif & Alat Berat': ['ASII', 'AUTO', 'GJTL', 'VKTR', 'UNTR'],
   'Transportasi':          ['SMDR', 'SOCI', 'TCPI', 'GTSI', 'BULL', 'HUMI', 'JAYA'],
 }
