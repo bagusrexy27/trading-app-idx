@@ -250,7 +250,6 @@ func main() {
 	h := handlers.New()
 	a := handlers.NewAnalysis()
 	ai := handlers.NewAI()
-	bt := handlers.NewBacktest()
 	br := handlers.NewBroker()
 
 	r := mux.NewRouter()
@@ -277,7 +276,6 @@ func main() {
 	// ── Analysis endpoints ────────────────────────────────────────────────────
 	api.HandleFunc("/analysis/{symbol}/summary", a.Summary).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/indicators", a.Indicators).Methods("GET")
-	api.HandleFunc("/analysis/{symbol}/signals", a.Signals).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/sma", a.SMA).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/ema", a.EMA).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/rsi", a.RSI).Methods("GET")
@@ -299,11 +297,8 @@ func main() {
 	api.HandleFunc("/analysis/{symbol}/adline", a.ADLine).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/cmf", a.CMF).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/mfi", a.MFI).Methods("GET")
-	api.HandleFunc("/analysis/{symbol}/advisor", a.Advisor).Methods("GET")
-	api.HandleFunc("/analysis/{symbol}/advisor-backtest", a.AdvisorBacktest).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/decision", a.Decision).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/decision-backtest", a.DecisionBacktest).Methods("GET")
-	api.HandleFunc("/analysis/{symbol}/backtest", bt.Backtest).Methods("GET")
 	api.HandleFunc("/overview", a.Overview).Methods("GET")
 	api.HandleFunc("/advisor/screen", a.AdvisorScreen).Methods("GET")
 	api.HandleFunc("/calibration", a.Calibration).Methods("GET")

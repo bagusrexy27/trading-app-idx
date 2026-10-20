@@ -59,8 +59,7 @@ curl -X POST localhost:1111/api/stocks -d '{"symbol":"BBCA","from":"2024-01-01"}
 | **Volume flow** | A/D Line, Money Flow Index, Chaikin Money Flow |
 | **Smart money** | AMD (Accumulation–Manipulation–Distribution), Fair Value Gap (FVG) dengan status active/filled/inverted, Bandarmology dari broker summary |
 | **Decision engine** | 11 faktor berbobot → signal 5 level + confidence + zona entry + stop + take profit bertingkat + distribusi probabilitas. Breakdown per faktor ikut dikirim |
-| **Advisor** | Pohon keputusan price-action dengan checklist 7 poin dan narasi Bahasa Indonesia |
-| **Backtest** | Backtest decision engine, advisor, dan composite signal atas histori tersimpan |
+| **Backtest** | Backtest decision engine atas histori tersimpan |
 | **Screener** | `/api/advisor/screen` — jalankan engine ke seluruh watchlist, ranking kandidat, filter turnover / R:R / confidence / syariah |
 | **Pasar** | Market overview, session prep, badge IHSG (`^JKSE`, cache 60s) |
 | **Lainnya** | Portfolio tracker, risk calculator, price alert, upload laporan PDF + analisa fundamental, export CSV, game latihan prediksi candle |
@@ -73,7 +72,7 @@ curl -X POST localhost:1111/api/stocks -d '{"symbol":"BBCA","from":"2024-01-01"}
 
 | Dokumen | Isi |
 |---|---|
-| [docs/architecture.md](docs/architecture.md) | Alur request, decision engine vs advisor, model storage, trade-off dan batasan yang diketahui |
+| [docs/architecture.md](docs/architecture.md) | Alur request, decision engine (satu sumber vonis), model storage, trade-off dan batasan yang diketahui |
 | [docs/api.md](docs/api.md) | Referensi 50+ endpoint: parameter, contoh response nyata, error code |
 | [docs/deploy.md](docs/deploy.md) | Runbook deploy Fly.io, seeding volume, auth, rollback |
 | [CLAUDE.md](CLAUDE.md) | Peta repo untuk Claude Code |

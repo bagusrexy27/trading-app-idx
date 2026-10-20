@@ -441,7 +441,7 @@ func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay
 	}
 
 	// ── Candlestick (confirmation only) ──────────────────────────────────────
-	candleLabel, candleDir := candlePattern(prices, n-1)
+	candleLabel, candleDir := CandlePattern(prices, n-1)
 	strongCandle := candleLabel != "Bar hijau" && candleLabel != "Bar merah" && candleLabel != "-"
 	candleSc := 50
 	switch candleDir {

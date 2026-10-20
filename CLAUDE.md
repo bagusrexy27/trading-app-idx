@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-**IDX Stock Analyzer** — Full-stack technical analysis platform for Indonesian (IDX) stocks. Go backend (Gorilla Mux) fetches Yahoo Finance data and runs 15+ technical indicators, a rule-based advisor/decision engine, and a local AI write-up; React + Vite frontend renders a decision-board landing page, charts, advisor verdicts, market screener, portfolio, and a candle-prediction practice game.
+**IDX Stock Analyzer** — Full-stack technical analysis platform for Indonesian (IDX) stocks. Go backend (Gorilla Mux) fetches Yahoo Finance data and runs 15+ technical indicators, a weighted decision engine (the single source of verdicts), and a local AI write-up; React + Vite frontend renders a decision-board landing page, charts, decision verdicts, market screener, portfolio, and a candle-prediction practice game.
 
 All code lives in `stock-api/`. Run all commands from that directory unless noted.
 
@@ -49,23 +49,21 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `analysis/amd.go` | Accumulation–Manipulation–Distribution (Wyckoff-style) phase detector |
 | `analysis/adline.go`, `mfi.go`, `cmf.go` | Volume-flow indicators: A/D Line, Money Flow Index, Chaikin Money Flow |
 | `analysis/bandar.go` | Bandarmology (broker accumulation/distribution) analysis over broker-summary data |
-| `analysis/advisor.go` | Rule-based price-action decision engine — verdict `STRONG_BUY \| BUY \| WAIT \| AVOID \| REDUCE` with confidence, stop/target, Indonesian action text; tests in `advisor_test.go` |
-| `analysis/advisor_backtest.go` | Backtests the advisor's signals over history |
-| `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP. Low-confidence results downgrade to WAIT. Separate from (and newer than) the Advisor's if/else tree. `DecisionEngineWithBroker` folds in broker data |
+| `analysis/helpers.go` | Shared price-action helpers incl. `CandlePattern` — the one candle detector (engine, `/ai`, `/session` via `candleInfo`) |
+| `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP. Low-confidence results downgrade to WAIT. **Only source of verdicts** — the old Advisor tree and `calcSignals` were removed (2026-10-20) because they contradicted it. `DecisionEngineWithBroker` folds in broker data |
 | `analysis/decision_backtest.go` | Backtests the decision engine |
 | `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50): plan = entry next open, WIN if TP1 before stop within 20 bars. Also the **projection**: per regime × 5/10/20-bar horizon × score bucket, % of cases ending Bullish/Sideways/Bearish (move beyond 0.5 × ATR% × √h) + p10–p90 range — the only bull/side/bear odds in the app (`Projection.jsx`) |
 | `analysis/fvg.go` | Fair Value Gap detection (also feeds decision engine confluence) |
 | `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate`, `updateAll` (guarded by `updateMu`) |
 | `handlers/autoupdate.go` | `StartAutoUpdate` (called from `main`): boot refresh + 15-min refresh in market hours |
 | `handlers/analysis.go` | All `/api/analysis/*` endpoints (calls `analysis.*`) |
-| `handlers/advisor.go` | Advisor, decision, and their backtest endpoints for one symbol |
+| `handlers/advisor.go` | `/decision` and `/decision-backtest` for one symbol (file name is historical) |
 | `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true`) |
 | `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar or stock count changes; fetches `^JKSE` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
 | `handlers/syariah.go` | Syariah set = OJK DES Periode I 2026 Lampiran I (622 stocks, `isSyariah`); `syariahValidUntil` drives `syariah_stale` in the screen response + UI warning. Replace from the next DES PDF (±1 Dec / ±1 Jun) |
 | `handlers/indices.go` | IDX30/LQ45 sets + `indexValidUntil` (BEI re-evaluates quarterly, announced ~late Jan/Apr/Jul/Oct) |
 | `handlers/indices.go` | Hardcoded IDX30/LQ45 constituent sets (`isIDX30`/`isLQ45`) → `idx30`/`lq45` on stock list + screen rows; screen filter `?index=idx30\|lq45`. BEI re-evaluates quarterly (Feb/May/Aug/Nov) — edit manually |
-| `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative analysis (no external LLM); uses signals, indicators, pattern detection, and uploaded reports text |
-| `handlers/backtest.go` | `GET /api/analysis/{symbol}/backtest` — simulates BUY/SELL on composite-signal change at next open; returns trades + summary |
+| `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative (no external LLM); verdict/stop/targets/R:R from `DecisionEngineWithBroker`, indicators for context, `candleInfo` pattern, uploaded reports text |
 | `handlers/ihsg.go` | `GET /api/ihsg` — fetches `^JKSE` (Jakarta Composite Index) via the same fetcher |
 | `handlers/broker.go` | Broker-summary data CRUD under `./data/broker/{SYMBOL}.json`; includes `/mock` generator for test data. Mock files carry `"source": "mock"` and `LoadBrokerDays` ignores them, so synthetic flows never reach the decision engine |
 | `handlers/reports.go` | PDF research reports — list/upload/delete under `./data/reports/{SYMBOL}/`; uses `github.com/ledongthuc/pdf` for text extraction (consumed by AI handler). **Gotcha:** upload also spawns a Claude Code terminal (`openClaudeTerminal`) that analyzes the PDF and writes `./data/fundamentals/{SYMBOL}.json` |
@@ -77,7 +75,7 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 - Stocks: `GET/POST /api/stocks`, `POST /api/stocks/update-all`, `GET/DELETE /api/stocks/{symbol}`, `GET /api/stocks/{symbol}/latest`, `POST /api/stocks/{symbol}/update`, `GET /api/stocks/{symbol}/export.csv`
 - Reports: `GET/POST /api/stocks/{symbol}/reports`, `DELETE /api/stocks/{symbol}/reports/{id}`
 - Fundamental: `GET/POST /api/stocks/{symbol}/fundamental`
-- Analysis (`/api/analysis/{symbol}/*`): `summary`, `indicators`, `signals`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `fvg`, `avwap`, `pivots`, `amd`, `adline`, `cmf`, `mfi`, `advisor`, `advisor-backtest`, `decision`, `decision-backtest`, `ai`, `backtest`
+- Analysis (`/api/analysis/{symbol}/*`): `summary`, `indicators`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `fvg`, `avwap`, `pivots`, `amd`, `adline`, `cmf`, `mfi`, `decision`, `decision-backtest`, `ai`
 - Dividends: `GET /api/dividends` (`?refresh=1` re-fetches Yahoo), `POST /api/dividends` (replaces manual entries)
 - Market: `GET /api/overview`, `GET /api/advisor/screen`, `GET /api/calibration`, `GET /api/session`, `GET /api/ihsg`
 - Broker: `GET/DELETE /api/broker/{symbol}`, `GET /api/broker/{symbol}/summary`, `POST /api/broker/{symbol}/mock`
@@ -102,7 +100,7 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 │   ├── Overview.jsx          ← change cards, 52-week range, volume, MA, RSI bar
 │   ├── ChartTab.jsx          ← lightweight-charts candlestick + SMA + volume; FVG/Fib zones drawn via custom primitives in `components/chart/`
 │   ├── Indicators.jsx        ← RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku
-│   ├── Advisor.jsx           ← "Saran" tab: advisor verdict banner + backtest stats
+│   ├── Advisor.jsx           ← "Saran" tab: decision verdict banner + decision-backtest stats
 │   ├── RiskCalc.jsx          ← position sizing / stop-loss helper
 │   └── ReportUpload.jsx      ← "Laporan" tab: PDF upload/list/delete; renders FundamentalAnalysis.jsx
 ├── MarketOverview.jsx        ← (view=overview) market-wide overview; renders IHSGChart.jsx
@@ -116,7 +114,7 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 └── AddStockModal.jsx         ← POST /api/stocks (symbol + optional from-date)
 ```
 
-**`api.js`** — fetch wrapper; throws on `success: false`; namespaces: `api.stocks.*`, `api.analysis.*`, `api.broker.*`, plus top-level `api.overview()`, `api.advisorScreen()`, `api.session()`, `api.ihsg()`.
+**`api.js`** — fetch wrapper; throws on `success: false`; namespaces: `api.stocks.*`, `api.analysis.*`, `api.dividends.*`, plus top-level `api.overview()`, `api.advisorScreen()`, `api.session()`, `api.ihsg()`, `api.calibration()`. Only endpoints the UI calls have wrappers.
 
 **`utils.js`** — `fmt.price/pct/vol`, `colorOf`/`signalStyle` Tailwind helpers, `APEX_DARK` shared ApexCharts theme.
 

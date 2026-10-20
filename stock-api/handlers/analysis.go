@@ -99,27 +99,6 @@ func trendLabel(close, sma20, sma50 float64) string {
 	return "neutral"
 }
 
-func scoreToSignal(score, max int) (overall, strength string) {
-	if max == 0 {
-		return "NEUTRAL", "0.00"
-	}
-	ratio := float64(score) / float64(max)
-	strength = fmt.Sprintf("%.2f", analysis.R2(ratio))
-	switch {
-	case ratio >= 0.6:
-		overall = "STRONG_BUY"
-	case ratio >= 0.2:
-		overall = "BUY"
-	case ratio <= -0.6:
-		overall = "STRONG_SELL"
-	case ratio <= -0.2:
-		overall = "SELL"
-	default:
-		overall = "NEUTRAL"
-	}
-	return
-}
-
 // ── GET /api/analysis/{symbol}/summary ───────────────────────────────────────
 
 func (h *AnalysisHandler) Summary(w http.ResponseWriter, r *http.Request) {
@@ -271,160 +250,6 @@ func (h *AnalysisHandler) Indicators(w http.ResponseWriter, r *http.Request) {
 		"macd":       macdLatest,
 		"bollinger":  bollLatest,
 		"stochastic": stochLatest,
-	})
-}
-
-// ── GET /api/analysis/{symbol}/signals ───────────────────────────────────────
-
-type signalEntry struct {
-	Indicator string  `json:"indicator"`
-	Value     float64 `json:"value"`
-	Signal    string  `json:"signal"`
-	Reason    string  `json:"reason"`
-	Score     int     `json:"score"`
-}
-
-type signalResult struct {
-	Signal    string
-	Strength  string
-	Score     int
-	MaxScore  int
-	Breakdown []signalEntry
-}
-
-func calcSignals(prices []models.StockPrice) signalResult {
-	if len(prices) < 2 {
-		return signalResult{}
-	}
-	latest := prices[len(prices)-1]
-	entries := make([]signalEntry, 0, 5)
-	total := 0
-
-	// RSI(14)
-	if pts := analysis.RSI(prices, 14); len(pts) > 0 {
-		v := pts[len(pts)-1].Value
-		e := signalEntry{Indicator: "RSI(14)", Value: v}
-		switch {
-		case v <= 30:
-			e.Signal, e.Score, e.Reason = "BUY", 1, "oversold (≤30)"
-		case v <= 40:
-			e.Signal, e.Score, e.Reason = "BUY", 1, "approaching oversold (≤40)"
-		case v >= 70:
-			e.Signal, e.Score, e.Reason = "SELL", -1, "overbought (≥70)"
-		case v >= 60:
-			e.Signal, e.Score, e.Reason = "SELL", -1, "approaching overbought (≥60)"
-		default:
-			e.Signal, e.Score, e.Reason = "NEUTRAL", 0, "neutral zone (40–60)"
-		}
-		entries = append(entries, e)
-		total += e.Score
-	}
-
-	// MACD(12,26,9)
-	if pts := analysis.MACD(prices, 12, 26, 9); len(pts) >= 2 {
-		cur, prev := pts[len(pts)-1], pts[len(pts)-2]
-		e := signalEntry{Indicator: "MACD(12,26,9)", Value: cur.Histogram}
-		switch {
-		case cur.MACD > cur.Signal && prev.MACD <= prev.Signal:
-			e.Signal, e.Score, e.Reason = "BUY", 1, "bullish crossover"
-		case cur.MACD < cur.Signal && prev.MACD >= prev.Signal:
-			e.Signal, e.Score, e.Reason = "SELL", -1, "bearish crossover"
-		case cur.Histogram > 0:
-			e.Signal, e.Score, e.Reason = "BUY", 1, "histogram positive"
-		case cur.Histogram < 0:
-			e.Signal, e.Score, e.Reason = "SELL", -1, "histogram negative"
-		default:
-			e.Signal, e.Score, e.Reason = "NEUTRAL", 0, "flat"
-		}
-		entries = append(entries, e)
-		total += e.Score
-	}
-
-	// MA trend
-	sma20 := lastPoint(analysis.SMA(prices, 20))
-	sma50 := lastPoint(analysis.SMA(prices, 50))
-	if sma20 > 0 && sma50 > 0 {
-		e := signalEntry{Indicator: "SMA(20) vs SMA(50)", Value: analysis.R2(sma20 - sma50)}
-		switch {
-		case sma20 > sma50 && latest.Close > sma20:
-			e.Signal, e.Score, e.Reason = "BUY", 1, "price > SMA20 > SMA50 (uptrend)"
-		case sma20 < sma50 && latest.Close < sma20:
-			e.Signal, e.Score, e.Reason = "SELL", -1, "price < SMA20 < SMA50 (downtrend)"
-		default:
-			e.Signal, e.Score, e.Reason = "NEUTRAL", 0, "mixed trend"
-		}
-		entries = append(entries, e)
-		total += e.Score
-	}
-
-	// Bollinger Bands
-	if pts := analysis.Bollinger(prices, 20, 2.0); len(pts) > 0 {
-		b := pts[len(pts)-1]
-		e := signalEntry{Indicator: "Bollinger(20,2)", Value: b.PercentB}
-		switch {
-		case b.PercentB <= 5:
-			e.Signal, e.Score, e.Reason = "BUY", 1, "%B ≤5% — near lower band"
-		case b.PercentB >= 95:
-			e.Signal, e.Score, e.Reason = "SELL", -1, "%B ≥95% — near upper band"
-		default:
-			e.Signal, e.Score, e.Reason = "NEUTRAL", 0, fmt.Sprintf("%%B = %.1f%%", b.PercentB)
-		}
-		entries = append(entries, e)
-		total += e.Score
-	}
-
-	// Stochastic(14,3)
-	if pts := analysis.Stochastic(prices, 14, 3); len(pts) >= 2 {
-		cur, prev := pts[len(pts)-1], pts[len(pts)-2]
-		e := signalEntry{Indicator: "Stochastic(14,3)", Value: cur.K}
-		switch {
-		case cur.K <= 20 && cur.K > prev.K:
-			e.Signal, e.Score, e.Reason = "BUY", 1, "%K turning up in oversold zone"
-		case cur.K >= 80 && cur.K < prev.K:
-			e.Signal, e.Score, e.Reason = "SELL", -1, "%K turning down in overbought zone"
-		case cur.K <= 20:
-			e.Signal, e.Score, e.Reason = "BUY", 1, "oversold (K ≤20)"
-		case cur.K >= 80:
-			e.Signal, e.Score, e.Reason = "SELL", -1, "overbought (K ≥80)"
-		default:
-			e.Signal, e.Score, e.Reason = "NEUTRAL", 0, "neutral zone"
-		}
-		entries = append(entries, e)
-		total += e.Score
-	}
-
-	overall, strength := scoreToSignal(total, len(entries))
-	return signalResult{
-		Signal:    overall,
-		Strength:  strength,
-		Score:     total,
-		MaxScore:  len(entries),
-		Breakdown: entries,
-	}
-}
-
-func (h *AnalysisHandler) Signals(w http.ResponseWriter, r *http.Request) {
-	symbol := canonicalSymbol(mux.Vars(r)["symbol"])
-	prices, ok := loadPrices(w, symbol)
-	if !ok {
-		return
-	}
-	if len(prices) < 2 {
-		respond(w, 422, false, "need at least 2 bars for signals", nil)
-		return
-	}
-	latest := prices[len(prices)-1]
-	sig := calcSignals(prices)
-
-	respond(w, 200, true, "", map[string]interface{}{
-		"symbol":    symbol,
-		"date":      latest.Date,
-		"close":     latest.Close,
-		"signal":    sig.Signal,
-		"strength":  sig.Strength,
-		"score":     sig.Score,
-		"max_score": sig.MaxScore,
-		"breakdown": sig.Breakdown,
 	})
 }
 
@@ -927,123 +752,31 @@ type candlePattern struct {
 	Description string `json:"description"`
 }
 
-func detectPattern(prices []models.StockPrice) candlePattern {
-	if len(prices) < 2 {
-		return candlePattern{Name: "N/A", Type: "neutral", Description: "Data tidak cukup"}
+// candleInfo labels the latest bar with the decision engine's own candle
+// detector, so /session, /ai and the engine never disagree about a pattern.
+func candleInfo(prices []models.StockPrice) candlePattern {
+	label, dir := analysis.CandlePattern(prices, len(prices)-1)
+	switch label {
+	case "Bar hijau":
+		return candlePattern{Name: "Candle naik", Type: "neutral", Description: "Tanpa pola khusus"}
+	case "Bar merah":
+		return candlePattern{Name: "Candle turun", Type: "neutral", Description: "Tanpa pola khusus"}
+	case "-":
+		return candlePattern{Name: "-", Type: "neutral", Description: "Data tidak cukup"}
 	}
-	cur := prices[len(prices)-1]
-	prev := prices[len(prices)-2]
+	typ := map[string]string{"bull": "bullish", "bear": "bearish"}[dir]
+	if typ == "" {
+		typ = "neutral"
+	}
+	return candlePattern{Name: label, Type: typ, Description: patternDesc[label]}
+}
 
-	rng := cur.High - cur.Low
-	if rng < 0.001 {
-		return candlePattern{Name: "Doji", Type: "neutral", Description: "Pasar ragu-ragu"}
-	}
-
-	body := math.Abs(cur.Close - cur.Open)
-	bodyPct := body / rng * 100
-	upperWick := cur.High - math.Max(cur.Open, cur.Close)
-	lowerWick := math.Min(cur.Open, cur.Close) - cur.Low
-	bullish := cur.Close >= cur.Open
-
-	// Doji family
-	if bodyPct < 10 {
-		if lowerWick > 0.6*rng {
-			return candlePattern{Name: "Dragonfly Doji", Type: "bullish", Description: "Potensi reversal naik dari support"}
-		}
-		if upperWick > 0.6*rng {
-			return candlePattern{Name: "Gravestone Doji", Type: "bearish", Description: "Potensi reversal turun dari resistance"}
-		}
-		return candlePattern{Name: "Doji", Type: "neutral", Description: "Pasar ragu-ragu, tunggu konfirmasi"}
-	}
-
-	// Engulfing (2-candle pattern — checked early for priority)
-	prevBullish := prev.Close >= prev.Open
-	if bullish && !prevBullish {
-		if cur.Open <= prev.Close && cur.Close >= prev.Open {
-			return candlePattern{Name: "Bullish Engulfing", Type: "bullish", Description: "Sinyal reversal kuat ke atas"}
-		}
-	}
-	if !bullish && prevBullish {
-		if cur.Open >= prev.Close && cur.Close <= prev.Open {
-			return candlePattern{Name: "Bearish Engulfing", Type: "bearish", Description: "Sinyal reversal kuat ke bawah"}
-		}
-	}
-
-	// Marubozu (body >= 80%, no significant wicks)
-	if bodyPct >= 80 {
-		if bullish {
-			return candlePattern{Name: "Bullish Marubozu", Type: "bullish", Description: "Tekanan beli sangat kuat, momentum positif"}
-		}
-		return candlePattern{Name: "Bearish Marubozu", Type: "bearish", Description: "Tekanan jual sangat kuat, momentum negatif"}
-	}
-
-	// Hammer / Shooting Star (body < 40%)
-	if bodyPct < 40 {
-		if lowerWick >= 2*body && upperWick <= 0.3*body {
-			return candlePattern{Name: "Hammer", Type: "bullish", Description: "Sinyal reversal naik, buyer menolak level rendah"}
-		}
-		if upperWick >= 2*body && lowerWick <= 0.3*body {
-			return candlePattern{Name: "Shooting Star", Type: "bearish", Description: "Sinyal reversal turun, seller menolak level tinggi"}
-		}
-		if lowerWick >= 1.5*body && upperWick >= 1.5*body {
-			return candlePattern{Name: "Spinning Top", Type: "neutral", Description: "Kekuatan seimbang, belum ada arah jelas"}
-		}
-	}
-
-	// Three White Soldiers / Three Black Crows (3-candle)
-	if len(prices) >= 3 {
-		p1 := prices[len(prices)-3]
-		p2 := prices[len(prices)-2]
-		// p3 is `cur` already
-		if p1.Close > p1.Open && p2.Close > p2.Open && cur.Close > cur.Open {
-			if p2.Close > p1.Close && cur.Close > p2.Close {
-				return candlePattern{Name: "Three White Soldiers", Type: "bullish", Description: "3 candle bullish berturut, momentum naik kuat"}
-			}
-		}
-		if p1.Close < p1.Open && p2.Close < p2.Open && cur.Close < cur.Open {
-			if p2.Close < p1.Close && cur.Close < p2.Close {
-				return candlePattern{Name: "Three Black Crows", Type: "bearish", Description: "3 candle bearish berturut, momentum turun kuat"}
-			}
-		}
-		// Morning Star (gap down then recovery)
-		prevBear := p1.Close < p1.Open
-		bigBody1 := math.Abs(p1.Close-p1.Open)/rng >= 0.5
-		smallBody2 := math.Abs(p2.Close-p2.Open) < 0.3*math.Abs(p1.Close-p1.Open)
-		if prevBear && bigBody1 && smallBody2 && bullish && bodyPct >= 40 {
-			return candlePattern{Name: "Morning Star", Type: "bullish", Description: "Reversal bullish 3-candle, sinyal pembalikan naik"}
-		}
-		// Evening Star
-		prevBull := p1.Close > p1.Open
-		if prevBull && bigBody1 && smallBody2 && !bullish && bodyPct >= 40 {
-			return candlePattern{Name: "Evening Star", Type: "bearish", Description: "Reversal bearish 3-candle, sinyal pembalikan turun"}
-		}
-	}
-
-	// Harami (inside candle)
-	prevBodyHigh := math.Max(prev.Open, prev.Close)
-	prevBodyLow := math.Min(prev.Open, prev.Close)
-	curBodyHigh := math.Max(cur.Open, cur.Close)
-	curBodyLow := math.Min(cur.Open, cur.Close)
-	if curBodyHigh < prevBodyHigh && curBodyLow > prevBodyLow {
-		prevBullish := prev.Close >= prev.Open
-		if !prevBullish && bullish {
-			return candlePattern{Name: "Bullish Harami", Type: "bullish", Description: "Candle kecil di dalam candle besar bearish, potensi reversal"}
-		}
-		if prevBullish && !bullish {
-			return candlePattern{Name: "Bearish Harami", Type: "bearish", Description: "Candle kecil di dalam candle besar bullish, potensi reversal"}
-		}
-	}
-
-	// Inside Bar
-	if cur.High <= prev.High && cur.Low >= prev.Low {
-		return candlePattern{Name: "Inside Bar", Type: "neutral", Description: "Konsolidasi dalam range candle sebelumnya, tunggu breakout"}
-	}
-
-	// Generic
-	if bullish {
-		return candlePattern{Name: "Candle Bullish", Type: "bullish", Description: "Pembeli lebih kuat dari penjual"}
-	}
-	return candlePattern{Name: "Candle Bearish", Type: "bearish", Description: "Penjual lebih kuat dari pembeli"}
+var patternDesc = map[string]string{
+	"Bullish Engulfing":          "Sinyal reversal kuat ke atas",
+	"Bearish Engulfing":          "Sinyal reversal kuat ke bawah",
+	"Hammer (tolak bawah)":       "Pembeli menolak harga rendah",
+	"Shooting Star (tolak atas)": "Penjual menolak harga tinggi",
+	"Doji (ragu-ragu)":           "Pasar ragu-ragu, tunggu konfirmasi",
 }
 
 type sessionItem struct {
@@ -1137,7 +870,7 @@ func (h *AnalysisHandler) Session(w http.ResponseWriter, r *http.Request) {
 				UpperWickPct: upperWickPct,
 				LowerWickPct: lowerWickPct,
 				VolRatio:     volRatio,
-				Pattern:      detectPattern(prices),
+				Pattern:      candleInfo(prices),
 				Signal:       dec.Signal,
 				Score:        dec.Score,
 				MaxScore:     100,

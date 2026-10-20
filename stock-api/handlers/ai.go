@@ -89,8 +89,8 @@ func (h *AIHandler) Analyze(w http.ResponseWriter, r *http.Request) {
 		volRatio = analysis.R2(float64(latest.Volume) / float64(vol20))
 	}
 
-	sig := calcSignals(prices)
-	pattern := detectPattern(prices)
+	dec := analysis.DecisionEngineWithBroker(prices, LoadBrokerDays(symbol))
+	pattern := candleInfo(prices)
 	reports := GetReportsText(symbol)
 
 	// ── Buat analisa ──────────────────────────────────────────────────
@@ -102,7 +102,7 @@ func (h *AIHandler) Analyze(w http.ResponseWriter, r *http.Request) {
 		stochK, stochD,
 		upper, middle, lower, percentB,
 		pct1d, pct5d, pct1m, volRatio,
-		sig.Signal, sig.Score, sig.MaxScore,
+		dec,
 		pattern.Name, pattern.Description,
 		reports,
 	)
@@ -111,7 +111,7 @@ func (h *AIHandler) Analyze(w http.ResponseWriter, r *http.Request) {
 		"symbol":    symbol,
 		"date":      latest.Date,
 		"close":     latest.Close,
-		"signal":    sig.Signal,
+		"signal":    dec.Signal,
 		"analysis":  text,
 		"generated": time.Now().Format("15:04 WIB"),
 	})
@@ -126,7 +126,7 @@ func generateLocalAnalysis(
 	stochK, stochD float64,
 	upper, middle, lower, percentB float64,
 	pct1d, pct5d, pct1m, volRatio float64,
-	signal string, score, maxScore int,
+	dec analysis.Decision,
 	patternName, patternDesc string,
 	reportsText string,
 ) string {
@@ -203,7 +203,7 @@ func generateLocalAnalysis(
 
 	// ── 2. Konfluensi Sinyal ──────────────────────────────────────────
 
-	sb.WriteString("\n\n**Konfluensi Sinyal**\n")
+	sb.WriteString("\n\n**Indikator Klasik**\n")
 
 	bullCount, bearCount := 0, 0
 	var bullFactors, bearFactors []string
@@ -267,7 +267,7 @@ func generateLocalAnalysis(
 
 	switch {
 	case bullCount >= 4:
-		sb.WriteString(fmt.Sprintf("Konfluensi bullish kuat: %d/%d indikator sependapat positif.", bullCount, bullCount+bearCount))
+		sb.WriteString(fmt.Sprintf("Indikator klasik kompak positif: %d/%d.", bullCount, bullCount+bearCount))
 		if len(bullFactors) > 0 {
 			sb.WriteString(" Pendukung: " + strings.Join(bullFactors, ", ") + ".")
 		}
@@ -275,7 +275,7 @@ func generateLocalAnalysis(
 			sb.WriteString(" Catatan: " + strings.Join(bearFactors, ", ") + ".")
 		}
 	case bearCount >= 4:
-		sb.WriteString(fmt.Sprintf("Konfluensi bearish: %d/%d indikator menekan.", bearCount, bullCount+bearCount))
+		sb.WriteString(fmt.Sprintf("Indikator klasik kompak negatif: %d/%d.", bearCount, bullCount+bearCount))
 		if len(bearFactors) > 0 {
 			sb.WriteString(" Penekan: " + strings.Join(bearFactors, ", ") + ".")
 		}
@@ -283,7 +283,7 @@ func generateLocalAnalysis(
 			sb.WriteString(" Satu-satunya positif: " + strings.Join(bullFactors, ", ") + ".")
 		}
 	case bullCount > bearCount:
-		sb.WriteString(fmt.Sprintf("Sinyal campuran, kecenderungan bullish (%d vs %d).", bullCount, bearCount))
+		sb.WriteString(fmt.Sprintf("Indikator klasik campuran: %d positif vs %d negatif.", bullCount, bearCount))
 		if len(bullFactors) > 0 {
 			sb.WriteString(" Positif: " + strings.Join(bullFactors, ", ") + ".")
 		}
@@ -291,7 +291,7 @@ func generateLocalAnalysis(
 			sb.WriteString(" Negatif: " + strings.Join(bearFactors, ", ") + ".")
 		}
 	case bearCount > bullCount:
-		sb.WriteString(fmt.Sprintf("Sinyal campuran, kecenderungan bearish (%d vs %d).", bearCount, bullCount))
+		sb.WriteString(fmt.Sprintf("Indikator klasik campuran: %d negatif vs %d positif.", bearCount, bullCount))
 		if len(bearFactors) > 0 {
 			sb.WriteString(" Negatif: " + strings.Join(bearFactors, ", ") + ".")
 		}
@@ -302,7 +302,14 @@ func generateLocalAnalysis(
 		sb.WriteString("Indikator terbagi rata — pasar dalam kondisi tidak pasti, hindari posisi agresif.")
 	}
 
-	if patternName != "" && patternName != "None" && patternName != "-" {
+	// A raw indicator tally can point the other way than the weighted engine;
+	// say so instead of letting this paragraph read like a second verdict.
+	engineBull := dec.Signal == "BUY" || dec.Signal == "STRONG_BUY"
+	if (bullCount > bearCount && !engineBull) || (bearCount > bullCount && engineBull) {
+		sb.WriteString(fmt.Sprintf(" (Ini hitungan kasar indikator klasik; vonis decision engine tetap %s, lihat Outlook.)", strings.ReplaceAll(dec.Signal, "_", " ")))
+	}
+
+	if patternName != "" && patternName != "None" && patternName != "-" && patternDesc != "Tanpa pola khusus" {
 		sb.WriteString(fmt.Sprintf(" Pola candle: %s (%s).", patternName, patternDesc))
 	}
 	if volRatio >= 1.5 {
@@ -362,23 +369,17 @@ func generateLocalAnalysis(
 
 	sb.WriteString("\n\n**Outlook & Rekomendasi**\n")
 
-	// Stop & target dari Bollinger band
-	stopLoss := lower * 0.99
-	if stopLoss <= 0 {
-		stopLoss = close * 0.95
+	// Stop, target & R/R come from the decision engine — the same plan the
+	// Saran tab and the screener show, so the write-up never contradicts them.
+	score, maxScore := dec.Score, 100
+	stopLoss, rr := dec.StopLoss, dec.RiskReward
+	t1, t2 := close*1.03, close*1.06
+	if len(dec.TakeProfit) > 0 {
+		t1 = dec.TakeProfit[0].Price
+		t2 = t1
 	}
-	t1 := middle
-	if t1 <= close {
-		t1 = close * 1.03
-	}
-	t2 := upper
-	if t2 <= t1 {
-		t2 = close * 1.06
-	}
-
-	rr := 0.0
-	if close-stopLoss > 0 {
-		rr = (t1 - close) / (close - stopLoss)
+	if len(dec.TakeProfit) > 1 {
+		t2 = dec.TakeProfit[1].Price
 	}
 
 	nearSup := "support terdekat"
@@ -386,7 +387,7 @@ func generateLocalAnalysis(
 		nearSup = supports[0]
 	}
 
-	switch signal {
+	switch dec.Signal {
 	case "STRONG_BUY", "STRONG BUY":
 		sb.WriteString(fmt.Sprintf(
 			"ENTRY — Momentum sangat bullish (skor %d/%d). Masuk di area saat ini (%.0f) atau pada pullback ke %s. Stop-loss di %.0f. Target 1: %.0f, Target 2: %.0f. R/R ≈ %.1f:1.",
@@ -395,13 +396,13 @@ func generateLocalAnalysis(
 		sb.WriteString(fmt.Sprintf(
 			"AKUMULASI — Sinyal bullish (skor %d/%d). Ideal masuk pada pullback ke %s, bukan di harga saat ini (%.0f). Stop-loss di %.0f. Target: %.0f.",
 			score, maxScore, nearSup, close, stopLoss, t1))
-	case "NEUTRAL":
+	case "WAIT":
 		sb.WriteString(fmt.Sprintf(
 			"WAIT & SEE — Sinyal netral (skor %d/%d). Pasar konsolidasi di range %.0f–%.0f. Tunggu breakout disertai volume tinggi sebelum masuk posisi baru.",
 			score, maxScore, lower, upper))
 	case "SELL":
 		sb.WriteString(fmt.Sprintf(
-			"KURANGI POSISI — Tekanan jual mulai dominan (skor %d/%d). Take profit sebagian jika masih memegang. Hindari membeli baru. Pantau support %s sebagai potensi titik reversal.",
+			"KURANGI POSISI — Tekanan jual mulai dominan (skor %d/%d). Take profit sebagian jika masih memegang. Hindari membeli baru. Pantau %s sebagai potensi titik reversal.",
 			score, maxScore, nearSup))
 	case "STRONG_SELL", "STRONG SELL":
 		sb.WriteString(fmt.Sprintf(
@@ -409,6 +410,9 @@ func generateLocalAnalysis(
 			score, maxScore))
 	default:
 		sb.WriteString(fmt.Sprintf("Pantau perkembangan indikator lebih lanjut. Skor sinyal: %d/%d.", score, maxScore))
+	}
+	if dec.Note != "" {
+		sb.WriteString(" " + dec.Note)
 	}
 
 	// ── 5. Fundamental (jika ada PDF) ────────────────────────────────

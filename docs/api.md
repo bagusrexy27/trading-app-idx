@@ -219,11 +219,9 @@ Satu panggilan untuk seluruh kartu Overview.
 
 Snapshot nilai **terkini** semua indikator dalam satu objek — tanpa series historis.
 
-### `GET /analysis/{symbol}/signals`
-
-Sinyal komposit dengan skor dan breakdown per indikator penyusunnya. `overall` adalah salah satu dari `STRONG_BUY` · `BUY` · `NEUTRAL` · `SELL` · `STRONG_SELL`, diturunkan dari rasio skor terhadap skor maksimum (ambang ±0.2 dan ±0.6), dan `strength` adalah rasio itu sebagai string.
-
 ### `GET /analysis/{symbol}/ai`
+
+Narasi rule-based lokal. Vonis, stop, target, dan R/R diambil dari decision engine (sama dengan `/decision`); pola candle dari `analysis.CandlePattern`, detektor yang sama dengan engine dan `/session`.
 
 Narasi teknikal **berbasis aturan, lokal** — tidak memanggil LLM eksternal. Dibentuk dari sinyal, indikator, deteksi pola candle, dan teks laporan PDF yang sudah diupload untuk simbol tersebut.
 
@@ -289,49 +287,6 @@ Memutar ulang sinyal decision engine atas seluruh histori tersimpan, dengan atur
 ```
 
 `result`: `TARGET` · `STOP` · `OPEN`. Ini backtest sederhana atas data harian tersimpan — tanpa slippage, tanpa biaya, tanpa pengecekan likuiditas. Pakai sebagai pembanding relatif antar simbol, bukan sebagai ekspektasi keuntungan.
-
----
-
-## Advisor
-
-### `GET /analysis/{symbol}/advisor`
-
-```json
-{"success":true,"data":{"symbol":"BBCA","advice":{
-  "verdict":"WAIT",
-  "action":"TUNGGU. Harga sideways, belum ada setup lengkap. Sabar sampai breakout dari range dengan volume, atau pantulan jelas dari support.",
-  "confidence":"Rendah","trend":"Sideways","location":"Dekat support",
-  "candle":"Bar merah","volume_state":"Normal",
-  "rsi":40.89,"close":6225,"support":6225,"resistance":6850,
-  "entry":6225,"stop":6162.75,"target":6850,
-  "stop_pct":1.01,"target_pct":10.04,"risk_reward":10.04,
-  "reasons":["Tren SIDEWAYS — arah belum jelas, tunggu breakout",
-             "Candle 'Bar merah' belum konfirmasi beli",
-             "Volume belum mendukung"],
-  "scenarios":["✓ Stop di support 6163 = -1.0% (masih di bawah batas 7%). Ukuran lot normal boleh.",
-               "Kalau harga TEMBUS & tutup di bawah support 6225 → setup batal, JANGAN average down.",
-               "…"],
-  "checklist":[
-    {"label":"1. Tren naik (harga > SMA50, SMA20 > SMA50)","pass":false,"note":"tren Sideways"},
-    {"label":"2. Struktur higher-low","pass":true,"note":"low naik (sehat)"},
-    {"label":"3. Di lokasi bagus (dekat support)","pass":true,"note":"Dekat support"},
-    {"label":"4. Candle konfirmasi bullish","pass":false,"note":"Bar merah"},
-    {"label":"5. Volume mendukung (>1.05×)","pass":false,"note":"0.89× rata-rata"},
-    {"label":"6. Risk/Reward ≥ 1:2","pass":true,"note":"R/R 10.0"},
-    {"label":"7. RSI belum overbought (<70)","pass":true,"note":"RSI 41"}
-  ]
-}}}
-```
-
-`verdict`: `STRONG_BUY` · `BUY` · `WAIT` · `AVOID` · `REDUCE`. `confidence` di sini kategori (`Tinggi`/`Sedang`/`Rendah`), berbeda dari `confidence` numerik pada decision engine.
-
-### `GET /analysis/{symbol}/advisor-backtest`
-
-Backtest sinyal advisor, bentuk output sejenis `decision-backtest`.
-
-### `GET /analysis/{symbol}/backtest`
-
-Backtest lain lagi: mensimulasikan BUY/SELL saat **composite signal** berubah, entry di open berikutnya. Mengembalikan `trades` + `summary`.
 
 ---
 

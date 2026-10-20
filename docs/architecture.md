@@ -38,8 +38,8 @@ Semua kode di `stock-api/`.
 |---|---|
 | `analysis.go` | SMA, EMA, RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku, Fibonacci, Pivots |
 | `decision.go` | **Decision engine** — skoring multi-faktor berbobot (lihat di bawah) |
-| `advisor.go` | Pohon keputusan price-action, verdict + checklist Bahasa Indonesia |
-| `decision_backtest.go`, `advisor_backtest.go` | Replay sinyal masing-masing engine atas histori tersimpan |
+| `helpers.go` | Helper price-action bersama, termasuk `CandlePattern` — satu-satunya detektor pola candle (engine, `/ai`, `/session`) |
+| `decision_backtest.go` | Replay sinyal decision engine atas histori tersimpan |
 | `fvg.go` | Fair Value Gap — deteksi gap 3-bar, lacak status `active` / `filled` / `inverted` |
 | `amd.go` | Siklus Accumulation–Manipulation–Distribution (Wyckoff / ICT) |
 | `bandar.go` | Bandarmology atas data broker summary (`BrokerDay`) |
@@ -81,11 +81,9 @@ Tiga sifat yang penting dipahami:
 
 Varian `DecisionEngineWithBroker()` menambahkan skor bandarmology kalau `data/broker/{SYMBOL}.json` ada; tanpa itu faktor tersebut netral (50) dan catatannya berbunyi "data broker tidak tersedia".
 
-### 2. Advisor (`analysis/advisor.go`)
+### 2. Satu sumber vonis
 
-Pohon if/else price-action, bukan skoring. Output `verdict` (`STRONG_BUY` · `BUY` · `WAIT` · `AVOID` · `REDUCE`), satu baris `action` Bahasa Indonesia, `reasons[]`, `scenarios[]` ("kalau harga tembus X maka …"), dan `checklist[]` 7 poin yang tiap itemnya pass/fail dengan catatan.
-
-Advisor sengaja dipertahankan karena keluarannya bisa dibaca sebagai penalaran, bukan angka: berguna untuk memahami kenapa sebuah setup ditolak. Decision engine yang dipakai screener pasar.
+Decision engine adalah **satu-satunya** sumber vonis. Advisor (pohon if/else) dan `calcSignals` (skor 5 indikator) dihapus 2026-10-20 karena bisa bertentangan dengan engine — misalnya narasi AI bilang BUY sementara tab Saran bilang WAIT. Narasi `/ai` sekarang mengambil vonis, stop, target, dan R/R dari engine.
 
 ### Screener (`handlers/advisor_screen.go`)
 
@@ -122,14 +120,14 @@ React 18 + Vite. `ui/` build ke `../static/`, yang disajikan `http.FileServer` d
 
 ```
 App.jsx                  ← state global (stocks[], selected, view, toast), navigasi history
-│                          view: today | stock | overview | session | advisor | portfolio | practice
+│                          view: today | stock | overview | session | advisor | portfolio | dividends | practice | kamus
 ├── Sidebar.jsx           ← rail nav (Today/Market/Session/Screen/Port/Drill) + daftar saham + search
 ├── DecisionBoard.jsx     ← (today) landing: ringkasan keputusan hari ini
 ├── StockPanel.jsx        ← (stock) container tab; chart compact selalu mounted di atas tab
 │   ├── Overview.jsx      ← kartu perubahan, range 52 minggu, volume, MA, bar RSI
 │   ├── ChartTab.jsx      ← candlestick lightweight-charts + overlay FVG & Fibonacci (primitive custom)
 │   ├── Indicators.jsx    ← RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku (ApexCharts)
-│   ├── Advisor.jsx       ← tab "Saran": verdict + statistik backtest
+│   ├── Advisor.jsx       ← tab "Saran": verdict decision engine + statistik decision-backtest
 │   ├── RiskCalc.jsx      ← position sizing / stop loss
 │   └── ReportUpload.jsx  ← tab "Laporan": upload PDF + FundamentalAnalysis.jsx
 ├── MarketOverview.jsx    ← (overview) + IHSGChart.jsx
@@ -179,4 +177,3 @@ Namespace `tv` di `ui/tailwind.config.js`: `tv-bg` (#131722), `tv-card` (#1e222d
 | **Scheduler in-process** | Lokal: data segar tiap 15 menit di jam bursa tanpa klik. Di Fly dengan `auto_stop_machines`, scheduler hanya jalan selama mesin bangun, dan setiap cold start memicu refresh penuh (~90 panggilan Yahoo) |
 | **Yahoo Finance tak resmi** | Tanpa kontrak, tanpa SLA, rate limit tak terdokumentasi. `User-Agent` wajib. Perubahan bentuk response akan merusak `fetcher` tanpa peringatan |
 | **Daftar syariah manual** | Snapshot hardcoded, butuh edit + rebuild setiap review DES |
-| **Dua mesin keputusan** | Decision engine dan Advisor bisa tidak sepakat untuk simbol yang sama. Itu disengaja (beda metode), tapi berarti ada dua jalur yang harus dipelihara dan dua backtest yang harus dibaca |

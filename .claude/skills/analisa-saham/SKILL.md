@@ -74,4 +74,4 @@ Lalu probabilitas skenario besok: Naik X% / Sideways Y% / Turun Z% (jumlah 100%)
 
 Ringkas tapi lengkap: fase trend → level S/R → volume → candle → tabel skor → verdict + probabilitas → trade plan. Tutup dengan disclaimer satu baris bahwa ini analisa probabilistik, bukan kepastian.
 
-Pembanding opsional: `GET http://localhost:1111/api/analysis/{SYMBOL}/advisor` (rule engine internal app). Kalau verdict beda jauh dengan analisamu, sebutkan bedanya.
+Pembanding opsional: `GET http://localhost:1111/api/analysis/{SYMBOL}/decision` (decision engine app — satu-satunya sumber vonis). Kalau verdict beda jauh dengan analisamu, sebutkan bedanya.
