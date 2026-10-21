@@ -3,7 +3,7 @@
 FROM node:20-alpine AS ui
 WORKDIR /app/ui
 COPY ui/package.json ui/package-lock.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install
 COPY ui/ ./
 RUN npm run build
 

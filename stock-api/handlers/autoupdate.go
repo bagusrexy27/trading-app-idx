@@ -2,16 +2,17 @@ package handlers
 
 import (
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
-	"stock-api/fetcher"
 	"stock-api/storage"
 )
 
 var wib = time.FixedZone("WIB", 7*3600)
 
-// StartAutoUpdate refreshes every tracked stock once at startup, then every
+// StartAutoUpdate refreshes stale stocks once at startup, then every
 // 15 minutes while IDX is trading. Outside the window (weekends, before 09:00,
 // after 16:15 WIB) and on exchange holidays it does nothing.
 func StartAutoUpdate() {
@@ -40,6 +41,9 @@ func runAutoUpdate(reason string) {
 	if err != nil {
 		logf("auto-update (%s): %v", reason, err)
 		return
+	}
+	if reason == "startup" {
+		symbols = staleAtStartup(symbols, time.Now())
 	}
 	start := time.Now()
 	added, failed := 0, 0
@@ -70,12 +74,49 @@ func inMarketWindow(t time.Time) bool {
 	return m >= 9*60 && m <= 16*60+15
 }
 
-// tradedToday asks Yahoo whether ^JKSE has a bar dated today — false on
+// tradedToday reports whether ^JKSE has a bar dated today — false on
 // exchange holidays (and in the first minutes after the open, given Yahoo's lag).
 func tradedToday(now time.Time) bool {
-	prices, _, err := fetcher.Fetch("^JKSE", now.AddDate(0, 0, -5))
-	if err != nil || len(prices) == 0 {
+	bars, _, err := jkseBars()
+	if err != nil || len(bars) == 0 {
 		return false
 	}
-	return prices[len(prices)-1].Date == now.In(wib).Format("2006-01-02")
+	return bars[len(bars)-1].Date == now.In(wib).Format("2006-01-02")
+}
+
+// staleAtStartup drops stocks that already hold the final candle of the latest
+// session, so a Fly cold start outside market hours doesn't re-pull ~90 symbols
+// from Yahoo. Inside the market window (or if ^JKSE can't be fetched) every
+// stock is stale.
+func staleAtStartup(symbols []string, now time.Time) []string {
+	if inMarketWindow(now) {
+		return symbols
+	}
+	bars, _, err := jkseBars()
+	if err != nil || len(bars) == 0 {
+		return symbols
+	}
+	session := bars[len(bars)-1].Date
+	closed, err := time.ParseInLocation("2006-01-02 15:04", session+" 16:15", wib)
+	if err != nil {
+		return symbols
+	}
+	var stale []string
+	for _, sym := range symbols {
+		if !hasFinalCandle(sym, session, closed) {
+			stale = append(stale, sym)
+		}
+	}
+	return stale
+}
+
+// hasFinalCandle: newest stored bar is the session's and the file was written
+// after that session closed (so the bar isn't a partial intraday candle).
+func hasFinalCandle(sym, session string, closed time.Time) bool {
+	d, err := storage.Load(sym)
+	if err != nil || d == nil || len(d.Prices) == 0 || d.Prices[len(d.Prices)-1].Date < session {
+		return false
+	}
+	fi, err := os.Stat(filepath.Join(storage.DataDir, sym+".json"))
+	return err == nil && fi.ModTime().After(closed)
 }

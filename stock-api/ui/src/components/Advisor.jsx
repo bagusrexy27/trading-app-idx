@@ -140,7 +140,7 @@ export default function Advisor({ symbol, decisionData }) {
               </div>
               <div>
                 <div className="text-[11px] text-tv-muted">Trades (closed)</div>
-                <div className="font-bold">{bt.total} <span className="text-tv-muted font-normal">({bt.wins}W / {bt.losses}L{bt.open_trades ? ` · ${bt.open_trades} open` : ''})</span></div>
+                <div className="font-bold">{bt.total} <span className="text-tv-muted font-normal">({bt.wins}W / {bt.losses}L{bt.timeouts ? ` / ${bt.timeouts} timeout` : ''}{bt.open_trades ? ` · ${bt.open_trades} open` : ''})</span></div>
               </div>
               <div>
                 <div className="text-[11px] text-tv-muted">Avg planned R:R</div>
@@ -148,7 +148,7 @@ export default function Advisor({ symbol, decisionData }) {
               </div>
             </div>
             <p className="text-[10px] text-tv-muted mt-2">
-              Simulation: enter on STRONG_BUY/BUY, exit at stop/target intrabar. No look-ahead.
+              Simulation: enter next open on STRONG_BUY/BUY, exit at stop/TP1 or close after 20 bars (timeout). Same rules as the calibration record. No look-ahead.
             </p>
           </>
         )}

@@ -31,30 +31,30 @@ export const signalStyle = (s) => {
   return 'bg-tv-muted/10 text-tv-muted border-tv-muted/20'
 }
 
-export const APEX_DARK = {
-  chart: {
-    background: 'transparent',
-    animations: {
-      enabled: true,
-      easing: 'easeinout',
-      speed: 550,
-      animateGradually: { enabled: false },
-      dynamicAnimation: { enabled: true, speed: 300 },
-    },
+// Shared lightweight-charts base options (dark theme) for the indicator and
+// practice charts. ChartTab keeps its own richer config.
+export const LW_BASE = {
+  autoSize: true,
+  layout: {
+    background: { color: 'transparent' },
+    textColor: '#787b86',
+    fontSize: 10,
+    fontFamily: 'Inter, sans-serif',
+    attributionLogo: false,
   },
-  theme:  { mode: 'dark' },
-  grid:   { borderColor: '#2a2e39', strokeDashArray: 4, xaxis: { lines: { show: false } } },
-  xaxis:  {
-    type: 'category',
-    tickAmount: 8,
-    axisBorder: { show: false },
-    axisTicks:  { show: false },
-    labels: { style: { colors: '#787b86', fontSize: '10px' }, rotate: 0, formatter: v => v ? v.slice(5) : '' },
+  grid: {
+    vertLines: { visible: false },
+    horzLines: { color: '#2a2e3950', style: 2 }, // LineStyle.Dashed
   },
-  yaxis: { labels: { style: { colors: '#787b86', fontSize: '10px' } } },
-  tooltip: { theme: 'dark' },
-  legend:  { show: false },
-  dataLabels: { enabled: false },
+  crosshair: {
+    vertLine: { color: '#787b86', width: 1, style: 2, labelBackgroundColor: '#2a2e39' },
+    horzLine: { color: '#787b86', width: 1, style: 2, labelBackgroundColor: '#2a2e39' },
+  },
+  rightPriceScale: { borderVisible: false },
+  timeScale: { borderVisible: false },
+  // charts sit in the page's scroll flow: don't trap the wheel / vertical swipe
+  handleScale: { mouseWheel: false },
+  handleScroll: { mouseWheel: false, vertTouchDrag: false },
 }
 
 // Rekam jejak historis Decision Engine (dari /api/calibration, terlampir di

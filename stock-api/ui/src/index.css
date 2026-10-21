@@ -61,12 +61,6 @@ body::after {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
-/* ── ApexCharts overrides ────────────────────────────────────────────────── */
-.apexcharts-toolbar { z-index: 1 !important; }
-.apexcharts-menu { background: #13131a !important; border: 1px solid rgba(255,255,255,0.08) !important; }
-.apexcharts-menu-item:hover { background: #1b1b24 !important; }
-.apexcharts-tooltip { border: 1px solid rgba(255,255,255,0.08) !important; }
-.apexcharts-tooltip-title { background: #0a0a0f !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
 
 /* ── Scan line effect on chart container ────────────────────────────────── */
 .chart-scan {

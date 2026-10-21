@@ -3,6 +3,9 @@ package handlers
 import (
 	"testing"
 	"time"
+
+	"stock-api/models"
+	"stock-api/storage"
 )
 
 func TestInMarketWindow(t *testing.T) {
@@ -21,5 +24,29 @@ func TestInMarketWindow(t *testing.T) {
 		if got := inMarketWindow(tm); got != want {
 			t.Errorf("%s: got %v want %v", s, got, want)
 		}
+	}
+}
+
+func TestHasFinalCandle(t *testing.T) {
+	old := storage.DataDir
+	storage.DataDir = t.TempDir()
+	defer func() { storage.DataDir = old }()
+
+	d := &models.StockData{Symbol: "TEST", Prices: []models.StockPrice{{Date: "2026-10-20", Close: 100}}}
+	if err := storage.Save(d); err != nil {
+		t.Fatal(err)
+	}
+	closed := time.Now().Add(-time.Hour) // file written after the close
+	if !hasFinalCandle("TEST", "2026-10-20", closed) {
+		t.Error("current bar written after close must count as final")
+	}
+	if hasFinalCandle("TEST", "2026-10-21", closed) {
+		t.Error("older last bar must be stale")
+	}
+	if hasFinalCandle("TEST", "2026-10-20", time.Now().Add(time.Hour)) {
+		t.Error("file written before the close holds a partial candle")
+	}
+	if hasFinalCandle("NOPE", "2026-10-20", closed) {
+		t.Error("missing stock must be stale")
 	}
 }

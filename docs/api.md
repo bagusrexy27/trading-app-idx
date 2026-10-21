@@ -269,24 +269,24 @@ Skor `Bandarmology` bernilai 50 (netral) selama `data/broker/{SYMBOL}.json` belu
 
 ### `GET /analysis/{symbol}/decision-backtest`
 
-Memutar ulang sinyal decision engine atas seluruh histori tersimpan, dengan aturan exit stop/target yang sama.
+Memutar ulang sinyal decision engine atas seluruh histori tersimpan. Aturan exit = kalibrasi (`planOutcome`): masuk open hari berikutnya, keluar di stop (gap tembus = harga open) atau TP1, atau close setelah 20 bar (timeout). Trade tidak tumpang tindih.
 
 ```json
 {"success":true,"data":{"symbol":"BBCA","backtest":{
   "trades":[
     {"entry_date":"2025-10-28","entry_price":8350,"exit_date":"2025-10-29","exit_price":8425,
-     "signal":"BUY","result":"TARGET","pnl_pct":0.9,"risk_reward":1.5},
+     "signal":"BUY","result":"WIN","pnl_pct":0.9,"risk_reward":1.5},
     {"entry_date":"2026-09-02","entry_price":6650,"exit_date":"2026-09-10","exit_price":6475,
-     "signal":"BUY","result":"STOP","pnl_pct":-2.63,"risk_reward":4.33},
+     "signal":"BUY","result":"LOSS","pnl_pct":-2.63,"risk_reward":4.33},
     "…"
   ],
-  "total":13,"wins":9,"losses":4,"open_trades":0,
+  "total":13,"wins":8,"losses":4,"timeouts":1,"open_trades":0,
   "win_rate":69.23,"avg_win_pct":1.58,"avg_loss_pct":-1.62,
   "expectancy_pct":0.6,"avg_rr":1.85
 }}}
 ```
 
-`result`: `TARGET` · `STOP` · `OPEN`. Ini backtest sederhana atas data harian tersimpan — tanpa slippage, tanpa biaya, tanpa pengecekan likuiditas. Pakai sebagai pembanding relatif antar simbol, bukan sebagai ekspektasi keuntungan.
+`result`: `WIN` · `LOSS` · `TIMEOUT` · `OPEN` (data habis sebelum selesai). `win_rate` = wins / total (timeout dihitung bukan menang), `expectancy_pct` = rata-rata P&L termasuk timeout — definisi sama dengan `calibration`. Ini backtest sederhana atas data harian tersimpan — tanpa slippage, tanpa biaya, tanpa pengecekan likuiditas. Pakai sebagai pembanding relatif antar simbol, bukan sebagai ekspektasi keuntungan.
 
 ---
 

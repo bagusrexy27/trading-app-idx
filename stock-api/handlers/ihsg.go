@@ -13,12 +13,6 @@ import (
 // Yahoo returns daily bars; the latest bar reflects the current trading session
 // (data is delayed ~15 minutes on the free Yahoo endpoint).
 
-type ihsgCache struct {
-	mu      sync.Mutex
-	payload ihsgPayload
-	fetched time.Time
-}
-
 type ihsgPayload struct {
 	Symbol    string              `json:"symbol"` // "^JKSE"
 	Exchange  string              `json:"exchange"`
@@ -36,22 +30,34 @@ type ihsgPayload struct {
 	Delayed   bool                `json:"delayed"` // true = Yahoo free tier (~15min delay)
 }
 
-var ihsgStore = &ihsgCache{}
+// jkse is the one ^JKSE fetch shared by /api/ihsg, the calibration regime and
+// the auto-update holiday check: 2 years of daily bars, cached 60s.
+var jkse struct {
+	mu       sync.Mutex
+	bars     []models.StockPrice
+	exchange string
+	fetched  time.Time
+}
 
-const ihsgCacheTTL = 60 * time.Second
+const jkseTTL = 60 * time.Second
+
+func jkseBars() ([]models.StockPrice, string, error) {
+	jkse.mu.Lock()
+	defer jkse.mu.Unlock()
+	if time.Since(jkse.fetched) < jkseTTL && len(jkse.bars) > 0 {
+		return jkse.bars, jkse.exchange, nil
+	}
+	bars, exchange, err := fetcher.Fetch("^JKSE", time.Now().AddDate(-2, 0, 0))
+	if err != nil {
+		return nil, "", err
+	}
+	jkse.bars, jkse.exchange, jkse.fetched = bars, exchange, time.Now()
+	return bars, exchange, nil
+}
 
 // GET /api/ihsg — current IHSG snapshot + last 30 days of bars.
 func (h *Handler) IHSG(w http.ResponseWriter, r *http.Request) {
-	ihsgStore.mu.Lock()
-	defer ihsgStore.mu.Unlock()
-
-	if time.Since(ihsgStore.fetched) < ihsgCacheTTL && ihsgStore.payload.Last != 0 {
-		respond(w, 200, true, "ok (cached)", ihsgStore.payload)
-		return
-	}
-
-	from := time.Now().AddDate(0, 0, -45)
-	prices, exchange, err := fetcher.Fetch("^JKSE", from)
+	prices, exchange, err := jkseBars()
 	if err != nil {
 		respond(w, 502, false, "fetch IHSG: "+err.Error(), nil)
 		return
@@ -74,7 +80,7 @@ func (h *Handler) IHSG(w http.ResponseWriter, r *http.Request) {
 		history = history[len(history)-30:]
 	}
 
-	ihsgStore.payload = ihsgPayload{
+	respond(w, 200, true, "ok", ihsgPayload{
 		Symbol:    "^JKSE",
 		Exchange:  exchange,
 		Last:      last.Close,
@@ -89,8 +95,5 @@ func (h *Handler) IHSG(w http.ResponseWriter, r *http.Request) {
 		History:   history,
 		FetchedAt: time.Now().Format(time.RFC3339),
 		Delayed:   true,
-	}
-	ihsgStore.fetched = time.Now()
-
-	respond(w, 200, true, "ok", ihsgStore.payload)
+	})
 }

@@ -12,7 +12,7 @@ Semua perintah dijalankan dari `stock-api/`.
 
 | Stage | Isi |
 |---|---|
-| `ui` | `node:20-alpine` → `npm install --legacy-peer-deps` → `npm run build`. `vite.config.js` mengarahkan output ke `../static`, jadi bundle mendarat di `/app/static` |
+| `ui` | `node:20-alpine` → `npm install` → `npm run build`. `vite.config.js` mengarahkan output ke `../static`, jadi bundle mendarat di `/app/static` |
 | `build` | `golang:1.24-alpine` → `CGO_ENABLED=0 go build -trimpath` |
 | runtime | `alpine:3.20` + `ca-certificates` + `tzdata`. Berisi binary, `./static`, dan snapshot `data/` yang disalin ke `./seed-data` |
 
@@ -114,7 +114,7 @@ Server punya auto-update in-process: refresh penuh saat boot, lalu tiap 15 menit
 curl -u user:pass -X POST https://<app>.fly.dev/api/stocks/update-all
 ```
 
-Atau tekan **Update All** di sidebar UI. Endpoint ini menarik seluruh watchlist secara berurutan dari Yahoo Finance, jadi bisa berjalan puluhan detik. Kalau butuh data segar walau tidak ada pengunjung, jalankan curl di atas dari cron eksternal — itu juga membangunkan mesin (dan memicu refresh boot). Catatan: setiap cold start = refresh penuh ~90 panggilan Yahoo.
+Atau tekan **Update All** di sidebar UI. Endpoint ini menarik seluruh watchlist secara berurutan dari Yahoo Finance, jadi bisa berjalan puluhan detik. Kalau butuh data segar walau tidak ada pengunjung, jalankan curl di atas dari cron eksternal — itu juga membangunkan mesin (dan memicu refresh boot). Catatan: cold start di jam bursa = refresh penuh ~90 panggilan Yahoo; di luar jam bursa hanya saham yang belum punya candle final sesi terakhir.
 
 ---
 

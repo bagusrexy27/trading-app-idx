@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api'
 import { fmt, colorOf } from '../utils'
 import MoneyInput from './MoneyInput'
+import { positionPnL, portfolioTotals } from '../money'
 
 const STORAGE_KEY = 'idx_portfolio_v1'
 
@@ -57,22 +58,10 @@ export default function Portfolio({ showToast }) {
   }
 
   // Compute derived values
-  const enriched = positions.map(pos => {
-    const cur   = prices[pos.symbol] ?? pos.buyPrice
-    const lots  = pos.qty / 100
-    const invest= pos.buyPrice * pos.qty
-    const curVal= cur * pos.qty
-    const pnl   = curVal - invest
-    const pnlPct= invest > 0 ? (pnl / invest) * 100 : 0
-    const stopHit = pnlPct <= -7   // aturan disiplin: stop loss -7%
-    return { ...pos, cur, lots, invest, curVal, pnl, pnlPct, stopHit }
-  })
+  const enriched = positions.map(pos => ({ ...pos, ...positionPnL(pos, prices[pos.symbol] ?? pos.buyPrice) }))
   const breached = enriched.filter(p => p.stopHit)
 
-  const totalInvest = enriched.reduce((s, p) => s + p.invest, 0)
-  const totalCur    = enriched.reduce((s, p) => s + p.curVal, 0)
-  const totalPnl    = totalCur - totalInvest
-  const totalPct    = totalInvest > 0 ? (totalPnl / totalInvest) * 100 : 0
+  const { invest: totalInvest, cur: totalCur, pnl: totalPnl, pct: totalPct } = portfolioTotals(enriched)
   const best  = enriched.reduce((b, p) => (!b || p.pnlPct > b.pnlPct) ? p : b, null)
   const worst = enriched.reduce((w, p) => (!w || p.pnlPct < w.pnlPct) ? p : w, null)
 

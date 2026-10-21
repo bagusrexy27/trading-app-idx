@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { fmt } from '../utils'
 import MoneyInput from './MoneyInput'
+import { positionSize, averagePrice, plPct } from '../money'
 
 export default function RiskCalc({ data }) {
   const lastClose = data?.summary?.price?.close ?? 0
@@ -13,31 +14,18 @@ export default function RiskCalc({ data }) {
 
   const calc = useMemo(() => {
     const m = parseFloat(modal)    || 0
-    const r = parseFloat(riskPct)  / 100
+    const rp = parseFloat(riskPct)
     const e = parseFloat(entry)    || lastClose
     const atr = lastAtr
 
-    const riskRp   = m * r
-    const sl1x     = e - atr
-    const sl2x     = e - 2 * atr
-    const slDist1  = e - sl1x
-    const slDist2  = e - sl2x
-
-    // lots (1 lot = 100 shares)
-    const lots1x = slDist1 > 0 ? Math.floor(riskRp / (slDist1 * 100)) : 0
-    const lots2x = slDist2 > 0 ? Math.floor(riskRp / (slDist2 * 100)) : 0
-    const shares1 = lots1x * 100
-    const shares2 = lots2x * 100
-
-    // R:R targets
-    const targets = [1, 2, 3].map(r => ({
-      r,
-      tp1: e + r * slDist1,
-      tp2: e + r * slDist2,
-    }))
-
-    const actualRisk1 = slDist1 * shares1
-    const actualRisk2 = slDist2 * shares2
+    const p1 = positionSize({ modal: m, riskPct: rp, entry: e, atr, atrMult: 1 })
+    const p2 = positionSize({ modal: m, riskPct: rp, entry: e, atr, atrMult: 2 })
+    const riskRp = p1.riskRp
+    const sl1x = p1.sl, sl2x = p2.sl
+    const lots1x = p1.lots, lots2x = p2.lots
+    const shares1 = p1.shares, shares2 = p2.shares
+    const actualRisk1 = p1.actualRisk, actualRisk2 = p2.actualRisk
+    const targets = p1.targets.map((t, i) => ({ r: t.r, tp1: t.price, tp2: p2.targets[i].price }))
 
     return { riskRp, sl1x, sl2x, lots1x, lots2x, shares1, shares2, targets, actualRisk1, actualRisk2, atr }
   }, [modal, riskPct, entry, lastClose, lastAtr])
@@ -128,16 +116,11 @@ function AvgCalc({ lastClose, inputCls }) {
   const c = useMemo(() => {
     const rows = [{ lot: curLot, price: curAvg }, ...buys]
       .map(r => ({ lot: parseFloat(r.lot) || 0, price: parseFloat(r.price) || 0 }))
-      .filter(r => r.lot > 0 && r.price > 0)
-    const totLot   = rows.reduce((a, r) => a + r.lot, 0)
-    const totModal = rows.reduce((a, r) => a + r.lot * 100 * r.price, 0)
-    const avg      = totLot > 0 ? totModal / (totLot * 100) : 0
-    const oldAvg   = parseFloat(curAvg) || 0
-    const mkt      = lastClose || 0
+    const { avg, totLot, totModal } = averagePrice(rows)
     return {
       avg, totLot, totModal,
-      plOld: oldAvg > 0 && mkt > 0 ? (mkt - oldAvg) / oldAvg * 100 : null,
-      plNew: avg > 0 && mkt > 0 ? (mkt - avg) / avg * 100 : null,
+      plOld: plPct(parseFloat(curAvg) || 0, lastClose || 0),
+      plNew: plPct(avg, lastClose || 0),
     }
   }, [curLot, curAvg, buys, lastClose])
 

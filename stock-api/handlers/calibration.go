@@ -4,10 +4,8 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
-	"time"
 
 	"stock-api/analysis"
-	"stock-api/fetcher"
 	"stock-api/models"
 	"stock-api/storage"
 )
@@ -55,7 +53,7 @@ func currentCalibration() (*analysis.Calibration, string) {
 
 	var regime analysis.RegimeFunc
 	current := "unknown"
-	idx, _, err := fetcher.Fetch("^JKSE", time.Now().AddDate(-2, 0, 0))
+	idx, _, err := jkseBars()
 	if err == nil && len(idx) > 50 {
 		regime = analysis.IndexRegime(idx)
 		if r := regime("9999-12-31"); r != "" { // latest index bar

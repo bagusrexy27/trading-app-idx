@@ -24,9 +24,10 @@ go test ./analysis/ -run TestDecision   # Single test by name (analysis tests re
 
 ### Frontend (React + Vite) — run from `stock-api/ui/`
 ```bash
-npm install --legacy-peer-deps   # required: react-apexcharts vs React 18 peer dep
+npm install
 npm run dev                      # :5173, proxies /api/* to :1111
 npm run build                    # outputs to ../static/ (served by Go)
+npm test                         # Vitest: money.test.js (RiskCalc/Portfolio math, MoneyInput), practiceScore.test.js
 ```
 
 ### Development workflow
@@ -51,20 +52,20 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `analysis/bandar.go` | Bandarmology (broker accumulation/distribution) analysis over broker-summary data |
 | `analysis/helpers.go` | Shared price-action helpers incl. `CandlePattern` — the one candle detector (engine, `/ai`, `/session` via `candleInfo`) |
 | `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP. Low-confidence results downgrade to WAIT. **Only source of verdicts** — the old Advisor tree and `calcSignals` were removed (2026-10-20) because they contradicted it. `DecisionEngineWithBroker` folds in broker data |
-| `analysis/decision_backtest.go` | Backtests the decision engine |
+| `analysis/decision_backtest.go` | Backtests the decision engine per stock; exits via `planOutcome` (shared with calibration — same entry/stop/TP1/20-bar timeout rules) |
 | `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50): plan = entry next open, WIN if TP1 before stop within 20 bars. Also the **projection**: per regime × 5/10/20-bar horizon × score bucket, % of cases ending Bullish/Sideways/Bearish (move beyond 0.5 × ATR% × √h) + p10–p90 range — the only bull/side/bear odds in the app (`Projection.jsx`) |
 | `analysis/fvg.go` | Fair Value Gap detection (also feeds decision engine confluence) |
 | `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate`, `updateAll` (guarded by `updateMu`) |
-| `handlers/autoupdate.go` | `StartAutoUpdate` (called from `main`): boot refresh + 15-min refresh in market hours |
+| `handlers/autoupdate.go` | `StartAutoUpdate` (called from `main`): boot refresh of stale stocks only + 15-min refresh in market hours |
 | `handlers/analysis.go` | All `/api/analysis/*` endpoints (calls `analysis.*`) |
 | `handlers/advisor.go` | `/decision` and `/decision-backtest` for one symbol (file name is historical) |
 | `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true`) |
-| `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar or stock count changes; fetches `^JKSE` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
+| `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar or stock count changes; `^JKSE` via `jkseBars` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
 | `handlers/syariah.go` | Syariah set = OJK DES Periode I 2026 Lampiran I (622 stocks, `isSyariah`); `syariahValidUntil` drives `syariah_stale` in the screen response + UI warning. Replace from the next DES PDF (±1 Dec / ±1 Jun) |
 | `handlers/indices.go` | IDX30/LQ45 sets + `indexValidUntil` (BEI re-evaluates quarterly, announced ~late Jan/Apr/Jul/Oct) |
 | `handlers/indices.go` | Hardcoded IDX30/LQ45 constituent sets (`isIDX30`/`isLQ45`) → `idx30`/`lq45` on stock list + screen rows; screen filter `?index=idx30\|lq45`. BEI re-evaluates quarterly (Feb/May/Aug/Nov) — edit manually |
 | `handlers/ai.go` | `GET /api/analysis/{symbol}/ai` — **rule-based local** narrative (no external LLM); verdict/stop/targets/R:R from `DecisionEngineWithBroker`, indicators for context, `candleInfo` pattern, uploaded reports text |
-| `handlers/ihsg.go` | `GET /api/ihsg` — fetches `^JKSE` (Jakarta Composite Index) via the same fetcher |
+| `handlers/ihsg.go` | `GET /api/ihsg` — Jakarta Composite Index; owns `jkseBars()`, the single `^JKSE` fetch (2y, cached 60s) shared with calibration regime + auto-update holiday check |
 | `handlers/broker.go` | Broker-summary data CRUD under `./data/broker/{SYMBOL}.json`; includes `/mock` generator for test data. Mock files carry `"source": "mock"` and `LoadBrokerDays` ignores them, so synthetic flows never reach the decision engine |
 | `handlers/reports.go` | PDF research reports — list/upload/delete under `./data/reports/{SYMBOL}/`; uses `github.com/ledongthuc/pdf` for text extraction (consumed by AI handler). **Gotcha:** upload also spawns a Claude Code terminal (`openClaudeTerminal`) that analyzes the PDF and writes `./data/fundamentals/{SYMBOL}.json` |
 | `handlers/fundamental.go` | Read/write arbitrary JSON to `./data/fundamentals/{SYMBOL}.json` |
@@ -116,11 +117,13 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 
 **`api.js`** — fetch wrapper; throws on `success: false`; namespaces: `api.stocks.*`, `api.analysis.*`, `api.dividends.*`, plus top-level `api.overview()`, `api.advisorScreen()`, `api.session()`, `api.ihsg()`, `api.calibration()`. Only endpoints the UI calls have wrappers.
 
-**`utils.js`** — `fmt.price/pct/vol`, `colorOf`/`signalStyle` Tailwind helpers, `APEX_DARK` shared ApexCharts theme.
+**`money.js`** — pure money math (`positionSize`, `averagePrice`, `positionPnL`, `portfolioTotals`) used by RiskCalc + Portfolio; tested in `money.test.js`.
 
-**Charting libs** — ChartTab uses `lightweight-charts` v5 (series primitives for zone overlays); Indicators, Practice, IHSGChart etc. still use ApexCharts with animations off.
+**`utils.js`** — `fmt.price/pct/vol`, `colorOf`/`signalStyle` Tailwind helpers, `LW_BASE` shared lightweight-charts options (Indicators, Practice).
 
-**Chart alignment (ApexCharts)** — indicator series (SMA, Bollinger, etc.) have fewer points than raw prices. Components build a `date → value` Map from indicator data, then map over the full price array using `map[p.date] ?? null` so all ApexCharts series share equal-length arrays.
+**Charting libs** — `lightweight-charts` v5 only: ChartTab (series primitives for zone overlays), Indicators (3 charts with synced pan/zoom), Practice (time axis hidden). IHSGChart embeds the TradingView widget.
+
+**Chart alignment (Indicators)** — indicator series have fewer points than raw prices (warm-up). `align()` maps the full price date list through a `date → value` Map and emits whitespace points (`{ time }`) for missing dates, so every chart has the same logical indexes and the pan/zoom sync maps bar-to-bar.
 
 ### Data & storage
 
@@ -167,12 +170,11 @@ fly deploy
 **Deployment-specific behaviour:**
 - `data/` is committed to git (~4 MB OHLCV) so the image ships a snapshot. `data/reports/` stays gitignored.
 - `openClaudeTerminal` (PDF upload → Claude CLI) is gated to `runtime.GOOS == "windows"`; on the server it's a no-op, since an upload-triggered `exec` is remote code execution.
-- In-process auto-update (`handlers/autoupdate.go`): full refresh at boot, then every 15 min on IDX trading days 09:00–16:15 WIB (holiday = `^JKSE` has no bar today). Shares `updateMu` with `POST /api/stocks/update-all` (endpoint waits, auto tick skips). On Fly it only runs while the machine is awake, and every cold start triggers a full refresh.
+- In-process auto-update (`handlers/autoupdate.go`): at boot refreshes only stale stocks (outside market hours a stock is fresh when its newest bar is the latest `^JKSE` session and the file was written after that day's 16:15 close), then every 15 min on IDX trading days 09:00–16:15 WIB (holiday = `^JKSE` has no bar today). Shares `updateMu` with `POST /api/stocks/update-all` (endpoint waits, auto tick skips). On Fly it only runs while the machine is awake, and a cold start outside market hours only pulls stocks missing the latest final candle.
 ## Key constraints
 
 - **IDX only** — Yahoo Finance `.JK` suffix; prices are integers (Indonesian Rupiah, no decimals). IHSG uses `^JKSE`.
 - **No database** — file-based persistence only. OHLCV is `RWMutex`-protected; `fundamentals/`, `reports/`, `broker/` assume single-user.
-- **`npm install` requires `--legacy-peer-deps`** — `react-apexcharts` peer-dep conflict with React 18.
 - **PDF dependency** — `github.com/ledongthuc/pdf` (text extraction for uploaded research reports).
 - **AI endpoint is local, upload flow is not** — `/api/analysis/{symbol}/ai` is rule-based (no external LLM call). But PDF upload spawns a Claude Code terminal via `os/exec` (`reports.go`): requires `claude` CLI installed, Windows-only (`wt`/`cmd start`), and assumes localhost single-user — do not expose the server to a network.
 - **UI text is Indonesian** — user-facing labels/messages in Bahasa Indonesia (e.g. tabs "Saran", "Laporan"; view "Latihan").

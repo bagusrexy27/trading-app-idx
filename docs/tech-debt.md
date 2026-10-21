@@ -1,7 +1,7 @@
 # Tech Debt Backlog
 
 Audit 2026-10-20. Skor = (Impact + Risk) × (6 − Effort), skala 1–5.
-Fase 1 & 2 selesai 2026-10-20 (✅); fase 3 #8 + #14 selesai (engine disatukan, Advisor/calcSignals/backtest lama dihapus; #17 ◐: satu detektor candle, sisa 2 loop replay decision_backtest vs calibration). #4: syariah sudah DES Periode I 2026 resmi; IDX30/LQ45 periode Nov 2026 belum diumumkan BEI (±26–28 Okt) — update setelahnya. #11: file ter-ignore sudah di-untrack; churn data harian di git masih terbuka (◐).
+Fase 1 & 2 selesai 2026-10-20 (✅); fase 3 #8 + #14 selesai (engine disatukan, Advisor/calcSignals/backtest lama dihapus; #17 ✅). Sisa fase 3 (#15, #17, #18, #19) selesai 2026-10-21. #4: syariah sudah DES Periode I 2026 resmi; IDX30/LQ45 periode Nov 2026 belum diumumkan BEI (±26–28 Okt) — update setelahnya. #11: file ter-ignore sudah di-untrack; churn data harian di git masih terbuka (◐).
 Centang item saat selesai; hapus baris kalau sudah tidak relevan.
 
 ## Prioritas
@@ -22,11 +22,11 @@ Centang item saat selesai; hapus baris kalau sudah tidak relevan.
 | ~~12~~ ✅ | Test bergantung data live | Test | 2 | 3 | 2 | **20** | `TestAdvisorRealData` (`advisor_test.go:28`), `TestFVGRealData` (`fvg_test.go:140`) — data berubah tiap 15 mnt |
 | ~~13~~ ✅ | Tidak ada CI & lint | Infra | 3 | 3 | 3 | **18** | tidak ada `.github/workflows`, golangci, eslint |
 | ~~14~~ ✅ | Engine/route mati | Kode | 2 | 2 | 2 | **16** | Advisor + advisor-backtest (~574 baris) + `handlers/backtest.go` tak dipanggil UI; banyak `api.analysis.*` tak terpakai |
-| 15 | Scheduler vs auto-stop Fly | Infra | 2 | 2 | 2 | **16** | tiap cold start → full refresh ~90 call Yahoo; `^JKSE` di-fetch di 3 tempat; cache in-memory hilang saat tidur |
+| ~~15~~ ✅ | Scheduler vs auto-stop Fly | Infra | 2 | 2 | 2 | **16** | tiap cold start → full refresh ~90 call Yahoo; `^JKSE` di-fetch di 3 tempat; cache in-memory hilang saat tidur |
 | ~~16~~ ✅ | Log tanpa timestamp; potensi panic | Infra/Kode | 1 | 2 | 1 | **15** | `log.SetFlags(0)` `main.go`; `reports.go:61` abaikan error `e.Info()` lalu `info.Size()` |
-| 17 ◐ | 4 loop backtest & 3 detektor pola candle | Kode | 3 | 3 | 4 | **12** | `advisor_backtest.go`, `decision_backtest.go`, `handlers/backtest.go`, `calibration.go:212`; `candlePattern` vs `detectPattern` (aturan Hammer beda) |
-| 18 | Tidak ada test frontend | Test | 2 | 3 | 4 | **10** | termasuk hitungan uang Portfolio/RiskCalc |
-| 19 | ApexCharts 542 KB untuk 2 file + `--legacy-peer-deps` | Dependensi | 2 | 2 | 4 | **8** | dipakai cuma `Indicators.jsx`, `Practice.jsx` |
+| ~~17~~ ✅ | 4 loop backtest & 3 detektor pola candle | Kode | 3 | 3 | 4 | **12** | `advisor_backtest.go`, `decision_backtest.go`, `handlers/backtest.go`, `calibration.go:212`; `candlePattern` vs `detectPattern` (aturan Hammer beda) |
+| ~~18~~ ✅ | Tidak ada test frontend | Test | 2 | 3 | 4 | **10** | termasuk hitungan uang Portfolio/RiskCalc |
+| ~~19~~ ✅ | ApexCharts 542 KB untuk 2 file + `--legacy-peer-deps` | Dependensi | 2 | 2 | 4 | **8** | dipakai cuma `Indicators.jsx`, `Practice.jsx` |
 
 Catatan keamanan: `.env` berisi `ANTHROPIC_API_KEY` yang tidak dipakai kode mana pun — hapus; rotate kalau pernah dibagikan.
 

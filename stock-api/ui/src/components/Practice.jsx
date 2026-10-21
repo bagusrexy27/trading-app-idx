@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { createChart, CandlestickSeries, createSeriesMarkers } from 'lightweight-charts'
 import { api } from '../api'
-import { fmt, APEX_DARK } from '../utils'
+import { fmt, LW_BASE } from '../utils'
 import MoneyInput from './MoneyInput'
 import { DEFAULT_SCORE, DAILY_GOAL, BADGES, nextScore, dayStr, liveDayStreak, simulateTrade } from '../practiceScore'
-
-const ReactApexChart = lazy(() => import('react-apexcharts'))
 
 // ── Latihan Trading Plan ─────────────────────────────────────────────────────
 // Game: chart historis acak (saham & tanggal disembunyikan), user pasang
@@ -211,34 +210,9 @@ export default function Practice({ stocks = [] }) {
   const roundsToday = score.day === today ? score.dayRounds : 0
   const dayStreak = liveDayStreak(score, today)
 
-  // ── chart series ───────────────────────────────────────────────────────────
+  // ── chart ──────────────────────────────────────────────────────────────────
   const shown = useMemo(() => !round ? [] : phase === 'reveal' ? [...round.bars, ...round.futureBars] : round.bars, [round, phase])
-  const series = useMemo(() => [{
-    data: shown.map((b, i) => ({ x: i, y: [b.open, b.high, b.low, b.close] })),
-  }], [shown])
-
-  const chartOpts = useMemo(() => {
-    const line = (y, text, color) => ({ y, borderColor: color, strokeDashArray: 4, label: { text: `${text} ${fmt.price(y)}`, position: 'left', textAnchor: 'start', style: { background: color, color: '#fff', fontSize: '9px' } } })
-    const lines = planErr ? [] : [line(tp, 'TP', '#2ebd85'), line(entry, 'Entry', '#5e6ad2'), line(sl, 'SL', '#f6465d')]
-    // rentang sumbu Y ikut mencakup garis TP/SL supaya tetap terlihat walau di luar range harga
-    const lows = shown.map(b => b.low), highs = shown.map(b => b.high)
-    const lo = Math.min(...lows, ...(planErr ? [] : [sl])), hi = Math.max(...highs, ...(planErr ? [] : [tp]))
-    const pad = (hi - lo) * 0.04
-    return {
-      ...APEX_DARK,
-      chart: { ...APEX_DARK.chart, type: 'candlestick', height: 340, toolbar: { show: false }, animations: { enabled: true, speed: 350 } },
-      plotOptions: { candlestick: { colors: { upward: '#2ebd85', downward: '#f6465d' } } },
-      // sembunyikan tanggal supaya tidak bisa "hafal" — sumbu pakai index
-      xaxis: { type: 'numeric', labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
-      yaxis: { min: lo - pad, max: hi + pad, labels: { style: { colors: '#8a8f98', fontSize: '10px' }, formatter: v => fmt.price(v) } },
-      grid: { borderColor: 'rgba(255,255,255,0.06)' },
-      tooltip: { theme: 'dark' },
-      annotations: {
-        yaxis: lines,
-        xaxis: phase === 'reveal' ? [{ x: WINDOW - 0.5, borderColor: '#8a8f98', strokeDashArray: 2, label: { text: 'plan dipasang di sini', orientation: 'horizontal', style: { background: '#2a2e39', color: '#fff', fontSize: '9px' } } }] : [],
-      },
-    }
-  }, [phase, shown, planErr, entry, tp, sl])
+  const lines = planErr ? [] : [['TP', tp, '#2ebd85'], ['Entry', entry, '#5e6ad2'], ['SL', sl, '#f6465d']]
 
   return (
     <div className="p-5 sm:p-8 max-w-4xl mx-auto">
@@ -314,9 +288,7 @@ export default function Practice({ stocks = [] }) {
           {phase === 'load' ? (
             <div className="h-[340px] rounded-xl shimmer-bg" />
           ) : (
-            <Suspense fallback={<div className="h-[340px] rounded-xl shimmer-bg" />}>
-              <ReactApexChart type="candlestick" height={340} series={series} options={chartOpts} />
-            </Suspense>
+            <PracticeChart bars={shown} lines={lines} reveal={phase === 'reveal'} />
           )}
 
           {/* ── form plan / hasil ──────────────────────────────── */}
@@ -439,4 +411,55 @@ export default function Practice({ stocks = [] }) {
       </p>
     </div>
   )
+}
+
+// Candles on a fake daily clock (index → day) with the time axis hidden, so the
+// date can't give the answer away. TP/Entry/SL are price lines; the price scale
+// stretches to keep them in view even when they sit outside the candles.
+function PracticeChart({ bars, lines, reveal }) {
+  const ref = useRef(null)
+  const chartRef = useRef(null)
+  const series = useRef(null)
+  const markers = useRef(null)
+  const priceLines = useRef([])
+
+  useEffect(() => {
+    const chart = createChart(ref.current, {
+      ...LW_BASE,
+      timeScale: { ...LW_BASE.timeScale, visible: false },
+      localization: { priceFormatter: v => fmt.price(Math.round(v)), timeFormatter: () => '' },
+    })
+    series.current = chart.addSeries(CandlestickSeries, {
+      upColor: '#2ebd85', downColor: '#f6465d', wickUpColor: '#2ebd85', wickDownColor: '#f6465d', borderVisible: false,
+    })
+    markers.current = createSeriesMarkers(series.current, [])
+    chartRef.current = chart
+    return () => chart.remove()
+  }, [])
+
+  const key = lines.map(l => l[1]).join('|')
+  useEffect(() => {
+    const s = series.current
+    s.setData(bars.map((b, i) => ({ time: (i + 1) * 86400, open: b.open, high: b.high, low: b.low, close: b.close })))
+    priceLines.current.forEach(pl => s.removePriceLine(pl))
+    priceLines.current = lines.map(([title, price, color]) =>
+      s.createPriceLine({ price, color, lineStyle: 2, lineWidth: 1, axisLabelVisible: true, title }))
+    const prices = lines.map(l => l[1])
+    s.applyOptions({
+      autoscaleInfoProvider: base => {
+        const r = base()
+        if (!r || !prices.length) return r
+        return { ...r, priceRange: {
+          minValue: Math.min(r.priceRange.minValue, ...prices),
+          maxValue: Math.max(r.priceRange.maxValue, ...prices),
+        } }
+      },
+    })
+    markers.current.setMarkers(reveal && bars.length > WINDOW
+      ? [{ time: (WINDOW + 1) * 86400, position: 'aboveBar', shape: 'arrowDown', color: '#8a8f98', text: 'plan dipasang di sini' }]
+      : [])
+    chartRef.current.timeScale().fitContent()
+  }, [bars, key, reveal]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  return <div ref={ref} className="h-[340px]" />
 }

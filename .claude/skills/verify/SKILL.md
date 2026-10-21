@@ -22,7 +22,7 @@ Navigation flow:
 4. Back to stock list: sidebar `getByText('Watchlist', { exact: true })`.
 
 ## Gotchas
-- Chart (lightweight-charts) = `<canvas>` elements; assert `.apexcharts-canvas` count is 0 on Chart tab (ApexCharts remains only in Indicators tab).
+- Chart (lightweight-charts) = `<canvas>` elements; Indicators tab and Latihan (Practice) also render lightweight-charts canvases — ApexCharts is gone.
 - Chart pane is 500px; with YesterdayCard visible (1W range) the volume area falls below a 900px viewport fold — scroll or use full-page screenshot before concluding volume is missing.
 - `favicon.ico` 404s on every load — pre-existing console noise, ignore.
 - Yahoo data contains zero-volume flat bars (O=H=L=C, V=0) on some dates — data quirk, not a render bug.

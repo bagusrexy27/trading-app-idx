@@ -106,7 +106,7 @@ Decision engine adalah **satu-satunya** sumber vonis. Advisor (pohon if/else) da
 
 `doUpdate()` (`handlers/handlers.go`) membaca tanggal tersimpan terakhir, meminta Yahoo mulai `lastDate+1`, mendedup berdasarkan string tanggal, menambahkan, lalu mengurutkan ulang. `POST /api/stocks/update-all` melakukannya untuk seluruh watchlist.
 
-Update otomatis in-process (`handlers/autoupdate.go`): sekali saat server start, lalu tiap 15 menit di hari bursa 09:00–16:15 WIB. Hari libur terdeteksi dari `^JKSE` yang tidak punya bar hari ini. Tombol **Update All** dan curl tetap bisa dipakai; keduanya berbagi `updateMu`, jadi tidak pernah jalan bersamaan (endpoint menunggu, tick otomatis dilewati).
+Update otomatis in-process (`handlers/autoupdate.go`): saat server start hanya saham basi (di luar jam bursa: bar terakhir ≠ sesi `^JKSE` terakhir, atau file ditulis sebelum 16:15 hari itu), lalu tiap 15 menit di hari bursa 09:00–16:15 WIB. Hari libur terdeteksi dari `^JKSE` yang tidak punya bar hari ini. Tombol **Update All** dan curl tetap bisa dipakai; keduanya berbagi `updateMu`, jadi tidak pernah jalan bersamaan (endpoint menunggu, tick otomatis dilewati).
 
 ### Daftar syariah
 
@@ -126,7 +126,7 @@ App.jsx                  ← state global (stocks[], selected, view, toast), nav
 ├── StockPanel.jsx        ← (stock) container tab; chart compact selalu mounted di atas tab
 │   ├── Overview.jsx      ← kartu perubahan, range 52 minggu, volume, MA, bar RSI
 │   ├── ChartTab.jsx      ← candlestick lightweight-charts + overlay FVG & Fibonacci (primitive custom)
-│   ├── Indicators.jsx    ← RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku (ApexCharts)
+│   ├── Indicators.jsx    ← RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku (lightweight-charts, pan/zoom tersinkron)
 │   ├── Advisor.jsx       ← tab "Saran": verdict decision engine + statistik decision-backtest
 │   ├── RiskCalc.jsx      ← position sizing / stop loss
 │   └── ReportUpload.jsx  ← tab "Laporan": upload PDF + FundamentalAnalysis.jsx
@@ -144,20 +144,18 @@ Semua view kecuali `StockPanel` di-code-split lewat `React.lazy` + `Suspense`; t
 
 **`api.js`** — wrapper fetch tipis. Melempar `Error` kalau `success: false`, dan memberi pesan khusus saat response bukan JSON (biasanya berarti backend lama belum punya route baru → rebuild binary). Namespace: `api.stocks.*`, `api.analysis.*`, `api.broker.*`, plus `api.overview()`, `api.advisorScreen()`, `api.session()`, `api.ihsg()`.
 
-**`utils.js`** — `fmt.price/pct/vol`, helper kelas Tailwind `colorOf`/`signalStyle`, tema `APEX_DARK`.
+**`utils.js`** — `fmt.price/pct/vol`, helper kelas Tailwind `colorOf`/`signalStyle`, opsi dasar lightweight-charts `LW_BASE`.
 
 ### Dua library chart
 
 Bukan kecelakaan:
 
 - **`lightweight-charts`** dipakai `ChartTab.jsx` — zoom/pan candlestick 60fps, plus dua primitive custom (`chart/FVGZonesPrimitive.js`, `chart/FibZonesPrimitive.js`) untuk menggambar zona langsung di canvas chart.
-- **ApexCharts** dipakai panel `Indicators.jsx` — chart garis kecil di mana performa interaksi tidak penting.
-
-Untuk ApexCharts, animasi **dimatikan** dan event wheel-zoom di-throttle rAF. Menyalakan ulang animasi membawa kembali lag berat saat zoom/pan.
+- `Indicators.jsx` (RSI/MACD/OBV, 3 chart yang pan/zoom-nya disinkron lewat logical range) dan `Practice.jsx` (candlestick, sumbu waktu disembunyikan) memakai library yang sama dengan opsi dasar `LW_BASE` di `utils.js`. ApexCharts sudah dibuang (2026-10-21).
 
 ### Penyelarasan series chart
 
-Series indikator (SMA, Bollinger, dll) punya titik lebih sedikit daripada harga mentah. Komponen membangun `Map` `date → value` dari data indikator, lalu memetakan seluruh array harga dengan `map[p.date] ?? null`, sehingga semua series ApexCharts punya panjang sama.
+Series indikator (SMA, Bollinger, dll) punya titik lebih sedikit daripada harga mentah. Komponen membangun `Map` `date → value` dari data indikator, lalu `align()` memetakan seluruh tanggal harga dan memberi titik whitespace (`{ time }`) untuk tanggal tanpa nilai, sehingga tiap chart punya indeks logis yang sama dan sinkronisasi pan/zoom cocok bar per bar.
 
 ### Warna Tailwind
 
@@ -174,6 +172,6 @@ Namespace `tv` di `ui/tailwind.config.js`: `tv-bg` (#131722), `tv-card` (#1e222d
 | **Auth gagal-terbuka** | `basicAuth` hanya aktif kalau `AUTH_USER` **dan** `AUTH_PASS` terisi. Kalau salah satu kosong, server jalan terbuka dan hanya mencetak peringatan kuning saat startup — bukan `log.Fatal`. Lupa `fly secrets set` berarti seluruh route, termasuk DELETE dan upload, terbuka |
 | **Upload PDF memicu `os/exec`** | `openClaudeTerminal()` membuka terminal Claude Code untuk menganalisa PDF dan menulis `data/fundamentals/{SYMBOL}.json`. Digerbangi `runtime.GOOS == "windows"` sehingga no-op di server — karena upload yang memicu exec adalah jalur eksekusi kode remote. Jangan pernah jalankan versi Windows-nya dengan port terbuka |
 | **Endpoint AI lokal** | `/api/analysis/{symbol}/ai` berbasis aturan, tanpa panggilan LLM eksternal. Narasi dibentuk dari sinyal, indikator, deteksi pola, dan teks laporan PDF yang diekstrak |
-| **Scheduler in-process** | Lokal: data segar tiap 15 menit di jam bursa tanpa klik. Di Fly dengan `auto_stop_machines`, scheduler hanya jalan selama mesin bangun, dan setiap cold start memicu refresh penuh (~90 panggilan Yahoo) |
+| **Scheduler in-process** | Lokal: data segar tiap 15 menit di jam bursa tanpa klik. Di Fly dengan `auto_stop_machines`, scheduler hanya jalan selama mesin bangun, cold start di luar jam bursa hanya menarik saham yang belum punya candle final (biasanya 0 panggilan); di jam bursa tetap refresh penuh |
 | **Yahoo Finance tak resmi** | Tanpa kontrak, tanpa SLA, rate limit tak terdokumentasi. `User-Agent` wajib. Perubahan bentuk response akan merusak `fetcher` tanpa peringatan |
 | **Daftar syariah manual** | Snapshot hardcoded, butuh edit + rebuild setiap review DES |

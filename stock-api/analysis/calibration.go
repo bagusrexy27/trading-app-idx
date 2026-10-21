@@ -231,7 +231,7 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 					}
 				}
 			}
-			result, pnl, ok := planOutcome(prices, i, dec.StopLoss, firstTP(dec))
+			result, pnl, _, ok := planOutcome(prices, i, dec.StopLoss, firstTP(dec))
 			if !ok {
 				continue
 			}
@@ -343,32 +343,36 @@ func firstTP(d Decision) float64 {
 	return d.TakeProfit[0].Price
 }
 
-// planOutcome resolves the plan made at the close of bar i. ok=false when the
-// plan is invalid or the horizon runs past the end of the data unresolved.
-func planOutcome(prices []models.StockPrice, i int, stop, target float64) (result string, pnlPct float64, ok bool) {
+// planOutcome resolves the plan made at the close of bar i: enter at the next
+// open, WIN at TP1, LOSS at the stop (gap-through exits at the open, same-bar
+// touch = LOSS), TIMEOUT at the close of bar i+CalibHorizon. exit is the bar it
+// resolved on. ok=false when the plan is invalid (result "") or the data ends
+// before it resolves (result "OPEN", pnl marked at the last close).
+// Shared by Calibrate and BacktestDecision so both report the same rules.
+func planOutcome(prices []models.StockPrice, i int, stop, target float64) (result string, pnlPct float64, exit int, ok bool) {
 	n := len(prices)
 	entry := prices[i+1].Open
 	if entry <= 0 {
 		entry = prices[i+1].Close
 	}
 	if entry <= 0 || stop <= 0 || target <= entry || stop >= entry {
-		return "", 0, false
+		return "", 0, 0, false
 	}
 	end := i + CalibHorizon
 	for j := i + 1; j <= end; j++ {
 		if j >= n {
-			return "", 0, false
+			return "OPEN", (prices[n-1].Close/entry - 1) * 100, n - 1, false
 		}
 		if prices[j].Low <= stop {
 			exit := stop
 			if prices[j].Open < stop { // gapped through the stop
 				exit = prices[j].Open
 			}
-			return "LOSS", (exit/entry - 1) * 100, true
+			return "LOSS", (exit/entry - 1) * 100, j, true
 		}
 		if prices[j].High >= target {
-			return "WIN", (target/entry - 1) * 100, true
+			return "WIN", (target/entry - 1) * 100, j, true
 		}
 	}
-	return "TIMEOUT", (prices[end].Close/entry - 1) * 100, true
+	return "TIMEOUT", (prices[end].Close/entry - 1) * 100, end, true
 }

@@ -1,5 +1,6 @@
-// Self-check: node src/practiceScore.check.js
+// npm test
 import assert from 'node:assert/strict'
+import { test } from 'vitest'
 import { DEFAULT_SCORE, DAILY_GOAL, nextScore, liveDayStreak, simulateTrade } from './practiceScore.js'
 
 const play = (s, n, day, correct = true, followed = false) => {
@@ -8,6 +9,7 @@ const play = (s, n, day, correct = true, followed = false) => {
   return [s, earned]
 }
 
+test('daily streak, badges, score migration', () => {
 let [s] = play(DEFAULT_SCORE, DAILY_GOAL - 1, '2026-10-05')
 assert.equal(s.dayStreak, 0)
 ;[s] = play(s, 1, '2026-10-05')
@@ -34,6 +36,9 @@ assert.equal(r.score.best, 3)
 ;[s] = play(s, DAILY_GOAL, '2027-01-01')
 assert.equal(s.dayStreak, 2)
 
+})
+
+test('simulateTrade', () => {
 // ── simulateTrade ──
 const bar = (open, high, low, close) => ({ open, high, low, close })
 const plan = { entry: 1000, tp: 1100, sl: 950 }
@@ -57,4 +62,4 @@ t = simulateTrade(1050, [bar(1060, 1080, 995, 1000), bar(1000, 1110, 990, 1100)]
 assert.equal(t.result, 'tp'); assert.equal(t.exitIdx, 1)
 assert.equal(nextScore(DEFAULT_SCORE, { correct: true, r: 2, today: '2026-10-05' }).score.totalR, 2)
 
-console.log('practiceScore OK')
+})

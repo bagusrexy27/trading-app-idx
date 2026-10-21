@@ -18,7 +18,7 @@ Yahoo Finance ──▶ fetcher ──▶ ./data/{SYMBOL}.json ──▶ analysi
 cd stock-api
 
 # 1. Build UI (output ke ../static/, disajikan Go di root)
-cd ui && npm install --legacy-peer-deps && npm run build && cd ..
+cd ui && npm install && npm run build && cd ..
 
 # 2. Build & jalankan backend
 go build -o stock-api.exe .
@@ -100,7 +100,6 @@ npm run build                 # produksi → ../static/
 
 - **IDX saja** — Yahoo Finance butuh sufiks `.JK`; harga Rupiah bilangan bulat tanpa desimal. IHSG pakai `^JKSE`.
 - **Tanpa database** — `./data/{SYMBOL}.json`. OHLCV dilindungi `sync.RWMutex`; `broker/`, `fundamentals/`, `reports/` mengasumsikan pemakai tunggal.
-- **`--legacy-peer-deps` wajib** saat `npm install` — konflik peer dep `react-apexcharts` dengan React 18.
 - **Jangan ekspos ke jaringan tanpa auth.** Upload PDF memicu `os/exec` yang membuka terminal Claude Code (Windows saja) — itu jalur eksekusi kode remote kalau server terbuka. Set `AUTH_USER` **dan** `AUTH_PASS` sebelum deploy; lihat [docs/deploy.md](docs/deploy.md).
 - **`DATA_DIR` hanya boleh berisi file saham.** `storage.List()` menganggap setiap `*.json` di situ sebagai ticker.
 - **Teks UI Bahasa Indonesia** — label dan pesan untuk pengguna pakai bahasa Indonesia.
