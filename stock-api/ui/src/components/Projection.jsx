@@ -93,7 +93,7 @@ export function ProjectionCard({ calibration, close }) {
 
           {!p.reliable && <p className="text-xs text-tv-yellow mt-2">Sampel sedikit (&lt;30) — angka ini belum bisa dipercaya.</p>}
           <p className="text-[10px] text-tv-muted mt-2">
-            Diukur dari data ±1,5 tahun semua saham yang dilacak, tanpa mengintip masa depan. Hari berurutan saling tumpang-tindih,
+            Diukur dari data sejak 2020 semua saham yang dilacak, tanpa mengintip masa depan. Hari berurutan saling tumpang-tindih,
             jadi jumlah kasus terlihat lebih besar dari aslinya. Hanya saham yang <i>sekarang</i> dilacak yang ikut dihitung — saham yang dulu
             jatuh lalu tak dilacak tidak masuk, jadi angkanya bisa sedikit terlalu optimis. Skenario, bukan ramalan.
           </p>

@@ -46,20 +46,21 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `models/` | `StockPrice` (OHLCV + date) and `StockData` (symbol + prices) |
 | `fetcher/` | Yahoo Finance v8 chart API; appends `.JK` automatically |
 | `storage/` | `./data/{SYMBOL}.json`; thread-safe via `sync.RWMutex` |
-| `analysis/analysis.go` | Pure indicator math: SMA, EMA, RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP, SAR, Ichimoku, Fibonacci, Pivots |
+| `analysis/analysis.go` | Pure indicator math: SMA, EMA, RSI, MACD, Bollinger, Stochastic, ATR, OBV, ADX, VWAP (rolling 20), SAR, Ichimoku (spans displaced +26, chikou −26), Fibonacci, Pivots. Verified against a textbook/Pine reference (2026-10-22) — `indicators_test.go` pins ADX (Wilder), VWAP, Ichimoku |
 | `analysis/amd.go` | Accumulation–Manipulation–Distribution (Wyckoff-style) phase detector |
 | `analysis/adline.go`, `mfi.go`, `cmf.go` | Volume-flow indicators: A/D Line, Money Flow Index, Chaikin Money Flow |
 | `analysis/bandar.go` | Bandarmology (broker accumulation/distribution) analysis over broker-summary data |
 | `analysis/helpers.go` | Shared price-action helpers incl. `CandlePattern` — the one candle detector (engine, `/ai`, `/session` via `candleInfo`) |
 | `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP. Low-confidence results downgrade to WAIT. **Only source of verdicts** — the old Advisor tree and `calcSignals` were removed (2026-10-20) because they contradicted it. `DecisionEngineWithBroker` folds in broker data |
 | `analysis/decision_backtest.go` | Backtests the decision engine per stock; exits via `planOutcome` (shared with calibration — same entry/stop/TP1/20-bar timeout rules) |
-| `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50): plan = entry next open, WIN if TP1 before stop within 20 bars. Also the **projection**: per regime × 5/10/20-bar horizon × score bucket, % of cases ending Bullish/Sideways/Bearish (move beyond 0.5 × ATR% × √h) + p10–p90 range — the only bull/side/bear odds in the app (`Projection.jsx`) |
+| `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50; `^JKSE` fetched since 2020 so every bar has a regime). The engine replay runs in parallel over all CPUs (~15s for 92 stocks × 6.5y); `handlers/calibration.go` serves the stale table while rebuilding in the background, and boot warms it: plan = entry next open, WIN if TP1 before stop within 20 bars. Also the **projection**: per regime × 5/10/20-bar horizon × score bucket, % of cases ending Bullish/Sideways/Bearish (move beyond 0.5 × ATR% × √h) + p10–p90 range — the only bull/side/bear odds in the app (`Projection.jsx`) |
 | `analysis/fvg.go` | Fair Value Gap detection (also feeds decision engine confluence) |
+| `analysis/valuation.go` | 3-year PBV band (mean ±1/±2 SD of price ÷ book value per share; USD reporters converted via `USDIDR=X`) + quality screen from the Astronacci "5 Undervalued Stock" report: listing >10y, dividend yield ≥5%, avg ROE >12%, net income always positive (Yahoo has ~4 annual reports). `undervalue` = passes all four AND PBV below its mean. Feeds the engine as factor **Valuasi** (10%, technical weights scaled to 90%) only when quality passes; otherwise the factor is absent and the score equals the plain engine — so calibration (replayed without valuation) still measures the same model |
 | `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate`, `updateAll` (guarded by `updateMu`) |
 | `handlers/autoupdate.go` | `StartAutoUpdate` (called from `main`): boot refresh of stale stocks only + 15-min refresh in market hours |
 | `handlers/analysis.go` | All `/api/analysis/*` endpoints (calls `analysis.*`) |
 | `handlers/advisor.go` | `/decision` and `/decision-backtest` for one symbol (file name is historical) |
-| `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true`) |
+| `handlers/advisor_screen.go` | `GET /api/advisor/screen` — runs the **decision engine** (not Advisor) across all stocks concurrently, returns ranked candidates (`?mode=buy&min_turnover=&syariah=true&undervalue=true`); each row carries `valuation` |
 | `handlers/calibration.go` | In-memory calibration cache (rebuilt when newest stored bar or stock count changes; `^JKSE` via `jkseBars` for regime). Attached as `calibration` to `/decision` and every screen row; screen also returns `regime` |
 | `handlers/syariah.go` | Syariah set = OJK DES Periode I 2026 Lampiran I (622 stocks, `isSyariah`); `syariahValidUntil` drives `syariah_stale` in the screen response + UI warning. Replace from the next DES PDF (±1 Dec / ±1 Jun) |
 | `handlers/indices.go` | IDX30/LQ45 sets + `indexValidUntil` (BEI re-evaluates quarterly, announced ~late Jan/Apr/Jul/Oct) |
@@ -68,12 +69,13 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `handlers/ihsg.go` | `GET /api/ihsg` — Jakarta Composite Index; owns `jkseBars()`, the single `^JKSE` fetch (2y, cached 60s) shared with calibration regime + auto-update holiday check |
 | `handlers/broker.go` | Broker-summary data CRUD under `./data/broker/{SYMBOL}.json`; includes `/mock` generator for test data. Mock files carry `"source": "mock"` and `LoadBrokerDays` ignores them, so synthetic flows never reach the decision engine |
 | `handlers/reports.go` | PDF research reports — list/upload/delete under `./data/reports/{SYMBOL}/`; uses `github.com/ledongthuc/pdf` for text extraction (consumed by AI handler). **Gotcha:** upload also spawns a Claude Code terminal (`openClaudeTerminal`) that analyzes the PDF and writes `./data/fundamentals/{SYMBOL}.json` |
+| `handlers/valuation.go` | Valuation cache `data/valuation/{SYMBOL}.json`, refreshed weekly in the auto-update goroutine (`FetchLongHistory` 3y + `FetchFundamentals`). Also owns **`decide(sym, prices)`** — the one call every handler uses for a verdict (broker + valuation folded in): `/decision`, screen, `/ai`, overview, session |
 | `handlers/fundamental.go` | Read/write arbitrary JSON to `./data/fundamentals/{SYMBOL}.json` |
 | `handlers/dividends.go` | Dividend calendar: Yahoo dividend history for all tracked stocks (`fetcher.FetchDividends`, cached 24h in `data/dividends/yahoo.json`) → `riwayat` rows + `perkiraan` (last 12 months projected +1y, specials >3× median skipped). Manual official announcements in `data/dividends/calendar.json` suppress nearby projections |
 
 **Routes** (registered in `main.go`):
 
-- Stocks: `GET/POST /api/stocks`, `POST /api/stocks/update-all`, `GET/DELETE /api/stocks/{symbol}`, `GET /api/stocks/{symbol}/latest`, `POST /api/stocks/{symbol}/update`, `GET /api/stocks/{symbol}/export.csv`
+- Stocks: `GET/POST /api/stocks`, `POST /api/stocks/update-all`, `POST /api/stocks/backfill` (extend history back to `historyStart` = 2020-01-01; new stocks start there too), `GET/DELETE /api/stocks/{symbol}`, `GET /api/stocks/{symbol}/latest`, `POST /api/stocks/{symbol}/update`, `GET /api/stocks/{symbol}/export.csv`
 - Reports: `GET/POST /api/stocks/{symbol}/reports`, `DELETE /api/stocks/{symbol}/reports/{id}`
 - Fundamental: `GET/POST /api/stocks/{symbol}/fundamental`
 - Analysis (`/api/analysis/{symbol}/*`): `summary`, `indicators`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `fvg`, `avwap`, `pivots`, `amd`, `adline`, `cmf`, `mfi`, `decision`, `decision-backtest`, `ai`
@@ -81,7 +83,7 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 - Market: `GET /api/overview`, `GET /api/advisor/screen`, `GET /api/calibration`, `GET /api/session`, `GET /api/ihsg`
 - Broker: `GET/DELETE /api/broker/{symbol}`, `GET /api/broker/{symbol}/summary`, `POST /api/broker/{symbol}/mock`
 
-**Incremental fetching** (`doUpdate`): reads last saved date, requests from `lastDate+1`, dedupes by date string, appends and re-sorts.
+**Incremental fetching** (`doUpdate`): reads last saved date, re-requests from it (refreshes a partial intraday candle), merges via `mergePrices` (dedupe by date, re-sort). History depth = `historyStart` (2020-01-01). Every ingest path runs `dropHolidayFillers`: Yahoo pads IDX holidays with flat zero-volume bars (e.g. 14–15 & 27–28 May 2026); bars like that on a date `^JKSE` did not trade are dropped (illiquid no-trade days are kept). `POST /api/stocks/backfill` also cleans stored files.
 
 **Symbols** stored without `.JK` (e.g. `BBCA`). `canonicalSymbol()` strips `.JK` from user input; fetcher re-adds it internally. `ValidateSymbol` middleware (on `/api`) and `AddStock` reject anything but `[A-Za-z0-9]{1,12}(.JK)?`, so `{symbol}` can never carry path separators into `filepath.Join`. Persisted JSON goes through `storage.WriteJSON` (temp file + rename).
 
@@ -121,7 +123,7 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 
 **`utils.js`** — `fmt.price/pct/vol`, `colorOf`/`signalStyle` Tailwind helpers, `LW_BASE` shared lightweight-charts options (Indicators, Practice).
 
-**Charting libs** — `lightweight-charts` v5 only: ChartTab (series primitives for zone overlays), Indicators (3 charts with synced pan/zoom), Practice (time axis hidden). IHSGChart embeds the TradingView widget.
+**Charting libs** — `lightweight-charts` v5 only: ChartTab (series primitives for zone overlays; TradingView-style: OHLC legend top-left, D/W/M timeframe resampled client-side in `chart/bars.js` (+ SMA/RSI/MACD, tested in `bars.test.js`), RSI/MACD as lower panes, log scale; FVG/AVWAP/Projection are daily-only), Indicators (3 charts with synced pan/zoom), Practice (time axis hidden). IHSGChart embeds the TradingView widget.
 
 **Chart alignment (Indicators)** — indicator series have fewer points than raw prices (warm-up). `align()` maps the full price date list through a `date → value` Map and emits whitespace points (`{ time }`) for missing dates, so every chart has the same logical indexes and the pan/zoom sync maps bar-to-bar.
 
@@ -130,6 +132,7 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 | Path | Content |
 |---|---|
 | `./data/{SYMBOL}.json` | OHLCV time series — `StockData` struct, `prices` always sorted by date string (lex-sort is correct for `YYYY-MM-DD`) |
+| `./data/valuation/` | Weekly PBV-band cache per stock (gitignored; rebuilt in the background on a fresh volume) |
 | `./data/dividends/` | `yahoo.json` (auto cache) + `calendar.json` (manual announcements). Subdir on purpose: `storage.List` treats every `data/*.json` as a stock |
 | `./data/fundamentals/{SYMBOL}.json` | Fundamental analysis JSON — written by the Claude Code terminal spawned on PDF upload; Laporan tab only reads it |
 | `./data/reports/{SYMBOL}/{timestamp}_{filename}.pdf` | Uploaded PDF research reports; AI handler reads text from these |
@@ -168,7 +171,7 @@ fly deploy
 | `AUTH_USER` / `AUTH_PASS` | *(unset)* | both set ⇒ HTTP basic auth on every route; unset ⇒ open locally, but **refuses to start on Fly** (`FLY_APP_NAME` set) |
 
 **Deployment-specific behaviour:**
-- `data/` is committed to git (~4 MB OHLCV) so the image ships a snapshot. `data/reports/` stays gitignored.
+- `data/` is committed to git (~19 MB OHLCV, daily bars since 2020) so the image ships a snapshot. `data/reports/` stays gitignored.
 - `openClaudeTerminal` (PDF upload → Claude CLI) is gated to `runtime.GOOS == "windows"`; on the server it's a no-op, since an upload-triggered `exec` is remote code execution.
 - In-process auto-update (`handlers/autoupdate.go`): at boot refreshes only stale stocks (outside market hours a stock is fresh when its newest bar is the latest `^JKSE` session and the file was written after that day's 16:15 close), then every 15 min on IDX trading days 09:00–16:15 WIB (holiday = `^JKSE` has no bar today). Shares `updateMu` with `POST /api/stocks/update-all` (endpoint waits, auto tick skips). On Fly it only runs while the machine is awake, and a cold start outside market hours only pulls stocks missing the latest final candle.
 ## Key constraints

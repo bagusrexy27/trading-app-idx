@@ -65,6 +65,7 @@ export const api = {
     if (opts.syariah) p.set('syariah', 'true')
     if (opts.index) p.set('index', opts.index)
     if (opts.includeLowRR) p.set('include_low_rr', 'true')
+    if (opts.undervalue) p.set('undervalue', 'true')
     return req(`/advisor/screen?${p}`)
   },
   session:  () => req('/session'),

@@ -41,6 +41,7 @@ Semua kode di `stock-api/`.
 | `helpers.go` | Helper price-action bersama, termasuk `CandlePattern` — satu-satunya detektor pola candle (engine, `/ai`, `/session`) |
 | `decision_backtest.go` | Replay sinyal decision engine atas histori tersimpan |
 | `fvg.go` | Fair Value Gap — deteksi gap 3-bar, lacak status `active` / `filled` / `inverted` |
+| `valuation.go` | Pita PBV 3 tahun (rata-rata ±1/±2 SD) + saringan kualitas (listing >10 th, dividend yield ≥5%, rata-rata ROE >12%, laba selalu positif). Masuk engine sebagai faktor **Valuasi** 10% hanya kalau lolos saringan; kalau tidak, skor identik dengan engine teknikal murni |
 | `amd.go` | Siklus Accumulation–Manipulation–Distribution (Wyckoff / ICT) |
 | `bandar.go` | Bandarmology atas data broker summary (`BrokerDay`) |
 | `adline.go`, `mfi.go`, `cmf.go` | Indikator aliran volume |
@@ -168,7 +169,7 @@ Namespace `tv` di `ui/tailwind.config.js`: `tv-bg` (#131722), `tv-card` (#1e222d
 | Keputusan | Konsekuensi |
 |---|---|
 | **File JSON, bukan database** | Nol dependensi operasional dan mudah di-inspect/di-commit, tapi tidak ada query, tidak ada transaksi, dan hanya OHLCV yang punya lock. `broker/`, `fundamentals/`, `reports/` mengasumsikan pemakai tunggal |
-| **`data/` ikut di-commit** | Image membawa snapshot ~4 MB sehingga deploy pertama langsung berisi — tapi setiap "Update All" menulis ulang ~75 file terlacak, jadi working tree praktis selalu kotor dan `git diff` perlu difilter path |
+| **`data/` ikut di-commit** | Image membawa snapshot ~19 MB (bar harian sejak 2020) sehingga deploy pertama langsung berisi — tapi setiap "Update All" menulis ulang ~75 file terlacak, jadi working tree praktis selalu kotor dan `git diff` perlu difilter path |
 | **Auth gagal-terbuka** | `basicAuth` hanya aktif kalau `AUTH_USER` **dan** `AUTH_PASS` terisi. Kalau salah satu kosong, server jalan terbuka dan hanya mencetak peringatan kuning saat startup — bukan `log.Fatal`. Lupa `fly secrets set` berarti seluruh route, termasuk DELETE dan upload, terbuka |
 | **Upload PDF memicu `os/exec`** | `openClaudeTerminal()` membuka terminal Claude Code untuk menganalisa PDF dan menulis `data/fundamentals/{SYMBOL}.json`. Digerbangi `runtime.GOOS == "windows"` sehingga no-op di server — karena upload yang memicu exec adalah jalur eksekusi kode remote. Jangan pernah jalankan versi Windows-nya dengan port terbuka |
 | **Endpoint AI lokal** | `/api/analysis/{symbol}/ai` berbasis aturan, tanpa panggilan LLM eksternal. Narasi dibentuk dari sinyal, indikator, deteksi pola, dan teks laporan PDF yang diekstrak |

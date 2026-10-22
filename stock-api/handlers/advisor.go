@@ -18,8 +18,7 @@ func (h *AnalysisHandler) Decision(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	brokerDays := LoadBrokerDays(symbol)
-	d := analysis.DecisionEngineWithBroker(prices, brokerDays)
+	d := decide(symbol, prices)
 	c, regime := currentCalibration()
 
 	respond(w, 200, true, "", map[string]interface{}{

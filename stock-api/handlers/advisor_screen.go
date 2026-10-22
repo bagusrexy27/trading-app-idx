@@ -20,6 +20,7 @@ type screenFilters struct {
 	SyariahOnly   bool
 	Index         string // "" | "idx30" | "lq45"
 	IncludeLowRR  bool
+	Undervalue    bool // only quality stocks below their 3-year mean PBV
 }
 
 func parseScreenFilters(r *http.Request) screenFilters {
@@ -46,31 +47,33 @@ func parseScreenFilters(r *http.Request) screenFilters {
 	f.SyariahOnly = r.URL.Query().Get("syariah") == "true"
 	f.Index = strings.ToLower(r.URL.Query().Get("index"))
 	f.IncludeLowRR = r.URL.Query().Get("include_low_rr") == "true"
+	f.Undervalue = r.URL.Query().Get("undervalue") == "true"
 	return f
 }
 
 // screenRow is one ranked screener result.
 type screenRow struct {
-	Symbol      string            `json:"symbol"`
-	Close       float64           `json:"close"`
-	Signal      string            `json:"signal"`
-	Score       int               `json:"score"`
-	Confidence  int               `json:"confidence"`
-	Trend       analysis.TrendSet `json:"trend"`
-	Structure   string            `json:"structure"`
-	VolumeState string            `json:"volume_state"`
-	EntryLow    float64           `json:"entry_low"`
-	EntryHigh   float64           `json:"entry_high"`
-	EntryIdeal  float64           `json:"entry_ideal"`
-	Stop        float64           `json:"stop"`
-	Target      float64           `json:"target"`
-	RiskReward  float64           `json:"risk_reward"`
-	TurnoverBn  float64           `json:"turnover_bn"`
-	Syariah     bool              `json:"syariah"`
-	IDX30       bool              `json:"idx30"`
-	LQ45        bool              `json:"lq45"`
-	Note        string            `json:"note,omitempty"`
-	Calibration *calibrationFor   `json:"calibration,omitempty"` // measured history for this score + regime
+	Symbol      string              `json:"symbol"`
+	Close       float64             `json:"close"`
+	Signal      string              `json:"signal"`
+	Score       int                 `json:"score"`
+	Confidence  int                 `json:"confidence"`
+	Trend       analysis.TrendSet   `json:"trend"`
+	Structure   string              `json:"structure"`
+	VolumeState string              `json:"volume_state"`
+	EntryLow    float64             `json:"entry_low"`
+	EntryHigh   float64             `json:"entry_high"`
+	EntryIdeal  float64             `json:"entry_ideal"`
+	Stop        float64             `json:"stop"`
+	Target      float64             `json:"target"`
+	RiskReward  float64             `json:"risk_reward"`
+	TurnoverBn  float64             `json:"turnover_bn"`
+	Syariah     bool                `json:"syariah"`
+	IDX30       bool                `json:"idx30"`
+	LQ45        bool                `json:"lq45"`
+	Note        string              `json:"note,omitempty"`
+	Calibration *calibrationFor     `json:"calibration,omitempty"` // measured history for this score + regime
+	Valuation   *analysis.Valuation `json:"valuation,omitempty"`   // 3-year PBV band + quality screen
 }
 
 // filterScreenRows applies mode and quality gates to ranked rows.
@@ -78,6 +81,9 @@ func filterScreenRows(rows []screenRow, f screenFilters) []screenRow {
 	out := make([]screenRow, 0, len(rows))
 	for _, row := range rows {
 		if f.Mode == "buy" && row.Signal != "STRONG_BUY" && row.Signal != "BUY" {
+			continue
+		}
+		if f.Undervalue && (row.Valuation == nil || !row.Valuation.Undervalue) {
 			continue
 		}
 		if f.SyariahOnly && !row.Syariah {
@@ -136,8 +142,7 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		brokerDays := LoadBrokerDays(sym)
-		dec := analysis.DecisionEngineWithBroker(d.Prices, brokerDays)
+		dec := decide(sym, d.Prices)
 		rows = append(rows, screenRow{
 			Symbol: sym, Close: d.Prices[n-1].Close,
 			Signal: dec.Signal, Score: dec.Score, Confidence: dec.Confidence,
@@ -147,6 +152,7 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 			TurnoverBn: analysis.R2(turnover),
 			Syariah:    isSyariah(sym), IDX30: isIDX30(sym), LQ45: isLQ45(sym), Note: dec.Note,
 			Calibration: lookupCalibration(calib, regime, sym, dec.Score, d.Prices),
+			Valuation:   dec.Valuation,
 		})
 	}
 
@@ -174,6 +180,7 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 		"syariah_stale":  syariahStale(time.Now()), // DES OJK lewat periode
 		"syariah_until":  syariahValidUntil,
 		"include_low_rr": f.IncludeLowRR,
+		"undervalue":     f.Undervalue,
 		"regime":         regime, // IHSG vs SMA50: up | down | unknown
 		"scanned":        scanned,
 		"matched":        len(out),

@@ -38,11 +38,11 @@ type chartResponse struct {
 }
 
 // toYahooSymbol appends the .JK suffix for IDX stocks.
-// Symbols starting with '^' (indices like ^JKSE) or already containing '.'
-// (e.g. already suffixed) are returned as-is.
+// Symbols starting with '^' (indices like ^JKSE), FX pairs ('=', e.g.
+// USDIDR=X) or already containing '.' (already suffixed) are returned as-is.
 func toYahooSymbol(symbol string) string {
 	s := strings.ToUpper(symbol)
-	if strings.HasPrefix(s, "^") || strings.Contains(s, ".") {
+	if strings.HasPrefix(s, "^") || strings.ContainsAny(s, ".=") {
 		return s
 	}
 	return s + ".JK"

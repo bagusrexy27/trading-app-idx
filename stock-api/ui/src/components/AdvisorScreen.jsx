@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
 import { fmt, calibShort, REGIME_LABEL } from '../utils'
+import { ValuationChip } from './ValuationCard'
 import { tip } from '../glossary'
 import { HorizonToggle, ScenarioBar, pickProj, projEdge } from './Projection'
 
@@ -65,6 +66,7 @@ function Card({ r, h, onSelect }) {
         )}
         {r.syariah && <Chip tone="text-tv-green">☪ Syariah</Chip>}
         {(r.idx30 || r.lq45) && <Chip tone="text-tv-blue">{r.idx30 ? 'IDX30' : 'LQ45'}</Chip>}
+        <ValuationChip v={r.valuation} />
       </div>
 
       {/* mini trade plan */}
@@ -103,6 +105,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
   const [mode, setMode]       = useState('buy')
   const [minTurn, setMinTurn] = useState(2)
   const [syariahOnly, setSyariahOnly] = useState(false)
+  const [undervalueOnly, setUndervalueOnly] = useState(false)
   const [index, setIndex] = useState('') // '' | 'idx30' | 'lq45'
   const [maxPrice, setMaxPrice]   = useState(0)   // 0 = semua
   const [minScore, setMinScore]   = useState(0)
@@ -125,13 +128,14 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       minRR: minRR || undefined,
       minConfidence: minConfidence || undefined,
       syariah: syariahOnly || undefined,
+      undervalue: undervalueOnly || undefined,
       index: index || undefined,
     })
       .then(d => { if (alive) setData(d) })
       .catch(e => { if (alive) showToast?.(e.message, 'error') })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
-  }, [mode, minTurn, minRR, minConfidence, syariahOnly, index, reloadKey, showToast])
+  }, [mode, minTurn, minRR, minConfidence, syariahOnly, undervalueOnly, index, reloadKey, showToast])
 
   // Filter harga/skor/volume/trend tetap di client — backend sudah handle R/R, keyakinan, syariah.
   const results = (data?.results ?? []).filter(r =>
@@ -150,7 +154,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       <div className="mb-5">
         <h1 className="text-xl font-extrabold flex items-center gap-2">🧭 Advisor Screener</h1>
         <p className="text-xs text-tv-muted mt-1">
-          Decision Engine ke semua saham: skor berbobot 11 faktor (struktur, trend, money flow, volume, S/R, momentum, ADX, candle, R/R, FVG, bandarmology). Diurutkan dari skor tertinggi, atau dari proyeksi terbaik (Bullish% − Bearish% terukur).
+          Decision Engine ke semua saham: skor berbobot 11 faktor (struktur, trend, money flow, volume, S/R, momentum, ADX, candle, R/R, FVG, bandarmology) + valuasi PBV 3 tahun untuk saham yang lolos saringan kualitas. Diurutkan dari skor tertinggi, atau dari proyeksi terbaik (Bullish% − Bearish% terukur).
         </p>
       </div>
 
@@ -177,6 +181,11 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
         <button onClick={() => setSyariahOnly(s => !s)}
           className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${syariahOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}>
           ☪ Syariah aja
+        </button>
+        <button onClick={() => setUndervalueOnly(s => !s)}
+          title="PBV di bawah rata-rata 3 tahun + lolos saringan: listing >10 th, dividend yield ≥5%, rata-rata ROE >12%, laba selalu positif"
+          className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${undervalueOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}>
+          💎 Undervalue aja
         </button>
         <button onClick={() => setReloadKey(k => k + 1)} className="ml-auto px-3 py-1.5 text-xs rounded-lg bg-tv-bg border border-tv-border text-tv-muted hover:text-tv-blue hover:border-tv-blue/40 transition-colors">
           ↻ Refresh

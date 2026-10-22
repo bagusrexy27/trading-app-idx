@@ -160,7 +160,7 @@ Format:
    condong risk-on/risk-off/hati-hati, dan saran sikap (mis. "selektif, utamakan RR
    tinggi + confidence tinggi; kurangi posisi kalau IHSG tembus support X"). Jangan
    generik — sebut angka/faktor konkret dari data hari ini.
-6. Tutup: 1 baris disclaimer — rekam jejak dari ±1,5 tahun data Yahoo (delay) +
+6. Tutup: 1 baris disclaimer — rekam jejak dari data Yahoo sejak 2020 (delay) +
    rangkuman berita publik, bukan kepastian; selalu pakai stop-loss.
 7. **Sources** — gabungan semua url dari SUMBER/baris agent, sebagai markdown link.
 

@@ -43,3 +43,4 @@ desktop.ini
 
 # Dividend cache (rebuilt from Yahoo every 24h)
 data/dividends/yahoo.json
+data/valuation/

@@ -73,7 +73,8 @@ type Decision struct {
 	TakeProfit      []TPLevel     `json:"take_profit"`
 	RiskReward      float64       `json:"risk_reward"`
 	Components      []FactorScore `json:"components"`
-	Note            string        `json:"note,omitempty"` // set when the signal was gated down
+	Note            string        `json:"note,omitempty"`      // set when the signal was gated down
+	Valuation       *Valuation    `json:"valuation,omitempty"` // 3-year PBV band + quality screen, when fundamentals are cached
 }
 
 // BuyScore is the minimum decision score for a BUY call. Calibration buckets
@@ -243,6 +244,16 @@ func DecisionEngine(prices []models.StockPrice) Decision {
 
 // DecisionEngineWithBroker is DecisionEngine with optional broker-summary flow.
 func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay) Decision {
+	return DecisionEngineFull(prices, brokerDays, nil)
+}
+
+// DecisionEngineFull adds the optional valuation factor (3-year PBV band, see
+// valuation.go). When val is nil or fails the quality screen the factor is
+// left out entirely and the result equals DecisionEngineWithBroker — so the
+// calibration replay, which has no point-in-time fundamentals, still measures
+// the same engine. When present it takes ValuationWeight% and the technical
+// weights are scaled to fill the rest.
+func DecisionEngineFull(prices []models.StockPrice, brokerDays []BrokerDay, val *Valuation) Decision {
 	n := len(prices)
 	if n < 60 {
 		return Decision{Signal: "WAIT", Confidence: 0,
@@ -517,6 +528,12 @@ func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay
 		{Name: "FVG Confluence", Score: fvgSc, Weight: 7, Note: fvgNote},
 		{Name: "Bandarmology", Score: bandarSc, Weight: 8, Note: bandarNote},
 	}
+	if valSc, valNote, ok := scoreValuation(val); ok {
+		for i := range comps {
+			comps[i].Weight = int(math.Round(float64(comps[i].Weight) * (100 - ValuationWeight) / 100))
+		}
+		comps = append(comps, FactorScore{Name: "Valuasi", Score: valSc, Weight: ValuationWeight, Note: valNote})
+	}
 	total := 0.0
 	for _, c := range comps {
 		total += float64(c.Score) * float64(c.Weight) / 100
@@ -569,6 +586,7 @@ func DecisionEngineWithBroker(prices []models.StockPrice, brokerDays []BrokerDay
 		RiskReward:      R2(rr),
 		Components:      comps,
 		Note:            note,
+		Valuation:       val,
 	}
 }
 

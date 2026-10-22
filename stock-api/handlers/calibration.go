@@ -4,31 +4,61 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"stock-api/analysis"
 	"stock-api/models"
 	"stock-api/storage"
 )
 
-// calibCache holds the Decision Engine calibration table. It is rebuilt when
-// the newest stored bar or the number of stocks changes (update / add / remove),
-// ~2s for ~80 stocks.
+// calibCache holds the Decision Engine calibration table. It goes stale when
+// the newest stored bar or the number of stocks changes (update / add /
+// remove). A rebuild replays the engine on every bar since 2020 (~10s on a
+// multi-core box, longer on a small VM), so a stale table keeps being served
+// while the new one is built in the background; only the very first build
+// blocks. StartAutoUpdate warms it at boot.
 //
-// ponytail: global lock, rebuild blocks concurrent callers — fine single-user.
-// If the IHSG fetch fails the table is built without regimes and the key is
-// not stored, so the next call retries.
+// ponytail: if the IHSG fetch fails the table is built without regimes and
+// the key is not stored, so the next call rebuilds.
 var calibCache struct {
-	mu     sync.Mutex
-	key    string
-	c      *analysis.Calibration
-	regime string // current IHSG regime: up | down | unknown
+	mu       sync.Mutex
+	key      string
+	c        *analysis.Calibration
+	regime   string // current IHSG regime: up | down | unknown
+	building bool
 }
+
+// calibBuild serialises rebuilds so concurrent first callers build once.
+var calibBuild sync.Mutex
 
 // currentCalibration returns the table plus the current market regime.
 func currentCalibration() (*analysis.Calibration, string) {
-	symbols, err := storage.List()
+	series, key, err := calibrationSeries()
 	if err != nil {
 		return nil, "unknown"
+	}
+
+	calibCache.mu.Lock()
+	if calibCache.c != nil && (calibCache.key == key || calibCache.building) {
+		c, r := calibCache.c, calibCache.regime
+		calibCache.mu.Unlock()
+		return c, r
+	}
+	if calibCache.c != nil { // stale: serve it, rebuild behind it
+		calibCache.building = true
+		c, r := calibCache.c, calibCache.regime
+		calibCache.mu.Unlock()
+		go rebuildCalibration(series, key)
+		return c, r
+	}
+	calibCache.mu.Unlock()
+	return rebuildCalibration(series, key) // first build: nothing to serve yet
+}
+
+func calibrationSeries() (map[string][]models.StockPrice, string, error) {
+	symbols, err := storage.List()
+	if err != nil {
+		return nil, "", err
 	}
 	series := make(map[string][]models.StockPrice, len(symbols))
 	key := ""
@@ -42,29 +72,40 @@ func currentCalibration() (*analysis.Calibration, string) {
 			key = last
 		}
 	}
+	// a newly added stock with old data must still trigger a rebuild
+	return series, key + "|" + strconv.Itoa(len(series)), nil
+}
 
-	key += "|" + strconv.Itoa(len(series)) // a newly added stock with old data must still trigger a rebuild
-
+func rebuildCalibration(series map[string][]models.StockPrice, key string) (*analysis.Calibration, string) {
+	calibBuild.Lock()
+	defer calibBuild.Unlock()
 	calibCache.mu.Lock()
-	defer calibCache.mu.Unlock()
-	if calibCache.c != nil && calibCache.key == key {
-		return calibCache.c, calibCache.regime
+	if calibCache.c != nil && calibCache.key == key { // built while we waited
+		c, r := calibCache.c, calibCache.regime
+		calibCache.building = false
+		calibCache.mu.Unlock()
+		return c, r
 	}
+	calibCache.mu.Unlock()
 
+	start := time.Now()
 	var regime analysis.RegimeFunc
 	current := "unknown"
-	idx, _, err := jkseBars()
-	if err == nil && len(idx) > 50 {
+	if idx, _, err := jkseBars(); err == nil && len(idx) > 50 {
 		regime = analysis.IndexRegime(idx)
 		if r := regime("9999-12-31"); r != "" { // latest index bar
 			current = r
 		}
 	}
 	c := analysis.Calibrate(series, regime)
-	calibCache.c, calibCache.regime = c, current
+
+	calibCache.mu.Lock()
+	defer calibCache.mu.Unlock()
+	calibCache.c, calibCache.regime, calibCache.building = c, current, false
 	if regime != nil {
 		calibCache.key = key
 	}
+	logf("calibration rebuilt: %d stocks, %s", c.Stocks, time.Since(start).Round(time.Second))
 	return c, current
 }
 

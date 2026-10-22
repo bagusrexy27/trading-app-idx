@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
 import { fmt, colorOf, calibShort, REGIME_LABEL } from '../utils'
+import { valuationTitle } from './ValuationCard'
 import { IconSharia } from './icons'
 import OmbakMeter from './OmbakMeter'
 import { tip } from '../glossary'
@@ -72,6 +73,12 @@ function TickerCard({ r, onSelect }) {
             {r.idx30 ? 'IDX30' : 'LQ45'}
           </span>
         )}
+        {r.valuation?.undervalue && (
+          <span title={valuationTitle(r.valuation)}
+            className="text-[9px] font-bold text-tv-green border border-tv-green/30 bg-tv-green/10 px-1.5 py-0.5 rounded cursor-help">
+            💎 PBV {r.valuation.pbv.toFixed(2)}x
+          </span>
+        )}
         <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded border
           ${buyish ? 'text-tv-green border-tv-green/30 bg-tv-green/10' : 'text-tv-red border-tv-red/30 bg-tv-red/10'}`}>
           {r.signal?.replace(/_/g, ' ')}
@@ -135,6 +142,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
   const [loading, setLoading] = useState(true)
   const [sort, setSort] = useState('score') // score | rr | volume
   const [shariaOnly, setShariaOnly] = useState(false)
+  const [undervalueOnly, setUndervalueOnly] = useState(false)
   const [index, setIndex] = useState('') // '' | 'idx30' | 'lq45'
   const [error, setError] = useState(null)
   const [regime, setRegime] = useState('unknown')
@@ -173,11 +181,11 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
 
   // 'score' = urutan backend apa adanya (skor → keyakinan → R/R), sama dengan screener.
   const sorted = useMemo(() => {
-    const list = rows.filter(r => (!shariaOnly || r.syariah) && (!index || r[index]))
+    const list = rows.filter(r => (!shariaOnly || r.syariah) && (!index || r[index]) && (!undervalueOnly || r.valuation?.undervalue))
     if (sort === 'rr') list.sort((a, b) => (b.risk_reward || 0) - (a.risk_reward || 0))
     if (sort === 'volume') list.sort((a, b) => (b.turnover_bn || 0) - (a.turnover_bn || 0))
     return list
-  }, [rows, sort, shariaOnly, index])
+  }, [rows, sort, shariaOnly, index, undervalueOnly])
 
   const buy = sorted.filter(isBuy)
   const buySyms = new Set(buy.map(r => r.symbol))
@@ -224,6 +232,14 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
               ${shariaOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}
           >
             <IconSharia /> Syariah
+          </button>
+          <button
+            onClick={() => setUndervalueOnly(v => !v)}
+            title="PBV di bawah rata-rata 3 tahun + lolos saringan: listing >10 th, dividend yield ≥5%, rata-rata ROE >12%, laba selalu positif"
+            className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all
+              ${undervalueOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}
+          >
+            💎 Undervalue
           </button>
           <button onClick={onAdd}
             className="px-3 py-1.5 text-xs font-bold rounded-lg bg-tv-accent text-white hover:bg-tv-accent/80 transition-all">

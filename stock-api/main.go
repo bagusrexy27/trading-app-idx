@@ -260,6 +260,7 @@ func main() {
 	api.HandleFunc("/stocks", h.ListStocks).Methods("GET")
 	api.HandleFunc("/stocks", h.AddStock).Methods("POST")
 	api.HandleFunc("/stocks/update-all", h.UpdateAllStocks).Methods("POST")
+	api.HandleFunc("/stocks/backfill", h.BackfillStocks).Methods("POST")
 	api.HandleFunc("/stocks/{symbol}", h.GetStock).Methods("GET")
 	api.HandleFunc("/stocks/{symbol}", h.DeleteStock).Methods("DELETE")
 	api.HandleFunc("/stocks/{symbol}/latest", h.GetLatest).Methods("GET")

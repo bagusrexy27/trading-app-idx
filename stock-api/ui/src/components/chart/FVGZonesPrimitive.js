@@ -1,5 +1,7 @@
 // FVG/iFVG zone overlay — lightweight-charts v5 ISeriesPrimitive.
-// Menggambar kotak translusen dari candle asal gap sampai tepi kanan pane.
+// Kotak translusen dari candle asal gap (iFVG: dari candle yang menembusnya,
+// saat perannya berbalik) memanjang sampai tepi kanan pane, termasuk area
+// kosong di kanan candle terakhir ("extend right" ala TradingView).
 
 const COLORS = {
   bull:     { fill: 'rgba(38,166,154,0.12)', border: 'rgba(38,166,154,0.5)', text: 'rgba(38,166,154,0.9)' },
@@ -17,6 +19,10 @@ class FVGPaneRenderer {
   update(rects) { this._rects = rects }
   draw(target) {
     target.useBitmapCoordinateSpace(({ context: ctx, horizontalPixelRatio: hr, verticalPixelRatio: vr, bitmapSize }) => {
+      const labels = [] // y-center label yang sudah digambar, untuk cegah tumpuk
+      const fs = Math.round(9 * vr)
+      ctx.font = `${fs}px Inter, sans-serif`
+      ctx.textBaseline = 'middle'
       for (const r of this._rects) {
         const x    = Math.round(r.x * hr)
         const w    = bitmapSize.width - x            // zona memanjang sampai "sekarang"
@@ -30,10 +36,15 @@ class FVGPaneRenderer {
         ctx.fillStyle = r.c.border
         ctx.fillRect(x, yTop, w, bw)
         ctx.fillRect(x, yBot - bw, w, bw)
+        // label di tepi kanan zona; lewati kalau berdempetan dengan label lain
+        const yMid = (yTop + yBot) / 2
+        if (labels.some(y => Math.abs(y - yMid) < fs * 1.3)) continue
+        const tw = ctx.measureText(r.label).width
+        const tx = bitmapSize.width - tw - Math.round(6 * hr)
+        if (tx < x) continue
+        labels.push(yMid)
         ctx.fillStyle = r.c.text
-        ctx.font = `${Math.round(9 * vr)}px Inter, sans-serif`
-        ctx.textBaseline = 'middle'
-        ctx.fillText(r.label, x + Math.round(5 * hr), (yTop + yBot) / 2)
+        ctx.fillText(r.label, tx, yMid)
       }
     })
   }
@@ -54,11 +65,12 @@ class FVGPaneView {
         const yA = series.priceToCoordinate(z.top)
         const yB = series.priceToCoordinate(z.bottom)
         if (yA == null || yB == null) continue
-        let x = ts.timeToCoordinate(z.date)
+        const start = z.status === 'inverted' && z.inverted_date ? z.inverted_date : z.date
+        let x = ts.timeToCoordinate(start)
         if (x == null) {
-          // Candle asal zona di luar viewport: clamp ke kiri kalau lebih tua
+          // Candle awal zona di luar viewport: clamp ke kiri kalau lebih tua
           // dari range terlihat (zona tetap membentang ke kanan), selain itu skip.
-          if (vis && z.date < timeToStr(vis.from)) x = 0
+          if (vis && start < timeToStr(vis.from)) x = 0
           else continue
         }
         const c = z.status === 'inverted' ? COLORS.inverted : (COLORS[z.type] ?? COLORS.bull)

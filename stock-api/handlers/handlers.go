@@ -152,7 +152,7 @@ func (h *Handler) AddStock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	from := time.Now().AddDate(-1, 0, 0) // default: past year
+	from := historyStart // default: same depth as every other stock
 	if req.From != "" {
 		from, err = time.Parse("2006-01-02", req.From)
 		if err != nil {
@@ -162,6 +162,7 @@ func (h *Handler) AddStock(w http.ResponseWriter, r *http.Request) {
 	}
 
 	prices, exchange, err := fetcher.Fetch(symbol, from)
+	prices = dropHolidayFillers(prices)
 	if err != nil {
 		respond(w, 500, false, "fetch error: "+err.Error(), nil)
 		return
@@ -359,6 +360,108 @@ func (h *Handler) DeleteStock(w http.ResponseWriter, r *http.Request) {
 
 // ─── shared update logic ─────────────────────────────────────────────────────
 
+// historyStart is how far back stock history goes: new stocks are fetched
+// from here and POST /api/stocks/backfill extends older files to it.
+var historyStart = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+
+// mergePrices folds fetched bars into d: a known date is overwritten (refreshes
+// a partial intraday candle), a new one appended; result stays date-sorted.
+func mergePrices(d *models.StockData, fetched []models.StockPrice) (added int) {
+	known := make(map[string]int, len(d.Prices))
+	for i, p := range d.Prices {
+		known[p.Date] = i
+	}
+	for _, p := range fetched {
+		if i, ok := known[p.Date]; ok {
+			d.Prices[i] = p
+		} else {
+			d.Prices = append(d.Prices, p)
+			added++
+		}
+	}
+	sort.Slice(d.Prices, func(i, j int) bool { return d.Prices[i].Date < d.Prices[j].Date })
+	return added
+}
+
+// dropHolidayFillers removes the flat, zero-volume bars Yahoo inserts on IDX
+// holidays (e.g. 14–15 & 27–28 May 2026): any such bar on a date ^JKSE did
+// not trade. A real no-trade day of an illiquid stock is kept — the index
+// traded that day. If ^JKSE can't be fetched nothing is dropped.
+func dropHolidayFillers(ps []models.StockPrice) []models.StockPrice {
+	idx, _, err := jkseBars()
+	if err != nil || len(idx) == 0 {
+		return ps
+	}
+	traded := make(map[string]bool, len(idx))
+	for _, b := range idx {
+		traded[b.Date] = true
+	}
+	first, last := idx[0].Date, idx[len(idx)-1].Date
+	out := ps[:0:0]
+	for _, p := range ps {
+		filler := p.Volume == 0 && p.Open == p.Close && p.High == p.Close && p.Low == p.Close
+		if filler && p.Date >= first && p.Date <= last && !traded[p.Date] {
+			continue
+		}
+		out = append(out, p)
+	}
+	return out
+}
+
+// BackfillStocks — POST /api/stocks/backfill
+//
+// Extends every stock whose history starts after historyStart back to it (one
+// Yahoo call per stock, sequential) and strips Yahoo's holiday filler bars
+// from every stored file. Stocks listed later just keep their IPO start.
+// Safe to repeat.
+func (h *Handler) BackfillStocks(w http.ResponseWriter, r *http.Request) {
+	symbols, err := storage.List()
+	if err != nil {
+		respond(w, 500, false, err.Error(), nil)
+		return
+	}
+	updateMu.Lock()
+	defer updateMu.Unlock()
+	// a week of slack: the first trading day of the year is rarely Jan 1
+	from := historyStart.AddDate(0, 0, 7).Format("2006-01-02")
+	results := make([]updateResult, 0, len(symbols))
+	for _, sym := range symbols {
+		res := updateResult{Symbol: sym}
+		d, err := storage.Load(sym)
+		if err != nil || d == nil {
+			res.Status = "error: not found"
+			results = append(results, res)
+			continue
+		}
+		before := len(d.Prices)
+		d.Prices = dropHolidayFillers(d.Prices) // also cleans bars stored before the filter existed
+		removed := before - len(d.Prices)
+		res.Status = fmt.Sprintf("removed %d holiday bars", removed)
+		if len(d.Prices) == 0 || d.Prices[0].Date > from {
+			prices, _, err := fetcher.Fetch(sym, historyStart)
+			if err != nil {
+				res.Status = "error: " + err.Error()
+				results = append(results, res)
+				continue
+			}
+			res.Added = mergePrices(d, dropHolidayFillers(prices))
+		}
+		if res.Added > 0 || removed > 0 {
+			if err := storage.Save(d); err != nil {
+				res.Status = "error: " + err.Error()
+			}
+		}
+		if len(d.Prices) > 0 {
+			res.Status += ", from " + d.Prices[0].Date
+		}
+		if d != nil {
+			res.Total = len(d.Prices)
+		}
+		results = append(results, res)
+	}
+	respond(w, 200, true, fmt.Sprintf("backfilled %d stocks", len(results)), results)
+}
+
 // doUpdate fetches new prices for a symbol and appends them to the saved file.
 // Returns the number of rows added, the updated StockData, a status message, and any error.
 func doUpdate(symbol string) (added int, data *models.StockData, msg string, err error) {
@@ -395,26 +498,9 @@ func doUpdate(symbol string) (added int, data *models.StockData, msg string, err
 		data = existing
 		return
 	}
+	newPrices = dropHolidayFillers(newPrices)
 
-	// Index stored dates so re-fetched dates overwrite (refresh) instead of duplicate.
-	known := make(map[string]int, len(existing.Prices))
-	for i, p := range existing.Prices {
-		known[p.Date] = i
-	}
-
-	for _, p := range newPrices {
-		if i, ok := known[p.Date]; ok {
-			existing.Prices[i] = p
-		} else {
-			existing.Prices = append(existing.Prices, p)
-			added++
-		}
-	}
-
-	// Keep prices sorted chronologically.
-	sort.Slice(existing.Prices, func(i, j int) bool {
-		return existing.Prices[i].Date < existing.Prices[j].Date
-	})
+	added = mergePrices(existing, newPrices)
 
 	existing.LastUpdated = time.Now().Format("2006-01-02")
 

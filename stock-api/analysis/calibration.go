@@ -2,7 +2,9 @@ package analysis
 
 import (
 	"math"
+	"runtime"
 	"sort"
+	"sync"
 
 	"stock-api/models"
 )
@@ -198,6 +200,7 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 			c.Projection[r][h] = map[int]*ProjStat{}
 		}
 	}
+	plans := replayPlans(series)
 	for sym, prices := range series {
 		n := len(prices)
 		if n < 61 {
@@ -209,7 +212,7 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 		}
 		atr := ATR(prices, 14) // atr[k] belongs to prices[k+14]
 		for i := 59; i < n-1; i++ {
-			dec := DecisionEngine(prices[:i+1])
+			dec := plans[sym][i-59]
 			b := scoreBucket(dec.Score)
 			keys := []string{"all"}
 			if regime != nil {
@@ -231,7 +234,7 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 					}
 				}
 			}
-			result, pnl, _, ok := planOutcome(prices, i, dec.StopLoss, firstTP(dec))
+			result, pnl, _, ok := planOutcome(prices, i, dec.StopLoss, dec.TP1)
 			if !ok {
 				continue
 			}
@@ -260,6 +263,51 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 		}
 	}
 	return c
+}
+
+// replayedPlan is the slice of a Decision that Calibrate needs per bar.
+type replayedPlan struct {
+	Score         int
+	StopLoss, TP1 float64
+}
+
+// replayPlans runs DecisionEngine on every bar of every series (no
+// look-ahead) — the expensive part, O(bars²) per stock — spread over all CPUs.
+// plans[sym][i-59] is the plan made at the close of bar i.
+func replayPlans(series map[string][]models.StockPrice) map[string][]replayedPlan {
+	type job struct {
+		sym    string
+		prices []models.StockPrice
+	}
+	jobs := make(chan job)
+	out := make(map[string][]replayedPlan, len(series))
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	for w := 0; w < runtime.NumCPU(); w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for j := range jobs {
+				n := len(j.prices)
+				ps := make([]replayedPlan, 0, n-60)
+				for i := 59; i < n-1; i++ {
+					d := DecisionEngine(j.prices[:i+1])
+					ps = append(ps, replayedPlan{d.Score, d.StopLoss, firstTP(d)})
+				}
+				mu.Lock()
+				out[j.sym] = ps
+				mu.Unlock()
+			}
+		}()
+	}
+	for sym, prices := range series {
+		if len(prices) >= 61 {
+			jobs <- job{sym, prices}
+		}
+	}
+	close(jobs)
+	wg.Wait()
+	return out
 }
 
 // Lookup returns the historical record for a live score in the given regime,

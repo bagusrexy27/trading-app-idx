@@ -18,7 +18,10 @@ var wib = time.FixedZone("WIB", 7*3600)
 func StartAutoUpdate() {
 	go func() {
 		runAutoUpdate("startup")
+		currentCalibration() // warm the table before the first request needs it
+		refreshValuations()
 		for range time.Tick(15 * time.Minute) {
+			refreshValuations() // weekly per stock; a no-op on most ticks
 			now := time.Now()
 			if !inMarketWindow(now) {
 				continue

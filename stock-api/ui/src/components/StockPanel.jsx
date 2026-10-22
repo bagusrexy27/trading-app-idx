@@ -6,6 +6,9 @@ import RiskCalc from './RiskCalc'
 import ReportUpload from './ReportUpload'
 import Advisor from './Advisor'
 
+// Chart history: everything stored (daily bars since 2020 ≈ 1.650).
+const CHART_BARS = 2000
+
 // Chart selalu ter-mount di atas panel — lazy sekali, jangan unmount saat ganti tab.
 const ChartTab   = lazy(() => import('./ChartTab'))
 const Indicators = lazy(() => import('./Indicators'))
@@ -17,12 +20,12 @@ const PANELS = [
   { id: 'reports',    label: 'Reports' },
 ]
 
-// ChartPane dibungkus memo; hanya terima prices/sma20/sma50/symbol.
+// ChartPane dibungkus memo; hanya terima prices/symbol (SMA dihitung ChartTab).
 // Jangan tambahkan prop baru yang dibuat inline (object/array literal).
-const ChartPane = memo(function ChartPane({ prices, sma20, sma50, symbol }) {
+const ChartPane = memo(function ChartPane({ prices, symbol }) {
   return (
     <Suspense fallback={<TabLoading />}>
-      <ChartTab data={{ prices, sma20, sma50 }} symbol={symbol} compact />
+      <ChartTab data={{ prices }} symbol={symbol} compact />
     </Suspense>
   )
 })
@@ -62,20 +65,16 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
     if (cold) setLoading(true)
     setError(null)
     try {
-      const [summary, pricesResp, decision, sma20, sma50] = await Promise.all([
+      const [summary, pricesResp, decision] = await Promise.all([
         api.analysis.summary(symbol),
-        api.stocks.get(symbol, 300),
+        api.stocks.get(symbol, CHART_BARS),
         api.analysis.decision(symbol),
-        api.analysis.sma(symbol, 20, 300).then(r => r?.data || []).catch(() => []),
-        api.analysis.sma(symbol, 50, 300).then(r => r?.data || []).catch(() => []),
       ])
       setData(d => ({
         ...(d || {}),
         summary,
         prices: pricesResp?.prices || [],
         decision,
-        sma20,
-        sma50,
       }))
       hasDataRef.current = true
     } catch (e) {
@@ -324,8 +323,6 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
       <div className="border-b border-tv-border flex-shrink-0">
         <ChartPane
           prices={data.prices}
-          sma20={data.sma20}
-          sma50={data.sma50}
           symbol={symbol}
         />
       </div>

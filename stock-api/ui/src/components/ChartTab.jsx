@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { createChart, CandlestickSeries, LineSeries, HistogramSeries, LineStyle, CrosshairMode } from 'lightweight-charts'
+import { createChart, CandlestickSeries, LineSeries, HistogramSeries, LineStyle, CrosshairMode, PriceScaleMode } from 'lightweight-charts'
 import { api } from '../api'
 import { fmt } from '../utils'
 import { FVGZonesPrimitive } from './chart/FVGZonesPrimitive'
 import { FibZonesPrimitive } from './chart/FibZonesPrimitive'
 import { HorizonToggle, pickProj } from './Projection'
+import { resample, sma, rsi, macd } from './chart/bars'
 
 // Batas atas proyeksi, dalam hari bursa. Panjang sebenarnya dihitung per saham
 // dari jarak target dibagi ATR — kalau dipatok tetap, semua saham tampil dengan
@@ -37,8 +38,13 @@ const FIB_STYLE = [
   ['l100', '100%',  '#8a8f98'],
 ]
 
-const RANGES = ['1W', '1M', '3M', '6M', '1Y', 'All']
-const RANGE_DAYS = { '1W': 5, '1M': 22, '3M': 66, '6M': 132, '1Y': 252, 'All': 9999 }
+const RANGES = ['1W', '1M', '3M', '6M', '1Y', '3Y', 'All']
+const RANGE_DAYS = { '1W': 5, '1M': 22, '3M': 66, '6M': 132, '1Y': 252, '3Y': 756, 'All': 9999 }
+
+// Timeframe: candle harian dirangkum di browser jadi mingguan / bulanan.
+const TFS = [['D', 'D', 1], ['W', 'W', 5], ['M', 'M', 21]] // [key, label, hari bursa per bar]
+const PANE_H = 110 // tinggi panel RSI / MACD
+const FVG_MAX = 12 // zona FVG/iFVG aktif terdekat yang digambar
 
 const UP = '#26a69a', DOWN = '#ef5350'
 const AVWAP_COLOR = '#29b6f6'
@@ -64,7 +70,18 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   // AVWAP: toggle on = klik candle untuk anchor; preset Low/High/Vol tersedia
   const [avwapOn, setAvwapOn]         = useState(false)
   const [avwapAnchor, setAvwapAnchor] = useState(null)  // date string
-  const { prices, sma20, sma50 } = data
+  const [tf, setTf]           = useState('D')
+  const [showRsi, setShowRsi] = useState(false)
+  const [showMacd, setShowMacd] = useState(false)
+  const [logScale, setLogScale] = useState(false)
+  const { prices } = data
+  // Bar yang digambar (D/W/M) + SMA-nya. FVG, AVWAP, dan Proyeksi berbasis
+  // tanggal harian, jadi hanya aktif di timeframe harian.
+  const bars  = useMemo(() => resample(prices, tf), [prices, tf])
+  const sma20 = useMemo(() => sma(bars, 20), [bars])
+  const sma50 = useMemo(() => sma(bars, 50), [bars])
+  const daily = tf === 'D'
+  useEffect(() => { if (!daily) { setShowFvg(false); setAvwapOn(false); setShowProj(false) } }, [daily])
 
   // Fetch level fibonacci saat toggle pertama dinyalakan
   useEffect(() => {
@@ -98,12 +115,13 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     return sum / 14
   }, [prices])
 
-  // Fetch zona FVG saat toggle pertama dinyalakan — hanya 3 zona terdekat
+  // Fetch zona FVG saat toggle pertama dinyalakan — zona aktif (FVG + iFVG)
+  // dari ±1 tahun terakhir, FVG_MAX terdekat ke harga sekarang
   useEffect(() => {
     if (!showFvg || fvgZones || !symbol) return
     let alive = true
-    api.analysis.fvg(symbol)
-      .then(r => { if (alive) setFvgZones(r.active?.slice(0, 3) ?? []) })
+    api.analysis.fvg(symbol, 250)
+      .then(r => { if (alive) setFvgZones(r.active?.slice(0, FVG_MAX) ?? []) })
       .catch(() => { if (alive) setShowFvg(false) })
     return () => { alive = false }
   }, [showFvg, fvgZones, symbol])
@@ -143,13 +161,15 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   const sliced = useMemo(() => prices.slice(-RANGE_DAYS[range]), [prices, range])
 
   const containerRef = useRef(null)   // div chart
-  const tooltipRef   = useRef(null)   // div tooltip mengambang
+  const legendRef    = useRef(null)   // legend OHLC kiri atas (ala TradingView)
+  const legendCtxRef = useRef({})     // { symbol, tf, last } — dibaca handler crosshair
+  const paneSeriesRef = useRef([])    // seri RSI/MACD di panel bawah
   const chartRef     = useRef(null)
   const candleRef    = useRef(null)
   const sma20Ref     = useRef(null)
   const sma50Ref     = useRef(null)
   const volRef       = useRef(null)
-  const barMapRef    = useRef({})     // date → price obj (untuk tooltip)
+  const barMapRef    = useRef({})     // date → bar (untuk legend)
   const fibLinesRef  = useRef([])
   const fvgPrimRef   = useRef(null)
   const fibPrimRef   = useRef(null)
@@ -187,7 +207,8 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         horzLine: { color: '#787b86', width: 1, style: LineStyle.Dashed, labelBackgroundColor: '#2a2e39' },
       },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.05, bottom: 0.28 } },
-      timeScale: { borderVisible: false, rightOffset: 3, minBarSpacing: 2 },
+      // rightOffset: ruang kosong di kanan candle terakhir, tempat zona FVG memanjang
+      timeScale: { borderVisible: false, rightOffset: 12, minBarSpacing: 0.5 },
       // The compact chart sits inside the page's scroll flow, so it must not
       // swallow the wheel or a vertical swipe — that would trap the user's
       // scroll on the chart. Zoom/pan there via the time/price axis or a
@@ -198,21 +219,24 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
       // handleScroll.mouseWheel is off too; vertTouchDrag does the same on touch.
       handleScale: { mouseWheel: !compact },
       handleScroll: { mouseWheel: !compact, vertTouchDrag: !compact },
-      localization: { priceFormatter: v => fmt.price(v) },
     })
 
+    // Format Rupiah per seri harga (bukan localization.priceFormatter di level
+    // chart — itu ikut menimpa angka RSI/MACD di panel bawah).
+    const idr = { type: 'custom', minMove: 1, formatter: v => fmt.price(Math.round(v)) }
     const candle = chart.addSeries(CandlestickSeries, {
+      priceFormat: idr,
       upColor: UP, downColor: DOWN,
       wickUpColor: UP, wickDownColor: DOWN,
       borderVisible: false,
     })
     const s20 = chart.addSeries(LineSeries, {
       color: '#ffc107', lineWidth: 2,
-      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false, priceFormat: idr,
     })
     const s50 = chart.addSeries(LineSeries, {
       color: '#9c6bff', lineWidth: 2, lineStyle: LineStyle.Dashed,
-      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false, priceFormat: idr,
     })
     const vol = chart.addSeries(HistogramSeries, {
       priceScaleId: 'vol',
@@ -233,19 +257,19 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     // sumbu waktu ikut memanjang ke kanan dengan sendirinya.
     const plan = chart.addSeries(LineSeries, {
       color: PROJ_PLAN, lineWidth: 2, lineStyle: LineStyle.Dashed,
-      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false, priceFormat: idr,
     })
     const coneUp = chart.addSeries(LineSeries, {
       color: PROJ_CONE + '80', lineWidth: 1, lineStyle: LineStyle.Dotted,
-      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false, priceFormat: idr,
     })
     const coneLo = chart.addSeries(LineSeries, {
       color: PROJ_CONE + '80', lineWidth: 1, lineStyle: LineStyle.Dotted,
-      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false, priceFormat: idr,
     })
     const coneLine = (alpha, style) => chart.addSeries(LineSeries, {
       color: PROJ_CONE + alpha, lineWidth: 1, lineStyle: style,
-      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false, priceFormat: idr,
     })
     planRef.current     = plan
     coneUpRef.current   = coneUp
@@ -256,7 +280,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
 
     const avwap = chart.addSeries(LineSeries, {
       color: AVWAP_COLOR, lineWidth: 2,
-      priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+      priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, priceFormat: idr,
     })
 
     // klik candle = set anchor AVWAP (hanya saat toggle aktif)
@@ -266,47 +290,10 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     }
     chart.subscribeClick(onClick)
 
-    // ── Tooltip OHLCV mengambang (subscribeCrosshairMove) ──────────────
+    // ── Legend OHLC kiri atas: bar di bawah kursor, atau bar terakhir ──
     const onMove = (param) => {
-      const tt = tooltipRef.current
-      if (!tt) return
-      if (!param.time || !param.point) { tt.style.display = 'none'; return }
-      const d = barMapRef.current[timeToDate(param.time)]
-      if (!d) { tt.style.display = 'none'; return }
-      const up   = d.close >= d.open
-      const clr  = up ? UP : DOWN
-      const chg  = d.close - d.open
-      const pct  = d.open ? (chg / d.open * 100).toFixed(2) : '0.00'
-      const s20v = param.seriesData.get(s20)?.value   // undefined saat toggle off
-      const s50v = param.seriesData.get(s50)?.value
-      const sign = up ? '+' : ''
-      tt.innerHTML =
-        '<div style="color:#787b86;font-size:10px;font-weight:600;letter-spacing:.04em;margin-bottom:6px">' + d.date + '</div>' +
-        '<div style="display:grid;grid-template-columns:auto 1fr;gap:1px 10px">' +
-          '<span style="color:#787b86">O</span><b>' + fmt.price(d.open) + '</b>' +
-          '<span style="color:' + UP + '">H</span><b style="color:' + UP + '">' + fmt.price(d.high) + '</b>' +
-          '<span style="color:' + DOWN + '">L</span><b style="color:' + DOWN + '">' + fmt.price(d.low)  + '</b>' +
-          '<span style="color:' + clr + '">C</span><b style="color:' + clr + '">' + fmt.price(d.close) + '</b>' +
-          '<span style="color:#787b86">V</span><b style="color:#d1d4dc">' + fmt.vol(d.volume) + '</b>' +
-        '</div>' +
-        '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #2a2e39;' +
-        'color:' + clr + ';font-weight:700;font-size:11px">' +
-          fmt.chg(chg) + ' (' + sign + pct + '%)' +
-        '</div>' +
-        ((s20v != null || s50v != null) ?
-          '<div style="margin-top:5px;padding-top:5px;border-top:1px solid #2a2e39;display:flex;gap:12px">' +
-            (s20v != null ? '<span style="color:#ffc107;font-size:10px">SMA20&nbsp;<b>' + fmt.price(s20v) + '</b></span>' : '') +
-            (s50v != null ? '<span style="color:#9c6bff;font-size:10px">SMA50&nbsp;<b>' + fmt.price(s50v) + '</b></span>' : '') +
-          '</div>'
-        : '')
-      tt.style.display = 'block'
-      const pad = 16
-      let x = param.point.x + pad
-      if (x + tt.offsetWidth > el.clientWidth) x = param.point.x - tt.offsetWidth - pad
-      let y = param.point.y + pad
-      if (y + tt.offsetHeight > el.clientHeight) y = param.point.y - tt.offsetHeight - pad
-      tt.style.left = Math.max(0, x) + 'px'
-      tt.style.top  = Math.max(0, y) + 'px'
+      const d = (param.time && barMapRef.current[timeToDate(param.time)]) || legendCtxRef.current.last
+      renderLegend(d, param.time ? param.seriesData.get(s20)?.value : undefined, param.time ? param.seriesData.get(s50)?.value : undefined)
     }
     chart.subscribeCrosshairMove(onMove)
 
@@ -329,30 +316,72 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   }, [])
 
   // ── Visible window mengikuti range selector ──────────────────────────
+  const perBar = TFS.find(t => t[0] === tf)[2]
   const applyRange = useCallback((r) => {
     const chart = chartRef.current
-    if (!chart || !prices.length) return
+    if (!chart || !bars.length) return
     const ts = chart.timeScale()
     if (r === 'All') { ts.fitContent(); return }
-    const n = Math.min(RANGE_DAYS[r], prices.length)
-    ts.setVisibleLogicalRange({ from: prices.length - n - 0.5, to: prices.length + 2 })
-  }, [prices.length])
+    const n = Math.min(Math.max(Math.ceil(RANGE_DAYS[r] / perBar), 2), bars.length)
+    ts.setVisibleLogicalRange({ from: bars.length - n - 0.5, to: bars.length + 2 })
+  }, [bars.length, perBar])
 
   // ── Set data saat prices/SMA berubah ─────────────────────────────────
   useEffect(() => {
     const candle = candleRef.current
-    if (!candle || !prices.length) return
-    barMapRef.current = Object.fromEntries(prices.map(p => [p.date, p]))
-    candle.setData(prices.map(p => ({ time: p.date, open: p.open, high: p.high, low: p.low, close: p.close })))
-    sma20Ref.current.setData(sma20.map(p => ({ time: p.date, value: p.value })))
-    sma50Ref.current.setData(sma50.map(p => ({ time: p.date, value: p.value })))
-    volRef.current.setData(prices.map(p => ({
+    if (!candle || !bars.length) return
+    barMapRef.current = Object.fromEntries(bars.map(p => [p.date, p]))
+    candle.setData(bars.map(p => ({ time: p.date, open: p.open, high: p.high, low: p.low, close: p.close })))
+    sma20Ref.current.setData(sma20)
+    sma50Ref.current.setData(sma50)
+    volRef.current.setData(bars.map(p => ({
       time: p.date, value: p.volume,
       color: p.close >= p.open ? UP + '55' : DOWN + '55',
     })))
+    const last = bars[bars.length - 1]
+    legendCtxRef.current = { symbol, tf, last }
+    renderLegend(last)
     applyRange(range)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prices, sma20, sma50])
+  }, [bars, sma20, sma50])
+
+  // ── Panel bawah: RSI(14) & MACD(12,26,9) dari bar yang tampil ─────────
+  useEffect(() => {
+    const chart = chartRef.current
+    if (!chart) return
+    paneSeriesRef.current.forEach(x => chart.removeSeries(x))
+    paneSeriesRef.current = []
+    while (chart.panes().length > 1) chart.removePane(chart.panes().length - 1)
+    const quiet = { priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false }
+    // formatter sendiri: localization.priceFormatter (Rupiah) membulatkan & memberi titik ribuan
+    const fmt1 = { type: 'custom', minMove: 0.01, formatter: v => v.toFixed(1) }
+    let pane = 0
+    if (showRsi) {
+      pane++
+      const r = chart.addSeries(LineSeries, { ...quiet, color: '#9c6bff', lineWidth: 1.5, priceFormat: fmt1 }, pane)
+      r.setData(rsi(bars))
+      r.createPriceLine({ price: 70, color: '#ef535080', lineStyle: LineStyle.Dashed, lineWidth: 1, axisLabelVisible: false, title: '70' })
+      r.createPriceLine({ price: 30, color: '#26a69a80', lineStyle: LineStyle.Dashed, lineWidth: 1, axisLabelVisible: false, title: '30' })
+      paneSeriesRef.current.push(r)
+    }
+    if (showMacd) {
+      pane++
+      const m = macd(bars)
+      const h = chart.addSeries(HistogramSeries, { ...quiet, lastValueVisible: false, priceFormat: fmt1 }, pane)
+      h.setData(m.hist.map(p => ({ ...p, color: p.value >= 0 ? UP + '88' : DOWN + '88' })))
+      const ml = chart.addSeries(LineSeries, { ...quiet, color: '#2196f3', lineWidth: 1.5, priceFormat: fmt1 }, pane)
+      ml.setData(m.macd)
+      const sl = chart.addSeries(LineSeries, { ...quiet, color: '#ffc107', lineWidth: 1.5, priceFormat: fmt1 }, pane)
+      sl.setData(m.signal)
+      paneSeriesRef.current.push(h, ml, sl)
+    }
+    // tinggi relatif: chart harga ±3× tiap panel (container ikut bertambah PANE_H per panel)
+    chart.panes().forEach((p, i) => p.setStretchFactor(i === 0 ? 3 : 1))
+  }, [showRsi, showMacd, bars])
+
+  useEffect(() => {
+    chartRef.current?.priceScale('right').applyOptions({ mode: logScale ? PriceScaleMode.Logarithmic : PriceScaleMode.Normal })
+  }, [logScale])
 
   useEffect(() => { applyRange(range) }, [range, applyRange])
 
@@ -450,6 +479,32 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     }
   }, [showProj, proj, projH, prices, atr14])
 
+  // Legend ditulis langsung ke DOM (dipanggil tiap gerak kursor — tanpa re-render React)
+  function renderLegend(d, s20v, s50v) {
+    const el = legendRef.current
+    if (!el || !d) return
+    const { symbol: sym, tf: t } = legendCtxRef.current
+    const clr = d.close >= d.open ? UP : DOWN
+    const chg = d.close - d.open
+    const pct = d.open ? (chg / d.open * 100).toFixed(2) : '0.00'
+    const kv = (k, v, c = clr) => `<span style="color:#787b86">${k}</span><b style="color:${c}">${v}</b>`
+    el.innerHTML =
+      '<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px">' +
+        `<b style="color:#d1d4dc;font-size:12px">${sym ?? ''}</b>` +
+        `<span style="color:#787b86">${TFS.find(x => x[0] === t)?.[1] ?? ''} · ${d.date}</span>` +
+        kv('O', fmt.price(d.open)) + kv('H', fmt.price(d.high)) + kv('L', fmt.price(d.low)) + kv('C', fmt.price(d.close)) +
+        `<b style="color:${clr}">${fmt.chg(chg)} (${chg >= 0 ? '+' : ''}${pct}%)</b>` +
+        kv('Vol', fmt.vol(d.volume), '#d1d4dc') +
+      '</div>' +
+      ((s20v != null || s50v != null)
+        ? '<div style="display:flex;gap:10px;margin-top:2px">' +
+            (s20v != null ? `<span style="color:#ffc107">SMA20 <b>${fmt.price(Math.round(s20v))}</b></span>` : '') +
+            (s50v != null ? `<span style="color:#9c6bff">SMA50 <b>${fmt.price(Math.round(s50v))}</b></span>` : '') +
+          '</div>'
+        : '')
+  }
+
+  const panes = (showRsi ? 1 : 0) + (showMacd ? 1 : 0)
   const yesterday = prices.length >= 2 ? prices[prices.length - 2] : null
   const today     = prices.length >= 1 ? prices[prices.length - 1] : null
 
@@ -458,6 +513,14 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
 
       {/* ── Range selector + SMA legend ───────────────────────────── */}
       <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex rounded-md border border-tv-border overflow-hidden mr-1" title="Timeframe candle: D = harian, W = mingguan, M = bulanan">
+          {TFS.map(([k, lbl]) => (
+            <button key={k} onClick={() => setTf(k)}
+              className={`px-2 py-1 text-xs font-bold transition-colors ${tf === k ? 'bg-tv-purple/20 text-tv-purple' : 'text-tv-muted bg-tv-card hover:text-tv-text'}`}>
+              {lbl}
+            </button>
+          ))}
+        </div>
         {RANGES.map(r => (
           <button
             key={r}
@@ -482,8 +545,9 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         </button>
         <button
           onClick={() => setAvwapOn(v => !v)}
+          disabled={!daily}
           title="Anchored VWAP — aktifkan lalu klik candle untuk set anchor, atau pakai preset"
-          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
+          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all disabled:opacity-30 disabled:pointer-events-none
             ${avwapOn
               ? 'bg-tv-blue/15 text-tv-blue border border-tv-blue/40 shadow-[0_0_12px_rgba(41,182,246,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
@@ -492,8 +556,9 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         </button>
         <button
           onClick={() => setShowFvg(v => !v)}
+          disabled={!daily}
           title="Fair Value Gap zones — gap 3-candle; kotak amber = iFVG (inverted)"
-          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
+          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all disabled:opacity-30 disabled:pointer-events-none
             ${showFvg
               ? 'bg-tv-purple/15 text-tv-purple border border-tv-purple/40 shadow-[0_0_12px_rgba(167,139,250,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
@@ -502,8 +567,9 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         </button>
         <button
           onClick={() => setShowProj(v => !v)}
+          disabled={!daily}
           title="Proyeksi: jalur rencana Decision Engine (entry → TP) + kerucut terukur dari kasus historis serupa. Skenario, bukan ramalan harga."
-          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
+          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all disabled:opacity-30 disabled:pointer-events-none
             ${showProj
               ? 'bg-tv-green/15 text-tv-green border border-tv-green/40 shadow-[0_0_12px_rgba(38,166,154,0.25)]'
               : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
@@ -528,7 +594,13 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
           <IndicatorToggle color="#ffc107" label="SMA20" dashed={false} active={showSma20} onClick={() => setShowSma20(v => !v)} />
           <IndicatorToggle color="#9c6bff" label="SMA50" dashed={true}  active={showSma50} onClick={() => setShowSma50(v => !v)} />
           <IndicatorToggle color="#8a8f98" label="Vol"   dashed={false} active={showVol}   onClick={() => setShowVol(v => !v)} />
-          <span className="text-[10px] text-tv-muted tabular-nums ml-2">{sliced.length} bars</span>
+          <IndicatorToggle color="#9c6bff" label="RSI"   dashed={false} active={showRsi}   onClick={() => setShowRsi(v => !v)} />
+          <IndicatorToggle color="#2196f3" label="MACD"  dashed={false} active={showMacd}  onClick={() => setShowMacd(v => !v)} />
+          <button onClick={() => setLogScale(v => !v)} title="Skala logaritmik — jarak % yang sama terlihat sama tinggi (berguna untuk rentang bertahun-tahun)"
+            className={`px-2 py-1 rounded-md border text-[10px] font-bold transition-all ${logScale ? 'border-tv-border bg-tv-card text-tv-text' : 'border-transparent text-tv-muted opacity-60 hover:opacity-90'}`}>
+            LOG
+          </button>
+          <span className="text-[10px] text-tv-muted tabular-nums ml-2">{sliced.length} hari</span>
         </div>
       </div>
 
@@ -542,15 +614,21 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
 
       {/* ── Chart card: candlestick + SMA + volume dalam satu canvas ── */}
       <div className="bg-tv-card border border-tv-border rounded-xl overflow-hidden chart-scan p-2 sm:p-3">
-        <div className={compact ? 'relative h-[200px] sm:h-[clamp(240px,34vh,380px)]' : 'relative'} style={compact ? undefined : { height: 500 }}>
+        <div
+          className={compact ? 'relative h-[200px] sm:h-[clamp(240px,34vh,380px)]' : 'relative'}
+          style={{
+            ...(compact ? {} : { height: 500 }),
+            // panel RSI/MACD menambah tinggi, bukan memeras chart harga
+            ...(panes ? { height: `calc(${compact ? 'clamp(240px,34vh,380px)' : '500px'} + ${panes * PANE_H}px)` } : {}),
+          }}
+        >
           <div ref={containerRef} className="absolute inset-0" />
           <div
-            ref={tooltipRef}
+            ref={legendRef}
             style={{
-              display: 'none', position: 'absolute', zIndex: 20, pointerEvents: 'none',
-              background: '#1e222d', border: '1px solid #2a2e39', borderRadius: 6,
-              padding: '10px 14px', fontSize: 11, fontFamily: 'Inter, sans-serif',
-              minWidth: 175, lineHeight: 1.5, color: '#d1d4dc',
+              position: 'absolute', top: 4, left: 6, right: 70, zIndex: 20, pointerEvents: 'none',
+              fontSize: 11, fontFamily: 'Inter, sans-serif', lineHeight: 1.5, color: '#d1d4dc',
+              textShadow: '0 0 4px #131722',
             }}
           />
         </div>
@@ -592,12 +670,12 @@ const GLOSSARY = [
   },
   {
     icon: '▦', color: 'text-tv-purple', term: 'FVG (Fair Value Gap)',
-    what: 'Celah harga dari tiga candle berurutan yang melompat tanpa transaksi bertemu di tengahnya.',
+    what: 'Celah harga dari tiga candle berurutan yang melompat tanpa transaksi bertemu di tengahnya. Ditampilkan zona yang masih aktif dari ±1 tahun terakhir (maksimal 12 terdekat), memanjang ke kanan sampai area kosong setelah candle terakhir.',
     how: 'Menandai lompatan yang terlalu cepat. Harga cukup sering kembali "mengisi" celah ini sebelum melanjutkan arah.',
   },
   {
     icon: '▦', color: 'text-tv-yellow', term: 'iFVG (inverted FVG)',
-    what: 'Kotak amber — FVG yang sudah ditembus harga.',
+    what: 'Kotak amber — FVG yang sudah ditembus harga (ditutup melewatinya). Kotaknya dimulai dari candle yang menembus, karena sejak saat itulah perannya berbalik.',
     how: 'Setelah ditembus, celah itu berganti peran: yang tadinya menahan dari bawah kini menekan dari atas, dan sebaliknya.',
   },
   {
@@ -670,7 +748,7 @@ function RangeStats({ range, sliced }) {
   }
   const avgVol = totalVol / sliced.length
 
-  const RANGE_LABELS = { '1W': '1 Week', '1M': '1 Month', '3M': '3 Months', '6M': '6 Months', '1Y': '1 Year', 'All': 'All data' }
+  const RANGE_LABELS = { '1W': '1 Week', '1M': '1 Month', '3M': '3 Months', '6M': '6 Months', '1Y': '1 Year', '3Y': '3 Years', 'All': 'All data' }
 
   return (
     <div key={range} className="flex flex-wrap items-center gap-x-5 gap-y-1.5 px-4 py-2.5 bg-tv-card border border-tv-border rounded-lg text-xs animate-slide-down">

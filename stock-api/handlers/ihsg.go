@@ -31,7 +31,8 @@ type ihsgPayload struct {
 }
 
 // jkse is the one ^JKSE fetch shared by /api/ihsg, the calibration regime and
-// the auto-update holiday check: 2 years of daily bars, cached 60s.
+// the auto-update holiday check: daily bars since historyStart (the regime
+// must cover every replayed stock bar), cached 60s.
 var jkse struct {
 	mu       sync.Mutex
 	bars     []models.StockPrice
@@ -47,7 +48,7 @@ func jkseBars() ([]models.StockPrice, string, error) {
 	if time.Since(jkse.fetched) < jkseTTL && len(jkse.bars) > 0 {
 		return jkse.bars, jkse.exchange, nil
 	}
-	bars, exchange, err := fetcher.Fetch("^JKSE", time.Now().AddDate(-2, 0, 0))
+	bars, exchange, err := fetcher.Fetch("^JKSE", historyStart)
 	if err != nil {
 		return nil, "", err
 	}

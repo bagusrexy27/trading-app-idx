@@ -89,7 +89,7 @@ func (h *AIHandler) Analyze(w http.ResponseWriter, r *http.Request) {
 		volRatio = analysis.R2(float64(latest.Volume) / float64(vol20))
 	}
 
-	dec := analysis.DecisionEngineWithBroker(prices, LoadBrokerDays(symbol))
+	dec := decide(symbol, prices)
 	pattern := candleInfo(prices)
 	reports := GetReportsText(symbol)
 

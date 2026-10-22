@@ -363,116 +363,92 @@ type ADXPoint struct {
 	MinusDI float64 `json:"minus_di"`
 }
 
-// ADX computes Wilder's ADX(period) along with +DI and -DI.
+// ADX computes Wilder's ADX(period) along with +DI and -DI. TR, +DM and -DM
+// are Wilder-smoothed (RMA, seeded with their first `period` average); DX is
+// smoothed the same way, so the first ADX is the mean of the first `period` DX
+// values — the TradingView / Wilder definition.
 func ADX(prices []models.StockPrice, period int) []ADXPoint {
-	if len(prices) < period*2+1 || period < 1 {
+	n := len(prices)
+	if n < period*2+1 || period < 1 {
 		return nil
 	}
-
-	n := len(prices)
-	plusDM := make([]float64, n-1)
-	minusDM := make([]float64, n-1)
-	tr := make([]float64, n-1)
-
-	for i := 1; i < n; i++ {
-		upMove := prices[i].High - prices[i-1].High
-		downMove := prices[i-1].Low - prices[i].Low
-		if upMove > downMove && upMove > 0 {
-			plusDM[i-1] = upMove
-		}
-		if downMove > upMove && downMove > 0 {
-			minusDM[i-1] = downMove
-		}
-		tr[i-1] = math.Max(prices[i].High-prices[i].Low,
-			math.Max(math.Abs(prices[i].High-prices[i-1].Close),
-				math.Abs(prices[i].Low-prices[i-1].Close)))
-	}
-
-	// Wilder's smoothing seed (sum of first `period` values)
-	atr14, pDM14, mDM14 := 0.0, 0.0, 0.0
-	for i := 0; i < period; i++ {
-		atr14 += tr[i]
-		pDM14 += plusDM[i]
-		mDM14 += minusDM[i]
-	}
-
 	pf := float64(period)
+	var tr, pDM, mDM float64 // running Wilder averages
+	var dxSum, adx float64
 	out := make([]ADXPoint, 0, n-2*period)
-
-	// first DI values
-	pDI := 100 * pDM14 / atr14
-	mDI := 100 * mDM14 / atr14
-	dx := 0.0
-	if pDI+mDI > 0 {
-		dx = 100 * math.Abs(pDI-mDI) / (pDI + mDI)
-	}
-	adxSum := dx // seed for ADX smoothing
-
-	// We need `period` DX values to seed the ADX; track them
-	dxBuf := make([]float64, 0, period)
-	dxBuf = append(dxBuf, dx)
-
-	for i := period; i < n-1; i++ {
-		atr14 = atr14 - atr14/pf + tr[i]
-		pDM14 = pDM14 - pDM14/pf + plusDM[i]
-		mDM14 = mDM14 - mDM14/pf + minusDM[i]
-
-		if atr14 == 0 {
-			dxBuf = append(dxBuf, 0)
-			continue
+	for i := 1; i < n; i++ {
+		up := prices[i].High - prices[i-1].High
+		down := prices[i-1].Low - prices[i].Low
+		var p, m float64
+		if up > down && up > 0 {
+			p = up
 		}
-		pDI = R2(100 * pDM14 / atr14)
-		mDI = R2(100 * mDM14 / atr14)
-		dx = 0
+		if down > up && down > 0 {
+			m = down
+		}
+		t := math.Max(prices[i].High-prices[i].Low,
+			math.Max(math.Abs(prices[i].High-prices[i-1].Close), math.Abs(prices[i].Low-prices[i-1].Close)))
+
+		if i <= period { // seed: plain average of the first `period` values
+			tr, pDM, mDM = tr+t/pf, pDM+p/pf, mDM+m/pf
+			if i < period {
+				continue
+			}
+		} else {
+			tr, pDM, mDM = (tr*(pf-1)+t)/pf, (pDM*(pf-1)+p)/pf, (mDM*(pf-1)+m)/pf
+		}
+
+		var pDI, mDI, dx float64
+		if tr > 0 {
+			pDI, mDI = 100*pDM/tr, 100*mDM/tr
+		}
 		if pDI+mDI > 0 {
 			dx = 100 * math.Abs(pDI-mDI) / (pDI + mDI)
 		}
-		dxBuf = append(dxBuf, dx)
 
-		if len(dxBuf) < period {
+		k := i - period + 1 // DX count so far
+		switch {
+		case k < period:
+			dxSum += dx
 			continue
+		case k == period:
+			adx = (dxSum + dx) / pf
+		default:
+			adx = (adx*(pf-1) + dx) / pf
 		}
-		// seed ADX on first `period` dx values
-		var adx float64
-		if len(dxBuf) == period {
-			for _, v := range dxBuf {
-				adxSum += v
-			}
-			adx = R2(adxSum / pf)
-		} else {
-			adx = R2((adxSum*(pf-1) + dx) / pf)
-			adxSum = adx
-		}
-
-		out = append(out, ADXPoint{
-			Date:    prices[i+1].Date,
-			ADX:     adx,
-			PlusDI:  pDI,
-			MinusDI: mDI,
-		})
+		out = append(out, ADXPoint{Date: prices[i].Date, ADX: R2(adx), PlusDI: R2(pDI), MinusDI: R2(mDI)})
 	}
 	return out
 }
 
-// ── VWAP (Cumulative for daily data) ─────────────────────────────────────────
+// ── VWAP (rolling, for daily data) ───────────────────────────────────────────
 
-// VWAP computes cumulative Volume-Weighted Average Price using daily bars.
-// TP = (High + Low + Close) / 3
-func VWAP(prices []models.StockPrice) []Point {
-	if len(prices) == 0 {
+// VWAP computes a rolling `period`-bar Volume-Weighted Average Price,
+// TP = (High + Low + Close) / 3. A cumulative VWAP over daily bars just
+// averages the whole stored history (since 2020) and says nothing about
+// today; for an anchored version use AVWAP.
+func VWAP(prices []models.StockPrice, period int) []Point {
+	if period < 1 || len(prices) < period {
 		return nil
 	}
-	out := make([]Point, 0, len(prices))
-	var cumTPV, cumVol float64
-	for _, p := range prices {
-		tp := (p.High + p.Low + p.Close) / 3
-		cumTPV += tp * float64(p.Volume)
-		cumVol += float64(p.Volume)
-		vwap := 0.0
-		if cumVol > 0 {
-			vwap = R2(cumTPV / cumVol)
+	out := make([]Point, 0, len(prices)-period+1)
+	var tpv, vol float64
+	for i, p := range prices {
+		tpv += (p.High + p.Low + p.Close) / 3 * float64(p.Volume)
+		vol += float64(p.Volume)
+		if i >= period {
+			q := prices[i-period]
+			tpv -= (q.High + q.Low + q.Close) / 3 * float64(q.Volume)
+			vol -= float64(q.Volume)
 		}
-		out = append(out, Point{Date: p.Date, Value: vwap})
+		if i < period-1 {
+			continue
+		}
+		v := (p.High + p.Low + p.Close) / 3 // no volume in the window: fall back to TP
+		if vol > 0 {
+			v = tpv / vol
+		}
+		out = append(out, Point{Date: p.Date, Value: R2(v)})
 	}
 	return out
 }
@@ -555,12 +531,12 @@ func SAR(prices []models.StockPrice) []Point {
 // ── Ichimoku Cloud ────────────────────────────────────────────────────────────
 
 type IchimokuPoint struct {
-	Date   string  `json:"date"`
-	Tenkan float64 `json:"tenkan"`
-	Kijun  float64 `json:"kijun"`
-	SpanA  float64 `json:"span_a"`
-	SpanB  float64 `json:"span_b"`
-	Chikou float64 `json:"chikou"`
+	Date   string   `json:"date"`
+	Tenkan float64  `json:"tenkan"`
+	Kijun  float64  `json:"kijun"`
+	SpanA  float64  `json:"span_a"`           // cloud edge shown at this date (computed 26 bars earlier)
+	SpanB  float64  `json:"span_b"`           // cloud edge shown at this date (computed 26 bars earlier)
+	Chikou *float64 `json:"chikou,omitempty"` // close 26 bars later — plotted here; empty for the last 26 bars
 }
 
 func ichimokuMid(prices []models.StockPrice, start, end int) float64 {
@@ -573,36 +549,34 @@ func ichimokuMid(prices []models.StockPrice, start, end int) float64 {
 			lo = prices[i].Low
 		}
 	}
-	return R2((hi + lo) / 2)
+	return (hi + lo) / 2
 }
 
-// Ichimoku computes the 5 Ichimoku components using standard (9,26,52) periods.
+// Ichimoku computes the standard (9, 26, 52) cloud as it is plotted: the
+// spans are projected 26 bars forward, so the cloud at date i uses Tenkan,
+// Kijun and the 52-bar midpoint from bar i-26; Chikou is today's close drawn
+// 26 bars back, so at date i it is the close of bar i+26.
 func Ichimoku(prices []models.StockPrice) []IchimokuPoint {
-	if len(prices) < 52 {
+	const shift = 26
+	n := len(prices)
+	if n < 52+shift {
 		return nil
 	}
-	out := make([]IchimokuPoint, 0, len(prices)-51)
-	for i := 51; i < len(prices); i++ {
-		tenkan := ichimokuMid(prices, i-8, i)
-		kijun := ichimokuMid(prices, i-25, i)
-		spanA := R2((tenkan + kijun) / 2)
-		spanB := ichimokuMid(prices, i-51, i)
-		chikou := prices[i].Close
-		// Chikou is plotted 26 bars back; we return current close for alignment
-		_ = chikou
-		chikouDate := prices[i].Date
-		if i >= 26 {
-			chikouDate = prices[i-26].Date
-		}
-		_ = chikouDate
-		out = append(out, IchimokuPoint{
+	out := make([]IchimokuPoint, 0, n-51-shift)
+	for i := 51 + shift; i < n; i++ {
+		j := i - shift // bar the cloud at i was computed on
+		pt := IchimokuPoint{
 			Date:   prices[i].Date,
-			Tenkan: tenkan,
-			Kijun:  kijun,
-			SpanA:  spanA,
-			SpanB:  spanB,
-			Chikou: prices[i].Close,
-		})
+			Tenkan: R2(ichimokuMid(prices, i-8, i)),
+			Kijun:  R2(ichimokuMid(prices, i-25, i)),
+			SpanA:  R2((ichimokuMid(prices, j-8, j) + ichimokuMid(prices, j-25, j)) / 2),
+			SpanB:  R2(ichimokuMid(prices, j-51, j)),
+		}
+		if i+shift < n {
+			c := prices[i+shift].Close
+			pt.Chikou = &c
+		}
+		out = append(out, pt)
 	}
 	return out
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { api } from '../api'
 import { fmt, REGIME_LABEL } from '../utils'
 import { ProjectionCard } from './Projection'
+import ValuationCard from './ValuationCard'
 
 const SIGNAL = {
   STRONG_BUY:  { label: 'STRONG BUY',  text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
@@ -51,7 +52,7 @@ function CalibCard({ c }) {
       )}
       {!good && <p className="text-xs text-tv-red mt-1.5">⚠️ Rata-rata historis negatif — setup seperti ini belum terbukti menguntungkan.</p>}
       {!c.reliable && <p className="text-xs text-tv-yellow mt-1.5">Sampel sedikit — angka ini belum bisa dipercaya.</p>}
-      <p className="text-[10px] text-tv-muted mt-2">Data ±1,5 tahun; hari-hari berurutan saling tumpang-tindih, jadi jumlah kasus terlihat lebih besar dari aslinya. Bukan jaminan.</p>
+      <p className="text-[10px] text-tv-muted mt-2">Data sejak 2020 (saham IPO setelahnya: sejak listing); hari-hari berurutan saling tumpang-tindih, jadi jumlah kasus terlihat lebih besar dari aslinya. Bukan jaminan.</p>
     </div>
   )
 }
@@ -156,6 +157,8 @@ export default function Advisor({ symbol, decisionData }) {
 
       {dec.calibration?.samples > 0 && <CalibCard c={dec.calibration} />}
 
+      <ValuationCard v={dec.valuation} />
+
       {dec.close > 0 && <ProjectionCard calibration={dec.calibration} close={dec.close} />}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -211,7 +214,7 @@ export default function Advisor({ symbol, decisionData }) {
           ))}
         </div>
         <p className="text-[10px] text-tv-muted mt-3 leading-relaxed">
-          Score 50 = neutral. Includes FVG confluence and bandarmology when broker data exists.
+          Score 50 = neutral. Includes FVG confluence and bandarmology when broker data exists, and Valuasi (10%) when the stock passes the quality screen.
           Confidence = how aligned the factors are — not a price guarantee.
         </p>
       </div>

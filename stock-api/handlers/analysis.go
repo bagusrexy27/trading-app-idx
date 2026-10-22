@@ -430,9 +430,10 @@ func (h *AnalysisHandler) VWAP(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	pts := tailPoints(analysis.VWAP(prices), intParam(r, "limit", 9999))
+	period := intParam(r, "period", 20)
+	pts := tailPoints(analysis.VWAP(prices, period), intParam(r, "limit", 9999))
 	respond(w, 200, true, "", map[string]interface{}{
-		"symbol": symbol, "count": len(pts), "data": pts,
+		"symbol": symbol, "period": period, "count": len(pts), "data": pts,
 	})
 }
 
@@ -705,7 +706,7 @@ func (h *AnalysisHandler) Overview(w http.ResponseWriter, r *http.Request) {
 			// Same engine as the Saran tab — see analysis/decision.go. Anything
 			// that shows a BUY/SELL verdict must come from here, or the views
 			// contradict each other.
-			dec := analysis.DecisionEngine(prices)
+			dec := decide(sym, prices)
 
 			ch <- res{ok: true, item: overviewItem{
 				Symbol:     sym,
@@ -853,7 +854,7 @@ func (h *AnalysisHandler) Session(w http.ResponseWriter, r *http.Request) {
 				volRatio = analysis.R2(float64(cur.Volume) / float64(vol20))
 			}
 
-			dec := analysis.DecisionEngine(prices) // single source of verdict truth
+			dec := decide(sym, prices) // single source of verdict truth
 
 			ch <- res{ok: true, item: sessionItem{
 				Symbol:       sym,

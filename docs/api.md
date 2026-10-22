@@ -147,7 +147,7 @@ $ curl -s 'localhost:1111/api/analysis/BBCA/rsi?limit=3'
 | `/analysis/{symbol}/atr` | `period=14`, `limit` |
 | `/analysis/{symbol}/obv` | `limit` |
 | `/analysis/{symbol}/adx` | `period=14`, `limit` |
-| `/analysis/{symbol}/vwap` | `limit` |
+| `/analysis/{symbol}/vwap` | `period` (default 20) · `limit` — VWAP **rolling** N hari (bukan kumulatif); untuk VWAP sejak tanggal tertentu pakai `avwap` |
 | `/analysis/{symbol}/avwap` | `anchor` (tanggal `YYYY-MM-DD`, **wajib**) |
 | `/analysis/{symbol}/sar` | `limit` |
 | `/analysis/{symbol}/ichimoku` | `limit` — 5 komponen |
@@ -163,7 +163,7 @@ Endpoint multi-nilai tetap mengembalikan satu array `data`, tapi tiap titiknya m
 | `bollinger` | `upper`, `middle`, `lower`, `bandwidth`, `percent_b` |
 | `stochastic` | `k`, `d` |
 | `adx` | `adx`, `plus_di`, `minus_di` |
-| `ichimoku` | Tenkan, Kijun, Span A/B, Chikou |
+| `ichimoku` | Tenkan, Kijun, Span A/B, Chikou — **sudah digeser seperti di chart**: Span A/B di tanggal X dihitung 26 bar sebelumnya (awan yang terlihat di X); Chikou di X = close 26 bar sesudahnya (kosong untuk 26 bar terakhir) |
 
 `avwap` mengembalikan `422` kalau `anchor` kosong (`parameter anchor (YYYY-MM-DD) wajib diisi`) dan `404` kalau tanggal anchor tidak ada di data tersimpan.
 
@@ -304,6 +304,7 @@ Menjalankan decision engine ke seluruh simbol tersimpan lalu merangking hasilnya
 | `min_confidence` | `0` | Confidence minimum (0–100) |
 | `syariah` | `false` | `true` = hanya konstituen ISSI |
 | `include_low_rr` | `false` | `true` = jangan buang kandidat R:R rendah |
+| `undervalue` | `false` | `true` = hanya saham `valuation.undervalue` (PBV di bawah rata-rata 3 tahun + lolos 4 saringan kualitas) |
 
 ```json
 {"success":true,"data":{
