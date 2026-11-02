@@ -1,7 +1,7 @@
 {
   "symbol": "WGSH",
   "exchange": "JKT",
-  "last_updated": "2026-10-22",
+  "last_updated": "2026-11-02",
   "prices": [
     {
       "date": "2021-12-06",
@@ -9350,10 +9350,66 @@
     {
       "date": "2026-10-22",
       "open": 75,
-      "high": 75,
+      "high": 79,
       "low": 70,
-      "close": 71,
-      "volume": 681800
+      "close": 76,
+      "volume": 5336700
+    },
+    {
+      "date": "2026-10-23",
+      "open": 76,
+      "high": 81,
+      "low": 75,
+      "close": 79,
+      "volume": 4881000
+    },
+    {
+      "date": "2026-10-26",
+      "open": 81,
+      "high": 86,
+      "low": 78,
+      "close": 81,
+      "volume": 7943500
+    },
+    {
+      "date": "2026-10-27",
+      "open": 79,
+      "high": 81,
+      "low": 73,
+      "close": 73,
+      "volume": 2203700
+    },
+    {
+      "date": "2026-10-28",
+      "open": 73,
+      "high": 75,
+      "low": 66,
+      "close": 70,
+      "volume": 16893400
+    },
+    {
+      "date": "2026-10-29",
+      "open": 68,
+      "high": 75,
+      "low": 67,
+      "close": 70,
+      "volume": 12002700
+    },
+    {
+      "date": "2026-10-30",
+      "open": 68,
+      "high": 77,
+      "low": 63,
+      "close": 77,
+      "volume": 6425300
+    },
+    {
+      "date": "2026-11-02",
+      "open": 73,
+      "high": 79,
+      "low": 72,
+      "close": 76,
+      "volume": 10220900
     }
   ]
 }

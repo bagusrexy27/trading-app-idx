@@ -32,6 +32,7 @@ export const api = {
     ai:         (s)       => req(`/analysis/${s}/ai`),
     fibonacci:  (s)       => req(`/analysis/${s}/fibonacci`),
     fvg:        (s, lookback) => req(`/analysis/${s}/fvg?lookback=${lookback ?? 200}`),
+    levels:     (s)       => req(`/analysis/${s}/levels`),
     decision:        (s) => req(`/analysis/${s}/decision`),
     decisionBacktest:(s) => req(`/analysis/${s}/decision-backtest`),
     avwap:      (s, anchor) => req(`/analysis/${s}/avwap?anchor=${encodeURIComponent(anchor)}`),

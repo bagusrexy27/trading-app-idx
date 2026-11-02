@@ -1,7 +1,7 @@
 {
   "symbol": "KOTA",
   "exchange": "JKT",
-  "last_updated": "2026-10-22",
+  "last_updated": "2026-11-02",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13110,10 +13110,66 @@
     {
       "date": "2026-10-22",
       "open": 93,
-      "high": 102,
+      "high": 104,
+      "low": 92,
+      "close": 93,
+      "volume": 327315000
+    },
+    {
+      "date": "2026-10-23",
+      "open": 93,
+      "high": 103,
+      "low": 92,
+      "close": 99,
+      "volume": 341363300
+    },
+    {
+      "date": "2026-10-26",
+      "open": 100,
+      "high": 103,
       "low": 93,
-      "close": 100,
-      "volume": 39468800
+      "close": 93,
+      "volume": 243827700
+    },
+    {
+      "date": "2026-10-27",
+      "open": 92,
+      "high": 95,
+      "low": 87,
+      "close": 87,
+      "volume": 106503800
+    },
+    {
+      "date": "2026-10-28",
+      "open": 86,
+      "high": 89,
+      "low": 81,
+      "close": 84,
+      "volume": 158177200
+    },
+    {
+      "date": "2026-10-29",
+      "open": 86,
+      "high": 87,
+      "low": 79,
+      "close": 79,
+      "volume": 108975800
+    },
+    {
+      "date": "2026-10-30",
+      "open": 76,
+      "high": 78,
+      "low": 74,
+      "close": 74,
+      "volume": 61211700
+    },
+    {
+      "date": "2026-11-02",
+      "open": 69,
+      "high": 76,
+      "low": 69,
+      "close": 73,
+      "volume": 495835100
     }
   ]
 }

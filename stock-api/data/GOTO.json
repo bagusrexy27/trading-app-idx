@@ -1,7 +1,7 @@
 {
   "symbol": "GOTO",
   "exchange": "JKT",
-  "last_updated": "2026-10-22",
+  "last_updated": "2026-11-02",
   "prices": [
     {
       "date": "2022-04-11",
@@ -8664,8 +8664,64 @@
       "open": 25,
       "high": 26,
       "low": 25,
-      "close": 26,
-      "volume": 188972200
+      "close": 25,
+      "volume": 5648855300
+    },
+    {
+      "date": "2026-10-23",
+      "open": 25,
+      "high": 26,
+      "low": 24,
+      "close": 25,
+      "volume": 13834144600
+    },
+    {
+      "date": "2026-10-26",
+      "open": 25,
+      "high": 26,
+      "low": 24,
+      "close": 25,
+      "volume": 2451208000
+    },
+    {
+      "date": "2026-10-27",
+      "open": 25,
+      "high": 26,
+      "low": 24,
+      "close": 24,
+      "volume": 6290967500
+    },
+    {
+      "date": "2026-10-28",
+      "open": 24,
+      "high": 24,
+      "low": 23,
+      "close": 24,
+      "volume": 5301531900
+    },
+    {
+      "date": "2026-10-29",
+      "open": 24,
+      "high": 25,
+      "low": 23,
+      "close": 23,
+      "volume": 3893882400
+    },
+    {
+      "date": "2026-10-30",
+      "open": 24,
+      "high": 25,
+      "low": 23,
+      "close": 24,
+      "volume": 17135204700
+    },
+    {
+      "date": "2026-11-02",
+      "open": 25,
+      "high": 25,
+      "low": 23,
+      "close": 24,
+      "volume": 18584804
     }
   ]
 }

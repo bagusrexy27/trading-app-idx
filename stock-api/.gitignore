@@ -44,3 +44,8 @@ desktop.ini
 # Dividend cache (rebuilt from Yahoo every 24h)
 data/dividends/yahoo.json
 data/valuation/
+
+# Research scratch (export.csv / panel.pkl / jkse.json, ~70 MB) — rebuilt by
+# `go run ./research/blindtest export` + research/panel.py. research/frozen/ IS committed.
+research/out/
+__pycache__/

@@ -75,11 +75,34 @@ type Decision struct {
 	Components      []FactorScore `json:"components"`
 	Note            string        `json:"note,omitempty"`      // set when the signal was gated down
 	Valuation       *Valuation    `json:"valuation,omitempty"` // 3-year PBV band + quality screen, when fundamentals are cached
+	Gated           bool          `json:"gated,omitempty"`     // IHSG < SMA50: no buy verdict, trade plan withheld (GateRegime)
 }
 
 // BuyScore is the minimum decision score for a BUY call. Calibration buckets
 // "buy calls" by the same line, so change it here only.
 const BuyScore = 60
+
+// RegimeGateNote explains a buy verdict held back by GateRegime.
+const RegimeGateNote = "IHSG di bawah MA50 — sinyal tren naik ditahan; rencana beli disembunyikan sampai IHSG kembali di atas MA50."
+
+// GateRegime is the market-regime gate. While IHSG is below its SMA50
+// (regime "down") no stock gets a buy verdict and no trade plan is published:
+// the 2020–2026 replay (research/) found BUY calls in that regime won only
+// 25–43% of the time with a negative median, while the score itself has ~zero
+// edge at picking stocks. The score is kept, so calibration lookups still
+// match. Any other regime ("up", or "" when ^JKSE is unavailable) passes d
+// through unchanged.
+func GateRegime(d Decision, regime string) Decision {
+	if regime != "down" {
+		return d
+	}
+	if d.Signal == "BUY" || d.Signal == "STRONG_BUY" {
+		d.Signal, d.Note = "WAIT", RegimeGateNote
+	}
+	d.Gated = true
+	d.EntryZone, d.StopLoss, d.TakeProfit, d.RiskReward = EntryZone{}, 0, nil, 0
+	return d
+}
 
 // Calibration knobs. These are tuned against IDX behaviour (crash gaps leave
 // swing levels stranded far above price), not universal constants — adjust

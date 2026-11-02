@@ -6,14 +6,15 @@ import MarketHeatmap from './MarketHeatmap'
 import WeeklyRecap from './WeeklyRecap'
 import Term from './Term'
 
-const SIGNAL_ORDER = ['STRONG_BUY', 'BUY', 'NEUTRAL', 'SELL', 'STRONG_SELL']
+// Overview signals come from the decision engine (STRONG_BUY…STRONG_SELL incl. WAIT).
+const SIGNAL_ORDER = ['STRONG_BUY', 'BUY', 'WAIT', 'SELL', 'STRONG_SELL']
 
 const SUMMARY_CARDS = [
-  { signal: 'STRONG_BUY',  label: 'Strong Buy',  cls: 'bg-tv-green text-white' },
-  { signal: 'BUY',         label: 'Buy',          cls: 'bg-tv-green/15 text-tv-green border border-tv-green/30' },
-  { signal: 'NEUTRAL',     label: 'Neutral',      cls: 'bg-tv-muted/10 text-tv-muted border border-tv-muted/20' },
-  { signal: 'SELL',        label: 'Sell',         cls: 'bg-tv-red/15 text-tv-red border border-tv-red/30' },
-  { signal: 'STRONG_SELL', label: 'Strong Sell',  cls: 'bg-tv-red text-white' },
+  { signal: 'STRONG_BUY',  cls: 'bg-tv-green text-white' },
+  { signal: 'BUY',         cls: 'bg-tv-green/15 text-tv-green border border-tv-green/30' },
+  { signal: 'WAIT',        cls: 'bg-tv-muted/10 text-tv-muted border border-tv-muted/20' },
+  { signal: 'SELL',        cls: 'bg-tv-red/15 text-tv-red border border-tv-red/30' },
+  { signal: 'STRONG_SELL', cls: 'bg-tv-red text-white' },
 ]
 
 const COLUMNS = [
@@ -106,10 +107,10 @@ export default function MarketOverview({ onSelectStock, showToast }) {
 
       {/* Summary cards */}
       <div className="grid grid-cols-5 gap-3 mb-6">
-        {SUMMARY_CARDS.map(({ signal, label, cls }) => (
+        {SUMMARY_CARDS.map(({ signal, cls }) => (
           <div key={signal} className={`rounded-xl px-3 py-3 text-center ${cls}`}>
             <div className="text-2xl font-bold">{counts[signal]}</div>
-            <div className="text-[11px] font-medium mt-0.5 opacity-80">{label}</div>
+            <div className="text-[11px] font-medium mt-0.5 opacity-80">{signalLabel(signal)}</div>
           </div>
         ))}
       </div>

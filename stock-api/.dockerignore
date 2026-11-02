@@ -12,3 +12,6 @@ ui/dist/
 data/reports/
 data/portfolio.json
 data/broker/
+
+# Research scratch is ~70 MB and never needed by the server.
+research/out/

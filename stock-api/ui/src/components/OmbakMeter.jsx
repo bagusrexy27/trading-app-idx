@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
-import { fmt, colorOf } from '../utils'
+import { fmt, colorOf, signalLabel } from '../utils'
 import Term from './Term'
 
 // ── Ombak Meter ──────────────────────────────────────────────────────────────
@@ -80,9 +80,9 @@ export default function OmbakMeter({ regime = 'unknown', buy = 0, wait = 0, sell
   const total = buy + wait + sell
   const hist = calib?.[regime]
   const bar = [
-    { n: buy, cls: 'bg-tv-green', label: 'BUY' },
-    { n: wait, cls: 'bg-tv-muted/60', label: 'WAIT' },
-    { n: sell, cls: 'bg-tv-red', label: 'HINDARI' },
+    { n: buy, cls: 'bg-tv-green', label: signalLabel('BUY') },
+    { n: wait, cls: 'bg-tv-muted/60', label: signalLabel('WAIT') },
+    { n: sell, cls: 'bg-tv-red', label: signalLabel('SELL') },
   ]
 
   return (
@@ -95,12 +95,12 @@ export default function OmbakMeter({ regime = 'unknown', buy = 0, wait = 0, sell
             <span className="float-y mr-1">{s.emoji}</span>{s.label}
           </div>
           <p className="text-xs text-tv-text/90 mt-1.5 leading-relaxed max-w-md">
-            {REGIME_TEXT[regime] || REGIME_TEXT.unknown} &amp; {sell} dari {total} saham sebaiknya dihindari. {s.advice}
+            {REGIME_TEXT[regime] || REGIME_TEXT.unknown} &amp; {sell} dari {total} saham sedang tren turun. {s.advice}
           </p>
           {hist?.samples > 0 && (
             <p className="text-[11px] text-tv-muted mt-2">
-              Historis sinyal BUY di kondisi ini: <Term k="winrate">kena target</Term> {hist.win_rate.toFixed(0)}% · <Term k="avgpnl">rata-rata</Term>{' '}
-              <b className={colorOf(hist.avg_pnl_pct)}>{fmt.pct(hist.avg_pnl_pct)}</b>/trade (n={hist.samples})
+              Historis sinyal tren naik di kondisi ini: <Term k="avgpnl">rata-rata</Term>{' '}
+              <b className={colorOf(hist.avg_pnl_pct)}>{fmt.pct(hist.avg_pnl_pct)}</b>/trade · <Term k="winrate">kena target</Term> {hist.win_rate.toFixed(0)}% (n={hist.samples})
             </p>
           )}
         </div>

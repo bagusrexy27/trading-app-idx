@@ -1,0 +1,7850 @@
+{
+ "cutoff": "2025-11-28",
+ "made_at": "2026-11-02T14:12:49+07:00",
+ "ihsg": {
+  "chg_1m_pct": 4.223864950008416,
+  "chg_3m_pct": 9.98750715042538,
+  "chg_ytd_pct": 20.181080295414123,
+  "close": 8508.7060546875,
+  "high_52w": 8622.267578125,
+  "low_52w": 5882.60498046875,
+  "sma50": 8243.85
+ },
+ "regime": "up",
+ "buy_calls_asof_cutoff": {
+  "all": {
+   "samples": 26111,
+   "wins": 14941,
+   "losses": 10445,
+   "timeouts": 725,
+   "win_rate": 57.22,
+   "avg_pnl_pct": 0.04
+  },
+  "down": {
+   "samples": 6791,
+   "wins": 3822,
+   "losses": 2832,
+   "timeouts": 137,
+   "win_rate": 56.28,
+   "avg_pnl_pct": -0.04
+  },
+  "up": {
+   "samples": 19320,
+   "wins": 11119,
+   "losses": 7613,
+   "timeouts": 588,
+   "win_rate": 57.55,
+   "avg_pnl_pct": 0.08
+  }
+ },
+ "counts": {
+  "BUY": 26,
+  "SELL": 18,
+  "STRONG_BUY": 6,
+  "WAIT": 32,
+  "candidates": 26
+ },
+ "rows": [
+  {
+   "symbol": "MEDS",
+   "close": 93,
+   "signal": "STRONG_BUY",
+   "score": 82,
+   "confidence": 77,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 87,
+   "entry_high": 91,
+   "entry_ideal": 89,
+   "stop": 84,
+   "target": 113,
+   "risk_reward": 4.8,
+   "turnover_bn": 7.24,
+   "atr_pct": 8.29,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 80,
+    "score_hi": 89,
+    "horizon": 20,
+    "samples": 82,
+    "win_rate": 31.71,
+    "avg_pnl_pct": -0.44,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 55,
+    "wins": 27,
+    "losses": 28,
+    "timeouts": 0,
+    "win_rate": 49.09,
+    "avg_pnl_pct": -2.37
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 90,
+     "reliable": true,
+     "bullish": 30,
+     "sideways": 47.78,
+     "bearish": 22.22,
+     "threshold_pct": 9.27,
+     "band_pct": [
+      -13.57,
+      -7.54,
+      0.35,
+      14.89,
+      26.3
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 88,
+     "reliable": true,
+     "bullish": 25,
+     "sideways": 51.14,
+     "bearish": 23.86,
+     "threshold_pct": 13.11,
+     "band_pct": [
+      -18.01,
+      -12.19,
+      0,
+      13.44,
+      35.05
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 86,
+     "reliable": true,
+     "bullish": 29.07,
+     "sideways": 50,
+     "bearish": 20.93,
+     "threshold_pct": 18.54,
+     "band_pct": [
+      -28.99,
+      -15.24,
+      -2.91,
+      24.95,
+      57.86
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ISAT",
+   "close": 2390,
+   "signal": "STRONG_BUY",
+   "score": 76,
+   "confidence": 79,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Weak Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 2360,
+   "entry_high": 2400,
+   "entry_ideal": 2380,
+   "stop": 2330,
+   "target": 2590,
+   "risk_reward": 4.2,
+   "turnover_bn": 40.89,
+   "atr_pct": 4.12,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 456,
+    "wins": 261,
+    "losses": 177,
+    "timeouts": 18,
+    "win_rate": 57.24,
+    "avg_pnl_pct": -0.2
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 4.6,
+     "band_pct": [
+      -7.32,
+      -3.82,
+      0,
+      4.21,
+      10.29
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 6.51,
+     "band_pct": [
+      -10.64,
+      -5.56,
+      -0.31,
+      6.27,
+      15.76
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 9.2,
+     "band_pct": [
+      -13.38,
+      -6.83,
+      0.71,
+      10.16,
+      22.82
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BULL",
+   "close": 302,
+   "signal": "STRONG_BUY",
+   "score": 76,
+   "confidence": 74,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 282,
+   "entry_high": 296,
+   "entry_ideal": 288,
+   "stop": 262,
+   "target": 352,
+   "risk_reward": 2.46,
+   "turnover_bn": 125.41,
+   "atr_pct": 9.24,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 292,
+    "wins": 191,
+    "losses": 101,
+    "timeouts": 0,
+    "win_rate": 65.41,
+    "avg_pnl_pct": 0.44
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 10.33,
+     "band_pct": [
+      -16.43,
+      -8.59,
+      0,
+      9.45,
+      23.1
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 14.61,
+     "band_pct": [
+      -23.89,
+      -12.49,
+      -0.69,
+      14.08,
+      35.39
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 20.67,
+     "band_pct": [
+      -30.03,
+      -15.33,
+      1.59,
+      22.82,
+      51.23
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BUMI",
+   "close": 244,
+   "signal": "STRONG_BUY",
+   "score": 76,
+   "confidence": 73,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 234,
+   "entry_high": 242,
+   "entry_ideal": 238,
+   "stop": 230,
+   "target": 266,
+   "risk_reward": 3.5,
+   "turnover_bn": 1998.74,
+   "atr_pct": 6.44,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 273,
+    "wins": 177,
+    "losses": 91,
+    "timeouts": 5,
+    "win_rate": 64.84,
+    "avg_pnl_pct": 0.87
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 7.2,
+     "band_pct": [
+      -11.45,
+      -5.98,
+      0,
+      6.59,
+      16.1
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 10.18,
+     "band_pct": [
+      -16.64,
+      -8.7,
+      -0.48,
+      9.81,
+      24.65
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 14.4,
+     "band_pct": [
+      -20.92,
+      -10.68,
+      1.11,
+      15.9,
+      35.69
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "CUAN",
+   "close": 2680,
+   "signal": "STRONG_BUY",
+   "score": 76,
+   "confidence": 67,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 2570,
+   "entry_high": 2640,
+   "entry_ideal": 2600,
+   "stop": 2350,
+   "target": 2890,
+   "risk_reward": 1.16,
+   "turnover_bn": 337.49,
+   "atr_pct": 5.69,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 260,
+    "wins": 167,
+    "losses": 77,
+    "timeouts": 16,
+    "win_rate": 64.23,
+    "avg_pnl_pct": 0.75
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 6.36,
+     "band_pct": [
+      -10.11,
+      -5.28,
+      0,
+      5.82,
+      14.22
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 8.99,
+     "band_pct": [
+      -14.7,
+      -7.69,
+      -0.43,
+      8.67,
+      21.78
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 12.72,
+     "band_pct": [
+      -18.48,
+      -9.43,
+      0.98,
+      14.04,
+      31.53
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "RAJA",
+   "close": 1320,
+   "signal": "STRONG_BUY",
+   "score": 76,
+   "confidence": 66,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 1255,
+   "entry_high": 1300,
+   "entry_ideal": 1280,
+   "stop": 1160,
+   "target": 1490,
+   "risk_reward": 1.75,
+   "turnover_bn": 445.13,
+   "atr_pct": 6.39,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 510,
+    "wins": 321,
+    "losses": 173,
+    "timeouts": 16,
+    "win_rate": 62.94,
+    "avg_pnl_pct": 1.33
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 7.14,
+     "band_pct": [
+      -11.36,
+      -5.93,
+      0,
+      6.53,
+      15.97
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 10.1,
+     "band_pct": [
+      -16.51,
+      -8.63,
+      -0.48,
+      9.73,
+      24.46
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 14.28,
+     "band_pct": [
+      -20.76,
+      -10.59,
+      1.1,
+      15.77,
+      35.41
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "OILS",
+   "close": 266,
+   "signal": "BUY",
+   "score": 74,
+   "confidence": 62,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 248,
+   "entry_high": 260,
+   "entry_ideal": 254,
+   "stop": 234,
+   "target": 270,
+   "risk_reward": 0.8,
+   "turnover_bn": 11.38,
+   "atr_pct": 9.4,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 148,
+    "wins": 74,
+    "losses": 61,
+    "timeouts": 13,
+    "win_rate": 50,
+    "avg_pnl_pct": -0.86
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 10.51,
+     "band_pct": [
+      -16.71,
+      -8.73,
+      0,
+      9.61,
+      23.5
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 14.86,
+     "band_pct": [
+      -24.29,
+      -12.7,
+      -0.71,
+      14.32,
+      35.99
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 21.02,
+     "band_pct": [
+      -30.54,
+      -15.59,
+      1.61,
+      23.2,
+      52.1
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "WIFI",
+   "close": 3730,
+   "signal": "BUY",
+   "score": 73,
+   "confidence": 66,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 3590,
+   "entry_high": 3680,
+   "entry_ideal": 3640,
+   "stop": 3530,
+   "target": 3880,
+   "risk_reward": 2.18,
+   "turnover_bn": 349.07,
+   "atr_pct": 5.01,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 272,
+    "wins": 161,
+    "losses": 107,
+    "timeouts": 4,
+    "win_rate": 59.19,
+    "avg_pnl_pct": -0
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 5.61,
+     "band_pct": [
+      -8.91,
+      -4.66,
+      0,
+      5.13,
+      12.53
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 7.93,
+     "band_pct": [
+      -12.96,
+      -6.78,
+      -0.38,
+      7.64,
+      19.2
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 11.21,
+     "band_pct": [
+      -16.29,
+      -8.31,
+      0.86,
+      12.38,
+      27.79
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BKSL",
+   "close": 153,
+   "signal": "BUY",
+   "score": 73,
+   "confidence": 66,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Sideways",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 150,
+   "entry_high": 154,
+   "entry_ideal": 152,
+   "stop": 148,
+   "target": 155,
+   "risk_reward": 0.75,
+   "turnover_bn": 93.95,
+   "atr_pct": 5.54,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 107,
+    "wins": 34,
+    "losses": 70,
+    "timeouts": 3,
+    "win_rate": 31.78,
+    "avg_pnl_pct": -3.44
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 6.2,
+     "band_pct": [
+      -9.85,
+      -5.15,
+      0,
+      5.67,
+      13.86
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 8.76,
+     "band_pct": [
+      -14.33,
+      -7.49,
+      -0.42,
+      8.44,
+      21.22
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 12.39,
+     "band_pct": [
+      -18.01,
+      -9.19,
+      0.95,
+      13.68,
+      30.72
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "HUMI",
+   "close": 149,
+   "signal": "BUY",
+   "score": 73,
+   "confidence": 59,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 141,
+   "entry_high": 147,
+   "entry_ideal": 144,
+   "stop": 138,
+   "target": 150,
+   "risk_reward": 1,
+   "turnover_bn": 28.04,
+   "atr_pct": 7.45,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 70,
+    "wins": 43,
+    "losses": 24,
+    "timeouts": 3,
+    "win_rate": 61.43,
+    "avg_pnl_pct": -0.6
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 8.33,
+     "band_pct": [
+      -13.24,
+      -6.92,
+      0,
+      7.62,
+      18.62
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 11.78,
+     "band_pct": [
+      -19.25,
+      -10.07,
+      -0.56,
+      11.35,
+      28.53
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 16.66,
+     "band_pct": [
+      -24.21,
+      -12.35,
+      1.28,
+      18.39,
+      41.3
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "DSSA",
+   "close": 4398,
+   "signal": "BUY",
+   "score": 72,
+   "confidence": 63,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 4250,
+   "entry_high": 4350,
+   "entry_ideal": 4300,
+   "stop": 4000,
+   "target": 4470,
+   "risk_reward": 0.57,
+   "turnover_bn": 231.93,
+   "atr_pct": 4.59,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 341,
+    "wins": 236,
+    "losses": 80,
+    "timeouts": 25,
+    "win_rate": 69.21,
+    "avg_pnl_pct": 1.49
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 5.14,
+     "band_pct": [
+      -8.17,
+      -4.27,
+      0,
+      4.7,
+      11.48
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 7.26,
+     "band_pct": [
+      -11.87,
+      -6.21,
+      -0.35,
+      7,
+      17.59
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 10.27,
+     "band_pct": [
+      -14.93,
+      -7.62,
+      0.79,
+      11.34,
+      25.47
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "VKTR",
+   "close": 496,
+   "signal": "BUY",
+   "score": 72,
+   "confidence": 62,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Normal",
+   "entry_low": 474,
+   "entry_high": 488,
+   "entry_ideal": 482,
+   "stop": 432,
+   "target": 565,
+   "risk_reward": 1.66,
+   "turnover_bn": 31.4,
+   "atr_pct": 5.94,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 120,
+    "wins": 79,
+    "losses": 34,
+    "timeouts": 7,
+    "win_rate": 65.83,
+    "avg_pnl_pct": 0.94
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 6.64,
+     "band_pct": [
+      -10.55,
+      -5.52,
+      0,
+      6.07,
+      14.84
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 9.39,
+     "band_pct": [
+      -15.35,
+      -8.02,
+      -0.45,
+      9.05,
+      22.73
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 13.28,
+     "band_pct": [
+      -19.29,
+      -9.85,
+      1.02,
+      14.66,
+      32.91
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "HRTA",
+   "close": 1495,
+   "signal": "BUY",
+   "score": 71,
+   "confidence": 65,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Normal",
+   "entry_low": 1450,
+   "entry_high": 1490,
+   "entry_ideal": 1470,
+   "stop": 1425,
+   "target": 1540,
+   "risk_reward": 1.56,
+   "turnover_bn": 56.03,
+   "atr_pct": 5.88,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 345,
+    "wins": 193,
+    "losses": 144,
+    "timeouts": 8,
+    "win_rate": 55.94,
+    "avg_pnl_pct": -0.21
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 6.58,
+     "band_pct": [
+      -10.46,
+      -5.46,
+      0,
+      6.02,
+      14.7
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 9.3,
+     "band_pct": [
+      -15.2,
+      -7.95,
+      -0.44,
+      8.96,
+      22.52
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 13.15,
+     "band_pct": [
+      -19.11,
+      -9.75,
+      1.01,
+      14.52,
+      32.6
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ENRG",
+   "close": 985,
+   "signal": "BUY",
+   "score": 70,
+   "confidence": 73,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 950,
+   "entry_high": 975,
+   "entry_ideal": 960,
+   "stop": 930,
+   "target": 990,
+   "risk_reward": 1,
+   "turnover_bn": 119.4,
+   "atr_pct": 5.01,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 362,
+    "wins": 226,
+    "losses": 130,
+    "timeouts": 6,
+    "win_rate": 62.43,
+    "avg_pnl_pct": 0.73
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 5.6,
+     "band_pct": [
+      -8.91,
+      -4.66,
+      0,
+      5.13,
+      12.53
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 7.93,
+     "band_pct": [
+      -12.96,
+      -6.77,
+      -0.38,
+      7.64,
+      19.2
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 11.21,
+     "band_pct": [
+      -16.29,
+      -8.31,
+      0.86,
+      12.38,
+      27.79
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "MINA",
+   "close": 370,
+   "signal": "BUY",
+   "score": 70,
+   "confidence": 66,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 348,
+   "entry_high": 362,
+   "entry_ideal": 356,
+   "stop": 246,
+   "target": 426,
+   "risk_reward": 0.64,
+   "turnover_bn": 258.6,
+   "atr_pct": 7.65,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 70,
+    "score_hi": 79,
+    "horizon": 20,
+    "samples": 5473,
+    "win_rate": 52.31,
+    "avg_pnl_pct": 0.16,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 136,
+    "wins": 89,
+    "losses": 42,
+    "timeouts": 5,
+    "win_rate": 65.44,
+    "avg_pnl_pct": 1.89
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 5783,
+     "reliable": true,
+     "bullish": 23.31,
+     "sideways": 55.65,
+     "bearish": 21.04,
+     "threshold_pct": 8.55,
+     "band_pct": [
+      -13.6,
+      -7.11,
+      0,
+      7.82,
+      19.12
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 5750,
+     "reliable": true,
+     "bullish": 24.23,
+     "sideways": 54.08,
+     "bearish": 21.69,
+     "threshold_pct": 12.09,
+     "band_pct": [
+      -19.77,
+      -10.34,
+      -0.57,
+      11.65,
+      29.29
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 5681,
+     "reliable": true,
+     "bullish": 26.84,
+     "sideways": 55.08,
+     "bearish": 18.08,
+     "threshold_pct": 17.1,
+     "band_pct": [
+      -24.86,
+      -12.68,
+      1.31,
+      18.88,
+      42.4
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "RATU",
+   "close": 12125,
+   "signal": "BUY",
+   "score": 69,
+   "confidence": 77,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 11625,
+   "entry_high": 11950,
+   "entry_ideal": 11800,
+   "stop": 10650,
+   "target": 13450,
+   "risk_reward": 1.43,
+   "turnover_bn": 249.22,
+   "atr_pct": 5.43,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 65,
+    "wins": 37,
+    "losses": 28,
+    "timeouts": 0,
+    "win_rate": 56.92,
+    "avg_pnl_pct": 0.08
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 6.07,
+     "band_pct": [
+      -8.84,
+      -4.43,
+      0,
+      5.38,
+      12.17
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 8.58,
+     "band_pct": [
+      -12.53,
+      -6.3,
+      0,
+      7.92,
+      18.77
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 12.13,
+     "band_pct": [
+      -16.45,
+      -8.59,
+      0.54,
+      12.61,
+      29.25
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "SSIA",
+   "close": 1875,
+   "signal": "BUY",
+   "score": 69,
+   "confidence": 62,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Weak Bearish",
+    "short": "Bullish",
+    "overall": "Weak Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 1795,
+   "entry_high": 1850,
+   "entry_ideal": 1820,
+   "stop": 1750,
+   "target": 1905,
+   "risk_reward": 1.21,
+   "turnover_bn": 115.27,
+   "atr_pct": 5.69,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 360,
+    "wins": 228,
+    "losses": 113,
+    "timeouts": 19,
+    "win_rate": 63.33,
+    "avg_pnl_pct": 0.32
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 6.36,
+     "band_pct": [
+      -9.27,
+      -4.64,
+      0,
+      5.64,
+      12.76
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 8.99,
+     "band_pct": [
+      -13.13,
+      -6.6,
+      0,
+      8.3,
+      19.68
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 12.72,
+     "band_pct": [
+      -17.24,
+      -9,
+      0.57,
+      13.22,
+      30.66
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "NICL",
+   "close": 1080,
+   "signal": "BUY",
+   "score": 68,
+   "confidence": 76,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Sideways",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 1050,
+   "entry_high": 1070,
+   "entry_ideal": 1060,
+   "stop": 1035,
+   "target": 1090,
+   "risk_reward": 1.2,
+   "turnover_bn": 14.11,
+   "atr_pct": 4.48,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 338,
+    "wins": 225,
+    "losses": 113,
+    "timeouts": 0,
+    "win_rate": 66.57,
+    "avg_pnl_pct": 0.68
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 5.01,
+     "band_pct": [
+      -7.3,
+      -3.66,
+      0,
+      4.44,
+      10.05
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 7.09,
+     "band_pct": [
+      -10.35,
+      -5.2,
+      0,
+      6.54,
+      15.51
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 10.02,
+     "band_pct": [
+      -13.59,
+      -7.1,
+      0.45,
+      10.42,
+      24.16
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "SCMA",
+   "close": 386,
+   "signal": "BUY",
+   "score": 68,
+   "confidence": 65,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Normal",
+   "entry_low": 376,
+   "entry_high": 384,
+   "entry_ideal": 380,
+   "stop": 370,
+   "target": 396,
+   "risk_reward": 1.6,
+   "turnover_bn": 52.24,
+   "atr_pct": 4.79,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 353,
+    "wins": 204,
+    "losses": 126,
+    "timeouts": 23,
+    "win_rate": 57.79,
+    "avg_pnl_pct": 0.23
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 5.35,
+     "band_pct": [
+      -7.8,
+      -3.91,
+      0,
+      4.75,
+      10.74
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 7.57,
+     "band_pct": [
+      -11.06,
+      -5.56,
+      0,
+      6.99,
+      16.56
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 10.71,
+     "band_pct": [
+      -14.52,
+      -7.58,
+      0.48,
+      11.13,
+      25.81
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "EXCL",
+   "close": 2890,
+   "signal": "BUY",
+   "score": 67,
+   "confidence": 77,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 2820,
+   "entry_high": 2870,
+   "entry_ideal": 2850,
+   "stop": 2800,
+   "target": 2950,
+   "risk_reward": 2,
+   "turnover_bn": 33.71,
+   "atr_pct": 3.05,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 358,
+    "wins": 206,
+    "losses": 152,
+    "timeouts": 0,
+    "win_rate": 57.54,
+    "avg_pnl_pct": -0.42
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 3.41,
+     "band_pct": [
+      -4.97,
+      -2.49,
+      0,
+      3.02,
+      6.84
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 4.82,
+     "band_pct": [
+      -7.04,
+      -3.54,
+      0,
+      4.45,
+      10.55
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 6.82,
+     "band_pct": [
+      -9.25,
+      -4.83,
+      0.3,
+      7.09,
+      16.44
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "SMGR",
+   "close": 2910,
+   "signal": "BUY",
+   "score": 67,
+   "confidence": 76,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Weak Bullish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 2810,
+   "entry_high": 2880,
+   "entry_ideal": 2850,
+   "stop": 2780,
+   "target": 2950,
+   "risk_reward": 1.43,
+   "turnover_bn": 60.69,
+   "atr_pct": 4.45,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 255,
+    "wins": 117,
+    "losses": 136,
+    "timeouts": 2,
+    "win_rate": 45.88,
+    "avg_pnl_pct": -0.81
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 4.97,
+     "band_pct": [
+      -7.25,
+      -3.63,
+      0,
+      4.41,
+      9.98
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 7.03,
+     "band_pct": [
+      -10.27,
+      -5.16,
+      0,
+      6.49,
+      15.39
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 9.94,
+     "band_pct": [
+      -13.48,
+      -7.04,
+      0.44,
+      10.34,
+      23.97
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "UNTR",
+   "close": 28000,
+   "signal": "BUY",
+   "score": 67,
+   "confidence": 72,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 27575,
+   "entry_high": 27850,
+   "entry_ideal": 27725,
+   "stop": 27100,
+   "target": 28475,
+   "risk_reward": 1.2,
+   "turnover_bn": 84.68,
+   "atr_pct": 1.99,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 417,
+    "wins": 221,
+    "losses": 184,
+    "timeouts": 12,
+    "win_rate": 53,
+    "avg_pnl_pct": -0.49
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 2.23,
+     "band_pct": [
+      -3.25,
+      -1.63,
+      0,
+      1.98,
+      4.48
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 3.15,
+     "band_pct": [
+      -4.61,
+      -2.32,
+      0,
+      2.91,
+      6.9
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 4.46,
+     "band_pct": [
+      -6.05,
+      -3.16,
+      0.2,
+      4.64,
+      10.75
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "TLKM",
+   "close": 3510,
+   "signal": "BUY",
+   "score": 67,
+   "confidence": 64,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Weak Bullish",
+    "short": "Weak Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Normal",
+   "entry_low": 3450,
+   "entry_high": 3510,
+   "entry_ideal": 3480,
+   "stop": 3420,
+   "target": 3610,
+   "risk_reward": 2.17,
+   "turnover_bn": 349.26,
+   "atr_pct": 3.47,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 331,
+    "wins": 178,
+    "losses": 147,
+    "timeouts": 6,
+    "win_rate": 53.78,
+    "avg_pnl_pct": -0.26
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 3.88,
+     "band_pct": [
+      -5.66,
+      -2.84,
+      0,
+      3.44,
+      7.79
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 5.49,
+     "band_pct": [
+      -8.02,
+      -4.03,
+      0,
+      5.07,
+      12.02
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 7.77,
+     "band_pct": [
+      -10.53,
+      -5.5,
+      0.35,
+      8.07,
+      18.72
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BUVA",
+   "close": 1375,
+   "signal": "BUY",
+   "score": 67,
+   "confidence": 51,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Below Average",
+   "entry_low": 1310,
+   "entry_high": 1355,
+   "entry_ideal": 1335,
+   "stop": 965,
+   "target": 1410,
+   "risk_reward": 0.2,
+   "turnover_bn": 217.73,
+   "atr_pct": 6.16,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 164,
+    "wins": 109,
+    "losses": 55,
+    "timeouts": 0,
+    "win_rate": 66.46,
+    "avg_pnl_pct": 2.36
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 6.89,
+     "band_pct": [
+      -10.04,
+      -5.03,
+      0,
+      6.11,
+      13.82
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 9.74,
+     "band_pct": [
+      -14.23,
+      -7.16,
+      0,
+      8.99,
+      21.32
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 13.78,
+     "band_pct": [
+      -18.68,
+      -9.76,
+      0.61,
+      14.32,
+      33.22
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "INET",
+   "close": 650,
+   "signal": "BUY",
+   "score": 66,
+   "confidence": 76,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 610,
+   "entry_high": 635,
+   "entry_ideal": 625,
+   "stop": 545,
+   "target": 745,
+   "risk_reward": 1.5,
+   "turnover_bn": 482.73,
+   "atr_pct": 8.29,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 107,
+    "wins": 72,
+    "losses": 31,
+    "timeouts": 4,
+    "win_rate": 67.29,
+    "avg_pnl_pct": 2.2
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 9.27,
+     "band_pct": [
+      -13.52,
+      -6.77,
+      0,
+      8.22,
+      18.61
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 13.11,
+     "band_pct": [
+      -19.15,
+      -9.63,
+      0,
+      12.1,
+      28.7
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 18.55,
+     "band_pct": [
+      -25.15,
+      -13.13,
+      0.82,
+      19.28,
+      44.71
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "GTSI",
+   "close": 139,
+   "signal": "BUY",
+   "score": 66,
+   "confidence": 63,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 131,
+   "entry_high": 136,
+   "entry_ideal": 134,
+   "stop": 127,
+   "target": 142,
+   "risk_reward": 1.14,
+   "turnover_bn": 39.25,
+   "atr_pct": 7.75,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 87,
+    "wins": 56,
+    "losses": 23,
+    "timeouts": 8,
+    "win_rate": 64.37,
+    "avg_pnl_pct": 3.13
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 8.66,
+     "band_pct": [
+      -12.63,
+      -6.33,
+      0,
+      7.68,
+      17.38
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 12.25,
+     "band_pct": [
+      -17.89,
+      -9,
+      0,
+      11.31,
+      26.81
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 17.33,
+     "band_pct": [
+      -23.49,
+      -12.27,
+      0.77,
+      18.01,
+      41.77
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ASII",
+   "close": 6550,
+   "signal": "BUY",
+   "score": 63,
+   "confidence": 70,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 6425,
+   "entry_high": 6500,
+   "entry_ideal": 6475,
+   "stop": 6375,
+   "target": 6575,
+   "risk_reward": 1,
+   "turnover_bn": 256.65,
+   "atr_pct": 2.4,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 331,
+    "wins": 172,
+    "losses": 145,
+    "timeouts": 14,
+    "win_rate": 51.96,
+    "avg_pnl_pct": -0.3
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 2.68,
+     "band_pct": [
+      -3.91,
+      -1.96,
+      0,
+      2.38,
+      5.38
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 3.79,
+     "band_pct": [
+      -5.54,
+      -2.78,
+      0,
+      3.5,
+      8.3
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 5.36,
+     "band_pct": [
+      -7.27,
+      -3.8,
+      0.24,
+      5.58,
+      12.93
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BRMS",
+   "close": 975,
+   "signal": "BUY",
+   "score": 62,
+   "confidence": 53,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Weak Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 955,
+   "entry_high": 975,
+   "entry_ideal": 965,
+   "stop": 940,
+   "target": 1020,
+   "risk_reward": 2.2,
+   "turnover_bn": 802.23,
+   "atr_pct": 4.98,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 395,
+    "wins": 250,
+    "losses": 131,
+    "timeouts": 14,
+    "win_rate": 63.29,
+    "avg_pnl_pct": 1.3
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 5.56,
+     "band_pct": [
+      -8.11,
+      -4.06,
+      0,
+      4.93,
+      11.16
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 7.87,
+     "band_pct": [
+      -11.49,
+      -5.78,
+      0,
+      7.26,
+      17.21
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 11.13,
+     "band_pct": [
+      -15.08,
+      -7.88,
+      0.49,
+      11.57,
+      26.82
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "MYOR",
+   "close": 2180,
+   "signal": "BUY",
+   "score": 61,
+   "confidence": 70,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Sideways",
+    "short": "Sideways",
+    "overall": "Sideways"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Normal",
+   "entry_low": 2140,
+   "entry_high": 2180,
+   "entry_ideal": 2160,
+   "stop": 2130,
+   "target": 2200,
+   "risk_reward": 1.33,
+   "turnover_bn": 31.42,
+   "atr_pct": 2.99,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 374,
+    "wins": 170,
+    "losses": 195,
+    "timeouts": 9,
+    "win_rate": 45.45,
+    "avg_pnl_pct": -0.91
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 3.34,
+     "band_pct": [
+      -4.87,
+      -2.44,
+      0,
+      2.96,
+      6.71
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 4.73,
+     "band_pct": [
+      -6.9,
+      -3.47,
+      0,
+      4.36,
+      10.34
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 6.69,
+     "band_pct": [
+      -9.07,
+      -4.73,
+      0.3,
+      6.95,
+      16.12
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "PGAS",
+   "close": 1805,
+   "signal": "BUY",
+   "score": 60,
+   "confidence": 68,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 1775,
+   "entry_high": 1795,
+   "entry_ideal": 1785,
+   "stop": 1760,
+   "target": 1855,
+   "risk_reward": 2.8,
+   "turnover_bn": 61.45,
+   "atr_pct": 2.33,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 429,
+    "wins": 256,
+    "losses": 163,
+    "timeouts": 10,
+    "win_rate": 59.67,
+    "avg_pnl_pct": 0.11
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 2.6,
+     "band_pct": [
+      -3.79,
+      -1.9,
+      0,
+      2.3,
+      5.22
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 3.68,
+     "band_pct": [
+      -5.37,
+      -2.7,
+      0,
+      3.39,
+      8.04
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 5.2,
+     "band_pct": [
+      -7.05,
+      -3.68,
+      0.23,
+      5.41,
+      12.54
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "INKP",
+   "close": 8775,
+   "signal": "BUY",
+   "score": 60,
+   "confidence": 47,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Above Average",
+   "entry_low": 8575,
+   "entry_high": 8700,
+   "entry_ideal": 8650,
+   "stop": 8275,
+   "target": 9325,
+   "risk_reward": 1.8,
+   "turnover_bn": 57.53,
+   "atr_pct": 3.09,
+   "candidate": true,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 347,
+    "wins": 212,
+    "losses": 128,
+    "timeouts": 7,
+    "win_rate": 61.1,
+    "avg_pnl_pct": 0.32
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 3.45,
+     "band_pct": [
+      -5.03,
+      -2.52,
+      0,
+      3.06,
+      6.93
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 4.88,
+     "band_pct": [
+      -7.13,
+      -3.58,
+      0,
+      4.5,
+      10.68
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 6.9,
+     "band_pct": [
+      -9.36,
+      -4.89,
+      0.31,
+      7.18,
+      16.64
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "UNVR",
+   "close": 2600,
+   "signal": "BUY",
+   "score": 60,
+   "confidence": 47,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Below Average",
+   "entry_low": 2520,
+   "entry_high": 2570,
+   "entry_ideal": 2550,
+   "stop": 2410,
+   "target": 2630,
+   "risk_reward": 0.57,
+   "turnover_bn": 84.36,
+   "atr_pct": 4.01,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 60,
+    "score_hi": 69,
+    "horizon": 20,
+    "samples": 13765,
+    "win_rate": 59.79,
+    "avg_pnl_pct": 0.04,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 253,
+    "wins": 125,
+    "losses": 121,
+    "timeouts": 7,
+    "win_rate": 49.41,
+    "avg_pnl_pct": -0.24
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 15343,
+     "reliable": true,
+     "bullish": 22.78,
+     "sideways": 58.76,
+     "bearish": 18.46,
+     "threshold_pct": 4.49,
+     "band_pct": [
+      -6.54,
+      -3.28,
+      0,
+      3.98,
+      9.01
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 15224,
+     "reliable": true,
+     "bullish": 23.71,
+     "sideways": 58.02,
+     "bearish": 18.27,
+     "threshold_pct": 6.35,
+     "band_pct": [
+      -9.27,
+      -4.66,
+      0,
+      5.86,
+      13.89
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14938,
+     "reliable": true,
+     "bullish": 25.67,
+     "sideways": 57.03,
+     "bearish": 17.3,
+     "threshold_pct": 8.98,
+     "band_pct": [
+      -12.17,
+      -6.36,
+      0.4,
+      9.33,
+      21.64
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BMRI",
+   "close": 4830,
+   "signal": "WAIT",
+   "score": 59,
+   "confidence": 82,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Bullish",
+    "short": "Weak Bullish",
+    "overall": "Weak Bullish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 4760,
+   "entry_high": 4820,
+   "entry_ideal": 4790,
+   "stop": 4740,
+   "target": 4870,
+   "risk_reward": 1.6,
+   "turnover_bn": 659.01,
+   "atr_pct": 2.26,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 407,
+    "wins": 253,
+    "losses": 146,
+    "timeouts": 8,
+    "win_rate": 62.16,
+    "avg_pnl_pct": 0.36
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 2.53,
+     "band_pct": [
+      -3.57,
+      -1.77,
+      0,
+      1.99,
+      4.71
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 3.57,
+     "band_pct": [
+      -5.08,
+      -2.56,
+      0,
+      3.01,
+      7.28
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 5.05,
+     "band_pct": [
+      -7.1,
+      -3.74,
+      -0.15,
+      4.59,
+      11.19
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "AKRA",
+   "close": 1240,
+   "signal": "WAIT",
+   "score": 58,
+   "confidence": 78,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Weak Bullish",
+    "short": "Weak Bullish",
+    "overall": "Sideways"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Below Average",
+   "entry_low": 1205,
+   "entry_high": 1235,
+   "entry_ideal": 1220,
+   "stop": 1195,
+   "target": 1260,
+   "risk_reward": 1.6,
+   "turnover_bn": 30.21,
+   "atr_pct": 4.03,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 438,
+    "wins": 250,
+    "losses": 182,
+    "timeouts": 6,
+    "win_rate": 57.08,
+    "avg_pnl_pct": -0.41
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 4.51,
+     "band_pct": [
+      -6.37,
+      -3.16,
+      0,
+      3.56,
+      8.41
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 6.38,
+     "band_pct": [
+      -9.07,
+      -4.56,
+      0,
+      5.37,
+      12.98
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 9.02,
+     "band_pct": [
+      -12.66,
+      -6.67,
+      -0.27,
+      8.2,
+      19.97
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "DEWA",
+   "close": 432,
+   "signal": "WAIT",
+   "score": 58,
+   "confidence": 66,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Below Average",
+   "entry_low": 414,
+   "entry_high": 426,
+   "entry_ideal": 420,
+   "stop": 388,
+   "target": 440,
+   "risk_reward": 0.63,
+   "turnover_bn": 487.69,
+   "atr_pct": 5.84,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 258,
+    "wins": 160,
+    "losses": 88,
+    "timeouts": 10,
+    "win_rate": 62.02,
+    "avg_pnl_pct": 0.56
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 6.53,
+     "band_pct": [
+      -9.23,
+      -4.58,
+      0,
+      5.16,
+      12.18
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 9.24,
+     "band_pct": [
+      -13.15,
+      -6.61,
+      0,
+      7.78,
+      18.81
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 13.07,
+     "band_pct": [
+      -18.35,
+      -9.67,
+      -0.39,
+      11.88,
+      28.94
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BNBR",
+   "close": 57,
+   "signal": "WAIT",
+   "score": 58,
+   "confidence": 49,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Above Average",
+   "entry_low": 55,
+   "entry_high": 56,
+   "entry_ideal": 56,
+   "stop": 54,
+   "target": 61,
+   "risk_reward": 2.5,
+   "turnover_bn": 3.2,
+   "atr_pct": 4.39,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 36,
+    "wins": 10,
+    "losses": 21,
+    "timeouts": 5,
+    "win_rate": 27.78,
+    "avg_pnl_pct": -5.8
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 4.9,
+     "band_pct": [
+      -6.92,
+      -3.44,
+      0,
+      3.87,
+      9.14
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 6.93,
+     "band_pct": [
+      -9.86,
+      -4.96,
+      0,
+      5.84,
+      14.12
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 9.81,
+     "band_pct": [
+      -13.77,
+      -7.26,
+      -0.29,
+      8.91,
+      21.71
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "MEDC",
+   "close": 1325,
+   "signal": "WAIT",
+   "score": 57,
+   "confidence": 87,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Weak Bearish",
+    "short": "Sideways",
+    "overall": "Sideways"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 1300,
+   "entry_high": 1320,
+   "entry_ideal": 1310,
+   "stop": 1290,
+   "target": 1335,
+   "risk_reward": 1.25,
+   "turnover_bn": 48.89,
+   "atr_pct": 3.27,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 355,
+    "wins": 195,
+    "losses": 160,
+    "timeouts": 0,
+    "win_rate": 54.93,
+    "avg_pnl_pct": -0.26
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 3.66,
+     "band_pct": [
+      -5.16,
+      -2.56,
+      0,
+      2.89,
+      6.82
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 5.17,
+     "band_pct": [
+      -7.36,
+      -3.7,
+      0,
+      4.35,
+      10.53
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 7.31,
+     "band_pct": [
+      -10.27,
+      -5.41,
+      -0.22,
+      6.65,
+      16.19
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "GOTO",
+   "close": 64,
+   "signal": "WAIT",
+   "score": 57,
+   "confidence": 74,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Weak Bullish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 62,
+   "entry_high": 64,
+   "entry_ideal": 63,
+   "stop": 60,
+   "target": 67,
+   "risk_reward": 1.33,
+   "turnover_bn": 329.81,
+   "atr_pct": 4.59,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 110,
+    "wins": 50,
+    "losses": 60,
+    "timeouts": 0,
+    "win_rate": 45.45,
+    "avg_pnl_pct": -2.01
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 5.14,
+     "band_pct": [
+      -7.25,
+      -3.6,
+      0,
+      4.05,
+      9.57
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 7.26,
+     "band_pct": [
+      -10.33,
+      -5.2,
+      0,
+      6.11,
+      14.78
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 10.27,
+     "band_pct": [
+      -14.42,
+      -7.6,
+      -0.31,
+      9.33,
+      22.74
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "MDKA",
+   "close": 2280,
+   "signal": "WAIT",
+   "score": 57,
+   "confidence": 67,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Sideways",
+    "short": "Bearish",
+    "overall": "Sideways"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Below Average",
+   "entry_low": 2200,
+   "entry_high": 2260,
+   "entry_ideal": 2230,
+   "stop": 2180,
+   "target": 2320,
+   "risk_reward": 1.8,
+   "turnover_bn": 124.45,
+   "atr_pct": 4.46,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 429,
+    "wins": 237,
+    "losses": 183,
+    "timeouts": 9,
+    "win_rate": 55.24,
+    "avg_pnl_pct": -0.41
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 4.98,
+     "band_pct": [
+      -7.04,
+      -3.49,
+      0,
+      3.93,
+      9.29
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 7.05,
+     "band_pct": [
+      -10.02,
+      -5.04,
+      0,
+      5.93,
+      14.34
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 9.96,
+     "band_pct": [
+      -13.99,
+      -7.37,
+      -0.3,
+      9.05,
+      22.06
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "SMDR",
+   "close": 306,
+   "signal": "WAIT",
+   "score": 57,
+   "confidence": 65,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Sideways",
+    "overall": "Sideways"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Below Average",
+   "entry_low": 300,
+   "entry_high": 304,
+   "entry_ideal": 302,
+   "stop": 298,
+   "target": 310,
+   "risk_reward": 2,
+   "turnover_bn": 3.96,
+   "atr_pct": 2.27,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 388,
+    "wins": 221,
+    "losses": 164,
+    "timeouts": 3,
+    "win_rate": 56.96,
+    "avg_pnl_pct": -0.26
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 2.54,
+     "band_pct": [
+      -3.59,
+      -1.78,
+      0,
+      2.01,
+      4.74
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 3.6,
+     "band_pct": [
+      -5.12,
+      -2.57,
+      0,
+      3.03,
+      7.32
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 5.09,
+     "band_pct": [
+      -7.14,
+      -3.76,
+      -0.15,
+      4.62,
+      11.26
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "INDF",
+   "close": 7350,
+   "signal": "WAIT",
+   "score": 56,
+   "confidence": 83,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Weak Bearish",
+    "short": "Bullish",
+    "overall": "Sideways"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 7225,
+   "entry_high": 7325,
+   "entry_ideal": 7275,
+   "stop": 7200,
+   "target": 7450,
+   "risk_reward": 2.33,
+   "turnover_bn": 55.34,
+   "atr_pct": 2.15,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 307,
+    "wins": 170,
+    "losses": 134,
+    "timeouts": 3,
+    "win_rate": 55.37,
+    "avg_pnl_pct": -0.24
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 2.41,
+     "band_pct": [
+      -3.4,
+      -1.69,
+      0,
+      1.9,
+      4.49
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 3.41,
+     "band_pct": [
+      -4.84,
+      -2.44,
+      0,
+      2.87,
+      6.93
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 4.82,
+     "band_pct": [
+      -6.76,
+      -3.56,
+      -0.14,
+      4.38,
+      10.66
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "EMTK",
+   "close": 1225,
+   "signal": "WAIT",
+   "score": 56,
+   "confidence": 70,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Weak Bullish",
+    "short": "Sideways",
+    "overall": "Weak Bullish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 1170,
+   "entry_high": 1205,
+   "entry_ideal": 1190,
+   "stop": 1150,
+   "target": 1230,
+   "risk_reward": 1,
+   "turnover_bn": 169.99,
+   "atr_pct": 5.77,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 370,
+    "wins": 235,
+    "losses": 126,
+    "timeouts": 9,
+    "win_rate": 63.51,
+    "avg_pnl_pct": 0.21
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 6.46,
+     "band_pct": [
+      -9.12,
+      -4.53,
+      0,
+      5.09,
+      12.03
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 9.13,
+     "band_pct": [
+      -12.99,
+      -6.53,
+      0,
+      7.68,
+      18.59
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 12.91,
+     "band_pct": [
+      -18.13,
+      -9.55,
+      -0.39,
+      11.73,
+      28.59
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "AUTO",
+   "close": 2540,
+   "signal": "WAIT",
+   "score": 54,
+   "confidence": 69,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Weak Bullish",
+    "short": "Sideways",
+    "overall": "Weak Bullish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 2480,
+   "entry_high": 2520,
+   "entry_ideal": 2500,
+   "stop": 2440,
+   "target": 2550,
+   "risk_reward": 0.83,
+   "turnover_bn": 9.83,
+   "atr_pct": 3.22,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 413,
+    "wins": 212,
+    "losses": 192,
+    "timeouts": 9,
+    "win_rate": 51.33,
+    "avg_pnl_pct": -0.2
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 3.59,
+     "band_pct": [
+      -5.08,
+      -2.52,
+      0,
+      2.84,
+      6.7
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 5.08,
+     "band_pct": [
+      -7.23,
+      -3.64,
+      0,
+      4.28,
+      10.35
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 7.19,
+     "band_pct": [
+      -10.09,
+      -5.32,
+      -0.21,
+      6.53,
+      15.92
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BBCA",
+   "close": 8275,
+   "signal": "WAIT",
+   "score": 52,
+   "confidence": 78,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Weak Bullish",
+    "short": "Sideways",
+    "overall": "Sideways"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 8150,
+   "entry_high": 8225,
+   "entry_ideal": 8200,
+   "stop": 7950,
+   "target": 8325,
+   "risk_reward": 0.5,
+   "turnover_bn": 949.96,
+   "atr_pct": 1.82,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 435,
+    "wins": 233,
+    "losses": 187,
+    "timeouts": 15,
+    "win_rate": 53.56,
+    "avg_pnl_pct": -0.06
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 2.04,
+     "band_pct": [
+      -2.88,
+      -1.43,
+      0,
+      1.61,
+      3.8
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 2.88,
+     "band_pct": [
+      -4.1,
+      -2.06,
+      0,
+      2.43,
+      5.87
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 4.07,
+     "band_pct": [
+      -5.72,
+      -3.01,
+      -0.12,
+      3.7,
+      9.02
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ADMR",
+   "close": 1270,
+   "signal": "WAIT",
+   "score": 51,
+   "confidence": 70,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Weak Bullish",
+    "short": "Bearish",
+    "overall": "Sideways"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Below Average",
+   "entry_low": 1245,
+   "entry_high": 1275,
+   "entry_ideal": 1260,
+   "stop": 1230,
+   "target": 1295,
+   "risk_reward": 1.17,
+   "turnover_bn": 51.07,
+   "atr_pct": 4.71,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 193,
+    "wins": 108,
+    "losses": 80,
+    "timeouts": 5,
+    "win_rate": 55.96,
+    "avg_pnl_pct": -0.41
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 5.26,
+     "band_pct": [
+      -7.43,
+      -3.69,
+      0,
+      4.15,
+      9.81
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 7.45,
+     "band_pct": [
+      -10.59,
+      -5.33,
+      0,
+      6.27,
+      15.15
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 10.53,
+     "band_pct": [
+      -14.78,
+      -7.79,
+      -0.31,
+      9.57,
+      23.31
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "TCPI",
+   "close": 7525,
+   "signal": "WAIT",
+   "score": 50,
+   "confidence": 59,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Sideways",
+    "overall": "Bullish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Normal",
+   "entry_low": 7225,
+   "entry_high": 7425,
+   "entry_ideal": 7325,
+   "stop": 7125,
+   "target": 7800,
+   "risk_reward": 2.38,
+   "turnover_bn": 52.39,
+   "atr_pct": 5.14,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 432,
+    "wins": 232,
+    "losses": 199,
+    "timeouts": 1,
+    "win_rate": 53.7,
+    "avg_pnl_pct": -0.49
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 5.75,
+     "band_pct": [
+      -8.12,
+      -4.03,
+      0,
+      4.54,
+      10.71
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 8.13,
+     "band_pct": [
+      -11.56,
+      -5.81,
+      0,
+      6.84,
+      16.54
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 11.49,
+     "band_pct": [
+      -16.14,
+      -8.5,
+      -0.34,
+      10.45,
+      25.45
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ICBP",
+   "close": 8450,
+   "signal": "WAIT",
+   "score": 50,
+   "confidence": 55,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Bearish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 8300,
+   "entry_high": 8400,
+   "entry_ideal": 8350,
+   "stop": 8225,
+   "target": 8475,
+   "risk_reward": 1,
+   "turnover_bn": 184.64,
+   "atr_pct": 2.27,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 50,
+    "score_hi": 59,
+    "horizon": 20,
+    "samples": 12638,
+    "win_rate": 61.91,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 333,
+    "wins": 179,
+    "losses": 138,
+    "timeouts": 16,
+    "win_rate": 53.75,
+    "avg_pnl_pct": -0.21
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 14351,
+     "reliable": true,
+     "bullish": 20.72,
+     "sideways": 61.99,
+     "bearish": 17.29,
+     "threshold_pct": 2.54,
+     "band_pct": [
+      -3.58,
+      -1.78,
+      0,
+      2,
+      4.73
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 14242,
+     "reliable": true,
+     "bullish": 22.06,
+     "sideways": 60.56,
+     "bearish": 17.38,
+     "threshold_pct": 3.59,
+     "band_pct": [
+      -5.11,
+      -2.57,
+      0,
+      3.02,
+      7.31
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 14050,
+     "reliable": true,
+     "bullish": 23.38,
+     "sideways": 58.66,
+     "bearish": 17.96,
+     "threshold_pct": 5.08,
+     "band_pct": [
+      -7.13,
+      -3.76,
+      -0.15,
+      4.61,
+      11.24
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "CPIN",
+   "close": 4630,
+   "signal": "WAIT",
+   "score": 49,
+   "confidence": 71,
+   "trend": {
+    "long": "Sideways",
+    "medium": "Sideways",
+    "short": "Bearish",
+    "overall": "Sideways"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 4540,
+   "entry_high": 4600,
+   "entry_ideal": 4570,
+   "stop": 4380,
+   "target": 4640,
+   "risk_reward": 0.37,
+   "turnover_bn": 47.92,
+   "atr_pct": 2.51,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 256,
+    "wins": 125,
+    "losses": 131,
+    "timeouts": 0,
+    "win_rate": 48.83,
+    "avg_pnl_pct": -0.86
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 2.81,
+     "band_pct": [
+      -3.8,
+      -1.85,
+      0,
+      2.03,
+      5.01
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 3.98,
+     "band_pct": [
+      -5.42,
+      -2.72,
+      0,
+      3.16,
+      7.85
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 5.62,
+     "band_pct": [
+      -7.8,
+      -4.05,
+      0,
+      4.99,
+      11.87
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "TOBA",
+   "close": 835,
+   "signal": "WAIT",
+   "score": 49,
+   "confidence": 68,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Below Average",
+   "entry_low": 815,
+   "entry_high": 845,
+   "entry_ideal": 830,
+   "stop": 805,
+   "target": 865,
+   "risk_reward": 1.4,
+   "turnover_bn": 95.31,
+   "atr_pct": 6.31,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 338,
+    "wins": 180,
+    "losses": 139,
+    "timeouts": 19,
+    "win_rate": 53.25,
+    "avg_pnl_pct": 1.05
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 7.05,
+     "band_pct": [
+      -9.55,
+      -4.64,
+      0,
+      5.1,
+      12.56
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 9.98,
+     "band_pct": [
+      -13.61,
+      -6.83,
+      0,
+      7.93,
+      19.69
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 14.11,
+     "band_pct": [
+      -19.57,
+      -10.16,
+      0,
+      12.53,
+      29.78
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "PGEO",
+   "close": 1160,
+   "signal": "WAIT",
+   "score": 49,
+   "confidence": 68,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Below Average",
+   "entry_low": 1145,
+   "entry_high": 1165,
+   "entry_ideal": 1155,
+   "stop": 1135,
+   "target": 1175,
+   "risk_reward": 1,
+   "turnover_bn": 33.53,
+   "atr_pct": 3.16,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 179,
+    "wins": 121,
+    "losses": 58,
+    "timeouts": 0,
+    "win_rate": 67.6,
+    "avg_pnl_pct": 1.62
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 3.54,
+     "band_pct": [
+      -4.79,
+      -2.33,
+      0,
+      2.56,
+      6.3
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 5,
+     "band_pct": [
+      -6.82,
+      -3.42,
+      0,
+      3.98,
+      9.87
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 7.07,
+     "band_pct": [
+      -9.81,
+      -5.09,
+      0,
+      6.28,
+      14.93
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "TINS",
+   "close": 3260,
+   "signal": "WAIT",
+   "score": 49,
+   "confidence": 57,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 3190,
+   "entry_high": 3290,
+   "entry_ideal": 3240,
+   "stop": 3150,
+   "target": 3400,
+   "risk_reward": 1.78,
+   "turnover_bn": 288.8,
+   "atr_pct": 5.6,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 332,
+    "wins": 223,
+    "losses": 105,
+    "timeouts": 4,
+    "win_rate": 67.17,
+    "avg_pnl_pct": 1.11
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 6.26,
+     "band_pct": [
+      -8.47,
+      -4.12,
+      0,
+      4.52,
+      11.15
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 8.85,
+     "band_pct": [
+      -12.08,
+      -6.06,
+      0,
+      7.04,
+      17.47
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 12.52,
+     "band_pct": [
+      -17.36,
+      -9.01,
+      0,
+      11.12,
+      26.42
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "GJTL",
+   "close": 1050,
+   "signal": "WAIT",
+   "score": 48,
+   "confidence": 74,
+   "trend": {
+    "long": "Weak Bearish",
+    "medium": "Bullish",
+    "short": "Sideways",
+    "overall": "Sideways"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Below Average",
+   "entry_low": 1035,
+   "entry_high": 1045,
+   "entry_ideal": 1040,
+   "stop": 1010,
+   "target": 1070,
+   "risk_reward": 1,
+   "turnover_bn": 6.82,
+   "atr_pct": 2.06,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 307,
+    "wins": 205,
+    "losses": 95,
+    "timeouts": 7,
+    "win_rate": 66.78,
+    "avg_pnl_pct": -0.45
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 2.3,
+     "band_pct": [
+      -3.11,
+      -1.51,
+      0,
+      1.66,
+      4.09
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 3.25,
+     "band_pct": [
+      -4.43,
+      -2.23,
+      0,
+      2.58,
+      6.42
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 4.6,
+     "band_pct": [
+      -6.38,
+      -3.31,
+      0,
+      4.08,
+      9.7
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "INCO",
+   "close": 3820,
+   "signal": "WAIT",
+   "score": 48,
+   "confidence": 58,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "HH + HL",
+   "volume_state": "Above Average",
+   "entry_low": 3750,
+   "entry_high": 3830,
+   "entry_ideal": 3790,
+   "stop": 3710,
+   "target": 3890,
+   "risk_reward": 1.25,
+   "turnover_bn": 51.7,
+   "atr_pct": 4.18,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 402,
+    "wins": 225,
+    "losses": 177,
+    "timeouts": 0,
+    "win_rate": 55.97,
+    "avg_pnl_pct": -0.23
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 4.67,
+     "band_pct": [
+      -6.32,
+      -3.07,
+      0,
+      3.37,
+      8.31
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 6.6,
+     "band_pct": [
+      -9.01,
+      -4.52,
+      0,
+      5.25,
+      13.03
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 9.34,
+     "band_pct": [
+      -12.95,
+      -6.72,
+      0,
+      8.29,
+      19.71
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "JPFA",
+   "close": 2440,
+   "signal": "WAIT",
+   "score": 48,
+   "confidence": 57,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Sideways",
+    "overall": "Bullish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 2360,
+   "entry_high": 2420,
+   "entry_ideal": 2390,
+   "stop": 2340,
+   "target": 2520,
+   "risk_reward": 2.6,
+   "turnover_bn": 76.23,
+   "atr_pct": 4.46,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 388,
+    "wins": 218,
+    "losses": 170,
+    "timeouts": 0,
+    "win_rate": 56.19,
+    "avg_pnl_pct": -0.39
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 4.99,
+     "band_pct": [
+      -6.76,
+      -3.28,
+      0,
+      3.61,
+      8.89
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 7.06,
+     "band_pct": [
+      -9.63,
+      -4.83,
+      0,
+      5.61,
+      13.93
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 9.98,
+     "band_pct": [
+      -13.84,
+      -7.19,
+      0,
+      8.87,
+      21.07
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ANTM",
+   "close": 2910,
+   "signal": "WAIT",
+   "score": 47,
+   "confidence": 77,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Normal",
+   "entry_low": 2850,
+   "entry_high": 2890,
+   "entry_ideal": 2870,
+   "stop": 2820,
+   "target": 2960,
+   "risk_reward": 1.8,
+   "turnover_bn": 336.16,
+   "atr_pct": 3.42,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 367,
+    "wins": 205,
+    "losses": 154,
+    "timeouts": 8,
+    "win_rate": 55.86,
+    "avg_pnl_pct": 0.15
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 3.83,
+     "band_pct": [
+      -5.18,
+      -2.52,
+      0,
+      2.76,
+      6.81
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 5.41,
+     "band_pct": [
+      -7.38,
+      -3.7,
+      0,
+      4.3,
+      10.68
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 7.65,
+     "band_pct": [
+      -10.61,
+      -5.51,
+      0,
+      6.8,
+      16.15
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BELL",
+   "close": 70,
+   "signal": "WAIT",
+   "score": 47,
+   "confidence": 49,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Weak Bullish",
+    "short": "Weak Bullish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 68,
+   "entry_high": 70,
+   "entry_ideal": 69,
+   "stop": 66,
+   "target": 72,
+   "risk_reward": 1,
+   "turnover_bn": 9.59,
+   "atr_pct": 7.71,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 201,
+    "wins": 119,
+    "losses": 75,
+    "timeouts": 7,
+    "win_rate": 59.2,
+    "avg_pnl_pct": -0.27
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 8.62,
+     "band_pct": [
+      -11.67,
+      -5.67,
+      0,
+      6.23,
+      15.36
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 12.2,
+     "band_pct": [
+      -16.64,
+      -8.35,
+      0,
+      9.7,
+      24.07
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 17.25,
+     "band_pct": [
+      -23.92,
+      -12.42,
+      0,
+      15.32,
+      36.41
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "MAPI",
+   "close": 1230,
+   "signal": "WAIT",
+   "score": 46,
+   "confidence": 63,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Weak Bullish",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + HL (mixed)",
+   "volume_state": "Below Average",
+   "entry_low": 1200,
+   "entry_high": 1220,
+   "entry_ideal": 1210,
+   "stop": 1185,
+   "target": 1240,
+   "risk_reward": 1.2,
+   "turnover_bn": 36.48,
+   "atr_pct": 4.05,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 397,
+    "wins": 194,
+    "losses": 200,
+    "timeouts": 3,
+    "win_rate": 48.87,
+    "avg_pnl_pct": -1.16
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 4.53,
+     "band_pct": [
+      -6.13,
+      -2.98,
+      0,
+      3.27,
+      8.06
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 6.4,
+     "band_pct": [
+      -8.73,
+      -4.38,
+      0,
+      5.09,
+      12.64
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 9.06,
+     "band_pct": [
+      -12.56,
+      -6.52,
+      0,
+      8.04,
+      19.11
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "SIMP",
+   "close": 620,
+   "signal": "WAIT",
+   "score": 45,
+   "confidence": 56,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Weak Bullish",
+    "short": "Sideways",
+    "overall": "Weak Bullish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 610,
+   "entry_high": 620,
+   "entry_ideal": 615,
+   "stop": 605,
+   "target": 630,
+   "risk_reward": 1.5,
+   "turnover_bn": 6.33,
+   "atr_pct": 2.53,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 328,
+    "wins": 214,
+    "losses": 105,
+    "timeouts": 9,
+    "win_rate": 65.24,
+    "avg_pnl_pct": 0.5
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 2.83,
+     "band_pct": [
+      -3.83,
+      -1.86,
+      0,
+      2.04,
+      5.04
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 4,
+     "band_pct": [
+      -5.45,
+      -2.74,
+      0,
+      3.18,
+      7.89
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 5.66,
+     "band_pct": [
+      -7.84,
+      -4.07,
+      0,
+      5.02,
+      11.94
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BRPT",
+   "close": 3580,
+   "signal": "WAIT",
+   "score": 42,
+   "confidence": 64,
+   "trend": {
+    "long": "Bullish",
+    "medium": "Bullish",
+    "short": "Weak Bearish",
+    "overall": "Bullish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Normal",
+   "entry_low": 3470,
+   "entry_high": 3550,
+   "entry_ideal": 3510,
+   "stop": 3420,
+   "target": 3680,
+   "risk_reward": 1.89,
+   "turnover_bn": 444.29,
+   "atr_pct": 4.78,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 327,
+    "wins": 169,
+    "losses": 158,
+    "timeouts": 0,
+    "win_rate": 51.68,
+    "avg_pnl_pct": -1.09
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 5.35,
+     "band_pct": [
+      -7.24,
+      -3.52,
+      0,
+      3.87,
+      9.53
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 7.56,
+     "band_pct": [
+      -10.32,
+      -5.18,
+      0,
+      6.01,
+      14.93
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 10.7,
+     "band_pct": [
+      -14.84,
+      -7.7,
+      0,
+      9.5,
+      22.58
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "AALI",
+   "close": 7575,
+   "signal": "WAIT",
+   "score": 42,
+   "confidence": 60,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Weak Bullish",
+    "short": "Bearish",
+    "overall": "Sideways"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 7475,
+   "entry_high": 7550,
+   "entry_ideal": 7500,
+   "stop": 7375,
+   "target": 7725,
+   "risk_reward": 1.8,
+   "turnover_bn": 7.86,
+   "atr_pct": 1.96,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 290,
+    "wins": 180,
+    "losses": 107,
+    "timeouts": 3,
+    "win_rate": 62.07,
+    "avg_pnl_pct": 0.46
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 2.19,
+     "band_pct": [
+      -2.96,
+      -1.44,
+      0,
+      1.58,
+      3.89
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 3.09,
+     "band_pct": [
+      -4.22,
+      -2.12,
+      0,
+      2.46,
+      6.1
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 4.37,
+     "band_pct": [
+      -6.06,
+      -3.15,
+      0,
+      3.88,
+      9.23
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "SIDO",
+   "close": 545,
+   "signal": "WAIT",
+   "score": 41,
+   "confidence": 59,
+   "trend": {
+    "long": "Sideways",
+    "medium": "Weak Bullish",
+    "short": "Sideways",
+    "overall": "Sideways"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 535,
+   "entry_high": 540,
+   "entry_ideal": 540,
+   "stop": 530,
+   "target": 550,
+   "risk_reward": 1,
+   "turnover_bn": 10.5,
+   "atr_pct": 2.05,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 250,
+    "wins": 141,
+    "losses": 108,
+    "timeouts": 1,
+    "win_rate": 56.4,
+    "avg_pnl_pct": -0.09
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 2.3,
+     "band_pct": [
+      -3.11,
+      -1.51,
+      0,
+      1.66,
+      4.09
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 3.25,
+     "band_pct": [
+      -4.43,
+      -2.22,
+      0,
+      2.58,
+      6.41
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 4.59,
+     "band_pct": [
+      -6.37,
+      -3.3,
+      0,
+      4.08,
+      9.69
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "TPIA",
+   "close": 7400,
+   "signal": "WAIT",
+   "score": 41,
+   "confidence": 53,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Weak Bearish",
+    "short": "Sideways",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Above Average",
+   "entry_low": 7225,
+   "entry_high": 7350,
+   "entry_ideal": 7275,
+   "stop": 7150,
+   "target": 7525,
+   "risk_reward": 2,
+   "turnover_bn": 87.56,
+   "atr_pct": 3.15,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 445,
+    "wins": 300,
+    "losses": 131,
+    "timeouts": 14,
+    "win_rate": 67.42,
+    "avg_pnl_pct": 0.74
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 3.52,
+     "band_pct": [
+      -4.76,
+      -2.31,
+      0,
+      2.54,
+      6.26
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 4.97,
+     "band_pct": [
+      -6.78,
+      -3.4,
+      0,
+      3.95,
+      9.81
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 7.03,
+     "band_pct": [
+      -9.75,
+      -5.06,
+      0,
+      6.25,
+      14.84
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "KLBF",
+   "close": 1200,
+   "signal": "WAIT",
+   "score": 40,
+   "confidence": 63,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Sideways",
+    "short": "Sideways",
+    "overall": "Weak Bearish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 1165,
+   "entry_high": 1195,
+   "entry_ideal": 1180,
+   "stop": 1155,
+   "target": 1230,
+   "risk_reward": 2,
+   "turnover_bn": 244.43,
+   "atr_pct": 4.2,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 313,
+    "wins": 150,
+    "losses": 149,
+    "timeouts": 14,
+    "win_rate": 47.92,
+    "avg_pnl_pct": -0.43
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 4.7,
+     "band_pct": [
+      -6.36,
+      -3.09,
+      0,
+      3.39,
+      8.36
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 6.64,
+     "band_pct": [
+      -9.06,
+      -4.55,
+      0,
+      5.28,
+      13.11
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 9.39,
+     "band_pct": [
+      -13.03,
+      -6.76,
+      0,
+      8.34,
+      19.83
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BBRI",
+   "close": 3680,
+   "signal": "WAIT",
+   "score": 40,
+   "confidence": 61,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Sideways",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "HH + LL (mixed)",
+   "volume_state": "Above Average",
+   "entry_low": 3620,
+   "entry_high": 3660,
+   "entry_ideal": 3640,
+   "stop": 3600,
+   "target": 3710,
+   "risk_reward": 1.75,
+   "turnover_bn": 726.65,
+   "atr_pct": 2.21,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 40,
+    "score_hi": 49,
+    "horizon": 20,
+    "samples": 12013,
+    "win_rate": 62.47,
+    "avg_pnl_pct": -0.09,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 351,
+    "wins": 186,
+    "losses": 156,
+    "timeouts": 9,
+    "win_rate": 52.99,
+    "avg_pnl_pct": -0.47
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 13834,
+     "reliable": true,
+     "bullish": 19.48,
+     "sideways": 64.04,
+     "bearish": 16.48,
+     "threshold_pct": 2.47,
+     "band_pct": [
+      -3.34,
+      -1.62,
+      0,
+      1.78,
+      4.39
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 13742,
+     "reliable": true,
+     "bullish": 21.33,
+     "sideways": 61.98,
+     "bearish": 16.69,
+     "threshold_pct": 3.49,
+     "band_pct": [
+      -4.76,
+      -2.39,
+      0,
+      2.77,
+      6.88
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 13565,
+     "reliable": true,
+     "bullish": 22.9,
+     "sideways": 59.81,
+     "bearish": 17.29,
+     "threshold_pct": 4.93,
+     "band_pct": [
+      -6.84,
+      -3.55,
+      0,
+      4.38,
+      10.41
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BBNI",
+   "close": 4260,
+   "signal": "SELL",
+   "score": 38,
+   "confidence": 64,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Weak Bullish",
+    "short": "Sideways",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Normal",
+   "entry_low": 4230,
+   "entry_high": 4270,
+   "entry_ideal": 4250,
+   "stop": 4200,
+   "target": 4410,
+   "risk_reward": 3.2,
+   "turnover_bn": 183.09,
+   "atr_pct": 2.24,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 396,
+    "wins": 226,
+    "losses": 159,
+    "timeouts": 11,
+    "win_rate": 57.07,
+    "avg_pnl_pct": -0.1
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 2.51,
+     "band_pct": [
+      -3.4,
+      -1.59,
+      0,
+      1.43,
+      3.79
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 3.55,
+     "band_pct": [
+      -4.89,
+      -2.39,
+      0,
+      2.17,
+      5.85
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 5.01,
+     "band_pct": [
+      -7.19,
+      -3.53,
+      0,
+      3.45,
+      9.83
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "PTBA",
+   "close": 2310,
+   "signal": "SELL",
+   "score": 38,
+   "confidence": 59,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Sideways",
+    "overall": "Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 2280,
+   "entry_high": 2300,
+   "entry_ideal": 2290,
+   "stop": 2210,
+   "target": 2320,
+   "risk_reward": 0.38,
+   "turnover_bn": 17.29,
+   "atr_pct": 1.53,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 347,
+    "wins": 164,
+    "losses": 156,
+    "timeouts": 27,
+    "win_rate": 47.26,
+    "avg_pnl_pct": -1.07
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 1.71,
+     "band_pct": [
+      -2.32,
+      -1.08,
+      0,
+      0.97,
+      2.58
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 2.41,
+     "band_pct": [
+      -3.33,
+      -1.62,
+      0,
+      1.48,
+      3.98
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 3.41,
+     "band_pct": [
+      -4.89,
+      -2.4,
+      0,
+      2.35,
+      6.7
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ADRO",
+   "close": 1810,
+   "signal": "SELL",
+   "score": 37,
+   "confidence": 67,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Weak Bullish",
+    "short": "Sideways",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 1775,
+   "entry_high": 1805,
+   "entry_ideal": 1790,
+   "stop": 1765,
+   "target": 1835,
+   "risk_reward": 1.8,
+   "turnover_bn": 179.5,
+   "atr_pct": 2.89,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 400,
+    "wins": 207,
+    "losses": 175,
+    "timeouts": 18,
+    "win_rate": 51.75,
+    "avg_pnl_pct": -0.3
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 3.24,
+     "band_pct": [
+      -4.39,
+      -2.05,
+      0,
+      1.84,
+      4.89
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 4.58,
+     "band_pct": [
+      -6.31,
+      -3.08,
+      0,
+      2.8,
+      7.55
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 6.47,
+     "band_pct": [
+      -9.27,
+      -4.55,
+      0,
+      4.45,
+      12.69
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BSDE",
+   "close": 940,
+   "signal": "SELL",
+   "score": 35,
+   "confidence": 69,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Normal",
+   "entry_low": 925,
+   "entry_high": 935,
+   "entry_ideal": 930,
+   "stop": 920,
+   "target": 950,
+   "risk_reward": 2,
+   "turnover_bn": 11.17,
+   "atr_pct": 2.6,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 298,
+    "wins": 143,
+    "losses": 147,
+    "timeouts": 8,
+    "win_rate": 47.99,
+    "avg_pnl_pct": -0.93
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 2.91,
+     "band_pct": [
+      -3.94,
+      -1.84,
+      0,
+      1.66,
+      4.39
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 4.11,
+     "band_pct": [
+      -5.67,
+      -2.76,
+      0,
+      2.52,
+      6.78
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 5.81,
+     "band_pct": [
+      -8.33,
+      -4.09,
+      0,
+      4,
+      11.4
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BBTN",
+   "close": 1195,
+   "signal": "SELL",
+   "score": 35,
+   "confidence": 67,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Sideways",
+    "overall": "Sideways"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 1180,
+   "entry_high": 1190,
+   "entry_ideal": 1185,
+   "stop": 1170,
+   "target": 1210,
+   "risk_reward": 1.67,
+   "turnover_bn": 27.45,
+   "atr_pct": 2.26,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 287,
+    "wins": 139,
+    "losses": 144,
+    "timeouts": 4,
+    "win_rate": 48.43,
+    "avg_pnl_pct": -0.89
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 2.52,
+     "band_pct": [
+      -3.42,
+      -1.6,
+      0,
+      1.44,
+      3.82
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 3.57,
+     "band_pct": [
+      -4.93,
+      -2.4,
+      0,
+      2.19,
+      5.89
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 5.05,
+     "band_pct": [
+      -7.24,
+      -3.55,
+      0,
+      3.47,
+      9.9
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "MBMA",
+   "close": 545,
+   "signal": "SELL",
+   "score": 35,
+   "confidence": 63,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Weak Bullish",
+    "short": "Bearish",
+    "overall": "Sideways"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 530,
+   "entry_high": 550,
+   "entry_ideal": 540,
+   "stop": 520,
+   "target": 560,
+   "risk_reward": 1,
+   "turnover_bn": 145.4,
+   "atr_pct": 6.44,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 108,
+    "wins": 49,
+    "losses": 59,
+    "timeouts": 0,
+    "win_rate": 45.37,
+    "avg_pnl_pct": -1.71
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 7.2,
+     "band_pct": [
+      -9.77,
+      -4.57,
+      0,
+      4.1,
+      10.89
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 10.19,
+     "band_pct": [
+      -14.06,
+      -6.85,
+      0,
+      6.23,
+      16.81
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 14.41,
+     "band_pct": [
+      -20.65,
+      -10.13,
+      0,
+      9.91,
+      28.25
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ESSA",
+   "close": 620,
+   "signal": "SELL",
+   "score": 35,
+   "confidence": 62,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Sideways",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 605,
+   "entry_high": 615,
+   "entry_ideal": 610,
+   "stop": 595,
+   "target": 635,
+   "risk_reward": 1.67,
+   "turnover_bn": 28.75,
+   "atr_pct": 4.41,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 388,
+    "wins": 245,
+    "losses": 138,
+    "timeouts": 5,
+    "win_rate": 63.14,
+    "avg_pnl_pct": 0.79
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 4.93,
+     "band_pct": [
+      -6.68,
+      -3.13,
+      0,
+      2.81,
+      7.45
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 6.97,
+     "band_pct": [
+      -9.62,
+      -4.69,
+      0,
+      4.27,
+      11.5
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 9.86,
+     "band_pct": [
+      -14.13,
+      -6.93,
+      0,
+      6.78,
+      19.33
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "CTRA",
+   "close": 870,
+   "signal": "SELL",
+   "score": 34,
+   "confidence": 61,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Weak Bearish",
+    "overall": "Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 855,
+   "entry_high": 865,
+   "entry_ideal": 860,
+   "stop": 840,
+   "target": 885,
+   "risk_reward": 1.25,
+   "turnover_bn": 17.08,
+   "atr_pct": 2.3,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 319,
+    "wins": 166,
+    "losses": 148,
+    "timeouts": 5,
+    "win_rate": 52.04,
+    "avg_pnl_pct": -0.65
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 2.57,
+     "band_pct": [
+      -3.49,
+      -1.63,
+      0,
+      1.47,
+      3.89
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 3.64,
+     "band_pct": [
+      -5.02,
+      -2.45,
+      0,
+      2.23,
+      6.01
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 5.15,
+     "band_pct": [
+      -7.38,
+      -3.62,
+      0,
+      3.54,
+      10.1
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "AMMN",
+   "close": 6600,
+   "signal": "SELL",
+   "score": 34,
+   "confidence": 61,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Above Average",
+   "entry_low": 6375,
+   "entry_high": 6525,
+   "entry_ideal": 6450,
+   "stop": 6025,
+   "target": 6800,
+   "risk_reward": 0.82,
+   "turnover_bn": 187.31,
+   "atr_pct": 4.39,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 184,
+    "wins": 96,
+    "losses": 81,
+    "timeouts": 7,
+    "win_rate": 52.17,
+    "avg_pnl_pct": -0.95
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 4.91,
+     "band_pct": [
+      -6.65,
+      -3.11,
+      0,
+      2.79,
+      7.42
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 6.94,
+     "band_pct": [
+      -9.57,
+      -4.67,
+      0,
+      4.25,
+      11.45
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 9.81,
+     "band_pct": [
+      -14.06,
+      -6.9,
+      0,
+      6.75,
+      19.24
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "AADI",
+   "close": 7500,
+   "signal": "SELL",
+   "score": 34,
+   "confidence": 59,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Weak Bullish",
+    "short": "Bearish",
+    "overall": "Sideways"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 7375,
+   "entry_high": 7525,
+   "entry_ideal": 7450,
+   "stop": 7325,
+   "target": 7600,
+   "risk_reward": 1.2,
+   "turnover_bn": 100.17,
+   "atr_pct": 3.43,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 41,
+    "wins": 22,
+    "losses": 19,
+    "timeouts": 0,
+    "win_rate": 53.66,
+    "avg_pnl_pct": -0.81
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 3.84,
+     "band_pct": [
+      -5.2,
+      -2.43,
+      0,
+      2.19,
+      5.8
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 5.43,
+     "band_pct": [
+      -7.49,
+      -3.65,
+      0,
+      3.32,
+      8.96
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 7.67,
+     "band_pct": [
+      -11,
+      -5.4,
+      0,
+      5.28,
+      15.05
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "NCKL",
+   "close": 1045,
+   "signal": "SELL",
+   "score": 33,
+   "confidence": 71,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Weak Bearish",
+    "overall": "Sideways"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 1020,
+   "entry_high": 1040,
+   "entry_ideal": 1030,
+   "stop": 1005,
+   "target": 1060,
+   "risk_reward": 1.2,
+   "turnover_bn": 71.73,
+   "atr_pct": 4.64,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 126,
+    "wins": 69,
+    "losses": 57,
+    "timeouts": 0,
+    "win_rate": 54.76,
+    "avg_pnl_pct": -0.45
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 5.19,
+     "band_pct": [
+      -7.03,
+      -3.29,
+      0,
+      2.95,
+      7.84
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 7.34,
+     "band_pct": [
+      -10.12,
+      -4.94,
+      0,
+      4.49,
+      12.11
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 10.37,
+     "band_pct": [
+      -14.87,
+      -7.3,
+      0,
+      7.14,
+      20.34
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "INDY",
+   "close": 1750,
+   "signal": "SELL",
+   "score": 33,
+   "confidence": 65,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Weak Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Normal",
+   "entry_low": 1715,
+   "entry_high": 1755,
+   "entry_ideal": 1735,
+   "stop": 1690,
+   "target": 1800,
+   "risk_reward": 1.44,
+   "turnover_bn": 36.46,
+   "atr_pct": 5.1,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 335,
+    "wins": 204,
+    "losses": 122,
+    "timeouts": 9,
+    "win_rate": 60.9,
+    "avg_pnl_pct": 0.21
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 5.7,
+     "band_pct": [
+      -7.73,
+      -3.61,
+      0,
+      3.25,
+      8.62
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 8.06,
+     "band_pct": [
+      -11.12,
+      -5.42,
+      0,
+      4.93,
+      13.3
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 11.4,
+     "band_pct": [
+      -16.33,
+      -8.01,
+      0,
+      7.84,
+      22.35
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "HRUM",
+   "close": 1005,
+   "signal": "SELL",
+   "score": 33,
+   "confidence": 63,
+   "trend": {
+    "long": "Weak Bullish",
+    "medium": "Bearish",
+    "short": "Weak Bearish",
+    "overall": "Sideways"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 980,
+   "entry_high": 995,
+   "entry_ideal": 985,
+   "stop": 955,
+   "target": 1015,
+   "risk_reward": 1,
+   "turnover_bn": 18.98,
+   "atr_pct": 3.62,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 377,
+    "wins": 218,
+    "losses": 147,
+    "timeouts": 12,
+    "win_rate": 57.82,
+    "avg_pnl_pct": 0.66
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 4.05,
+     "band_pct": [
+      -5.49,
+      -2.57,
+      0,
+      2.31,
+      6.13
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 5.73,
+     "band_pct": [
+      -7.91,
+      -3.85,
+      0,
+      3.51,
+      9.46
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 8.1,
+     "band_pct": [
+      -11.61,
+      -5.7,
+      0,
+      5.57,
+      15.89
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "FORE",
+   "close": 510,
+   "signal": "SELL",
+   "score": 33,
+   "confidence": 60,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 500,
+   "entry_high": 510,
+   "entry_ideal": 505,
+   "stop": 498,
+   "target": 520,
+   "risk_reward": 2.14,
+   "turnover_bn": 2.05,
+   "atr_pct": 2.5,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 6,
+    "wins": 4,
+    "losses": 2,
+    "timeouts": 0,
+    "win_rate": 66.67,
+    "avg_pnl_pct": -1.62
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 2.8,
+     "band_pct": [
+      -3.79,
+      -1.77,
+      0,
+      1.59,
+      4.23
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 3.95,
+     "band_pct": [
+      -5.46,
+      -2.66,
+      0,
+      2.42,
+      6.52
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 5.59,
+     "band_pct": [
+      -8.01,
+      -3.93,
+      0,
+      3.85,
+      10.96
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "BRIS",
+   "close": 2340,
+   "signal": "SELL",
+   "score": 31,
+   "confidence": 49,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Below Average",
+   "entry_low": 2330,
+   "entry_high": 2350,
+   "entry_ideal": 2340,
+   "stop": 2310,
+   "target": 2440,
+   "risk_reward": 3.33,
+   "turnover_bn": 36.33,
+   "atr_pct": 2.29,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 30,
+    "score_hi": 39,
+    "horizon": 20,
+    "samples": 9761,
+    "win_rate": 58.92,
+    "avg_pnl_pct": -0.15,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 412,
+    "wins": 259,
+    "losses": 124,
+    "timeouts": 29,
+    "win_rate": 62.86,
+    "avg_pnl_pct": 0.37
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 10946,
+     "reliable": true,
+     "bullish": 16.51,
+     "sideways": 67.91,
+     "bearish": 15.58,
+     "threshold_pct": 2.56,
+     "band_pct": [
+      -3.47,
+      -1.62,
+      0,
+      1.46,
+      3.87
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 10871,
+     "reliable": true,
+     "bullish": 17.41,
+     "sideways": 66.1,
+     "bearish": 16.49,
+     "threshold_pct": 3.62,
+     "band_pct": [
+      -4.99,
+      -2.43,
+      0,
+      2.21,
+      5.97
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 10729,
+     "reliable": true,
+     "bullish": 19.57,
+     "sideways": 63.32,
+     "bearish": 17.11,
+     "threshold_pct": 5.12,
+     "band_pct": [
+      -7.33,
+      -3.6,
+      0,
+      3.52,
+      10.03
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "AMRT",
+   "close": 1800,
+   "signal": "SELL",
+   "score": 28,
+   "confidence": 63,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Normal",
+   "entry_low": 1765,
+   "entry_high": 1795,
+   "entry_ideal": 1780,
+   "stop": 1755,
+   "target": 1835,
+   "risk_reward": 2.2,
+   "turnover_bn": 86.29,
+   "atr_pct": 3.01,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 20,
+    "score_hi": 29,
+    "horizon": 20,
+    "samples": 3563,
+    "win_rate": 58.24,
+    "avg_pnl_pct": -0.19,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 428,
+    "wins": 233,
+    "losses": 186,
+    "timeouts": 9,
+    "win_rate": 54.44,
+    "avg_pnl_pct": -0.1
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 4078,
+     "reliable": true,
+     "bullish": 16.9,
+     "sideways": 65.15,
+     "bearish": 17.95,
+     "threshold_pct": 3.36,
+     "band_pct": [
+      -5.09,
+      -2.36,
+      0,
+      1.91,
+      5.23
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 4058,
+     "reliable": true,
+     "bullish": 19.25,
+     "sideways": 62.39,
+     "bearish": 18.36,
+     "threshold_pct": 4.76,
+     "band_pct": [
+      -7.3,
+      -3.41,
+      0,
+      3.19,
+      8.54
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 4026,
+     "reliable": true,
+     "bullish": 20,
+     "sideways": 60.33,
+     "bearish": 19.67,
+     "threshold_pct": 6.73,
+     "band_pct": [
+      -10.49,
+      -5.32,
+      0,
+      5,
+      12.26
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ITMG",
+   "close": 22050,
+   "signal": "SELL",
+   "score": 28,
+   "confidence": 59,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Normal",
+   "entry_low": 21875,
+   "entry_high": 22000,
+   "entry_ideal": 21925,
+   "stop": 21775,
+   "target": 22550,
+   "risk_reward": 4.17,
+   "turnover_bn": 35.97,
+   "atr_pct": 1.03,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 20,
+    "score_hi": 29,
+    "horizon": 20,
+    "samples": 3563,
+    "win_rate": 58.24,
+    "avg_pnl_pct": -0.19,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 415,
+    "wins": 240,
+    "losses": 141,
+    "timeouts": 34,
+    "win_rate": 57.83,
+    "avg_pnl_pct": -0.06
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 4078,
+     "reliable": true,
+     "bullish": 16.9,
+     "sideways": 65.15,
+     "bearish": 17.95,
+     "threshold_pct": 1.15,
+     "band_pct": [
+      -1.74,
+      -0.81,
+      0,
+      0.65,
+      1.79
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 4058,
+     "reliable": true,
+     "bullish": 19.25,
+     "sideways": 62.39,
+     "bearish": 18.36,
+     "threshold_pct": 1.62,
+     "band_pct": [
+      -2.49,
+      -1.16,
+      0,
+      1.09,
+      2.92
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 4026,
+     "reliable": true,
+     "bullish": 20,
+     "sideways": 60.33,
+     "bearish": 19.67,
+     "threshold_pct": 2.3,
+     "band_pct": [
+      -3.58,
+      -1.82,
+      0,
+      1.71,
+      4.19
+     ]
+    }
+   ]
+  },
+  {
+   "symbol": "ACES",
+   "close": 418,
+   "signal": "SELL",
+   "score": 27,
+   "confidence": 64,
+   "trend": {
+    "long": "Bearish",
+    "medium": "Bearish",
+    "short": "Bearish",
+    "overall": "Bearish"
+   },
+   "structure": "LH + LL",
+   "volume_state": "Normal",
+   "entry_low": 412,
+   "entry_high": 416,
+   "entry_ideal": 414,
+   "stop": 408,
+   "target": 420,
+   "risk_reward": 1,
+   "turnover_bn": 19.81,
+   "atr_pct": 2.21,
+   "candidate": false,
+   "calibration": {
+    "regime": "up",
+    "score_lo": 20,
+    "score_hi": 29,
+    "horizon": 20,
+    "samples": 3563,
+    "win_rate": 58.24,
+    "avg_pnl_pct": -0.19,
+    "reliable": true
+   },
+   "stock_record": {
+    "samples": 257,
+    "wins": 133,
+    "losses": 124,
+    "timeouts": 0,
+    "win_rate": 51.75,
+    "avg_pnl_pct": -0.77
+   },
+   "projection": [
+    {
+     "horizon": 5,
+     "regime": "up",
+     "samples": 4078,
+     "reliable": true,
+     "bullish": 16.9,
+     "sideways": 65.15,
+     "bearish": 17.95,
+     "threshold_pct": 2.47,
+     "band_pct": [
+      -3.73,
+      -1.73,
+      0,
+      1.4,
+      3.84
+     ]
+    },
+    {
+     "horizon": 10,
+     "regime": "up",
+     "samples": 4058,
+     "reliable": true,
+     "bullish": 19.25,
+     "sideways": 62.39,
+     "bearish": 18.36,
+     "threshold_pct": 3.49,
+     "band_pct": [
+      -5.35,
+      -2.5,
+      0,
+      2.34,
+      6.26
+     ]
+    },
+    {
+     "horizon": 20,
+     "regime": "up",
+     "samples": 4026,
+     "reliable": true,
+     "bullish": 20,
+     "sideways": 60.33,
+     "bearish": 19.67,
+     "threshold_pct": 4.93,
+     "band_pct": [
+      -7.69,
+      -3.9,
+      0,
+      3.67,
+      8.99
+     ]
+    }
+   ]
+  }
+ ],
+ "excluded": [
+  "BACH",
+  "WBSA"
+ ],
+ "criteria": [
+  "K1: rata-rata return 20 hari bursa kelompok BUY \u003e kelompok SELL/STRONG_SELL (kalau kandidat BUY \u003c 3, pakai 10 skor tertinggi vs 10 skor terendah)",
+  "K2: rata-rata return 20 hari kelompok BUY \u003e IHSG 20 hari",
+  "K3: korelasi peringkat Spearman skor vs return 20 hari \u003e 0 (semua saham turnover \u003e= 2 M)",
+  "K4: rencana trading kandidat BUY (entry open hari berikutnya, TP1 vs stop, 20 hari): rata-rata P\u0026L \u003e 0",
+  "K5: 70-90% saham realisasi 20 hari berada dalam band p10-p90 proyeksi (ideal 80%)"
+ ]
+}

@@ -637,6 +637,24 @@ func (h *AnalysisHandler) Pivots(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// KeyLevels returns auto-detected support/resistance lines & zones
+// (trigger, konsolidasi, gap, low terbaru, basis, low 52 minggu) for the chart.
+func (h *AnalysisHandler) KeyLevels(w http.ResponseWriter, r *http.Request) {
+	symbol := canonicalSymbol(mux.Vars(r)["symbol"])
+	prices, ok := loadPrices(w, symbol)
+	if !ok {
+		return
+	}
+	res := analysis.KeyLevels(prices)
+	respond(w, 200, true, "", map[string]interface{}{
+		"symbol": symbol,
+		"date":   res.Date,
+		"close":  res.Close,
+		"atr":    res.ATR,
+		"levels": res.Levels,
+	})
+}
+
 // ── GET /api/overview ─────────────────────────────────────────────────────────
 
 type overviewItem struct {

@@ -1,7 +1,7 @@
 {
   "symbol": "BNBR",
   "exchange": "JKT",
-  "last_updated": "2026-10-22",
+  "last_updated": "2026-11-02",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13110,10 +13110,66 @@
     {
       "date": "2026-10-22",
       "open": 48,
-      "high": 51,
+      "high": 56,
       "low": 47,
+      "close": 53,
+      "volume": 590298400
+    },
+    {
+      "date": "2026-10-23",
+      "open": 53,
+      "high": 57,
+      "low": 52,
+      "close": 56,
+      "volume": 519115200
+    },
+    {
+      "date": "2026-10-26",
+      "open": 56,
+      "high": 57,
+      "low": 53,
+      "close": 53,
+      "volume": 561313700
+    },
+    {
+      "date": "2026-10-27",
+      "open": 52,
+      "high": 53,
+      "low": 50,
       "close": 50,
-      "volume": 108702400
+      "volume": 218937600
+    },
+    {
+      "date": "2026-10-28",
+      "open": 48,
+      "high": 49,
+      "low": 47,
+      "close": 47,
+      "volume": 472174800
+    },
+    {
+      "date": "2026-10-29",
+      "open": 47,
+      "high": 48,
+      "low": 44,
+      "close": 44,
+      "volume": 277325500
+    },
+    {
+      "date": "2026-10-30",
+      "open": 41,
+      "high": 42,
+      "low": 41,
+      "close": 41,
+      "volume": 228841400
+    },
+    {
+      "date": "2026-11-02",
+      "open": 39,
+      "high": 46,
+      "low": 39,
+      "close": 44,
+      "volume": 970564100
     }
   ]
 }

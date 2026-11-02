@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
-import { fmt, colorOf, calibShort, REGIME_LABEL } from '../utils'
+import { fmt, colorOf, calibShort, REGIME_LABEL, signalLabel } from '../utils'
 import { valuationTitle } from './ValuationCard'
 import { IconSharia } from './icons'
 import OmbakMeter from './OmbakMeter'
@@ -81,7 +81,7 @@ function TickerCard({ r, onSelect }) {
         )}
         <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded border
           ${buyish ? 'text-tv-green border-tv-green/30 bg-tv-green/10' : 'text-tv-red border-tv-red/30 bg-tv-red/10'}`}>
-          {r.signal?.replace(/_/g, ' ')}
+          {signalLabel(r.signal)}
         </span>
         <ScoreChip score={r.score} />
       </div>
@@ -103,7 +103,7 @@ function TickerCard({ r, onSelect }) {
           {buyish && calibShort(c) && (
             <div className={`text-[10px] mt-0.5 ${c.avg_pnl_pct > 0 ? 'text-tv-green' : 'text-tv-red'}`}
               title={`Skor ${c.score_lo}–${c.score_hi} saat ${REGIME_LABEL[c.regime] ?? 'semua kondisi IHSG'}: rencana kena TP1 sebelum stop dalam ${c.horizon} hari bursa.`}>
-              {c.avg_pnl_pct > 0 ? '' : '⚠️ '}{calibShort(c)} · rata-rata {fmt.pct(c.avg_pnl_pct)}/trade
+              {c.avg_pnl_pct > 0 ? '' : '⚠️ '}{calibShort(c)}
             </div>
           )}
         </div>
@@ -204,7 +204,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">Hari Ini</h1>
           <p className="text-xs text-tv-muted mt-1">
-            Peringkat Decision Engine untuk semua saham yang kamu lacak. Kolom beli hanya setup dengan R/R ≥ {MIN_RR} dan transaksi ≥ {MIN_TURNOVER_BN} M/hari.
+            Peringkat Decision Engine untuk semua saham yang kamu lacak. Kolom tren naik hanya setup dengan R/R ≥ {MIN_RR} dan transaksi ≥ {MIN_TURNOVER_BN} M/hari.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -288,14 +288,16 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
           <OmbakMeter regime={regime} buy={buy.length} wait={waiting.length} sell={avoid.length} />
           <div className="grid md:grid-cols-2 gap-6">
             <Column
-              title="Layak dibeli"
+              title="Tren naik"
               tone="text-tv-green"
               rows={buy}
               onSelect={onSelect}
-              empty={`Belum ada setup beli yang layak (R/R ≥ ${MIN_RR}, likuid).`}
+              empty={regime === 'down'
+                ? 'IHSG di bawah MA50 — sinyal tren naik ditahan sampai IHSG kembali di atas MA50.'
+                : `Belum ada saham tren naik dengan R/R ≥ ${MIN_RR} dan likuid.`}
             />
             <Column
-              title="Hindari hari ini"
+              title="Tren turun"
               tone="text-tv-red"
               rows={avoid}
               onSelect={onSelect}
@@ -308,8 +310,8 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
               {waiting.map(r => (
                 <button key={r.symbol} onClick={() => onSelect(r.symbol)}
                   title={r.signal === 'BUY' || r.signal === 'STRONG_BUY'
-                    ? `${r.signal.replace('_', ' ')} tapi R/R ${r.risk_reward?.toFixed(1)} · likuiditas ${r.turnover_bn} M/hari`
-                    : r.signal}
+                    ? `${signalLabel(r.signal)} tapi R/R ${r.risk_reward?.toFixed(1)} · likuiditas ${r.turnover_bn} M/hari`
+                    : signalLabel(r.signal)}
                   className="mr-2 hover:text-tv-blue transition-colors">
                   {r.symbol}
                 </button>

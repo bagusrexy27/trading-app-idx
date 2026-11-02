@@ -62,6 +62,34 @@ func TestDecisionEngineInvariants(t *testing.T) {
 
 // The gate is what stops the engine from calling a direction the factors do
 // not agree on — if it ever stops firing, WAIT-on-conflict is silently gone.
+func TestGateRegime(t *testing.T) {
+	plan := Decision{Signal: "STRONG_BUY", Score: 76, EntryZone: EntryZone{Buy: [2]float64{95, 100}, Ideal: 97},
+		StopLoss: 90, TakeProfit: []TPLevel{{Price: 110, Portion: "50%"}}, RiskReward: 2}
+
+	if got := GateRegime(plan, "up"); got.Signal != "STRONG_BUY" || got.Gated || got.StopLoss != 90 {
+		t.Fatalf("up regime must pass through, got %+v", got)
+	}
+	if got := GateRegime(plan, ""); got.Gated {
+		t.Fatalf("unknown regime must not gate, got %+v", got)
+	}
+	got := GateRegime(plan, "down")
+	if got.Signal != "WAIT" || !got.Gated || got.Note != RegimeGateNote || got.Score != 76 {
+		t.Fatalf("down regime must hold the buy and keep the score, got %+v", got)
+	}
+	if got.StopLoss != 0 || got.TakeProfit != nil || got.RiskReward != 0 || got.EntryZone != (EntryZone{}) {
+		t.Fatalf("down regime must withhold the plan, got %+v", got)
+	}
+	if plan.StopLoss != 90 || len(plan.TakeProfit) != 1 {
+		t.Fatal("GateRegime must not mutate its input")
+	}
+
+	sell := plan
+	sell.Signal = "SELL"
+	if got := GateRegime(sell, "down"); got.Signal != "SELL" || got.Note != "" || !got.Gated || got.StopLoss != 0 {
+		t.Fatalf("down regime keeps SELL but withholds its plan, got %+v", got)
+	}
+}
+
 func TestDecisionEngineLowConfidenceGate(t *testing.T) {
 	d := DecisionEngine(synthPrices(120))
 	if d.Confidence < 45 && d.Signal != "WAIT" {

@@ -110,7 +110,7 @@ export default function WeeklyRecap({ items, onSelectStock }) {
         </Stat>
         <Stat label={<Term k="sinyal">Sinyal sekarang</Term>}>
           <div className="text-xl font-bold tabular-nums">
-            <span className="text-tv-green">{nBuy}</span> <span className="text-tv-muted text-sm">BUY ·</span> <span className="text-tv-red">{nSell}</span> <span className="text-tv-muted text-sm">SELL</span>
+            <span className="text-tv-green">{nBuy}</span> <span className="text-tv-muted text-sm">tren naik ·</span> <span className="text-tv-red">{nSell}</span> <span className="text-tv-muted text-sm">tren turun</span>
           </div>
           <div className="text-[11px] text-tv-muted">sisanya {items.length - nBuy - nSell} tunggu</div>
         </Stat>

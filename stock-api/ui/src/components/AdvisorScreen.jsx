@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
-import { fmt, calibShort, REGIME_LABEL } from '../utils'
+import { fmt, calibShort, REGIME_LABEL, signalLabel, GATED_PLAN } from '../utils'
 import { ValuationChip } from './ValuationCard'
 import { tip } from '../glossary'
 import { HorizonToggle, ScenarioBar, pickProj, projEdge } from './Projection'
 
 const SIGNAL = {
-  STRONG_BUY:  { label: 'STRONG BUY',  icon: '🚀', badge: 'bg-tv-green/15 text-tv-green border-tv-green/40', bar: 'bg-tv-green' },
-  BUY:         { label: 'BUY',         icon: '✅', badge: 'bg-tv-green/10 text-tv-green border-tv-green/30', bar: 'bg-tv-green' },
-  WAIT:        { label: 'WAIT',        icon: '⏳', badge: 'bg-tv-yellow/10 text-tv-yellow border-tv-yellow/30', bar: 'bg-tv-yellow' },
-  SELL:        { label: 'SELL',        icon: '⚠️', badge: 'bg-tv-red/10 text-tv-red border-tv-red/30', bar: 'bg-tv-red' },
-  STRONG_SELL: { label: 'STRONG SELL', icon: '🚫', badge: 'bg-tv-red/15 text-tv-red border-tv-red/40', bar: 'bg-tv-red' },
+  STRONG_BUY:  { icon: '🚀', badge: 'bg-tv-green/15 text-tv-green border-tv-green/40', bar: 'bg-tv-green' },
+  BUY:         { icon: '✅', badge: 'bg-tv-green/10 text-tv-green border-tv-green/30', bar: 'bg-tv-green' },
+  WAIT:        { icon: '⏳', badge: 'bg-tv-yellow/10 text-tv-yellow border-tv-yellow/30', bar: 'bg-tv-yellow' },
+  SELL:        { icon: '⚠️', badge: 'bg-tv-red/10 text-tv-red border-tv-red/30', bar: 'bg-tv-red' },
+  STRONG_SELL: { icon: '🚫', badge: 'bg-tv-red/15 text-tv-red border-tv-red/40', bar: 'bg-tv-red' },
 }
 
 function Select({ label, value, onChange, options, strings = false }) {
@@ -48,7 +48,7 @@ function Card({ r, h, onSelect }) {
             <div className="text-[11px] text-tv-muted tabular-nums">{fmt.price(r.close)} · likuid {r.turnover_bn}bn/hr</div>
           </div>
         </div>
-        <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${v.badge}`}>{v.label}</span>
+        <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${v.badge}`}>{signalLabel(r.signal)}</span>
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-3">
@@ -69,13 +69,15 @@ function Card({ r, h, onSelect }) {
         <ValuationChip v={r.valuation} />
       </div>
 
-      {/* mini trade plan */}
+      {/* mini trade plan — withheld while the regime gate is on (note explains held buys) */}
+      {r.gated ? (!r.note && <p className="text-[10px] text-tv-muted mb-3">{GATED_PLAN}</p>) : (
       <div className="grid grid-cols-4 gap-2 text-center mb-3">
         <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('entry')}>Entry</div><div className="text-xs font-bold tabular-nums">{fmt.price(r.entry_low)}–{fmt.price(r.entry_high)}</div></div>
         <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('stop')}>Stop</div><div className="text-xs font-bold tabular-nums text-tv-red">{fmt.price(r.stop)}</div></div>
         <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('target')}>TP1</div><div className="text-xs font-bold tabular-nums text-tv-green">{fmt.price(r.target)}</div></div>
         <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('rr')}>R/R</div><div className={`text-xs font-bold ${r.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-yellow'}`}>1:{r.risk_reward?.toFixed(1)}</div></div>
       </div>
+      )}
 
       {p && (
         <div className="mb-3" title={`Dari ${p.samples} kasus serupa, ${h} hari bursa kemudian. Ambang ±${p.threshold_pct.toFixed(1)}% sesuai gerak wajar saham ini. 8 dari 10 kasus: ${fmt.pct(p.band_pct[0])} s/d ${fmt.pct(p.band_pct[4])}.`}>
@@ -161,7 +163,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 mb-5">
         <div className="flex rounded-lg border border-tv-border overflow-hidden">
-          {[['buy', '✅ Setup Beli'], ['all', '📋 Semua']].map(([m, lbl]) => (
+          {[['buy', '✅ Tren naik'], ['all', '📋 Semua']].map(([m, lbl]) => (
             <button key={m} onClick={() => setMode(m)}
               className={`px-3 py-1.5 text-xs font-semibold transition-colors ${mode === m ? 'bg-tv-blue/15 text-tv-blue' : 'text-tv-muted hover:text-tv-text'}`}>
               {lbl}
@@ -206,14 +208,14 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
 
       {data?.regime === 'down' && !loading && (
         <div className="text-xs text-tv-red bg-tv-red/10 border border-tv-red/30 rounded-lg px-3 py-2 mb-3">
-          ⚠️ {REGIME_LABEL.down} (pasar sedang turun). Secara historis, sinyal BUY di kondisi ini rata-rata <b>rugi</b>. Lebih aman tahan dulu atau pakai posisi kecil.
+          ⚠️ {REGIME_LABEL.down} (pasar sedang turun). Sinyal tren naik ditahan dan rencana beli disembunyikan sampai IHSG kembali di atas MA50 — secara historis, beli di kondisi ini rata-rata <b>rugi</b>.
         </div>
       )}
 
       {/* Summary line */}
       {data && !loading && (
         <div className="text-[11px] text-tv-muted mb-4">
-          {data.scanned} saham dipindai · <b className="text-tv-text">{results.length}</b> lolos {mode === 'buy' ? 'setup beli (skor ≥60)' : 'filter'}{results.length !== data.matched ? ` (dari ${data.matched} sebelum filter)` : ''}
+          {data.scanned} saham dipindai · <b className="text-tv-text">{results.length}</b> lolos {mode === 'buy' ? 'tren naik (skor ≥60)' : 'filter'}{results.length !== data.matched ? ` (dari ${data.matched} sebelum filter)` : ''}
         </div>
       )}
 
@@ -232,11 +234,13 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       ) : (
         <div className="text-center py-16 px-6">
           <div className="text-5xl mb-4">🌊</div>
-          <div className="text-tv-text font-semibold mb-1">Belum ada setup beli yang valid</div>
+          <div className="text-tv-text font-semibold mb-1">Belum ada saham tren naik yang lolos</div>
           <p className="text-xs text-tv-muted max-w-md mx-auto leading-relaxed">
-            {mode === 'buy'
-              ? 'Pasar lagi lemah — gak ada saham dengan skor ≥60 (BUY). Ini normal & sehat: sistem nolak entry paksa. Sabar, tahan cash, cek lagi nanti. Atau lihat "📋 Semua" untuk gambaran pasar.'
-              : 'Gak ada data. Coba turunkan filter likuiditas.'}
+            {mode !== 'buy'
+              ? 'Gak ada data. Coba turunkan filter likuiditas.'
+              : data?.regime === 'down'
+                ? 'IHSG di bawah MA50 — semua sinyal tren naik ditahan sampai IHSG kembali di atas MA50. Sabar, tahan cash. Lihat "📋 Semua" untuk gambaran pasar.'
+                : 'Pasar lagi lemah — gak ada saham dengan skor ≥60. Ini normal & sehat: sistem nolak entry paksa. Sabar, tahan cash, cek lagi nanti. Atau lihat "📋 Semua" untuk gambaran pasar.'}
           </p>
         </div>
       )}

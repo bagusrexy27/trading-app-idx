@@ -1,7 +1,7 @@
 {
   "symbol": "MEDS",
   "exchange": "JKT",
-  "last_updated": "2026-10-22",
+  "last_updated": "2026-11-02",
   "prices": [
     {
       "date": "2022-08-10",
@@ -8048,8 +8048,64 @@
       "open": 63,
       "high": 73,
       "low": 61,
+      "close": 67,
+      "volume": 131498500
+    },
+    {
+      "date": "2026-10-23",
+      "open": 67,
+      "high": 68,
+      "low": 66,
+      "close": 67,
+      "volume": 22001200
+    },
+    {
+      "date": "2026-10-26",
+      "open": 67,
+      "high": 70,
+      "low": 66,
       "close": 68,
-      "volume": 90099400
+      "volume": 35334800
+    },
+    {
+      "date": "2026-10-27",
+      "open": 68,
+      "high": 69,
+      "low": 64,
+      "close": 64,
+      "volume": 23496800
+    },
+    {
+      "date": "2026-10-28",
+      "open": 63,
+      "high": 63,
+      "low": 60,
+      "close": 62,
+      "volume": 24154800
+    },
+    {
+      "date": "2026-10-29",
+      "open": 62,
+      "high": 64,
+      "low": 60,
+      "close": 61,
+      "volume": 18628900
+    },
+    {
+      "date": "2026-10-30",
+      "open": 62,
+      "high": 62,
+      "low": 57,
+      "close": 58,
+      "volume": 26427100
+    },
+    {
+      "date": "2026-11-02",
+      "open": 59,
+      "high": 62,
+      "low": 58,
+      "close": 62,
+      "volume": 12757000
     }
   ]
 }

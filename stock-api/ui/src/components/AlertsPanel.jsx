@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api'
 import MoneyInput from './MoneyInput'
+import { signalLabel } from '../utils'
 
 const STORAGE_KEY = 'idx_alerts_v1'
 const ALERT_TYPES = [
@@ -8,8 +9,8 @@ const ALERT_TYPES = [
   { value: 'price_below',    label: 'Harga di bawah' },
   { value: 'rsi_oversold',   label: 'RSI < 30 (Oversold)' },
   { value: 'rsi_overbought', label: 'RSI > 70 (Overbought)' },
-  { value: 'signal_buy',     label: 'Sinyal BUY muncul' },
-  { value: 'signal_sell',    label: 'Sinyal SELL muncul' },
+  { value: 'signal_buy',     label: 'Sinyal tren naik muncul' },
+  { value: 'signal_sell',    label: 'Sinyal tren turun muncul' },
 ]
 
 function loadAlerts() {
@@ -46,10 +47,10 @@ export function useAlertChecker(stocks) {
           msg = `${alert.symbol} RSI overbought: ${s.rsi?.toFixed(1)}`
         } else if (alert.type === 'signal_buy' && (s.signal === 'BUY' || s.signal === 'STRONG_BUY' || s.signal === 'STRONG BUY')) {
           triggered = true
-          msg = `${alert.symbol} sinyal: ${s.signal}`
+          msg = `${alert.symbol} sinyal: ${signalLabel(s.signal)}`
         } else if (alert.type === 'signal_sell' && (s.signal === 'SELL' || s.signal === 'STRONG_SELL' || s.signal === 'STRONG SELL')) {
           triggered = true
-          msg = `${alert.symbol} sinyal: ${s.signal}`
+          msg = `${alert.symbol} sinyal: ${signalLabel(s.signal)}`
         }
 
         if (triggered && Notification.permission === 'granted') {

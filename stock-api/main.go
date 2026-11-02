@@ -294,6 +294,7 @@ func main() {
 	api.HandleFunc("/analysis/{symbol}/fvg", a.FVG).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/avwap", a.AVWAP).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/pivots", a.Pivots).Methods("GET")
+	api.HandleFunc("/analysis/{symbol}/levels", a.KeyLevels).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/amd", a.AMD).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/adline", a.ADLine).Methods("GET")
 	api.HandleFunc("/analysis/{symbol}/cmf", a.CMF).Methods("GET")

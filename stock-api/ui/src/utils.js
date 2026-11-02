@@ -18,8 +18,19 @@ export const colorOf = (n) =>
 export const bgOf = (n) =>
   n > 0 ? 'bg-tv-green/10 text-tv-green' : n < 0 ? 'bg-tv-red/10 text-tv-red' : 'bg-tv-muted/10 text-tv-muted'
 
-// Decision Engine emits STRONG_BUY / STRONG_SELL; older payloads use spaces.
-export const signalLabel = (s) => (s ? s.toUpperCase().replace(/_/g, ' ') : '')
+// Label tampilan sinyal: menggambarkan tren, bukan perintah beli/jual — riset
+// 2020–2026 (stock-api/research/) menunjukkan skor engine hampir tidak bisa
+// memilih saham pemenang. Nilai di API tetap STRONG_BUY…STRONG_SELL (payload
+// lama memakai spasi).
+const SIGNAL_LABEL = { STRONG_BUY: 'Tren naik kuat', BUY: 'Tren naik', WAIT: 'Tunggu', SELL: 'Tren turun', STRONG_SELL: 'Tren turun kuat' }
+export const signalLabel = (s) => {
+  const u = (s || '').toUpperCase().replace(/ /g, '_')
+  return SIGNAL_LABEL[u] ?? u.replace(/_/g, ' ')
+}
+
+// Gate regime (analysis.GateRegime): saat IHSG < MA50 rencana entry/stop/target
+// dikosongkan backend (`gated: true`); UI menampilkan teks ini sebagai gantinya.
+export const GATED_PLAN = 'Rencana beli disembunyikan — IHSG di bawah MA50. Muncul lagi saat IHSG kembali di atas MA50.'
 
 export const signalStyle = (s) => {
   const u = (s || '').toUpperCase().replace(/ /g, '_')
@@ -61,5 +72,6 @@ export const LW_BASE = {
 // decision & screen). Frekuensi nyata dari replay historis, bukan rumus skor.
 export const REGIME_LABEL = { up: 'IHSG di atas MA50', down: 'IHSG di bawah MA50', unknown: 'kondisi IHSG tidak diketahui' }
 
+// Rata-rata hasil di depan: win rate tinggi tetap rugi kalau target lebih dekat dari stop.
 export const calibShort = (c) =>
-  c?.samples ? `Historis ${Math.round(c.win_rate)}% kena TP (n=${c.samples})` : null
+  c?.samples ? `Historis rata-rata ${fmt.pct(c.avg_pnl_pct)}/trade · kena TP ${Math.round(c.win_rate)}% (n=${c.samples.toLocaleString('id-ID')})` : null

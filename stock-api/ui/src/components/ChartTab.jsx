@@ -4,6 +4,7 @@ import { api } from '../api'
 import { fmt } from '../utils'
 import { FVGZonesPrimitive } from './chart/FVGZonesPrimitive'
 import { FibZonesPrimitive } from './chart/FibZonesPrimitive'
+import { KeyLevelsPrimitive, levelColor, levelText } from './chart/KeyLevelsPrimitive'
 import { HorizonToggle, pickProj } from './Projection'
 import { resample, sma, rsi, macd } from './chart/bars'
 
@@ -60,6 +61,8 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   const [fib, setFib] = useState(null)          // FibLevels dari API (lookback 100 bar)
   const [showFvg, setShowFvg] = useState(false)
   const [fvgZones, setFvgZones] = useState(null) // 3 zona FVG/iFVG terdekat dari API
+  const [showLevels, setShowLevels] = useState(false)
+  const [levels, setLevels] = useState(null)     // respons /levels: { date, close, atr, levels[] }
   const [showProj, setShowProj] = useState(false)
   const [proj, setProj] = useState(null)         // Decision dari API (entry/stop/TP) + calibration
   const [projH, setProjH] = useState(20)         // horizon kerucut terukur (hari bursa)
@@ -92,7 +95,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
       .catch(() => { if (alive) setShowFib(false) })
     return () => { alive = false }
   }, [showFib, fib, symbol])
-  useEffect(() => { setFib(null); setShowFib(false); setAvwapAnchor(null); setAvwapOn(false); setFvgZones(null); setShowFvg(false); setProj(null); setShowProj(false) }, [symbol])
+  useEffect(() => { setFib(null); setShowFib(false); setAvwapAnchor(null); setAvwapOn(false); setFvgZones(null); setShowFvg(false); setProj(null); setShowProj(false); setLevels(null); setShowLevels(false) }, [symbol])
 
   // Rencana trade untuk proyeksi — sumbernya Decision Engine, sama dengan tab Saran
   useEffect(() => {
@@ -114,6 +117,19 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     }
     return sum / 14
   }, [prices])
+
+  // Garis S/R otomatis — dihitung backend dari data harian (analysis.KeyLevels).
+  // Diambil ulang saat data harga berubah (update intraday) selama toggle aktif.
+  const lastDate = prices.length ? prices[prices.length - 1].date : ''
+  useEffect(() => {
+    if (!showLevels || !symbol) return
+    if (levels && levels.date === lastDate) return
+    let alive = true
+    api.analysis.levels(symbol)
+      .then(r => { if (alive) setLevels(r) })
+      .catch(e => { if (alive) { setShowLevels(false); showToast?.(e.message, 'error') } })
+    return () => { alive = false }
+  }, [showLevels, levels, symbol, lastDate, showToast])
 
   // Fetch zona FVG saat toggle pertama dinyalakan — zona aktif (FVG + iFVG)
   // dari ±1 tahun terakhir, FVG_MAX terdekat ke harga sekarang
@@ -173,6 +189,8 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
   const fibLinesRef  = useRef([])
   const fvgPrimRef   = useRef(null)
   const fibPrimRef   = useRef(null)
+  const lvlPrimRef   = useRef(null)
+  const lvlLinesRef  = useRef([])
   const planRef      = useRef(null)   // garis rencana: close → entry → TP1 → TP2
   const coneUpRef    = useRef(null)   // kerucut terukur: p90 / p10 (8 dari 10 kasus)
   const coneLoRef    = useRef(null)
@@ -253,6 +271,10 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     candle.attachPrimitive(fibPrim)
     fibPrimRef.current = fibPrim
 
+    const lvlPrim = new KeyLevelsPrimitive()
+    candle.attachPrimitive(lvlPrim)
+    lvlPrimRef.current = lvlPrim
+
     // Proyeksi ke depan. Seri ini memakai tanggal setelah bar terakhir, jadi
     // sumbu waktu ikut memanjang ke kanan dengan sendirinya.
     const plan = chart.addSeries(LineSeries, {
@@ -308,8 +330,11 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
       chart.unsubscribeClick(onClick)
       candle.detachPrimitive(fvgPrim)
       candle.detachPrimitive(fibPrim)
+      candle.detachPrimitive(lvlPrim)
       fvgPrimRef.current = null
       fibPrimRef.current = null
+      lvlPrimRef.current = null
+      lvlLinesRef.current = []
       chart.remove()
       chartRef.current = null
     }
@@ -408,6 +433,26 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     }
   }, [showFib, fib])
 
+  // ── Garis S/R otomatis: price line (label di sumbu) + zona/teks (primitive) ──
+  useEffect(() => {
+    const candle = candleRef.current
+    if (!candle) return
+    lvlLinesRef.current.forEach(l => candle.removePriceLine(l))
+    lvlLinesRef.current = []
+    const list = showLevels && levels ? levels.levels : null
+    if (list) {
+      lvlLinesRef.current = list.map(l => candle.createPriceLine({
+        price: l.price,
+        color: levelColor(l),
+        lineWidth: l.kind === 'trigger' || l.kind === 'low52' ? 2 : 1,
+        lineStyle: l.kind === 'swing' ? LineStyle.Dotted : LineStyle.Solid,
+        axisLabelVisible: true,
+        title: l.name,
+      }))
+    }
+    lvlPrimRef.current?.updateLevels(list)
+  }, [showLevels, levels])
+
   // ── FVG/iFVG zone boxes — custom primitive ───────────────────────────
   useEffect(() => {
     fvgPrimRef.current?.updateZones(showFvg && fvgZones ? fvgZones : [])
@@ -436,7 +481,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
 
     const last  = prices[prices.length - 1]
     const tp    = proj.take_profit ?? []
-    const entry = proj.entry_zone?.ideal ?? last.close
+    const entry = proj.entry_zone?.ideal || last.close // 0 when the regime gate withholds the plan
 
     // Jarak ditempuh dalam satuan "berapa hari gerak rata-rata" = jarak / ATR.
     // Target yang jauh relatif volatilitasnya butuh lebih banyak bar, jadi tiap
@@ -457,7 +502,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     const pts = [{ time: last.date, value: last.close }, { time: at(entryBar), value: entry }]
     if (tp[0] && tp1Bar > entryBar) pts.push({ time: at(tp1Bar), value: tp[0].price })
     if (tp[1] && tp2Bar > tp1Bar)   pts.push({ time: at(tp2Bar), value: tp[1].price })
-    plan.setData(pts)
+    plan.setData(proj.gated ? [] : pts) // gated: no plan path, the measured cone still shows
 
     // Kerucut terukur: persentil hasil kasus historis serupa di hari ke-projH,
     // ditarik mundur ke hari ke-t dengan akar waktu (ketidakpastian menumpuk
@@ -566,6 +611,16 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
           ▦ FVG
         </button>
         <button
+          onClick={() => setShowLevels(v => !v)}
+          title="Garis support/resistance otomatis: trigger, konsolidasi, gap, low terbaru, basis harga, low 52 minggu"
+          className={`px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-md transition-all
+            ${showLevels
+              ? 'bg-tv-red/15 text-tv-red border border-tv-red/40 shadow-[0_0_12px_rgba(239,83,80,0.25)]'
+              : 'text-tv-muted bg-tv-card border border-tv-border hover:text-tv-text'}`}
+        >
+          ☰ S/R Auto
+        </button>
+        <button
           onClick={() => setShowProj(v => !v)}
           disabled={!daily}
           title="Proyeksi: jalur rencana Decision Engine (entry → TP) + kerucut terukur dari kasus historis serupa. Skenario, bukan ramalan harga."
@@ -634,6 +689,8 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
         </div>
       </div>
 
+      {showLevels && levels && <KeyLevelList data={levels} />}
+
       {!compact && <ChartGlossary />}
     </div>
   )
@@ -677,6 +734,11 @@ const GLOSSARY = [
     icon: '▦', color: 'text-tv-yellow', term: 'iFVG (inverted FVG)',
     what: 'Kotak amber — FVG yang sudah ditembus harga (ditutup melewatinya). Kotaknya dimulai dari candle yang menembus, karena sejak saat itulah perannya berbalik.',
     how: 'Setelah ditembus, celah itu berganti peran: yang tadinya menahan dari bawah kini menekan dari atas, dan sebaliknya.',
+  },
+  {
+    icon: '☰', color: 'text-tv-red', term: 'S/R Auto',
+    what: 'Garis support (hijau) dan resistance (merah) yang dihitung otomatis: trigger konfirmasi (oranye, close yang berulang di atas harga), area konsolidasi, gap yang belum tertutup, low terbaru, basis harga lama, dan low 52 minggu (biru).',
+    how: 'Peta tempat harga dulu berhenti atau berbalik — bukan sinyal beli/jual. Close di atas trigger = tanda pertama penurunan berhenti; close di bawah support terdekat = penurunan berlanjut.',
   },
   {
     icon: '⤳', color: 'text-tv-green', term: 'Proyeksi',
@@ -911,5 +973,34 @@ function IndicatorToggle({ color, label, dashed, active, onClick }) {
       )}
       <span className={`text-[10px] ${active ? 'text-tv-text' : 'text-tv-muted line-through'}`}>{label}</span>
     </button>
+  )
+}
+
+// Daftar level S/R di bawah chart — urut dari resistance terjauh ke support
+// terjauh, dengan posisi harga sekarang di tengah.
+function KeyLevelList({ data }) {
+  const res = data.levels.filter(l => l.side === 'resistance').reverse()
+  const sup = data.levels.filter(l => l.side === 'support')
+  const pct = p => ((p - data.close) / data.close * 100).toFixed(1)
+  const Row = ({ l }) => (
+    <div className="flex items-center gap-2 text-xs py-0.5">
+      <span className="w-2.5 h-0.5 rounded shrink-0" style={{ background: levelColor(l) }} />
+      <span className="text-tv-text truncate">{levelText(l)}</span>
+      <span className="ml-auto tabular-nums text-tv-muted">{pct(l.price) > 0 ? '+' : ''}{pct(l.price)}%</span>
+    </div>
+  )
+  return (
+    <div className="bg-tv-card border border-tv-border rounded-xl px-4 py-3">
+      <div className="flex items-baseline gap-2 mb-1.5">
+        <span className="text-xs font-semibold text-tv-text">Support / Resistance otomatis</span>
+        <span className="text-[10px] text-tv-muted">data s/d {data.date} · ATR {fmt.price(data.atr)}</span>
+      </div>
+      {res.map(l => <Row key={l.name} l={l} />)}
+      <div className="flex items-center gap-2 text-xs py-1 my-0.5 border-y border-dashed border-tv-border text-tv-muted">
+        ▸ Harga sekarang <span className="ml-auto tabular-nums text-tv-text font-semibold">{fmt.price(data.close)}</span>
+      </div>
+      {sup.map(l => <Row key={l.name} l={l} />)}
+      {!data.levels.length && <div className="text-xs text-tv-muted">Data belum cukup untuk menentukan level.</div>}
+    </div>
   )
 }

@@ -20,6 +20,14 @@ go test ./...                 # All tests (analysis/ + handlers/)
 go test ./analysis/ -run TestDecision   # Single test by name (analysis tests read frozen OHLCV from analysis/testdata/, never ./data)
 ```
 
+### Research — engine report card, run from `stock-api/`
+```bash
+go run ./research/blindtest analyze  -cutoff 2026-11-30   # freeze verdicts from bars <= cutoff → research/frozen/<cutoff>.json (refuses to overwrite)
+go run ./research/blindtest validate -cutoff 2025-11-28   # score a frozen file against what happened (K1–K6 criteria inside the file)
+go run ./research/blindtest export                        # engine on every bar since 2020 → research/out/export.csv (~1.5 min)
+python research/panel.py && python research/research.py all   # pandas pattern research, TRAIN 2020–23 / VALID 2024–Nov25 / TEST Dec25+
+```
+
 `main.go` calls `loadEnv(".env")` on startup (best-effort, never overrides real env). Env vars are listed under Deployment below — note `DATA_DIR` must be a real env var (`storage.DataDir` initialises before `.env` loads).
 
 ### Frontend (React + Vite) — run from `stock-api/ui/`
@@ -51,10 +59,11 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `analysis/adline.go`, `mfi.go`, `cmf.go` | Volume-flow indicators: A/D Line, Money Flow Index, Chaikin Money Flow |
 | `analysis/bandar.go` | Bandarmology (broker accumulation/distribution) analysis over broker-summary data |
 | `analysis/helpers.go` | Shared price-action helpers incl. `CandlePattern` — the one candle detector (engine, `/ai`, `/session` via `candleInfo`) |
-| `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP. Low-confidence results downgrade to WAIT. **Only source of verdicts** — the old Advisor tree and `calcSignals` were removed (2026-10-20) because they contradicted it. `DecisionEngineWithBroker` folds in broker data |
+| `analysis/decision.go` | **Decision engine** — weighted multi-factor scoring (market structure, EMA trend, money flow, volume, S/R, FVG, bandarmology…); 5-level signal, confidence, entry zone, tiered TP. Low-confidence results downgrade to WAIT. `GateRegime`: when IHSG < SMA50 a BUY/STRONG_BUY becomes WAIT (note `RegimeGateNote`) and every stock's plan (entry/stop/TP/R:R) is zeroed with `gated: true`; score kept so calibration still matches. **Only source of verdicts** — the old Advisor tree and `calcSignals` were removed (2026-10-20) because they contradicted it. `DecisionEngineWithBroker` folds in broker data |
 | `analysis/decision_backtest.go` | Backtests the decision engine per stock; exits via `planOutcome` (shared with calibration — same entry/stop/TP1/20-bar timeout rules) |
 | `analysis/calibration.go` | Replays the decision engine over all stocks (no look-ahead, broker excluded) and records real outcomes per score bucket × IHSG regime (close vs SMA50; `^JKSE` fetched since 2020 so every bar has a regime). The engine replay runs in parallel over all CPUs (~15s for 92 stocks × 6.5y); `handlers/calibration.go` serves the stale table while rebuilding in the background, and boot warms it: plan = entry next open, WIN if TP1 before stop within 20 bars. Also the **projection**: per regime × 5/10/20-bar horizon × score bucket, % of cases ending Bullish/Sideways/Bearish (move beyond 0.5 × ATR% × √h) + p10–p90 range — the only bull/side/bear odds in the app (`Projection.jsx`) |
 | `analysis/fvg.go` | Fair Value Gap detection (also feeds decision engine confluence) |
+| `analysis/levels.go` | **Key Levels** (chart button "S/R Auto") — auto support/resistance named R1..Rn / S1..Sn: trigger (close ≥2× in 15 bars above price), consolidation (4–8 bars, close range ≤0.8 ATR), unfilled gap (remaining part only), recent low (+double-bottom note), base (longest stay below price, P25–P75 of closes), 52-week low, swing fillers (max 2). Merged when <0.35 ATR apart, dropped when >30% or <0.25 ATR from close, snapped to IDX tick. Pinned against a frozen HRTA fixture in `levels_test.go`. Not used by the decision engine |
 | `analysis/valuation.go` | 3-year PBV band (mean ±1/±2 SD of price ÷ book value per share; USD reporters converted via `USDIDR=X`) + quality screen from the Astronacci "5 Undervalued Stock" report: listing >10y, dividend yield ≥5%, avg ROE >12%, net income always positive (Yahoo has ~4 annual reports). `undervalue` = passes all four AND PBV below its mean. Feeds the engine as factor **Valuasi** (10%, technical weights scaled to 90%) only when quality passes; otherwise the factor is absent and the score equals the plain engine — so calibration (replayed without valuation) still measures the same model |
 | `handlers/handlers.go` | Stock CRUD, update-all, latest, CSV export; helpers `canonicalSymbol`, `respond`, `loadPrices`, `doUpdate`, `updateAll` (guarded by `updateMu`) |
 | `handlers/autoupdate.go` | `StartAutoUpdate` (called from `main`): boot refresh of stale stocks only + 15-min refresh in market hours |
@@ -69,7 +78,8 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 | `handlers/ihsg.go` | `GET /api/ihsg` — Jakarta Composite Index; owns `jkseBars()`, the single `^JKSE` fetch (2y, cached 60s) shared with calibration regime + auto-update holiday check |
 | `handlers/broker.go` | Broker-summary data CRUD under `./data/broker/{SYMBOL}.json`; includes `/mock` generator for test data. Mock files carry `"source": "mock"` and `LoadBrokerDays` ignores them, so synthetic flows never reach the decision engine |
 | `handlers/reports.go` | PDF research reports — list/upload/delete under `./data/reports/{SYMBOL}/`; uses `github.com/ledongthuc/pdf` for text extraction (consumed by AI handler). **Gotcha:** upload also spawns a Claude Code terminal (`openClaudeTerminal`) that analyzes the PDF and writes `./data/fundamentals/{SYMBOL}.json` |
-| `handlers/valuation.go` | Valuation cache `data/valuation/{SYMBOL}.json`, refreshed weekly in the auto-update goroutine (`FetchLongHistory` 3y + `FetchFundamentals`). Also owns **`decide(sym, prices)`** — the one call every handler uses for a verdict (broker + valuation folded in): `/decision`, screen, `/ai`, overview, session |
+| `handlers/valuation.go` | Valuation cache `data/valuation/{SYMBOL}.json`, refreshed weekly in the auto-update goroutine (`FetchLongHistory` 3y + `FetchFundamentals`). Also owns **`decide(sym, prices)`** — the one call every handler uses for a verdict (broker + valuation folded in, then `analysis.GateRegime` with the `^JKSE` regime on the stock's last bar; `^JKSE` unavailable → no gate): `/decision`, screen, `/ai`, overview, session |
+| `research/` | **Engine report card** (not part of the server). `blindtest/` (Go, own `main`): `analyze` freezes the verdicts the engine would have given on a past cutoff (calibration rebuilt from bars ≤ cutoff), `validate` scores them later, `export` replays every bar. `frozen/` is committed evidence (2025-11-28 = first blind test); `out/` is gitignored scratch. `panel.py` + `research.py` (pandas) = pattern research. Findings 2026-11-02: score rank IC ≈ 0 for picking stocks; only the regime gate and the projection bands held out-of-sample |
 | `handlers/fundamental.go` | Read/write arbitrary JSON to `./data/fundamentals/{SYMBOL}.json` |
 | `handlers/dividends.go` | Dividend calendar: Yahoo dividend history for all tracked stocks (`fetcher.FetchDividends`, cached 24h in `data/dividends/yahoo.json`) → `riwayat` rows + `perkiraan` (last 12 months projected +1y, specials >3× median skipped). Manual official announcements in `data/dividends/calendar.json` suppress nearby projections |
 
@@ -78,7 +88,7 @@ Request flow: `main.go` (Gorilla Mux) → `handlers/` → `analysis/` + `storage
 - Stocks: `GET/POST /api/stocks`, `POST /api/stocks/update-all`, `POST /api/stocks/backfill` (extend history back to `historyStart` = 2020-01-01; new stocks start there too), `GET/DELETE /api/stocks/{symbol}`, `GET /api/stocks/{symbol}/latest`, `POST /api/stocks/{symbol}/update`, `GET /api/stocks/{symbol}/export.csv`
 - Reports: `GET/POST /api/stocks/{symbol}/reports`, `DELETE /api/stocks/{symbol}/reports/{id}`
 - Fundamental: `GET/POST /api/stocks/{symbol}/fundamental`
-- Analysis (`/api/analysis/{symbol}/*`): `summary`, `indicators`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `fvg`, `avwap`, `pivots`, `amd`, `adline`, `cmf`, `mfi`, `decision`, `decision-backtest`, `ai`
+- Analysis (`/api/analysis/{symbol}/*`): `summary`, `indicators`, `sma`, `ema`, `rsi`, `macd`, `bollinger`, `stochastic`, `atr`, `obv`, `adx`, `vwap`, `sar`, `ichimoku`, `fibonacci`, `fvg`, `levels`, `avwap`, `pivots`, `amd`, `adline`, `cmf`, `mfi`, `decision`, `decision-backtest`, `ai`
 - Dividends: `GET /api/dividends` (`?refresh=1` re-fetches Yahoo), `POST /api/dividends` (replaces manual entries)
 - Market: `GET /api/overview`, `GET /api/advisor/screen`, `GET /api/calibration`, `GET /api/session`, `GET /api/ihsg`
 - Broker: `GET/DELETE /api/broker/{symbol}`, `GET /api/broker/{symbol}/summary`, `POST /api/broker/{symbol}/mock`
@@ -121,7 +131,7 @@ App.jsx                       ← global state (stocks[], selected, view, toast)
 
 **`money.js`** — pure money math (`positionSize`, `averagePrice`, `positionPnL`, `portfolioTotals`) used by RiskCalc + Portfolio; tested in `money.test.js`.
 
-**`utils.js`** — `fmt.price/pct/vol`, `colorOf`/`signalStyle` Tailwind helpers, `LW_BASE` shared lightweight-charts options (Indicators, Practice).
+**`utils.js`** — `fmt.price/pct/vol`, `colorOf`/`signalStyle` Tailwind helpers, `LW_BASE` shared lightweight-charts options (Indicators, Practice). `signalLabel` is the one display mapping for signals — descriptive, not imperative (STRONG_BUY→"Tren naik kuat", BUY→"Tren naik", WAIT→"Tunggu", SELL→"Tren turun", STRONG_SELL→"Tren turun kuat"); API values stay BUY/SELL. `GATED_PLAN` is the text shown where a `gated` plan would be; `calibShort` leads with avg P&L/trade, win rate second.
 
 **Charting libs** — `lightweight-charts` v5 only: ChartTab (series primitives for zone overlays; TradingView-style: OHLC legend top-left, D/W/M timeframe resampled client-side in `chart/bars.js` (+ SMA/RSI/MACD, tested in `bars.test.js`), RSI/MACD as lower panes, log scale; FVG/AVWAP/Projection are daily-only), Indicators (3 charts with synced pan/zoom), Practice (time axis hidden). IHSGChart embeds the TradingView widget.
 

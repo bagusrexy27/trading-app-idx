@@ -71,9 +71,18 @@ func valuationOf(sym string, prices []models.StockPrice) *analysis.Valuation {
 }
 
 // decide is the one way handlers get a verdict: price action + broker flow +
-// valuation. Every view that shows BUY/SELL must call this so they agree.
+// valuation, then the IHSG regime gate (IHSG < SMA50 on the stock's last bar:
+// no buy verdict, no trade plan). Every view that shows BUY/SELL must call
+// this so they agree.
+//
+// ponytail: ^JKSE unavailable → regime unknown → no gate (fail open), same
+// as the calibration table built without regimes.
 func decide(sym string, prices []models.StockPrice) analysis.Decision {
-	return analysis.DecisionEngineFull(prices, LoadBrokerDays(sym), valuationOf(sym, prices))
+	d := analysis.DecisionEngineFull(prices, LoadBrokerDays(sym), valuationOf(sym, prices))
+	if idx, _, err := jkseBars(); err == nil && len(idx) > 50 && len(prices) > 0 {
+		d = analysis.GateRegime(d, analysis.IndexRegime(idx)(prices[len(prices)-1].Date))
+	}
+	return d
 }
 
 // refreshValuation fetches Yahoo data and rewrites the cache for one stock.

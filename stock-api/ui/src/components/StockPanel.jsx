@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, lazy, Suspense, memo } from 'react'
 import { api } from '../api'
-import { fmt, colorOf, signalStyle, signalLabel } from '../utils'
+import { fmt, colorOf, signalLabel, GATED_PLAN } from '../utils'
 import Overview from './Overview'
 import RiskCalc from './RiskCalc'
 import ReportUpload from './ReportUpload'
@@ -198,7 +198,7 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const signalNow = dec?.signal
   const buyish = signalNow === 'BUY' || signalNow === 'STRONG_BUY'
   const avoidish = signalNow === 'SELL' || signalNow === 'STRONG_SELL'
-  const verdictLabel = buyish ? 'BUY TODAY' : (avoidish ? 'AVOID' : signalLabel(signalNow) || 'WAIT')
+  const verdictLabel = signalLabel(signalNow || 'WAIT')
   const verdictTone = buyish
     ? { wrap: 'bg-tv-green/5 border-tv-green/20', text: 'text-tv-green' }
     : avoidish
@@ -297,6 +297,9 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
               <span className="mx-1.5 text-tv-border">·</span>
               Conf <b className="text-tv-text tabular-nums">{dec.confidence}%</b>
             </span>
+            {dec.gated ? (
+              <span className="text-xs text-tv-muted">{GATED_PLAN}</span>
+            ) : (
             <span className="text-xs text-tv-muted tabular-nums">
               Entry <b className="text-tv-text">{fmt.price(dec.entry_zone?.ideal ?? dec.entry_zone?.buy?.[0])}</b>
               <span className="mx-1.5 text-tv-border">·</span>
@@ -306,10 +309,6 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
               <span className="mx-1.5 text-tv-border">·</span>
               R:R <b className={dec.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-text'}>1:{dec.risk_reward?.toFixed(1)}</b>
             </span>
-            {signalNow && (
-              <span className={`ml-auto hidden md:inline-flex px-2 py-0.5 rounded border text-[10px] font-bold ${signalStyle(signalNow)}`}>
-                {signalLabel(signalNow)}
-              </span>
             )}
           </div>
         )}

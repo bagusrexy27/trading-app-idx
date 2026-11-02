@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
-import { fmt, REGIME_LABEL } from '../utils'
+import { fmt, REGIME_LABEL, signalLabel, GATED_PLAN } from '../utils'
 import { ProjectionCard } from './Projection'
 import ValuationCard from './ValuationCard'
 
 const SIGNAL = {
-  STRONG_BUY:  { label: 'STRONG BUY',  text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
-  BUY:         { label: 'BUY',         text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
-  WAIT:        { label: 'WAIT',        text: 'text-tv-yellow', banner: 'border-tv-yellow/40 bg-tv-yellow/5' },
-  SELL:        { label: 'SELL',        text: 'text-tv-red',    banner: 'border-tv-red/40 bg-tv-red/5' },
-  STRONG_SELL: { label: 'STRONG SELL', text: 'text-tv-red',    banner: 'border-tv-red/40 bg-tv-red/5' },
+  STRONG_BUY:  { text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
+  BUY:         { text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
+  WAIT:        { text: 'text-tv-yellow', banner: 'border-tv-yellow/40 bg-tv-yellow/5' },
+  SELL:        { text: 'text-tv-red',    banner: 'border-tv-red/40 bg-tv-red/5' },
+  STRONG_SELL: { text: 'text-tv-red',    banner: 'border-tv-red/40 bg-tv-red/5' },
 }
 
 const trendToneOf = (t) =>
@@ -42,12 +42,12 @@ function CalibCard({ c }) {
       <div className="text-xs font-bold text-tv-muted uppercase mb-2">Rekam jejak historis</div>
       <p className="text-sm leading-relaxed">
         Skor {c.score_lo}–{c.score_hi} saat {REGIME_LABEL[c.regime]}: dari <b>{c.samples.toLocaleString('id-ID')}</b> kasus serupa,
-        rencana kena TP1 sebelum stop <b className={good ? 'text-tv-green' : 'text-tv-red'}>{Math.round(c.win_rate)}%</b> dalam {c.horizon} hari bursa.
-        Rata-rata hasil <b className={good ? 'text-tv-green' : 'text-tv-red'}>{fmt.pct(c.avg_pnl_pct)}</b> per trade.
+        rata-rata hasil <b className={good ? 'text-tv-green' : 'text-tv-red'}>{fmt.pct(c.avg_pnl_pct)}</b> per trade.
+        <span className="text-tv-muted"> Rencana kena TP1 sebelum stop {Math.round(c.win_rate)}% dalam {c.horizon} hari bursa.</span>
       </p>
       {c.stock?.samples > 0 && (
         <p className="text-xs text-tv-muted mt-1.5">
-          Saham ini sendiri: {c.stock.samples} hari sinyal beli, {Math.round(c.stock.win_rate)}% kena TP, rata-rata {fmt.pct(c.stock.avg_pnl_pct)}.
+          Saham ini sendiri: rata-rata {fmt.pct(c.stock.avg_pnl_pct)} dari {c.stock.samples} hari sinyal beli ({Math.round(c.stock.win_rate)}% kena TP).
         </p>
       )}
       {!good && <p className="text-xs text-tv-red mt-1.5">⚠️ Rata-rata historis negatif — setup seperti ini belum terbukti menguntungkan.</p>}
@@ -107,7 +107,7 @@ export default function Advisor({ symbol, decisionData }) {
         <div className="flex items-center gap-3">
           <div>
             <div className={`text-xl font-extrabold ${v.text} flex items-center gap-2`}>
-              {v.label}
+              {signalLabel(dec.signal)}
               {dec.syariah && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-tv-green/10 text-tv-green border border-tv-green/30">Sharia</span>
               )}
@@ -132,12 +132,12 @@ export default function Advisor({ symbol, decisionData }) {
           <>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
               <div>
-                <div className="text-[11px] text-tv-muted">Win rate</div>
-                <div className={`font-bold ${bt.win_rate >= 50 ? 'text-tv-green' : 'text-tv-red'}`}>{bt.win_rate?.toFixed(1)}%</div>
-              </div>
-              <div>
                 <div className="text-[11px] text-tv-muted">Expectancy / trade</div>
                 <div className={`font-bold ${bt.expectancy_pct >= 0 ? 'text-tv-green' : 'text-tv-red'}`}>{bt.expectancy_pct > 0 ? '+' : ''}{bt.expectancy_pct?.toFixed(2)}%</div>
+              </div>
+              <div>
+                <div className="text-[11px] text-tv-muted">Win rate</div>
+                <div className="font-bold text-tv-muted">{bt.win_rate?.toFixed(1)}%</div>
               </div>
               <div>
                 <div className="text-[11px] text-tv-muted">Trades (closed)</div>
@@ -170,6 +170,9 @@ export default function Advisor({ symbol, decisionData }) {
 
       <div className="bg-tv-card border border-tv-border rounded-xl p-4">
         <div className="text-xs font-bold text-tv-muted uppercase mb-3">Trade plan</div>
+        {dec.gated ? (
+          <div className="text-[12px] text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/20 rounded-lg px-3 py-2">{GATED_PLAN}</div>
+        ) : (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
           <div>
             <div className="text-[11px] text-tv-muted">Entry zone (ideal {fmt.price(dec.entry_zone.ideal)})</div>
@@ -190,13 +193,14 @@ export default function Advisor({ symbol, decisionData }) {
             <div className={`font-bold ${dec.risk_reward >= 2 ? 'text-tv-green' : dec.risk_reward >= 1 ? 'text-tv-yellow' : 'text-tv-red'}`}>1 : {dec.risk_reward?.toFixed(1)}</div>
           </div>
         </div>
+        )}
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-[12px] mt-3">
           <span className="text-tv-muted">Support: <b className="text-tv-green tabular-nums">{dec.support.map(fmt.price).join(' · ')}</b></span>
           <span className="text-tv-muted">Resistance: <b className="text-tv-red tabular-nums">{dec.resistance.map(fmt.price).join(' · ')}</b></span>
         </div>
-        {!canTrade && (
+        {!canTrade && !dec.gated && (
           <div className="mt-3 text-[11px] text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/20 rounded-lg px-3 py-2">
-            Plan above only applies IF the setup becomes valid. Current signal is <b>{v.label}</b> — not an entry yet.
+            Plan above only applies IF the setup becomes valid. Current signal is <b>{signalLabel(dec.signal)}</b> — not an entry yet.
           </div>
         )}
       </div>

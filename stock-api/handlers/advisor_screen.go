@@ -72,6 +72,7 @@ type screenRow struct {
 	IDX30       bool                `json:"idx30"`
 	LQ45        bool                `json:"lq45"`
 	Note        string              `json:"note,omitempty"`
+	Gated       bool                `json:"gated,omitempty"`       // IHSG < SMA50: plan fields are zero (analysis.GateRegime)
 	Calibration *calibrationFor     `json:"calibration,omitempty"` // measured history for this score + regime
 	Valuation   *analysis.Valuation `json:"valuation,omitempty"`   // 3-year PBV band + quality screen
 }
@@ -143,12 +144,16 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 		}
 
 		dec := decide(sym, d.Prices)
+		target := 0.0 // no TP when the regime gate withholds the plan
+		if len(dec.TakeProfit) > 0 {
+			target = dec.TakeProfit[0].Price
+		}
 		rows = append(rows, screenRow{
 			Symbol: sym, Close: d.Prices[n-1].Close,
-			Signal: dec.Signal, Score: dec.Score, Confidence: dec.Confidence,
+			Signal: dec.Signal, Score: dec.Score, Confidence: dec.Confidence, Gated: dec.Gated,
 			Trend: dec.Trend, Structure: dec.MarketStructure.State, VolumeState: dec.Volume.Status,
 			EntryLow: dec.EntryZone.Buy[0], EntryHigh: dec.EntryZone.Buy[1], EntryIdeal: dec.EntryZone.Ideal,
-			Stop: dec.StopLoss, Target: dec.TakeProfit[0].Price, RiskReward: dec.RiskReward,
+			Stop: dec.StopLoss, Target: target, RiskReward: dec.RiskReward,
 			TurnoverBn: analysis.R2(turnover),
 			Syariah:    isSyariah(sym), IDX30: isIDX30(sym), LQ45: isLQ45(sym), Note: dec.Note,
 			Calibration: lookupCalibration(calib, regime, sym, dec.Score, d.Prices),
