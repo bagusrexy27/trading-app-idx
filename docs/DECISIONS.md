@@ -7,6 +7,8 @@
 - 2026-11-02: Rekam jejak historis menampilkan rata-rata hasil per trade lebih dulu, win rate di belakang (`calibShort`, CalibCard, OmbakMeter, panel backtest). Why: rencana engine menang 52–56% tapi rata-rata −0,3…−1,1% net per trade; win rate sendirian menyesatkan.
 - 2026-11-02: Uji buta & riset disimpan di `stock-api/research/` (satu modul Go dengan app); `frozen/` di-commit sebagai bukti, `out/` di-gitignore dan dockerignore; `analyze` menolak menimpa file beku. Why: uji harus bisa diulang, dan prediksi yang sudah dibekukan tidak boleh diedit setelah hasil terlihat.
 - 2026-11-02: Bobot faktor decision engine tidak diatur ulang. Why: semua faktor punya IC ≈ 0 dengan tanda yang berubah antar periode; mengatur ulang bobot = menghafal masa lalu (overfitting).
+- 2026-11-03: Tidak memakai ML untuk arah saham/IHSG maupun skor risiko jatuh. Why: `research/ml.py probe` (ridge, walk-forward 2022–2026, 90 saham likuid) — arah IC −0,02 dan IHSG kalah dari "selalu tebak mayoritas" tiap tahun; volatilitas & drawdown memang bisa diprediksi (IC 0,63 / 0,35) tapi ATR14 saja sama bagusnya (0,68 / 0,35), dan ATR sudah dipakai RiskCalc + band proyeksi.
+- 2026-11-03: Peringatan "rawan gerak besar" (|return 20 hari| > 2 × vol20 × √20, arah diabaikan) masuk forward test, belum dibangun di app. Why: satu-satunya target di mana model mengalahkan ATR (AUC 0,68 vs 0,43, 5/5 tahun; 10% teratas kena 14–22% vs semua 7–10%); pemicu utama saham yang lebih tenang dari biasanya (vol20 rendah vs vol60). Arah tetap acak (30–78% naik).
 - 2026-11-02: Tidak menjanjikan analisa yang "kemungkinan salahnya tipis"; ekspektasi realistis ±55–60% benar, keuntungan dari manajemen risiko. Why: aturan yang menang 84–88% di TRAIN (2020–2023) turun ke 54–64% di data yang tidak dipakai untuk mencarinya.
 
 ## Progress log
@@ -21,7 +23,10 @@
 - 2026-11-02: Tinjau rasio TP vs stop — rencana engine menang 52–56% tapi rata-rata −0,3…−1,1% net per trade.
 - 2026-11-02: Forward test bulanan — tiap akhir bulan jalankan `go run ./research/blindtest analyze -cutoff <tanggal>` (mis. 2026-11-30) dari `stock-api/`, lalu `validate` dengan cutoff yang sama sebulan kemudian.
 
+- 2026-11-03: Forward test gerak besar — `python research/ml.py freeze` tiap akhir bulan (pertama: `research/frozen/bigmove-2026-11-02.json`, 84 saham, flagged DEFI ENRG BYAN KOTA MYOR GTSI FORE HUMI), lalu `validate <tanggal>` setelah 20 bar (±1 Des). Kriteria ditetapkan sebelum hasil: LULUS jika gabungan 3 freeze (Nov, Des, Jan) memberi rasio flagged ≥ 1,5× semua saham. Satu freeze saja (8 saham, ±1–2 kejadian) terlalu kecil untuk diputuskan. Lulus → field di screener + `/decision` (model dihitung di Go) + badge UI; gagal → Parked.
+
 ## Parked
+- 2026-11-03: Skor risiko jatuh berbasis ML. Why parked: model hanya +0,006 IC di atas ATR14 yang sudah ada.
 - 2026-11-02: Mode "Pantulan" di screener (RSI < 35, IHSG ≥10% di bawah puncak 52 minggu, turnover ≥ Rp20 M/hari, tahan 40–60 hari). Why parked: user tidak memilihnya; menang 54–64% di data baru tapi gagal serentak per episode (2024: 0% menang, median −18%) dan terkena bias survivorship.
 - 2026-11-02: Aturan momentum (BUY & IHSG di atas MA50 & RSI > 70). Why parked: hanya 3 dari 7 tahun positif — tidak konsisten per tahun.
 - 2026-11-02: Filter "rekam jejak saham" (rata-rata historis saham > 0). Why parked: lolos di uji Des 2025, tapi di 2020–2023 justru lebih jelek — tidak konsisten antar periode.
