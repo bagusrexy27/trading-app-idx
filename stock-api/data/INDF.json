@@ -1,7 +1,7 @@
 {
   "symbol": "INDF",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 6325,
       "close": 6550,
       "volume": 2867700
+    },
+    {
+      "date": "2026-11-03",
+      "open": 6500,
+      "high": 6600,
+      "low": 6475,
+      "close": 6500,
+      "volume": 7373200
     }
   ]
 }

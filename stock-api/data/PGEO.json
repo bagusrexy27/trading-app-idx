@@ -1,7 +1,7 @@
 {
   "symbol": "PGEO",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2023-02-24",
@@ -6986,6 +6986,14 @@
       "low": 895,
       "close": 930,
       "volume": 7757700
+    },
+    {
+      "date": "2026-11-03",
+      "open": 930,
+      "high": 940,
+      "low": 870,
+      "close": 870,
+      "volume": 22460000
     }
   ]
 }

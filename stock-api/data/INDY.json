@@ -1,7 +1,7 @@
 {
   "symbol": "INDY",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1735,
       "close": 1925,
       "volume": 26568200
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1925,
+      "high": 1940,
+      "low": 1795,
+      "close": 1795,
+      "volume": 13453200
     }
   ]
 }

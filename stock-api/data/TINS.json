@@ -1,7 +1,7 @@
 {
   "symbol": "TINS",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 3630,
       "close": 3640,
       "volume": 42709500
+    },
+    {
+      "date": "2026-11-03",
+      "open": 3680,
+      "high": 3690,
+      "low": 3390,
+      "close": 3390,
+      "volume": 56042800
     }
   ]
 }

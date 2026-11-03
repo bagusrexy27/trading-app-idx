@@ -1,7 +1,7 @@
 {
   "symbol": "HRUM",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 680,
       "close": 700,
       "volume": 9215400
+    },
+    {
+      "date": "2026-11-03",
+      "open": 700,
+      "high": 710,
+      "low": 660,
+      "close": 660,
+      "volume": 5594200
     }
   ]
 }

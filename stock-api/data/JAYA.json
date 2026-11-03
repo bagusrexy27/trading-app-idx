@@ -1,7 +1,7 @@
 {
   "symbol": "JAYA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 113,
       "close": 119,
       "volume": 1368000
+    },
+    {
+      "date": "2026-11-03",
+      "open": 121,
+      "high": 122,
+      "low": 115,
+      "close": 115,
+      "volume": 230000
     }
   ]
 }

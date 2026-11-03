@@ -1,7 +1,7 @@
 {
   "symbol": "AMRT",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 900,
       "close": 900,
       "volume": 58708600
+    },
+    {
+      "date": "2026-11-03",
+      "open": 910,
+      "high": 915,
+      "low": 855,
+      "close": 855,
+      "volume": 67453200
     }
   ]
 }

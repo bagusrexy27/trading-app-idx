@@ -1,7 +1,7 @@
 {
   "symbol": "ISAT",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1280,
       "close": 1435,
       "volume": 176924300
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1450,
+      "high": 1470,
+      "low": 1365,
+      "close": 1375,
+      "volume": 89948600
     }
   ]
 }

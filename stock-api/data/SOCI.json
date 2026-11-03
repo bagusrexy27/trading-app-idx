@@ -1,7 +1,7 @@
 {
   "symbol": "SOCI",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 422,
       "close": 446,
       "volume": 12071200
+    },
+    {
+      "date": "2026-11-03",
+      "open": 446,
+      "high": 456,
+      "low": 416,
+      "close": 418,
+      "volume": 11926800
     }
   ]
 }

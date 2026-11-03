@@ -1,7 +1,7 @@
 {
   "symbol": "RAJA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 368,
       "close": 418,
       "volume": 69214400
+    },
+    {
+      "date": "2026-11-03",
+      "open": 434,
+      "high": 434,
+      "low": 390,
+      "close": 390,
+      "volume": 60603100
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "symbol": "GTSI",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2021-09-08",
@@ -9906,6 +9906,14 @@
       "low": 67,
       "close": 75,
       "volume": 55465900
+    },
+    {
+      "date": "2026-11-03",
+      "open": 76,
+      "high": 79,
+      "low": 70,
+      "close": 70,
+      "volume": 12663200
     }
   ]
 }

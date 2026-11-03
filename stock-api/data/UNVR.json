@@ -1,7 +1,7 @@
 {
   "symbol": "UNVR",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1385,
       "close": 1395,
       "volume": 32451000
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1420,
+      "high": 1420,
+      "low": 1380,
+      "close": 1380,
+      "volume": 17336800
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "symbol": "BKSL",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 36,
       "close": 39,
       "volume": 156626700
+    },
+    {
+      "date": "2026-11-03",
+      "open": 39,
+      "high": 41,
+      "low": 37,
+      "close": 37,
+      "volume": 89162500
     }
   ]
 }

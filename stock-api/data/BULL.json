@@ -1,7 +1,7 @@
 {
   "symbol": "BULL",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 220,
       "close": 248,
       "volume": 277214200
+    },
+    {
+      "date": "2026-11-03",
+      "open": 250,
+      "high": 254,
+      "low": 232,
+      "close": 232,
+      "volume": 131881100
     }
   ]
 }

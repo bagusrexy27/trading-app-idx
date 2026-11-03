@@ -1,7 +1,7 @@
 {
   "symbol": "ADMR",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2022-01-03",
@@ -9258,6 +9258,14 @@
       "low": 1290,
       "close": 1320,
       "volume": 68927400
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1330,
+      "high": 1335,
+      "low": 1255,
+      "close": 1300,
+      "volume": 39945400
     }
   ]
 }

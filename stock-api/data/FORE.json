@@ -1,7 +1,7 @@
 {
   "symbol": "FORE",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2025-04-14",
@@ -2986,6 +2986,14 @@
       "low": 520,
       "close": 550,
       "volume": 1630200
+    },
+    {
+      "date": "2026-11-03",
+      "open": 550,
+      "high": 560,
+      "low": 525,
+      "close": 530,
+      "volume": 1563800
     }
   ]
 }

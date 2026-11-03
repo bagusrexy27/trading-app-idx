@@ -1,7 +1,7 @@
 {
   "symbol": "MINA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 121,
       "close": 134,
       "volume": 31947800
+    },
+    {
+      "date": "2026-11-03",
+      "open": 136,
+      "high": 137,
+      "low": 125,
+      "close": 125,
+      "volume": 25570800
     }
   ]
 }

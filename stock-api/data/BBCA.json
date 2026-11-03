@@ -1,7 +1,7 @@
 {
   "symbol": "BBCA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 4970,
       "close": 4980,
       "volume": 196618100
+    },
+    {
+      "date": "2026-11-03",
+      "open": 5050,
+      "high": 5050,
+      "low": 4820,
+      "close": 4840,
+      "volume": 264100500
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "symbol": "INCO",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 3280,
       "close": 3330,
       "volume": 10886300
+    },
+    {
+      "date": "2026-11-03",
+      "open": 3370,
+      "high": 3390,
+      "low": 3100,
+      "close": 3120,
+      "volume": 18263500
     }
   ]
 }

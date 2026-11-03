@@ -1,7 +1,7 @@
 {
   "symbol": "WBSA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2026-04-10",
@@ -1106,6 +1106,14 @@
       "low": 446,
       "close": 452,
       "volume": 8393700
+    },
+    {
+      "date": "2026-11-03",
+      "open": 452,
+      "high": 452,
+      "low": 422,
+      "close": 422,
+      "volume": 4974100
     }
   ]
 }

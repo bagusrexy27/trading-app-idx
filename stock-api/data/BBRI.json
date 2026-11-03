@@ -1,7 +1,7 @@
 {
   "symbol": "BBRI",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 2770,
       "close": 2820,
       "volume": 179257800
+    },
+    {
+      "date": "2026-11-03",
+      "open": 2840,
+      "high": 2860,
+      "low": 2660,
+      "close": 2660,
+      "volume": 311334500
     }
   ]
 }

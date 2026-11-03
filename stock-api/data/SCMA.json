@@ -1,7 +1,7 @@
 {
   "symbol": "SCMA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 129,
       "close": 135,
       "volume": 80113500
+    },
+    {
+      "date": "2026-11-03",
+      "open": 137,
+      "high": 138,
+      "low": 126,
+      "close": 127,
+      "volume": 63907000
     }
   ]
 }

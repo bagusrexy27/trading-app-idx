@@ -1,7 +1,7 @@
 {
   "symbol": "UNTR",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 23850,
       "close": 23850,
       "volume": 1363800
+    },
+    {
+      "date": "2026-11-03",
+      "open": 23875,
+      "high": 24025,
+      "low": 23150,
+      "close": 23175,
+      "volume": 2322300
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "symbol": "TLKM",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1935,
       "close": 1960,
       "volume": 209433900
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1970,
+      "high": 1975,
+      "low": 1845,
+      "close": 1880,
+      "volume": 306438200
     }
   ]
 }

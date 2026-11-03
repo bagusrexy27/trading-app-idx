@@ -1,7 +1,7 @@
 {
   "symbol": "BRPT",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1000,
       "close": 1120,
       "volume": 145685300
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1125,
+      "high": 1130,
+      "low": 1045,
+      "close": 1045,
+      "volume": 70943100
     }
   ]
 }

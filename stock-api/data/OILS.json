@@ -1,7 +1,7 @@
 {
   "symbol": "OILS",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2021-09-06",
@@ -9922,6 +9922,14 @@
       "low": 226,
       "close": 246,
       "volume": 3033000
+    },
+    {
+      "date": "2026-11-03",
+      "open": 244,
+      "high": 250,
+      "low": 230,
+      "close": 234,
+      "volume": 2849000
     }
   ]
 }

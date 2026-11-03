@@ -1,7 +1,7 @@
 {
   "symbol": "CUAN",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2023-03-08",
@@ -6922,6 +6922,14 @@
       "low": 356,
       "close": 408,
       "volume": 543336400
+    },
+    {
+      "date": "2026-11-03",
+      "open": 412,
+      "high": 414,
+      "low": 380,
+      "close": 380,
+      "volume": 213898100
     }
   ]
 }

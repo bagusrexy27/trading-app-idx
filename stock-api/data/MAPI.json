@@ -1,7 +1,7 @@
 {
   "symbol": "MAPI",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1150,
       "close": 1210,
       "volume": 8445600
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1220,
+      "high": 1270,
+      "low": 1205,
+      "close": 1245,
+      "volume": 4306800
     }
   ]
 }

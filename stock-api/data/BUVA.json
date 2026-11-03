@@ -1,7 +1,7 @@
 {
   "symbol": "BUVA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 294,
       "close": 294,
       "volume": 61645800
+    },
+    {
+      "date": "2026-11-03",
+      "open": 274,
+      "high": 274,
+      "low": 274,
+      "close": 274,
+      "volume": 40389200
     }
   ]
 }

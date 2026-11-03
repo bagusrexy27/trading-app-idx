@@ -1,7 +1,7 @@
 {
   "symbol": "ITMG",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 24575,
       "close": 24975,
       "volume": 1070700
+    },
+    {
+      "date": "2026-11-03",
+      "open": 25250,
+      "high": 25300,
+      "low": 24700,
+      "close": 24700,
+      "volume": 1929800
     }
   ]
 }

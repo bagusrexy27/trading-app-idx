@@ -1,7 +1,7 @@
 {
   "symbol": "WIFI",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-12-30",
@@ -11242,6 +11242,14 @@
       "low": 850,
       "close": 920,
       "volume": 37124800
+    },
+    {
+      "date": "2026-11-03",
+      "open": 915,
+      "high": 925,
+      "low": 860,
+      "close": 860,
+      "volume": 27467900
     }
   ]
 }

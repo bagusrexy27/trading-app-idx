@@ -1,7 +1,7 @@
 {
   "symbol": "AALI",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 9425,
       "close": 9600,
       "volume": 2492400
+    },
+    {
+      "date": "2026-11-03",
+      "open": 9600,
+      "high": 9700,
+      "low": 9325,
+      "close": 9450,
+      "volume": 3053300
     }
   ]
 }

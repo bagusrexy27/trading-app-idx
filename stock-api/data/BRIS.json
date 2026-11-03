@@ -1,7 +1,7 @@
 {
   "symbol": "BRIS",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 990,
       "close": 1015,
       "volume": 63929800
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1025,
+      "high": 1050,
+      "low": 1000,
+      "close": 1010,
+      "volume": 120009500
     }
   ]
 }

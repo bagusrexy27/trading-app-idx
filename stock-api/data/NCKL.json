@@ -1,7 +1,7 @@
 {
   "symbol": "NCKL",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2023-04-12",
@@ -6746,6 +6746,14 @@
       "low": 720,
       "close": 730,
       "volume": 35699000
+    },
+    {
+      "date": "2026-11-03",
+      "open": 735,
+      "high": 740,
+      "low": 700,
+      "close": 700,
+      "volume": 26094100
     }
   ]
 }

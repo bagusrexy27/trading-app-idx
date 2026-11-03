@@ -1,7 +1,7 @@
 {
   "symbol": "SIDO",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 324,
       "close": 328,
       "volume": 42030100
+    },
+    {
+      "date": "2026-11-03",
+      "open": 322,
+      "high": 330,
+      "low": 314,
+      "close": 316,
+      "volume": 55263300
     }
   ]
 }

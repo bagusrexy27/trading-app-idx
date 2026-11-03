@@ -1,7 +1,7 @@
 {
   "symbol": "BBNI",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 3270,
       "close": 3290,
       "volume": 52677600
+    },
+    {
+      "date": "2026-11-03",
+      "open": 3320,
+      "high": 3330,
+      "low": 3160,
+      "close": 3200,
+      "volume": 57598000
     }
   ]
 }

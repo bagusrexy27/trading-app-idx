@@ -1,7 +1,7 @@
 {
   "symbol": "BNBR",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 39,
       "close": 44,
       "volume": 970564100
+    },
+    {
+      "date": "2026-11-03",
+      "open": 45,
+      "high": 45,
+      "low": 41,
+      "close": 41,
+      "volume": 217965900
     }
   ]
 }

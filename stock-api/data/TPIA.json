@@ -1,7 +1,7 @@
 {
   "symbol": "TPIA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1215,
       "close": 1345,
       "volume": 282151900
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1370,
+      "high": 1375,
+      "low": 1255,
+      "close": 1255,
+      "volume": 166614800
     }
   ]
 }

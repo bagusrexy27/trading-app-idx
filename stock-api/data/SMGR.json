@@ -1,7 +1,7 @@
 {
   "symbol": "SMGR",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1375,
       "close": 1415,
       "volume": 19499600
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1415,
+      "high": 1430,
+      "low": 1350,
+      "close": 1350,
+      "volume": 12487900
     }
   ]
 }

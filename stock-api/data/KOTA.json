@@ -1,7 +1,7 @@
 {
   "symbol": "KOTA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 69,
       "close": 73,
       "volume": 495835100
+    },
+    {
+      "date": "2026-11-03",
+      "open": 75,
+      "high": 76,
+      "low": 68,
+      "close": 68,
+      "volume": 156739200
     }
   ]
 }

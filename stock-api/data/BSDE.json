@@ -1,7 +1,7 @@
 {
   "symbol": "BSDE",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 476,
       "close": 488,
       "volume": 14434300
+    },
+    {
+      "date": "2026-11-03",
+      "open": 488,
+      "high": 490,
+      "low": 460,
+      "close": 460,
+      "volume": 14224500
     }
   ]
 }

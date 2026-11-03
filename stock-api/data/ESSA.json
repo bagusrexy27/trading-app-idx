@@ -1,7 +1,7 @@
 {
   "symbol": "ESSA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 492,
       "close": 530,
       "volume": 93431500
+    },
+    {
+      "date": "2026-11-03",
+      "open": 530,
+      "high": 535,
+      "low": 496,
+      "close": 496,
+      "volume": 54094500
     }
   ]
 }

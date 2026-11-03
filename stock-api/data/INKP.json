@@ -1,7 +1,7 @@
 {
   "symbol": "INKP",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 6300,
       "close": 6550,
       "volume": 3636200
+    },
+    {
+      "date": "2026-11-03",
+      "open": 6600,
+      "high": 6675,
+      "low": 6125,
+      "close": 6125,
+      "volume": 4024500
     }
   ]
 }

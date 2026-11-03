@@ -1,7 +1,7 @@
 {
   "symbol": "MYOR",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1330,
       "close": 1345,
       "volume": 2130100
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1345,
+      "high": 1375,
+      "low": 1275,
+      "close": 1280,
+      "volume": 11329800
     }
   ]
 }

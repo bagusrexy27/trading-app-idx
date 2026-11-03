@@ -1,7 +1,7 @@
 {
   "symbol": "MDKA",
   "exchange": "JKT",
-  "last_updated": "2026-11-02",
+  "last_updated": "2026-11-03",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13170,6 +13170,14 @@
       "low": 1780,
       "close": 1970,
       "volume": 48350500
+    },
+    {
+      "date": "2026-11-03",
+      "open": 1990,
+      "high": 2000,
+      "low": 1835,
+      "close": 1845,
+      "volume": 48630000
     }
   ]
 }
