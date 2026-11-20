@@ -11,12 +11,22 @@ import (
 )
 
 // raporDir holds the indicator report cards written by `go run ./research/rapor`
-// (one JSON per run, named by the last data date). The newest one is served.
+// (one JSON per run, named by the last data date). The newest one is served;
+// `-universe sehat` runs live in the sehat/ subfolder.
 var raporDir = storage.EnvOr("RAPOR_DIR", filepath.Join("research", "rapor"))
 
-// GetRapor — GET /api/research/rapor: the latest indicator report card, as-is.
+// GetRapor — GET /api/research/rapor[?universe=sehat]: the latest report card, as-is.
 func GetRapor(w http.ResponseWriter, r *http.Request) {
-	files, _ := filepath.Glob(filepath.Join(raporDir, "*.json"))
+	dir := raporDir
+	switch u := r.URL.Query().Get("universe"); u {
+	case "":
+	case "sehat":
+		dir = filepath.Join(raporDir, u)
+	default:
+		respond(w, 400, false, "universe hanya boleh kosong atau 'sehat'", nil)
+		return
+	}
+	files, _ := filepath.Glob(filepath.Join(dir, "*.json"))
 	if len(files) == 0 {
 		respond(w, 404, false, "Rapor belum dibuat — jalankan `go run ./research/rapor` dari stock-api/", nil)
 		return

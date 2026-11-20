@@ -127,8 +127,12 @@ export default function Rapor() {
   const [err, setErr] = useState(null)
   const [f, setF] = useState({ q: '', grade: '', kind: '', cat: '', appOnly: false })
   const [open, setOpen] = useState(null)
+  const [universe, setUniverse] = useState('')
 
-  useEffect(() => { api.rapor().then(setRep).catch(e => setErr(e.message)) }, [])
+  useEffect(() => {
+    setRep(null); setErr(null)
+    api.rapor(universe).then(setRep).catch(e => setErr(e.message))
+  }, [universe])
 
   const rows = useMemo(() => filterRows(rep?.indicators || [], f), [rep, f])
   const cats = useMemo(() => [...new Set((rep?.indicators || []).map(r => r.category))].sort(), [rep])
@@ -139,12 +143,28 @@ export default function Rapor() {
   }, [rep])
   const set = (k) => (e) => setF(p => ({ ...p, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }))
 
-  if (err) return <div className="p-7 text-sm text-tv-red">{err}</div>
-  if (!rep) return <div className="p-7 text-sm text-tv-muted">Memuat rapor…</div>
+  const tabs = (
+    <div className="flex gap-1 mb-3">
+      {[['', 'Semua saham likuid'], ['sehat', 'Saham sehat']].map(([u, l]) => (
+        <button key={u} onClick={() => setUniverse(u)}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${universe === u ? 'border-tv-blue text-tv-blue bg-tv-blue/10' : 'border-tv-border text-tv-muted hover:text-tv-text'}`}>
+          {l}
+        </button>
+      ))}
+    </div>
+  )
+  if (err) return <div className="p-7">{tabs}<p className="text-sm text-tv-red">{err}</p></div>
+  if (!rep) return <div className="p-7">{tabs}<p className="text-sm text-tv-muted">Memuat rapor…</p></div>
 
   return (
     <div className="p-4 sm:p-7 max-w-6xl mx-auto">
       <h1 className="text-2xl font-extrabold tracking-tight">Rapor Indikator</h1>
+      <div className="mt-3">{tabs}</div>
+      {universe === 'sehat' && (
+        <p className="text-xs text-tv-yellow mb-2 max-w-3xl">
+          Saham sehat = tiap hari hanya 40 saham dengan transaksi 20 hari terbesar, harga ≥ Rp500, ATR ≤ 4%. Pembandingnya sesama saham sehat di hari yang sama.
+        </p>
+      )}
       <p className="text-xs text-tv-muted mt-1 mb-4 max-w-3xl leading-relaxed">
         {rep.indicators.length} indikator diuji di {rep.stocks} saham sejak {rep.from.slice(0, 4)} (data sampai {rep.as_of}).
         Angka = seberapa jauh hasil 20 hari setelah sinyal <b>mengalahkan rata-rata semua saham di hari yang sama</b>.

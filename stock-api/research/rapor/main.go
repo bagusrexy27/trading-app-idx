@@ -47,8 +47,9 @@ type Report struct {
 	Stocks      int      `json:"stocks"`
 	MinTurnover float64  `json:"min_turnover_bn"`
 	From        string   `json:"from"`
-	BenchCAGR   float64  `json:"ihsg_cagr_pct"`   // IHSG buy-and-hold over the report window
-	BenchMaxDD  float64  `json:"ihsg_max_dd_pct"` // its worst peak-to-trough fall
+	Universe    string   `json:"universe,omitempty"` // "" = all liquid stocks · "sehat" = healthy subset
+	BenchCAGR   float64  `json:"ihsg_cagr_pct"`      // IHSG buy-and-hold over the report window
+	BenchMaxDD  float64  `json:"ihsg_max_dd_pct"`    // its worst peak-to-trough fall
 	Notes       []string `json:"notes"`
 	Indicators  []Result `json:"indicators"`
 }
@@ -61,7 +62,12 @@ const (
 func main() {
 	minTO := flag.Float64("minto", 20, "minimum 20-day average turnover, Rp bn, for a day to count")
 	out := flag.String("out", "", "output file (default research/rapor/<as_of>.json)")
+	universe := flag.String("universe", "", `"sehat" = only healthy stocks: top 40 by turnover that day, price >= Rp500, ATR <= 4% (baseline = same set)`)
+	sehatN := flag.Int("sehatn", 40, "with -universe sehat: how many top-turnover stocks per day (sensitivity: 30/50 write to research/out/)")
 	flag.Parse()
+	if *universe != "" && *universe != "sehat" {
+		fail("unknown -universe %q (only \"sehat\")", *universe)
+	}
 
 	start := time.Now()
 	idx := jkse()
@@ -140,6 +146,9 @@ func main() {
 	close(jobs)
 	wg.Wait()
 	fmt.Fprintf(os.Stderr, "\n%d stocks computed in %s\n", len(syms), time.Since(start).Round(time.Second))
+	if *universe == "sehat" {
+		healthyOnly(res, *sehatN)
+	}
 
 	// market mean forward return per date and horizon (all liquid stocks)
 	type acc struct{ sum, n float64 }
@@ -300,7 +309,19 @@ func main() {
 				}
 			}
 			summarize(&r, o20, mood, 50)
-			r.netObs = topQuintile(res, j, r.dir, excess)
+			r.netObs = topFrac(res, j, r.dir, excess, 0.2, 20)
+			base := meanObs(r.netObs)
+			for _, fr := range []float64{0.2, 1.0 / 3} { // neighbours: cheapest 20% / 33%, held 10 / 20 / 60 days
+				for _, h := range []int{10, 20, 60} {
+					if fr == 0.2 && h == 20 {
+						continue
+					}
+					o := topFrac(res, j, r.dir, excess, fr, h)
+					r.Params = append(r.Params, ParamCell{Label: fmt.Sprintf("top %.0f%%, %d hari", fr*100, h),
+						Excess: r3(meanObs(o) * 20 / float64(h)), N: len(o)})
+				}
+			}
+			r.Stable = stable(base, r.Params)
 			r.Groups = map[string]map[string]GroupStat{"rezim": regimeGroups(r.netObs, reg)}
 		}
 		results = append(results, r)
@@ -336,7 +357,11 @@ func main() {
 	conds := timingConds(jk, mood, breadth, ext, jk.dates)
 	results = append(results, timingResults(conds, m20, mood, reg)...)
 
-	written, ferr := writeForward(res, cat, conds, jk.dates, asOf)
+	forwardDir = filepath.Join("research", "forward", *universe) // each universe keeps its own hash chain
+	written, ferr := 0, error(nil)
+	if *minTO == 20 && *out == "" && *sehatN == 40 { // sensitivity runs (-minto, -out, -sehatn) never touch the forward log
+		written, ferr = writeForward(res, cat, conds, jk.dates, asOf)
+	}
 	if ferr != nil {
 		fail("forward log: %v", ferr)
 	}
@@ -364,7 +389,7 @@ func main() {
 		BenchCAGR: bc, BenchMaxDD: bdd,
 		Notes: []string{
 			"Market-neutral: hasil sinyal dikurangi rata-rata semua saham likuid di tanggal yang sama.",
-			"Entry = open hari berikutnya; biaya 0,4% bolak-balik; sinyal berulang < 10 hari pada saham yang sama dibuang.",
+			"Entry = open hari berikutnya; biaya 0,4% bolak-balik; sinyal berulang < 20 hari pada saham yang sama dibuang; ARB/ARA: order di hari terkunci tidak tereksekusi.",
 			"Periode: TRAIN 2020–2023 · VALID 2024–Nov 2025 · TEST Des 2025+.",
 			"Bias survivorship: hanya saham yang masih tercatat hari ini.",
 			"t dihitung dari rata-rata per bulan; horizon 20 hari tumpang tindih antar bulan sehingga t sedikit terlalu optimis.",
@@ -375,8 +400,15 @@ func main() {
 	if len(broken) > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("⚠️ Rantai hash log uji maju rusak pada: %v — ada file yang diubah setelah ditulis.", broken))
 	}
+	if *universe == "sehat" {
+		rep.Universe = "sehat"
+		rep.Notes = append(rep.Notes, "Universe 'saham sehat': per tanggal hanya 40 saham dengan transaksi 20 hari terbesar, harga ≥ Rp500, ATR ≤ 4%; pembanding = rata-rata saham sehat di tanggal yang sama.")
+	}
 	if *out == "" {
-		*out = filepath.Join("research", "rapor", asOf+".json")
+		*out = filepath.Join("research", "rapor", *universe, asOf+".json") // sehat → research/rapor/sehat/ (the app serves research/rapor/*.json)
+		if *sehatN != 40 {
+			*out = filepath.Join("research", "out", fmt.Sprintf("rapor-sehat%d-%s.json", *sehatN, asOf)) // sensitivity: scratch only
+		}
 	}
 	if err := storage.WriteJSON(*out, rep); err != nil {
 		fail("write %s: %v", *out, err)
@@ -488,10 +520,10 @@ func fail(format string, a ...any) {
 	os.Exit(1)
 }
 
-// topQuintile is the value-indicator "trade": on each date, buy the best 20%
-// of liquid stocks by the indicator (in its useful direction) and hold 20
-// days. Returns the per-date mean excess return (before costs).
-func topQuintile(res []stockOut, j int, dir float64, excess func(*series, int, int) float64) []obs {
+// topFrac is the value-indicator "trade": on each date, buy the best frac of
+// liquid stocks by the indicator (in its useful direction) and hold h days.
+// Returns the per-date mean excess return (before costs).
+func topFrac(res []stockOut, j int, dir float64, excess func(*series, int, int) float64, frac float64, h int) []obs {
 	type pt struct{ v, x float64 }
 	by := map[string][]pt{}
 	for _, o := range res {
@@ -499,7 +531,7 @@ func topQuintile(res []stockOut, j int, dir float64, excess func(*series, int, i
 			continue
 		}
 		for i := 0; i < o.s.n; i++ {
-			v, x := o.vals[j][i], excess(o.s, 20, i)
+			v, x := o.vals[j][i], excess(o.s, h, i)
 			if o.s.liquid[i] && !math.IsNaN(v) && !math.IsInf(v, 0) && !math.IsNaN(x) {
 				by[o.s.date[i]] = append(by[o.s.date[i]], pt{v * dir, x})
 			}
@@ -511,7 +543,7 @@ func topQuintile(res []stockOut, j int, dir float64, excess func(*series, int, i
 			continue
 		}
 		sort.Slice(ps, func(a, b int) bool { return ps[a].v > ps[b].v })
-		k := len(ps) / 5
+		k := int(float64(len(ps)) * frac)
 		xs := make([]float64, k)
 		for q := 0; q < k; q++ {
 			xs[q] = ps[q].x

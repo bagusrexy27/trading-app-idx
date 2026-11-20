@@ -1,14 +1,14 @@
 {
   "as_of": "2026-11-20",
-  "made_at": "2026-11-20T13:47:17+07:00",
+  "made_at": "2026-11-20T15:08:41+07:00",
   "stocks": 126,
   "min_turnover_bn": 20,
   "from": "2020-01-01",
-  "ihsg_cagr_pct": 0.84,
+  "ihsg_cagr_pct": 0.87,
   "ihsg_max_dd_pct": 46.31,
   "notes": [
     "Market-neutral: hasil sinyal dikurangi rata-rata semua saham likuid di tanggal yang sama.",
-    "Entry = open hari berikutnya; biaya 0,4% bolak-balik; sinyal berulang \u003c 10 hari pada saham yang sama dibuang.",
+    "Entry = open hari berikutnya; biaya 0,4% bolak-balik; sinyal berulang \u003c 20 hari pada saham yang sama dibuang; ARB/ARA: order di hari terkunci tidak tereksekusi.",
     "Periode: TRAIN 2020–2023 · VALID 2024–Nov 2025 · TEST Des 2025+.",
     "Bias survivorship: hanya saham yang masih tercatat hari ini.",
     "t dihitung dari rata-rata per bulan; horizon 20 hari tumpang tindih antar bulan sehingga t sedikit terlalu optimis."
@@ -40,7 +40,7 @@
         "5": 0.041,
         "60": 0.123
       },
-      "t": 2.849,
+      "t": 2.85,
       "years_won": "4/4",
       "by_year": {
         "2023": 0.031,
@@ -63,7 +63,7 @@
         "tenang": 231
       },
       "edge_net": {
-        "TEST": 3.377,
+        "TEST": 3.378,
         "TRAIN": -0.149,
         "VALID": -1.395
       },
@@ -72,13 +72,14 @@
       "n_eff": 44,
       "in_sample": 0.018,
       "holdout": 0.239,
+      "stable": true,
       "reasons": [
         "q = 0.060 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.318,
+            "excess": 0.319,
             "n": 306
           },
           "IHSG \u003c MA200, tenang": {
@@ -94,7 +95,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.513,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.354,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.265,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.238,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.245,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Altman Z-score",
@@ -122,7 +150,7 @@
         "5": -0.02,
         "60": -0.103
       },
-      "t": -2.84,
+      "t": -2.842,
       "years_won": "3/4",
       "by_year": {
         "2023": -0.062,
@@ -145,7 +173,7 @@
         "tenang": 231
       },
       "edge_net": {
-        "TEST": 1.97,
+        "TEST": 1.971,
         "TRAIN": 0.539,
         "VALID": 0.416
       },
@@ -154,6 +182,7 @@
       "n_eff": 44,
       "in_sample": 0.026,
       "holdout": 0.109,
+      "stable": true,
       "reasons": [
         "q = 0.060 (tidak signifikan)"
       ],
@@ -176,7 +205,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 1.212,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 1.597,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.808,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.826,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 1.232,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "S\u0026P 500 turun \u003e 5% dalam 20 hari",
@@ -188,7 +244,7 @@
       "direction": "baik",
       "n": 118,
       "split": {
-        "TEST": 10.924,
+        "TEST": 10.923,
         "TRAIN": 1.681,
         "VALID": 5.92
       },
@@ -207,7 +263,7 @@
         "2023": -0.511,
         "2024": 2.483,
         "2025": 6.824,
-        "2026": 10.924
+        "2026": 10.923
       },
       "by_mood": {
         "optimis": -3.785,
@@ -222,7 +278,7 @@
         "tenang": 32
       },
       "edge_net": {
-        "TEST": 10.524,
+        "TEST": 10.523,
         "TRAIN": 1.281,
         "VALID": 5.52
       },
@@ -230,7 +286,7 @@
       "q": 0.06,
       "n_eff": 21,
       "in_sample": 2.574,
-      "holdout": 10.924,
+      "holdout": 10.923,
       "reasons": [
         "q = 0.060 (tidak signifikan)"
       ],
@@ -269,7 +325,7 @@
       "direction": "baik",
       "n": 246,
       "split": {
-        "TEST": 11.819,
+        "TEST": 11.818,
         "TRAIN": 2.366,
         "VALID": 9.413
       },
@@ -288,13 +344,13 @@
         "2023": 2.819,
         "2024": 4.006,
         "2025": 10.614,
-        "2026": 11.819
+        "2026": 11.818
       },
       "by_mood": {
         "euforia": 13.89,
         "optimis": 2.473,
-        "panik": 6.794,
-        "takut": 2.188,
+        "panik": 6.793,
+        "takut": 2.187,
         "tenang": 2.414
       },
       "mood_n": {
@@ -305,7 +361,7 @@
         "tenang": 93
       },
       "edge_net": {
-        "TEST": 11.419,
+        "TEST": 11.418,
         "TRAIN": 1.966,
         "VALID": 9.013
       },
@@ -313,7 +369,7 @@
       "q": 0.06,
       "n_eff": 32,
       "in_sample": 3.026,
-      "holdout": 11.819,
+      "holdout": 11.818,
       "reasons": [
         "q = 0.060 (tidak signifikan)"
       ],
@@ -324,7 +380,7 @@
             "n": 55
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 10.925,
+            "excess": 10.924,
             "n": 38
           },
           "IHSG \u003c MA200, tenang": {
@@ -351,7 +407,7 @@
       "grade": "D",
       "n": 825,
       "split": {
-        "TEST": 1.185,
+        "TEST": 1.171,
         "TRAIN": -0.912,
         "VALID": -3.053
       },
@@ -362,11 +418,11 @@
       },
       "horizons": {
         "10": -0.39,
-        "20": -0.99,
+        "20": -1,
         "5": -0.56,
         "60": -1.2
       },
-      "t": -2.733,
+      "t": -2.736,
       "years_won": "1/7",
       "by_year": {
         "2020": -2.861,
@@ -375,12 +431,12 @@
         "2023": -0.833,
         "2024": -1.984,
         "2025": -4.469,
-        "2026": 1.899
+        "2026": 1.883
       },
       "by_mood": {
         "euforia": -3.365,
         "optimis": -3.007,
-        "panik": 0.659,
+        "panik": 0.648,
         "takut": -1.113,
         "tenang": -1.536
       },
@@ -398,7 +454,7 @@
       },
       "hit_pct": 40.61,
       "edge_net": {
-        "TEST": 0.785,
+        "TEST": 0.771,
         "TRAIN": -1.312,
         "VALID": -3.453
       },
@@ -406,12 +462,12 @@
       "q": 0.072,
       "n_eff": 76,
       "random_entry": {
-        "p50": 0.012,
+        "p50": 0.01,
         "p95": 0.91,
         "beats_p95": false
       },
       "in_sample": -1.675,
-      "holdout": 1.185,
+      "holdout": 1.171,
       "stable": false,
       "reasons": [
         "q = 0.072 (tidak signifikan)"
@@ -438,7 +494,7 @@
             "n": 211
           },
           "Q3": {
-            "excess": -2.698,
+            "excess": -2.714,
             "n": 185
           },
           "Q4": {
@@ -452,7 +508,7 @@
             "n": 23
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.709,
+            "excess": 0.698,
             "n": 258
           },
           "IHSG \u003c MA200, tenang": {
@@ -470,7 +526,7 @@
         },
         "sektor": {
           "Basic Materials": {
-            "excess": -0.138,
+            "excess": -0.137,
             "n": 184
           },
           "Communication Services": {
@@ -478,7 +534,7 @@
             "n": 67
           },
           "Consumer Cyclical": {
-            "excess": -2.661,
+            "excess": -2.709,
             "n": 60
           },
           "Consumer Defensive": {
@@ -486,7 +542,7 @@
             "n": 149
           },
           "Energy": {
-            "excess": -0.862,
+            "excess": -0.865,
             "n": 117
           },
           "Financial Services": {
@@ -518,17 +574,17 @@
       "params": [
         {
           "label": "MFI(10) lewat 14",
-          "excess": -0.776,
+          "excess": -0.781,
           "n": 945
         },
         {
           "label": "MFI(10) lewat 20",
-          "excess": -0.361,
+          "excess": -0.364,
           "n": 1466
         },
         {
           "label": "MFI(10) lewat 26",
-          "excess": 0.019,
+          "excess": 0.015,
           "n": 1962
         },
         {
@@ -538,17 +594,17 @@
         },
         {
           "label": "MFI(14) lewat 20",
-          "excess": -0.992,
+          "excess": -0.996,
           "n": 825
         },
         {
           "label": "MFI(14) lewat 26",
-          "excess": -0.344,
+          "excess": -0.347,
           "n": 1321
         },
         {
           "label": "MFI(18) lewat 14",
-          "excess": 0.142,
+          "excess": 0.129,
           "n": 192
         },
         {
@@ -558,7 +614,7 @@
         },
         {
           "label": "MFI(18) lewat 26",
-          "excess": -0.706,
+          "excess": -0.707,
           "n": 890
         }
       ]
@@ -614,7 +670,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 0.234,
+        "TEST": 0.232,
         "TRAIN": 0.68,
         "VALID": 2.911
       },
@@ -623,6 +679,7 @@
       "n_eff": 77,
       "in_sample": 0.034,
       "holdout": 0.046,
+      "stable": true,
       "reasons": [
         "q = 0.100 (tidak signifikan)"
       ],
@@ -633,7 +690,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 1.416,
+            "excess": 1.414,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -649,7 +706,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 1.566,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 1.317,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 1.1,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 1.143,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 1.026,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Force Index (13) tembus 0",
@@ -660,7 +744,7 @@
       "grade": "D",
       "n": 2552,
       "split": {
-        "TEST": -0.721,
+        "TEST": -0.728,
         "TRAIN": -0.104,
         "VALID": -1.782
       },
@@ -675,7 +759,7 @@
         "5": -0.55,
         "60": -1.47
       },
-      "t": -2.574,
+      "t": -2.577,
       "years_won": "1/7",
       "by_year": {
         "2020": -0.597,
@@ -684,12 +768,12 @@
         "2023": 0.129,
         "2024": -0.768,
         "2025": -3.076,
-        "2026": -0.3
+        "2026": -0.307
       },
       "by_mood": {
         "euforia": 2.94,
         "optimis": -1.949,
-        "panik": -0.772,
+        "panik": -0.78,
         "takut": -1.218,
         "tenang": 0.007
       },
@@ -707,7 +791,7 @@
       },
       "hit_pct": 41.77,
       "edge_net": {
-        "TEST": -1.121,
+        "TEST": -1.128,
         "TRAIN": -0.504,
         "VALID": -2.182
       },
@@ -720,7 +804,7 @@
         "beats_p95": false
       },
       "in_sample": -0.748,
-      "holdout": -0.721,
+      "holdout": -0.728,
       "reasons": [
         "q = 0.120 (tidak signifikan)"
       ],
@@ -746,7 +830,7 @@
             "n": 641
           },
           "Q3": {
-            "excess": -1.107,
+            "excess": -1.111,
             "n": 607
           },
           "Q4": {
@@ -760,7 +844,7 @@
             "n": 100
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -1.246,
+            "excess": -1.25,
             "n": 685
           },
           "IHSG \u003c MA200, tenang": {
@@ -786,7 +870,7 @@
             "n": 202
           },
           "Consumer Cyclical": {
-            "excess": -0.754,
+            "excess": -0.771,
             "n": 169
           },
           "Consumer Defensive": {
@@ -810,7 +894,7 @@
             "n": 185
           },
           "Real Estate": {
-            "excess": -2.199,
+            "excess": -2.202,
             "n": 138
           },
           "Technology": {
@@ -849,7 +933,7 @@
         "5": 0.012,
         "60": 0.009
       },
-      "t": 2.561,
+      "t": 2.56,
       "years_won": "6/7",
       "by_year": {
         "2020": 0.001,
@@ -875,7 +959,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 0.65,
+        "TEST": 0.648,
         "TRAIN": -0.237,
         "VALID": -0.649
       },
@@ -884,6 +968,7 @@
       "n_eff": 77,
       "in_sample": 0.007,
       "holdout": 0.043,
+      "stable": false,
       "reasons": [
         "q = 0.120 (tidak signifikan)"
       ],
@@ -894,7 +979,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.909,
+            "excess": 0.908,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -910,7 +995,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.165,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.108,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.026,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.027,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.008,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "MACD cross naik di bawah 0",
@@ -921,7 +1033,7 @@
       "grade": "D",
       "n": 1569,
       "split": {
-        "TEST": -1.566,
+        "TEST": -1.556,
         "TRAIN": -0.64,
         "VALID": -1.337
       },
@@ -932,11 +1044,11 @@
       },
       "horizons": {
         "10": -0.38,
-        "20": -1.04,
+        "20": -1.03,
         "5": -0.14,
         "60": -1.7
       },
-      "t": -2.422,
+      "t": -2.417,
       "years_won": "1/7",
       "by_year": {
         "2020": -2.136,
@@ -945,12 +1057,12 @@
         "2023": -1.303,
         "2024": -1.33,
         "2025": -1.443,
-        "2026": -1.495
+        "2026": -1.484
       },
       "by_mood": {
         "euforia": 0.482,
         "optimis": -1.278,
-        "panik": 0.188,
+        "panik": 0.2,
         "takut": -2.157,
         "tenang": -0.653
       },
@@ -968,7 +1080,7 @@
       },
       "hit_pct": 41.36,
       "edge_net": {
-        "TEST": -1.966,
+        "TEST": -1.956,
         "TRAIN": -1.04,
         "VALID": -1.737
       },
@@ -981,7 +1093,7 @@
         "beats_p95": false
       },
       "in_sample": -0.901,
-      "holdout": -1.566,
+      "holdout": -1.556,
       "reasons": [
         "q = 0.185 (tidak signifikan)"
       ],
@@ -1003,11 +1115,11 @@
             "n": 467
           },
           "Q2": {
-            "excess": -0.357,
+            "excess": -0.352,
             "n": 402
           },
           "Q3": {
-            "excess": -1.376,
+            "excess": -1.373,
             "n": 368
           },
           "Q4": {
@@ -1021,7 +1133,7 @@
             "n": 54
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.629,
+            "excess": -0.622,
             "n": 487
           },
           "IHSG \u003c MA200, tenang": {
@@ -1043,7 +1155,7 @@
             "n": 376
           },
           "Communication Services": {
-            "excess": 1.159,
+            "excess": 1.16,
             "n": 127
           },
           "Consumer Cyclical": {
@@ -1055,7 +1167,7 @@
             "n": 241
           },
           "Energy": {
-            "excess": -0.636,
+            "excess": -0.632,
             "n": 238
           },
           "Financial Services": {
@@ -1079,7 +1191,7 @@
             "n": 19
           },
           "Utilities": {
-            "excess": -0.557,
+            "excess": -0.521,
             "n": 62
           }
         }
@@ -1303,7 +1415,7 @@
         "tenang": 231
       },
       "edge_net": {
-        "TEST": 3.085,
+        "TEST": 3.086,
         "TRAIN": -0.387,
         "VALID": -1.786
       },
@@ -1312,13 +1424,14 @@
       "n_eff": 44,
       "in_sample": 0.001,
       "holdout": 0.218,
+      "stable": false,
       "reasons": [
         "q = 0.185 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.702,
+            "excess": 0.703,
             "n": 306
           },
           "IHSG \u003c MA200, tenang": {
@@ -1334,7 +1447,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.123,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.051,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.366,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.305,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.242,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Dividend yield 12 bulan",
@@ -1388,7 +1528,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 2.825,
+        "TEST": 2.826,
         "TRAIN": -0.552,
         "VALID": -1.342
       },
@@ -1397,6 +1537,7 @@
       "n_eff": 77,
       "in_sample": 0.017,
       "holdout": 0.199,
+      "stable": false,
       "reasons": [
         "q = 0.305 (tidak signifikan)"
       ],
@@ -1423,7 +1564,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.048,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.087,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.191,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.227,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.292,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Engine: STRONG_BUY baru",
@@ -1489,7 +1657,7 @@
       "q": 0.312,
       "n_eff": 73,
       "random_entry": {
-        "p50": -0.015,
+        "p50": -0.016,
         "p95": 1.013,
         "beats_p95": true
       },
@@ -1772,7 +1940,7 @@
       "direction": "tinggi",
       "n": 1391,
       "split": {
-        "TEST": 0.112,
+        "TEST": 0.113,
         "TRAIN": 0.055,
         "VALID": 0.021
       },
@@ -1820,7 +1988,8 @@
       "q": 0.312,
       "n_eff": 70,
       "in_sample": 0.042,
-      "holdout": 0.112,
+      "holdout": 0.113,
+      "stable": true,
       "reasons": [
         "q = 0.312 (tidak signifikan)"
       ],
@@ -1843,7 +2012,34 @@
             "n": 659
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.674,
+          "n": 1401
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.509,
+          "n": 1351
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.467,
+          "n": 1401
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.575,
+          "n": 1391
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.409,
+          "n": 1351
+        }
+      ]
     },
     {
       "name": "EBITDA ÷ EV (kebalikan EV/EBITDA)",
@@ -1903,6 +2099,7 @@
       "n_eff": 44,
       "in_sample": 0.004,
       "holdout": 0.22,
+      "stable": true,
       "reasons": [
         "q = 0.312 (tidak signifikan)"
       ],
@@ -1925,7 +2122,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.279,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.111,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.388,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.378,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.405,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Akrual",
@@ -1985,6 +2209,7 @@
       "n_eff": 44,
       "in_sample": 0.026,
       "holdout": 0.033,
+      "stable": true,
       "reasons": [
         "q = 0.312 (tidak signifikan)"
       ],
@@ -2007,7 +2232,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.415,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.456,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.603,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.637,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.553,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Bulan Januari",
@@ -2019,7 +2271,7 @@
       "direction": "buruk",
       "n": 123,
       "split": {
-        "TEST": -3.681,
+        "TEST": -3.683,
         "TRAIN": 0.03,
         "VALID": -2.962
       },
@@ -2037,11 +2289,11 @@
         "2023": 0.517,
         "2024": -3.889,
         "2025": -1.89,
-        "2026": -3.681
+        "2026": -3.683
       },
       "by_mood": {
-        "euforia": -6.514,
-        "optimis": -4.658,
+        "euforia": -6.515,
+        "optimis": -4.659,
         "panik": 3.47,
         "takut": 0.362,
         "tenang": -1.598
@@ -2054,7 +2306,7 @@
         "tenang": 46
       },
       "edge_net": {
-        "TEST": 3.281,
+        "TEST": 3.283,
         "TRAIN": -0.43,
         "VALID": 2.562
       },
@@ -2062,7 +2314,7 @@
       "q": 0.312,
       "n_eff": 6,
       "in_sample": 1.161,
-      "holdout": 3.681,
+      "holdout": 3.683,
       "reasons": [
         "q = 0.312 (tidak signifikan)"
       ],
@@ -2077,7 +2329,7 @@
             "n": 7
           },
           "IHSG \u003e MA200, bergejolak": {
-            "excess": -0.059,
+            "excess": -0.06,
             "n": 17
           },
           "IHSG \u003e MA200, tenang": {
@@ -2096,7 +2348,7 @@
       "grade": "D",
       "n": 1571,
       "split": {
-        "TEST": -0.752,
+        "TEST": -0.746,
         "TRAIN": -0.297,
         "VALID": -0.69
       },
@@ -2111,7 +2363,7 @@
         "5": -0.06,
         "60": -1.07
       },
-      "t": -1.782,
+      "t": -1.779,
       "years_won": "2/7",
       "by_year": {
         "2020": -3.471,
@@ -2120,12 +2372,12 @@
         "2023": -0.064,
         "2024": -0.129,
         "2025": -2.018,
-        "2026": -0.009
+        "2026": -0.002
       },
       "by_mood": {
         "euforia": 1.601,
         "optimis": -0.22,
-        "panik": -0.407,
+        "panik": -0.4,
         "takut": -0.429,
         "tenang": -1.137
       },
@@ -2143,7 +2395,7 @@
       },
       "hit_pct": 42.2,
       "edge_net": {
-        "TEST": -1.152,
+        "TEST": -1.146,
         "TRAIN": -0.697,
         "VALID": -1.09
       },
@@ -2156,7 +2408,7 @@
         "beats_p95": false
       },
       "in_sample": -0.451,
-      "holdout": -0.752,
+      "holdout": -0.746,
       "reasons": [
         "q = 0.343 (tidak signifikan)"
       ],
@@ -2178,7 +2430,7 @@
             "n": 409
           },
           "Q2": {
-            "excess": -1.333,
+            "excess": -1.327,
             "n": 381
           },
           "Q3": {
@@ -2196,7 +2448,7 @@
             "n": 55
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.699,
+            "excess": -0.694,
             "n": 410
           },
           "IHSG \u003c MA200, tenang": {
@@ -2254,7 +2506,7 @@
             "n": 2
           },
           "Utilities": {
-            "excess": 1.638,
+            "excess": 1.679,
             "n": 53
           }
         }
@@ -2269,7 +2521,7 @@
       "grade": "D",
       "n": 704,
       "split": {
-        "TEST": -0.121,
+        "TEST": -0.126,
         "TRAIN": -0.503,
         "VALID": -1.47
       },
@@ -2284,7 +2536,7 @@
         "5": -0.34,
         "60": -0.86
       },
-      "t": -1.852,
+      "t": -1.853,
       "years_won": "2/7",
       "by_year": {
         "2020": -0.513,
@@ -2293,12 +2545,12 @@
         "2023": 0.179,
         "2024": -1.983,
         "2025": -1.676,
-        "2026": 0.318
+        "2026": 0.313
       },
       "by_mood": {
         "euforia": -7.984,
         "optimis": -1.866,
-        "panik": 0.693,
+        "panik": 0.69,
         "takut": -0.679,
         "tenang": -2.551
       },
@@ -2316,7 +2568,7 @@
       },
       "hit_pct": 43.61,
       "edge_net": {
-        "TEST": -0.521,
+        "TEST": -0.526,
         "TRAIN": -0.903,
         "VALID": -1.87
       },
@@ -2329,7 +2581,7 @@
         "beats_p95": false
       },
       "in_sample": -0.88,
-      "holdout": -0.121,
+      "holdout": -0.126,
       "stable": true,
       "reasons": [
         "q = 0.354 (tidak signifikan)"
@@ -2348,19 +2600,19 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 0.001,
+            "excess": -0,
             "n": 211
           },
           "Q2": {
-            "excess": -1.923,
+            "excess": -1.913,
             "n": 172
           },
           "Q3": {
-            "excess": -0.848,
+            "excess": -0.865,
             "n": 169
           },
           "Q4": {
-            "excess": 0.033,
+            "excess": 0.037,
             "n": 152
           }
         },
@@ -2370,7 +2622,7 @@
             "n": 15
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 1.187,
+            "excess": 1.184,
             "n": 289
           },
           "IHSG \u003c MA200, tenang": {
@@ -2388,7 +2640,7 @@
         },
         "sektor": {
           "Basic Materials": {
-            "excess": 0.397,
+            "excess": 0.399,
             "n": 166
           },
           "Communication Services": {
@@ -2396,7 +2648,7 @@
             "n": 67
           },
           "Consumer Cyclical": {
-            "excess": -4.588,
+            "excess": -4.646,
             "n": 50
           },
           "Consumer Defensive": {
@@ -2404,7 +2656,7 @@
             "n": 106
           },
           "Energy": {
-            "excess": -1.099,
+            "excess": -1.094,
             "n": 104
           },
           "Financial Services": {
@@ -2416,11 +2668,11 @@
             "n": 18
           },
           "Industrials": {
-            "excess": -0.975,
+            "excess": -0.945,
             "n": 49
           },
           "Real Estate": {
-            "excess": -2.588,
+            "excess": -2.596,
             "n": 40
           },
           "Technology": {
@@ -2436,27 +2688,27 @@
       "params": [
         {
           "label": "RSI(10) lewat 21",
-          "excess": -1.218,
+          "excess": -1.229,
           "n": 421
         },
         {
           "label": "RSI(10) lewat 30",
-          "excess": -0.575,
+          "excess": -0.579,
           "n": 1273
         },
         {
           "label": "RSI(10) lewat 39",
-          "excess": -1.15,
+          "excess": -1.149,
           "n": 2223
         },
         {
           "label": "RSI(14) lewat 21",
-          "excess": -1.699,
+          "excess": -1.733,
           "n": 135
         },
         {
           "label": "RSI(14) lewat 30",
-          "excess": -0.666,
+          "excess": -0.667,
           "n": 704
         },
         {
@@ -2466,12 +2718,12 @@
         },
         {
           "label": "RSI(18) lewat 21",
-          "excess": -1.312,
+          "excess": -1.344,
           "n": 60
         },
         {
           "label": "RSI(18) lewat 30",
-          "excess": -1.219,
+          "excess": -1.236,
           "n": 406
         },
         {
@@ -2545,8 +2797,8 @@
       "q": 0.375,
       "n_eff": 76,
       "random_entry": {
-        "p50": -0.024,
-        "p95": 0.591,
+        "p50": -0.023,
+        "p95": 0.592,
         "beats_p95": true
       },
       "in_sample": 0.667,
@@ -2681,7 +2933,7 @@
       "grade": "D",
       "n": 2386,
       "split": {
-        "TEST": -0.984,
+        "TEST": -0.987,
         "TRAIN": 0.098,
         "VALID": -1.238
       },
@@ -2696,7 +2948,7 @@
         "5": -0.31,
         "60": -1.06
       },
-      "t": -1.801,
+      "t": -1.802,
       "years_won": "3/7",
       "by_year": {
         "2020": -1.349,
@@ -2705,12 +2957,12 @@
         "2023": 0.125,
         "2024": -0.696,
         "2025": -2.503,
-        "2026": -0.285
+        "2026": -0.288
       },
       "by_mood": {
         "euforia": -1.775,
         "optimis": -0.414,
-        "panik": 0.445,
+        "panik": 0.443,
         "takut": -0.595,
         "tenang": -1.195
       },
@@ -2728,11 +2980,11 @@
       },
       "hit_pct": 42.33,
       "edge_net": {
-        "TEST": -1.384,
+        "TEST": -1.387,
         "TRAIN": -0.302,
         "VALID": -1.638
       },
-      "p": 0.073,
+      "p": 0.072,
       "q": 0.375,
       "n_eff": 77,
       "random_entry": {
@@ -2741,7 +2993,7 @@
         "beats_p95": false
       },
       "in_sample": -0.408,
-      "holdout": -0.984,
+      "holdout": -0.987,
       "reasons": [
         "q = 0.375 (tidak signifikan)"
       ],
@@ -2759,7 +3011,7 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 0.953,
+            "excess": 0.956,
             "n": 688
           },
           "Q2": {
@@ -2767,11 +3019,11 @@
             "n": 571
           },
           "Q3": {
-            "excess": -0.487,
+            "excess": -0.493,
             "n": 567
           },
           "Q4": {
-            "excess": -1.041,
+            "excess": -1.04,
             "n": 560
           }
         },
@@ -2781,7 +3033,7 @@
             "n": 90
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.193,
+            "excess": -0.195,
             "n": 653
           },
           "IHSG \u003c MA200, tenang": {
@@ -2803,19 +3055,19 @@
             "n": 573
           },
           "Communication Services": {
-            "excess": 0.563,
+            "excess": 0.567,
             "n": 197
           },
           "Consumer Cyclical": {
-            "excess": -2.148,
+            "excess": -2.166,
             "n": 171
           },
           "Consumer Defensive": {
-            "excess": -1.518,
+            "excess": -1.516,
             "n": 341
           },
           "Energy": {
-            "excess": 0.395,
+            "excess": 0.396,
             "n": 364
           },
           "Financial Services": {
@@ -2879,7 +3131,7 @@
       "by_mood": {
         "euforia": -0.051,
         "optimis": -0.006,
-        "panik": -0.051,
+        "panik": -0.052,
         "takut": -0.041,
         "tenang": -0.019
       },
@@ -2891,7 +3143,7 @@
         "tenang": 127
       },
       "edge_net": {
-        "TEST": 0.496,
+        "TEST": 0.497,
         "VALID": 0.969
       },
       "p": 0.08,
@@ -2899,6 +3151,7 @@
       "n_eff": 31,
       "in_sample": 0.015,
       "holdout": 0.062,
+      "stable": false,
       "reasons": [
         "q = 0.384 (tidak signifikan)"
       ],
@@ -2919,6 +3172,206 @@
           "IHSG \u003e MA200, tenang": {
             "excess": 1.764,
             "n": 137
+          }
+        }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 1.117,
+          "n": 618
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.967,
+          "n": 568
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.898,
+          "n": 618
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.81,
+          "n": 608
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.507,
+          "n": 568
+        }
+      ]
+    },
+    {
+      "name": "Williams %R naik lewat −80",
+      "category": "momentum",
+      "kind": "signal",
+      "in_app": false,
+      "explain": "Williams %R (14) keluar dari jenuh jual.",
+      "grade": "D",
+      "n": 2854,
+      "split": {
+        "TEST": -0.462,
+        "TRAIN": -0.156,
+        "VALID": -1.275
+      },
+      "split_n": {
+        "TEST": 556,
+        "TRAIN": 1395,
+        "VALID": 903
+      },
+      "horizons": {
+        "10": -0.33,
+        "20": -0.57,
+        "5": -0.42,
+        "60": -0.98
+      },
+      "t": -1.712,
+      "years_won": "1/7",
+      "by_year": {
+        "2020": -1.352,
+        "2021": -0.062,
+        "2022": -0.272,
+        "2023": 0.284,
+        "2024": -0.568,
+        "2025": -2.193,
+        "2026": -0.126
+      },
+      "by_mood": {
+        "euforia": -0.193,
+        "optimis": -1.311,
+        "panik": -1.032,
+        "takut": 0.218,
+        "tenang": -0.418
+      },
+      "mood_n": {
+        "euforia": 118,
+        "optimis": 573,
+        "panik": 661,
+        "takut": 720,
+        "tenang": 782
+      },
+      "trade_atr": {
+        "TEST": -3.086,
+        "TRAIN": -0.621,
+        "VALID": -0.927
+      },
+      "hit_pct": 41.66,
+      "edge_net": {
+        "TEST": -0.862,
+        "TRAIN": -0.556,
+        "VALID": -1.675
+      },
+      "p": 0.085,
+      "q": 0.3923,
+      "n_eff": 76,
+      "random_entry": {
+        "p50": -0.011,
+        "p95": 0.459,
+        "beats_p95": false
+      },
+      "in_sample": -0.596,
+      "holdout": -0.462,
+      "reasons": [
+        "q = 0.392 (tidak signifikan)"
+      ],
+      "portfolio": {
+        "cagr_pct": -28.05,
+        "sharpe": -0.98,
+        "max_dd_pct": 87.95,
+        "profit_factor": 0.72,
+        "win_rate_pct": 33.15,
+        "avg_win_pct": 9.93,
+        "avg_loss_pct": -6.83,
+        "trades": 1460,
+        "exposure_pct": 88.9
+      },
+      "groups": {
+        "likuiditas": {
+          "Q1": {
+            "excess": 0.107,
+            "n": 766
+          },
+          "Q2": {
+            "excess": -0.627,
+            "n": 695
+          },
+          "Q3": {
+            "excess": -0.485,
+            "n": 697
+          },
+          "Q4": {
+            "excess": -1.342,
+            "n": 696
+          }
+        },
+        "rezim": {
+          "?": {
+            "excess": -1.619,
+            "n": 96
+          },
+          "IHSG \u003c MA200, bergejolak": {
+            "excess": -0.679,
+            "n": 773
+          },
+          "IHSG \u003c MA200, tenang": {
+            "excess": -0.033,
+            "n": 270
+          },
+          "IHSG \u003e MA200, bergejolak": {
+            "excess": -0.664,
+            "n": 480
+          },
+          "IHSG \u003e MA200, tenang": {
+            "excess": -0.501,
+            "n": 1235
+          }
+        },
+        "sektor": {
+          "Basic Materials": {
+            "excess": -0.286,
+            "n": 681
+          },
+          "Communication Services": {
+            "excess": -0.327,
+            "n": 229
+          },
+          "Consumer Cyclical": {
+            "excess": -1.396,
+            "n": 211
+          },
+          "Consumer Defensive": {
+            "excess": -1.643,
+            "n": 413
+          },
+          "Energy": {
+            "excess": 0.899,
+            "n": 440
+          },
+          "Financial Services": {
+            "excess": -0.73,
+            "n": 301
+          },
+          "Healthcare": {
+            "excess": -1.098,
+            "n": 71
+          },
+          "Industrials": {
+            "excess": -0.425,
+            "n": 203
+          },
+          "Real Estate": {
+            "excess": -1.573,
+            "n": 165
+          },
+          "Technology": {
+            "excess": -1.006,
+            "n": 30
+          },
+          "Utilities": {
+            "excess": -0.951,
+            "n": 110
           }
         }
       }
@@ -2987,7 +3440,7 @@
       "q": 0.3943,
       "n_eff": 75,
       "random_entry": {
-        "p50": -0.035,
+        "p50": -0.034,
         "p95": 0.89,
         "beats_p95": false
       },
@@ -3115,179 +3568,6 @@
       ]
     },
     {
-      "name": "Williams %R naik lewat −80",
-      "category": "momentum",
-      "kind": "signal",
-      "in_app": false,
-      "explain": "Williams %R (14) keluar dari jenuh jual.",
-      "grade": "D",
-      "n": 2854,
-      "split": {
-        "TEST": -0.452,
-        "TRAIN": -0.156,
-        "VALID": -1.275
-      },
-      "split_n": {
-        "TEST": 556,
-        "TRAIN": 1395,
-        "VALID": 903
-      },
-      "horizons": {
-        "10": -0.33,
-        "20": -0.57,
-        "5": -0.42,
-        "60": -0.98
-      },
-      "t": -1.708,
-      "years_won": "1/7",
-      "by_year": {
-        "2020": -1.352,
-        "2021": -0.062,
-        "2022": -0.272,
-        "2023": 0.284,
-        "2024": -0.568,
-        "2025": -2.193,
-        "2026": -0.115
-      },
-      "by_mood": {
-        "euforia": -0.193,
-        "optimis": -1.311,
-        "panik": -1.024,
-        "takut": 0.218,
-        "tenang": -0.418
-      },
-      "mood_n": {
-        "euforia": 118,
-        "optimis": 573,
-        "panik": 661,
-        "takut": 720,
-        "tenang": 782
-      },
-      "trade_atr": {
-        "TEST": -3.084,
-        "TRAIN": -0.621,
-        "VALID": -0.927
-      },
-      "hit_pct": 41.66,
-      "edge_net": {
-        "TEST": -0.852,
-        "TRAIN": -0.556,
-        "VALID": -1.675
-      },
-      "p": 0.086,
-      "q": 0.3943,
-      "n_eff": 76,
-      "random_entry": {
-        "p50": -0.011,
-        "p95": 0.459,
-        "beats_p95": false
-      },
-      "in_sample": -0.596,
-      "holdout": -0.452,
-      "reasons": [
-        "q = 0.394 (tidak signifikan)"
-      ],
-      "portfolio": {
-        "cagr_pct": -28.05,
-        "sharpe": -0.98,
-        "max_dd_pct": 87.95,
-        "profit_factor": 0.72,
-        "win_rate_pct": 33.15,
-        "avg_win_pct": 9.93,
-        "avg_loss_pct": -6.83,
-        "trades": 1460,
-        "exposure_pct": 88.9
-      },
-      "groups": {
-        "likuiditas": {
-          "Q1": {
-            "excess": 0.107,
-            "n": 766
-          },
-          "Q2": {
-            "excess": -0.625,
-            "n": 695
-          },
-          "Q3": {
-            "excess": -0.478,
-            "n": 697
-          },
-          "Q4": {
-            "excess": -1.343,
-            "n": 696
-          }
-        },
-        "rezim": {
-          "?": {
-            "excess": -1.619,
-            "n": 96
-          },
-          "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.672,
-            "n": 773
-          },
-          "IHSG \u003c MA200, tenang": {
-            "excess": -0.033,
-            "n": 270
-          },
-          "IHSG \u003e MA200, bergejolak": {
-            "excess": -0.664,
-            "n": 480
-          },
-          "IHSG \u003e MA200, tenang": {
-            "excess": -0.501,
-            "n": 1235
-          }
-        },
-        "sektor": {
-          "Basic Materials": {
-            "excess": -0.286,
-            "n": 681
-          },
-          "Communication Services": {
-            "excess": -0.327,
-            "n": 229
-          },
-          "Consumer Cyclical": {
-            "excess": -1.376,
-            "n": 211
-          },
-          "Consumer Defensive": {
-            "excess": -1.639,
-            "n": 413
-          },
-          "Energy": {
-            "excess": 0.898,
-            "n": 440
-          },
-          "Financial Services": {
-            "excess": -0.73,
-            "n": 301
-          },
-          "Healthcare": {
-            "excess": -1.098,
-            "n": 71
-          },
-          "Industrials": {
-            "excess": -0.425,
-            "n": 203
-          },
-          "Real Estate": {
-            "excess": -1.573,
-            "n": 165
-          },
-          "Technology": {
-            "excess": -1.006,
-            "n": 30
-          },
-          "Utilities": {
-            "excess": -0.951,
-            "n": 110
-          }
-        }
-      }
-    },
-    {
       "name": "Earnings yield (kebalikan PER)",
       "category": "fundamental",
       "kind": "value",
@@ -3336,7 +3616,7 @@
         "tenang": 231
       },
       "edge_net": {
-        "TEST": 2.579,
+        "TEST": 2.58,
         "TRAIN": -1.362,
         "VALID": -1.942
       },
@@ -3345,13 +3625,14 @@
       "n_eff": 44,
       "in_sample": -0.004,
       "holdout": 0.22,
+      "stable": false,
       "reasons": [
         "q = 0.394 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.536,
+            "excess": -0.535,
             "n": 306
           },
           "IHSG \u003c MA200, tenang": {
@@ -3367,7 +3648,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.338,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.149,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.02,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.099,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.254,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Stochastic cross naik di bawah 20",
@@ -3550,12 +3858,12 @@
         },
         {
           "label": "Stoch(10) \u003c 20",
-          "excess": 0.053,
+          "excess": 0.051,
           "n": 1847
         },
         {
           "label": "Stoch(10) \u003c 26",
-          "excess": -0.243,
+          "excess": -0.244,
           "n": 2294
         },
         {
@@ -3651,17 +3959,17 @@
         "VALID": 0.819
       },
       "p": 0.121,
-      "q": 0.4725,
+      "q": 0.48,
       "n_eff": 77,
       "random_entry": {
         "p50": -0.023,
-        "p95": 0.721,
+        "p95": 0.722,
         "beats_p95": false
       },
       "in_sample": 0.844,
       "holdout": -0.249,
       "reasons": [
-        "q = 0.472 (tidak signifikan)"
+        "q = 0.480 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -14.16,
@@ -3788,7 +4096,7 @@
         "5": 0.004,
         "60": 0.002
       },
-      "t": 1.39,
+      "t": 1.389,
       "years_won": "4/7",
       "by_year": {
         "2020": 0.018,
@@ -3818,13 +4126,14 @@
         "TRAIN": 0.066,
         "VALID": -0.019
       },
-      "p": 0.126,
-      "q": 0.4725,
+      "p": 0.128,
+      "q": 0.48,
       "n_eff": 77,
       "in_sample": 0.002,
       "holdout": 0.019,
+      "stable": false,
       "reasons": [
-        "q = 0.472 (tidak signifikan)"
+        "q = 0.480 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
@@ -3849,7 +4158,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.32,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.367,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.107,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.081,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.123,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Komponen engine: Candlestick",
@@ -3902,17 +4238,18 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": -0.012,
+        "TEST": -0.01,
         "TRAIN": -0.301,
         "VALID": -0.27
       },
       "p": 0.126,
-      "q": 0.4725,
+      "q": 0.48,
       "n_eff": 77,
       "in_sample": 0.017,
       "holdout": 0.012,
+      "stable": true,
       "reasons": [
-        "q = 0.472 (tidak signifikan)"
+        "q = 0.480 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
@@ -3921,7 +4258,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.465,
+            "excess": 0.466,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -3937,7 +4274,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.107,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.081,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.096,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.143,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.082,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Key Levels: mantul di support S1",
@@ -4121,7 +4485,7 @@
       "grade": "D",
       "n": 1584,
       "split": {
-        "TEST": 0.203,
+        "TEST": 0.202,
         "TRAIN": -0.63,
         "VALID": -0.204
       },
@@ -4145,12 +4509,12 @@
         "2023": 0.964,
         "2024": -0.263,
         "2025": -0.432,
-        "2026": 0.554
+        "2026": 0.553
       },
       "by_mood": {
         "euforia": -0.535,
         "optimis": 0.107,
-        "panik": -1.775,
+        "panik": -1.777,
         "takut": -0.36,
         "tenang": -0.066
       },
@@ -4168,7 +4532,7 @@
       },
       "hit_pct": 42.55,
       "edge_net": {
-        "TEST": -0.197,
+        "TEST": -0.198,
         "TRAIN": -1.03,
         "VALID": -0.604
       },
@@ -4181,7 +4545,7 @@
         "beats_p95": false
       },
       "in_sample": -0.452,
-      "holdout": 0.203,
+      "holdout": 0.202,
       "reasons": [
         "q = 0.505 (tidak signifikan)"
       ],
@@ -4199,7 +4563,7 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 0.566,
+            "excess": 0.565,
             "n": 385
           },
           "Q2": {
@@ -4221,7 +4585,7 @@
             "n": 69
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.121,
+            "excess": -0.122,
             "n": 410
           },
           "IHSG \u003c MA200, tenang": {
@@ -4259,7 +4623,7 @@
             "n": 256
           },
           "Financial Services": {
-            "excess": -0.819,
+            "excess": -0.821,
             "n": 160
           },
           "Healthcare": {
@@ -4346,17 +4710,17 @@
         "VALID": 0.089
       },
       "p": 0.173,
-      "q": 0.5767,
+      "q": 0.5741,
       "n_eff": 77,
       "random_entry": {
         "p50": 0.007,
-        "p95": 0.687,
+        "p95": 0.686,
         "beats_p95": false
       },
       "in_sample": 0.469,
       "holdout": 0.209,
       "reasons": [
-        "q = 0.577 (tidak signifikan)"
+        "q = 0.574 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -16.24,
@@ -4492,7 +4856,7 @@
       "by_mood": {
         "euforia": -0.085,
         "optimis": -0.021,
-        "panik": -0.034,
+        "panik": -0.035,
         "takut": -0.047,
         "tenang": -0.014
       },
@@ -4504,16 +4868,17 @@
         "tenang": 127
       },
       "edge_net": {
-        "TEST": 0.933,
+        "TEST": 0.934,
         "VALID": -0.097
       },
-      "p": 0.178,
-      "q": 0.5773,
+      "p": 0.177,
+      "q": 0.5741,
       "n_eff": 31,
       "in_sample": -0.017,
       "holdout": 0.125,
+      "stable": false,
       "reasons": [
-        "q = 0.577 (tidak signifikan)"
+        "q = 0.574 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
@@ -4534,7 +4899,34 @@
             "n": 137
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.767,
+          "n": 618
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.809,
+          "n": 568
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.344,
+          "n": 618
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.162,
+          "n": 608
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.235,
+          "n": 568
+        }
+      ]
     },
     {
       "name": "Bollinger mantul band bawah",
@@ -4545,7 +4937,7 @@
       "grade": "D",
       "n": 1625,
       "split": {
-        "TEST": 0.214,
+        "TEST": 0.213,
         "TRAIN": 0.159,
         "VALID": -1.102
       },
@@ -4574,7 +4966,7 @@
       "by_mood": {
         "euforia": -0.858,
         "optimis": -1.952,
-        "panik": 0.775,
+        "panik": 0.774,
         "takut": -0.724,
         "tenang": -0.066
       },
@@ -4592,7 +4984,7 @@
       },
       "hit_pct": 44.12,
       "edge_net": {
-        "TEST": -0.186,
+        "TEST": -0.187,
         "TRAIN": -0.241,
         "VALID": -1.502
       },
@@ -4605,7 +4997,7 @@
         "beats_p95": false
       },
       "in_sample": -0.347,
-      "holdout": 0.214,
+      "holdout": 0.213,
       "stable": false,
       "reasons": [
         "q = 0.586 (tidak signifikan)"
@@ -4632,7 +5024,7 @@
             "n": 410
           },
           "Q3": {
-            "excess": 0.046,
+            "excess": 0.045,
             "n": 370
           },
           "Q4": {
@@ -4646,7 +5038,7 @@
             "n": 62
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.439,
+            "excess": 0.438,
             "n": 496
           },
           "IHSG \u003c MA200, tenang": {
@@ -4664,7 +5056,7 @@
         },
         "sektor": {
           "Basic Materials": {
-            "excess": 0.822,
+            "excess": 0.821,
             "n": 382
           },
           "Communication Services": {
@@ -4712,7 +5104,7 @@
       "params": [
         {
           "label": "BB(14, 1.4)",
-          "excess": -0.518,
+          "excess": -0.519,
           "n": 2733
         },
         {
@@ -4727,7 +5119,7 @@
         },
         {
           "label": "BB(20, 1.4)",
-          "excess": -0.61,
+          "excess": -0.611,
           "n": 2327
         },
         {
@@ -4742,12 +5134,12 @@
         },
         {
           "label": "BB(26, 1.4)",
-          "excess": -0.778,
+          "excess": -0.78,
           "n": 2030
         },
         {
           "label": "BB(26, 2.0)",
-          "excess": -0.815,
+          "excess": -0.816,
           "n": 1400
         },
         {
@@ -4822,7 +5214,7 @@
       "n_eff": 76,
       "random_entry": {
         "p50": -0.013,
-        "p95": 0.573,
+        "p95": 0.574,
         "beats_p95": false
       },
       "in_sample": 0.712,
@@ -4987,7 +5379,7 @@
       "grade": "D",
       "n": 3793,
       "split": {
-        "TEST": -0.068,
+        "TEST": -0.078,
         "TRAIN": 0.08,
         "VALID": 0.292
       },
@@ -5002,7 +5394,7 @@
         "5": -0.03,
         "60": 0.07
       },
-      "t": 1.292,
+      "t": 1.284,
       "years_won": "4/7",
       "by_year": {
         "2020": 0.518,
@@ -5011,12 +5403,12 @@
         "2023": 0.783,
         "2024": -0.089,
         "2025": 0.366,
-        "2026": 0.16
+        "2026": 0.149
       },
       "by_mood": {
         "euforia": 0.601,
         "optimis": 0.596,
-        "panik": 0.359,
+        "panik": 0.348,
         "takut": -0.554,
         "tenang": 0.01
       },
@@ -5034,11 +5426,11 @@
       },
       "hit_pct": 43.58,
       "edge_net": {
-        "TEST": -0.468,
+        "TEST": -0.478,
         "TRAIN": -0.32,
         "VALID": -0.108
       },
-      "p": 0.204,
+      "p": 0.209,
       "q": 0.5864,
       "n_eff": 77,
       "random_entry": {
@@ -5047,7 +5439,7 @@
         "beats_p95": false
       },
       "in_sample": 0.163,
-      "holdout": -0.068,
+      "holdout": -0.078,
       "reasons": [
         "q = 0.586 (tidak signifikan)"
       ],
@@ -5065,7 +5457,7 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 1.368,
+            "excess": 1.366,
             "n": 1131
           },
           "Q2": {
@@ -5073,7 +5465,7 @@
             "n": 877
           },
           "Q3": {
-            "excess": -0.605,
+            "excess": -0.61,
             "n": 899
           },
           "Q4": {
@@ -5087,7 +5479,7 @@
             "n": 164
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.025,
+            "excess": 0.017,
             "n": 934
           },
           "IHSG \u003c MA200, tenang": {
@@ -5113,7 +5505,7 @@
             "n": 304
           },
           "Consumer Cyclical": {
-            "excess": -0.041,
+            "excess": -0.056,
             "n": 277
           },
           "Consumer Defensive": {
@@ -5133,7 +5525,7 @@
             "n": 92
           },
           "Industrials": {
-            "excess": 0.453,
+            "excess": 0.443,
             "n": 269
           },
           "Real Estate": {
@@ -5349,7 +5741,7 @@
         "5": -0.037,
         "60": -0.028
       },
-      "t": -1.305,
+      "t": -1.306,
       "years_won": "4/7",
       "by_year": {
         "2020": 0.134,
@@ -5363,7 +5755,7 @@
       "by_mood": {
         "euforia": 0.03,
         "optimis": -0.035,
-        "panik": -0.004,
+        "panik": -0.005,
         "takut": -0.039,
         "tenang": -0.046
       },
@@ -5375,7 +5767,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 2.309,
+        "TEST": 2.31,
         "TRAIN": -1.106,
         "VALID": -2.587
       },
@@ -5384,6 +5776,7 @@
       "n_eff": 77,
       "in_sample": 0.004,
       "holdout": 0.192,
+      "stable": true,
       "reasons": [
         "q = 0.586 (tidak signifikan)"
       ],
@@ -5410,7 +5803,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.505,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.724,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.49,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.576,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.767,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "S\u0026P 500 turun \u003e 2% semalam",
@@ -5422,7 +5842,7 @@
       "direction": "baik",
       "n": 40,
       "split": {
-        "TEST": 6.127,
+        "TEST": 6.125,
         "TRAIN": -0.262,
         "VALID": 5.184
       },
@@ -5441,7 +5861,7 @@
         "2023": -4.991,
         "2024": 2.478,
         "2025": 7.35,
-        "2026": 6.127
+        "2026": 6.125
       },
       "by_mood": {
         "optimis": -1.011,
@@ -5456,7 +5876,7 @@
         "tenang": 15
       },
       "edge_net": {
-        "TEST": 5.727,
+        "TEST": 5.725,
         "TRAIN": -0.662,
         "VALID": 4.784
       },
@@ -5464,7 +5884,7 @@
       "q": 0.5864,
       "n_eff": 25,
       "in_sample": 1.028,
-      "holdout": 6.127,
+      "holdout": 6.125,
       "reasons": [
         "q = 0.586 (tidak signifikan)"
       ],
@@ -5475,7 +5895,7 @@
             "n": 3
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 9.572,
+            "excess": 9.571,
             "n": 6
           },
           "IHSG \u003c MA200, tenang": {
@@ -5503,7 +5923,7 @@
       "direction": "baik",
       "n": 268,
       "split": {
-        "TEST": 1.614,
+        "TEST": 1.613,
         "TRAIN": 0.494,
         "VALID": -0.686
       },
@@ -5522,12 +5942,12 @@
         "2023": -2.377,
         "2024": -3.344,
         "2025": 0.644,
-        "2026": 1.614
+        "2026": 1.613
       },
       "by_mood": {
         "euforia": 2.682,
         "optimis": -0.279,
-        "panik": 4.65,
+        "panik": 4.649,
         "takut": -1.226,
         "tenang": -0.099
       },
@@ -5539,7 +5959,7 @@
         "tenang": 102
       },
       "edge_net": {
-        "TEST": 1.214,
+        "TEST": 1.213,
         "TRAIN": 0.094,
         "VALID": -1.086
       },
@@ -5547,7 +5967,7 @@
       "q": 0.5864,
       "n_eff": 36,
       "in_sample": 0.374,
-      "holdout": 1.614,
+      "holdout": 1.613,
       "reasons": [
         "q = 0.586 (tidak signifikan)"
       ],
@@ -5558,7 +5978,7 @@
             "n": 5
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 1.476,
+            "excess": 1.475,
             "n": 69
           },
           "IHSG \u003c MA200, tenang": {
@@ -5640,7 +6060,7 @@
       "q": 0.6104,
       "n_eff": 76,
       "random_entry": {
-        "p50": -0.009,
+        "p50": -0.01,
         "p95": 0.9,
         "beats_p95": false
       },
@@ -5772,9 +6192,9 @@
         "10": -0.033,
         "20": -0.028,
         "5": -0.036,
-        "60": -0.017
+        "60": -0.018
       },
-      "t": -1.214,
+      "t": -1.215,
       "years_won": "5/7",
       "by_year": {
         "2020": 0.143,
@@ -5800,7 +6220,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 1.879,
+        "TEST": 1.88,
         "TRAIN": -1.291,
         "VALID": -2.754
       },
@@ -5809,6 +6229,7 @@
       "n_eff": 77,
       "in_sample": 0.005,
       "holdout": 0.172,
+      "stable": true,
       "reasons": [
         "q = 0.620 (tidak signifikan)"
       ],
@@ -5819,7 +6240,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.392,
+            "excess": -0.391,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -5835,7 +6256,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.766,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.938,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.687,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.803,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.883,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "IHSG turun \u003e 20% dari puncak 1 tahun",
@@ -5847,7 +6295,7 @@
       "direction": "baik",
       "n": 176,
       "split": {
-        "TEST": -0.157,
+        "TEST": -0.156,
         "TRAIN": 5.182,
         "VALID": 11.293
       },
@@ -5862,13 +6310,13 @@
       "by_year": {
         "2020": 5.182,
         "2025": 11.293,
-        "2026": -0.157
+        "2026": -0.156
       },
       "by_mood": {
-        "optimis": 1.718,
-        "panik": -0.838,
-        "takut": 1.568,
-        "tenang": 6.899
+        "optimis": 1.716,
+        "panik": -0.835,
+        "takut": 1.567,
+        "tenang": 6.898
       },
       "mood_n": {
         "optimis": 24,
@@ -5877,7 +6325,7 @@
         "tenang": 30
       },
       "edge_net": {
-        "TEST": -0.557,
+        "TEST": -0.556,
         "TRAIN": 4.782,
         "VALID": 10.893
       },
@@ -5885,7 +6333,7 @@
       "q": 0.62,
       "n_eff": 16,
       "in_sample": 6.71,
-      "holdout": -0.157,
+      "holdout": -0.156,
       "reasons": [
         "q = 0.620 (tidak signifikan)"
       ],
@@ -5896,11 +6344,11 @@
             "n": 30
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.887,
+            "excess": 0.888,
             "n": 144
           },
           "IHSG \u003c MA200, tenang": {
-            "excess": -18.12,
+            "excess": -18.122,
             "n": 2
           }
         }
@@ -5916,7 +6364,7 @@
       "direction": "baik",
       "n": 187,
       "split": {
-        "TEST": 2.955,
+        "TEST": 2.958,
         "TRAIN": -0.311,
         "VALID": 2.412
       },
@@ -5926,7 +6374,7 @@
         "VALID": 53
       },
       "horizons": {},
-      "t": 1.086,
+      "t": 1.087,
       "years_won": "2/3",
       "by_year": {
         "2020": 6.786,
@@ -5935,12 +6383,12 @@
         "2023": 0.775,
         "2024": 1.17,
         "2025": 3.106,
-        "2026": 2.955
+        "2026": 2.958
       },
       "by_mood": {
-        "panik": 0.776,
+        "panik": 0.778,
         "takut": 3.528,
-        "tenang": 9.36
+        "tenang": 9.359
       },
       "mood_n": {
         "panik": 125,
@@ -5948,7 +6396,7 @@
         "tenang": 6
       },
       "edge_net": {
-        "TEST": 2.555,
+        "TEST": 2.558,
         "TRAIN": -0.711,
         "VALID": 2.012
       },
@@ -5956,7 +6404,7 @@
       "q": 0.6416,
       "n_eff": 29,
       "in_sample": 1.05,
-      "holdout": 2.955,
+      "holdout": 2.958,
       "reasons": [
         "q = 0.642 (tidak signifikan)"
       ],
@@ -5967,7 +6415,7 @@
             "n": 3
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 3.263,
+            "excess": 3.264,
             "n": 131
           },
           "IHSG \u003c MA200, tenang": {
@@ -5975,7 +6423,7 @@
             "n": 17
           },
           "IHSG \u003e MA200, bergejolak": {
-            "excess": 4.562,
+            "excess": 4.561,
             "n": 3
           },
           "IHSG \u003e MA200, tenang": {
@@ -5994,7 +6442,7 @@
       "grade": "D",
       "n": 1170,
       "split": {
-        "TEST": -0.598,
+        "TEST": -0.591,
         "TRAIN": -0.008,
         "VALID": -0.955
       },
@@ -6009,7 +6457,7 @@
         "5": -0.26,
         "60": -0.44
       },
-      "t": -1.046,
+      "t": -1.043,
       "years_won": "2/7",
       "by_year": {
         "2020": 0.078,
@@ -6018,12 +6466,12 @@
         "2023": -0.141,
         "2024": -0.364,
         "2025": -1.861,
-        "2026": -0.22
+        "2026": -0.213
       },
       "by_mood": {
         "euforia": -0.381,
         "optimis": -1.253,
-        "panik": 2.353,
+        "panik": 2.363,
         "takut": -0.701,
         "tenang": -0.758
       },
@@ -6041,7 +6489,7 @@
       },
       "hit_pct": 43.76,
       "edge_net": {
-        "TEST": -0.998,
+        "TEST": -0.991,
         "TRAIN": -0.408,
         "VALID": -1.355
       },
@@ -6054,7 +6502,7 @@
         "beats_p95": false
       },
       "in_sample": -0.363,
-      "holdout": -0.598,
+      "holdout": -0.591,
       "reasons": [
         "q = 0.646 (tidak signifikan)"
       ],
@@ -6072,7 +6520,7 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 1.374,
+            "excess": 1.376,
             "n": 302
           },
           "Q2": {
@@ -6084,7 +6532,7 @@
             "n": 296
           },
           "Q4": {
-            "excess": -1.762,
+            "excess": -1.759,
             "n": 283
           }
         },
@@ -6094,7 +6542,7 @@
             "n": 49
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.2,
+            "excess": -0.195,
             "n": 313
           },
           "IHSG \u003c MA200, tenang": {
@@ -6128,7 +6576,7 @@
             "n": 178
           },
           "Energy": {
-            "excess": 1.418,
+            "excess": 1.425,
             "n": 188
           },
           "Financial Services": {
@@ -6180,7 +6628,7 @@
         "10": -0.06,
         "20": -0.37,
         "5": -0.22,
-        "60": -2.52
+        "60": -2.53
       },
       "t": -1.008,
       "years_won": "3/7",
@@ -6391,7 +6839,7 @@
       "q": 0.6702,
       "n_eff": 77,
       "random_entry": {
-        "p50": -0.007,
+        "p50": -0.008,
         "p95": 0.685,
         "beats_p95": false
       },
@@ -6510,7 +6958,7 @@
       "direction": "buruk",
       "n": 1119,
       "split": {
-        "TEST": -1.38,
+        "TEST": -1.382,
         "TRAIN": -0.316,
         "VALID": -0.644
       },
@@ -6529,13 +6977,13 @@
         "2023": -0.475,
         "2024": -2.462,
         "2025": 2.99,
-        "2026": -3.352
+        "2026": -3.354
       },
       "by_mood": {
         "euforia": 2.541,
         "optimis": 0.58,
         "panik": -2.743,
-        "takut": -1.317,
+        "takut": -1.318,
         "tenang": -0.864
       },
       "mood_n": {
@@ -6546,7 +6994,7 @@
         "tenang": 373
       },
       "edge_net": {
-        "TEST": 0.98,
+        "TEST": 0.982,
         "TRAIN": -0.084,
         "VALID": 0.244
       },
@@ -6554,7 +7002,7 @@
       "q": 0.6702,
       "n_eff": 70,
       "in_sample": 0.441,
-      "holdout": 1.38,
+      "holdout": 1.382,
       "reasons": [
         "q = 0.670 (tidak signifikan)"
       ],
@@ -6592,7 +7040,7 @@
       "grade": "D",
       "n": 2817,
       "split": {
-        "TEST": -0.813,
+        "TEST": -0.814,
         "TRAIN": 0.383,
         "VALID": 0.576
       },
@@ -6607,7 +7055,7 @@
         "5": -0.06,
         "60": 0.06
       },
-      "t": 1.028,
+      "t": 1.026,
       "years_won": "5/7",
       "by_year": {
         "2020": 0.822,
@@ -6616,12 +7064,12 @@
         "2023": 1.368,
         "2024": 0.594,
         "2025": 0.393,
-        "2026": -0.783
+        "2026": -0.784
       },
       "by_mood": {
         "euforia": -0.746,
         "optimis": 0.22,
-        "panik": -0.021,
+        "panik": -0.022,
         "takut": 0.381,
         "tenang": 0.378
       },
@@ -6639,7 +7087,7 @@
       },
       "hit_pct": 44.69,
       "edge_net": {
-        "TEST": -1.213,
+        "TEST": -1.214,
         "TRAIN": -0.017,
         "VALID": 0.176
       },
@@ -6647,12 +7095,12 @@
       "q": 0.6814,
       "n_eff": 76,
       "random_entry": {
-        "p50": -0.002,
+        "p50": -0.001,
         "p95": 0.468,
         "beats_p95": false
       },
       "in_sample": 0.458,
-      "holdout": -0.813,
+      "holdout": -0.814,
       "reasons": [
         "q = 0.681 (tidak signifikan)"
       ],
@@ -6678,7 +7126,7 @@
             "n": 671
           },
           "Q3": {
-            "excess": -0.096,
+            "excess": -0.097,
             "n": 709
           },
           "Q4": {
@@ -6692,7 +7140,7 @@
             "n": 119
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.067,
+            "excess": -0.068,
             "n": 701
           },
           "IHSG \u003c MA200, tenang": {
@@ -6710,7 +7158,7 @@
         },
         "sektor": {
           "Basic Materials": {
-            "excess": 0.528,
+            "excess": 0.527,
             "n": 727
           },
           "Communication Services": {
@@ -6766,7 +7214,7 @@
       "grade": "D",
       "n": 369,
       "split": {
-        "TEST": 1.537,
+        "TEST": 1.538,
         "TRAIN": 1.17,
         "VALID": 0.456
       },
@@ -6790,7 +7238,7 @@
         "2023": 2.119,
         "2024": 1.347,
         "2025": -0.647,
-        "2026": 1.918
+        "2026": 1.919
       },
       "by_mood": {
         "euforia": -3.366,
@@ -6813,7 +7261,7 @@
       },
       "hit_pct": 50.68,
       "edge_net": {
-        "TEST": 1.137,
+        "TEST": 1.138,
         "TRAIN": 0.77,
         "VALID": 0.056
       },
@@ -6826,7 +7274,7 @@
         "beats_p95": false
       },
       "in_sample": 0.871,
-      "holdout": 1.537,
+      "holdout": 1.538,
       "reasons": [
         "q = 0.681 (tidak signifikan)"
       ],
@@ -6844,7 +7292,7 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 2.665,
+            "excess": 2.664,
             "n": 86
           },
           "Q2": {
@@ -6952,7 +7400,7 @@
         "5": 0.002,
         "60": 0.033
       },
-      "t": 0.991,
+      "t": 0.993,
       "years_won": "2/4",
       "by_year": {
         "2023": 0.071,
@@ -6975,7 +7423,7 @@
         "tenang": 231
       },
       "edge_net": {
-        "TEST": -1.408,
+        "TEST": -1.406,
         "TRAIN": -0.313,
         "VALID": -0.573
       },
@@ -6984,13 +7432,14 @@
       "n_eff": 44,
       "in_sample": 0.026,
       "holdout": -0.024,
+      "stable": false,
       "reasons": [
         "q = 0.681 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.081,
+            "excess": -0.08,
             "n": 306
           },
           "IHSG \u003c MA200, tenang": {
@@ -7006,7 +7455,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.219,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.04,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.49,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.507,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.731,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Keltner tembus atas",
@@ -7058,7 +7534,7 @@
         "tenang": 463
       },
       "trade_atr": {
-        "TEST": -2.276,
+        "TEST": -2.275,
         "TRAIN": -0.15,
         "VALID": 0.578
       },
@@ -7215,7 +7691,7 @@
         "2023": -0.01,
         "2024": -0.057,
         "2025": 0.06,
-        "2026": -0.033
+        "2026": -0.034
       },
       "by_mood": {
         "euforia": 0.085,
@@ -7232,17 +7708,18 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": -0.515,
+        "TEST": -0.514,
         "TRAIN": -0.434,
         "VALID": -1.909
       },
       "p": 0.374,
-      "q": 0.7647,
+      "q": 0.7627,
       "n_eff": 77,
       "in_sample": 0.016,
       "holdout": 0.011,
+      "stable": true,
       "reasons": [
-        "q = 0.765 (tidak signifikan)"
+        "q = 0.763 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
@@ -7267,7 +7744,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.355,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.671,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.599,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.671,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.732,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Komponen engine: FVG Confluence",
@@ -7324,13 +7828,14 @@
         "TRAIN": -0.315,
         "VALID": -1.038
       },
-      "p": 0.376,
-      "q": 0.7647,
+      "p": 0.375,
+      "q": 0.7627,
       "n_eff": 77,
       "in_sample": 0.007,
       "holdout": 0.009,
+      "stable": false,
       "reasons": [
-        "q = 0.765 (tidak signifikan)"
+        "q = 0.763 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
@@ -7339,7 +7844,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.312,
+            "excess": -0.311,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -7355,7 +7860,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.059,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.169,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.013,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.051,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.012,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Return 1 minggu",
@@ -7382,7 +7914,7 @@
         "5": -0.006,
         "60": -0.012
       },
-      "t": -0.836,
+      "t": -0.835,
       "years_won": "5/7",
       "by_year": {
         "2020": 0.019,
@@ -7408,15 +7940,16 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": -0.994,
+        "TEST": -0.995,
         "TRAIN": -0.454,
         "VALID": -0.04
       },
-      "p": 0.398,
+      "p": 0.399,
       "q": 0.7889,
       "n_eff": 77,
       "in_sample": 0.011,
       "holdout": 0.014,
+      "stable": false,
       "reasons": [
         "q = 0.789 (tidak signifikan)"
       ],
@@ -7427,7 +7960,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.771,
+            "excess": 0.77,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -7443,7 +7976,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.263,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.188,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.201,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.028,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.072,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Bulan Desember (window dressing)",
@@ -7455,7 +8015,7 @@
       "direction": "baik",
       "n": 121,
       "split": {
-        "TEST": 14.188,
+        "TEST": 14.187,
         "TRAIN": 0.107,
         "VALID": -2.598
       },
@@ -7473,10 +8033,10 @@
         "2022": -3.017,
         "2023": -0.185,
         "2024": -2.598,
-        "2025": 14.188
+        "2025": 14.187
       },
       "by_mood": {
-        "euforia": 9.726,
+        "euforia": 9.725,
         "optimis": 5.533,
         "panik": -1.727,
         "takut": -1.404,
@@ -7490,7 +8050,7 @@
         "tenang": 28
       },
       "edge_net": {
-        "TEST": 13.788,
+        "TEST": 13.787,
         "TRAIN": -0.293,
         "VALID": -2.998
       },
@@ -7498,7 +8058,7 @@
       "q": 0.7889,
       "n_eff": 6,
       "in_sample": -0.402,
-      "holdout": 14.188,
+      "holdout": 14.187,
       "reasons": [
         "q = 0.789 (tidak signifikan)"
       ],
@@ -7517,7 +8077,7 @@
             "n": 13
           },
           "IHSG \u003e MA200, tenang": {
-            "excess": 4.543,
+            "excess": 4.542,
             "n": 75
           }
         }
@@ -7587,7 +8147,7 @@
       "q": 0.8,
       "n_eff": 76,
       "random_entry": {
-        "p50": -0.007,
+        "p50": -0.006,
         "p95": 0.573,
         "beats_p95": false
       },
@@ -7933,7 +8493,7 @@
       "q": 0.8294,
       "n_eff": 77,
       "random_entry": {
-        "p50": -0.011,
+        "p50": -0.01,
         "p95": 0.492,
         "beats_p95": false
       },
@@ -8067,7 +8627,7 @@
         "5": -0.011,
         "60": -0.004
       },
-      "t": -0.779,
+      "t": -0.778,
       "years_won": "3/7",
       "by_year": {
         "2020": 0.063,
@@ -8076,7 +8636,7 @@
         "2023": 0.009,
         "2024": 0.037,
         "2025": 0.011,
-        "2026": -0.082
+        "2026": -0.081
       },
       "by_mood": {
         "euforia": 0.049,
@@ -8093,15 +8653,16 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 0.448,
+        "TEST": 0.447,
         "TRAIN": -0.808,
         "VALID": -1.556
       },
-      "p": 0.449,
+      "p": 0.451,
       "q": 0.8294,
       "n_eff": 77,
       "in_sample": 0.002,
       "holdout": 0.057,
+      "stable": false,
       "reasons": [
         "q = 0.829 (tidak signifikan)"
       ],
@@ -8128,7 +8689,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.291,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.403,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.176,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.321,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.333,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Momentum 6−1 bulan",
@@ -8185,11 +8773,12 @@
         "TRAIN": 1.481,
         "VALID": 2.54
       },
-      "p": 0.469,
+      "p": 0.47,
       "q": 0.8294,
       "n_eff": 76,
       "in_sample": 0.023,
       "holdout": -0.017,
+      "stable": true,
       "reasons": [
         "q = 0.829 (tidak signifikan)"
       ],
@@ -8200,7 +8789,7 @@
             "n": 74
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 1.713,
+            "excess": 1.712,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -8216,7 +8805,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 1.751,
+          "n": 1525
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 1.666,
+          "n": 1475
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 1.149,
+          "n": 1525
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 1.056,
+          "n": 1515
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 1.065,
+          "n": 1475
+        }
+      ]
     },
     {
       "name": "Rasio volume",
@@ -8269,7 +8885,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 0.096,
+        "TEST": 0.095,
         "TRAIN": -0.591,
         "VALID": 0.068
       },
@@ -8278,6 +8894,7 @@
       "n_eff": 77,
       "in_sample": 0.004,
       "holdout": 0.012,
+      "stable": false,
       "reasons": [
         "q = 0.829 (tidak signifikan)"
       ],
@@ -8288,7 +8905,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.951,
+            "excess": 0.95,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -8304,7 +8921,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.44,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.044,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.328,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.008,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.111,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "2 minggu sebelum Lebaran",
@@ -8317,7 +8961,7 @@
       "direction": "baik",
       "n": 49,
       "split": {
-        "TEST": 15.318,
+        "TEST": 15.316,
         "TRAIN": -1.147,
         "VALID": 4.505
       },
@@ -8335,12 +8979,12 @@
         "2023": -3.714,
         "2024": -2.793,
         "2025": 10.18,
-        "2026": 15.318
+        "2026": 15.316
       },
       "by_mood": {
         "euforia": -3.666,
         "optimis": 1.546,
-        "panik": 10.237,
+        "panik": 10.236,
         "takut": 0.564,
         "tenang": -1.341
       },
@@ -8352,7 +8996,7 @@
         "tenang": 9
       },
       "edge_net": {
-        "TEST": 14.918,
+        "TEST": 14.916,
         "TRAIN": -1.547,
         "VALID": 4.105
       },
@@ -8360,7 +9004,7 @@
       "q": 0.8294,
       "n_eff": 8,
       "in_sample": 1.058,
-      "holdout": 15.318,
+      "holdout": 15.316,
       "reasons": [
         "q = 0.829 (tidak signifikan)"
       ],
@@ -8442,10 +9086,10 @@
         "VALID": -1.722
       },
       "p": 0.513,
-      "q": 0.84,
+      "q": 0.8368,
       "n_eff": 77,
       "random_entry": {
-        "p50": -0.006,
+        "p50": -0.008,
         "p95": 0.498,
         "beats_p95": false
       },
@@ -8453,7 +9097,7 @@
       "holdout": -0.386,
       "stable": true,
       "reasons": [
-        "q = 0.840 (tidak signifikan)"
+        "q = 0.837 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -27.73,
@@ -8557,7 +9201,7 @@
       "params": [
         {
           "label": "RSI(10) lewat 50",
-          "excess": -0.564,
+          "excess": -0.563,
           "n": 2771
         },
         {
@@ -8581,7 +9225,7 @@
       "grade": "D",
       "n": 2708,
       "split": {
-        "TEST": 0.203,
+        "TEST": 0.205,
         "TRAIN": -0.197,
         "VALID": -0.396
       },
@@ -8596,7 +9240,7 @@
         "5": -0.16,
         "60": -0.11
       },
-      "t": -0.607,
+      "t": -0.606,
       "years_won": "2/7",
       "by_year": {
         "2020": -0.72,
@@ -8605,12 +9249,12 @@
         "2023": -0.351,
         "2024": -0.65,
         "2025": -0.215,
-        "2026": 0.305
+        "2026": 0.307
       },
       "by_mood": {
         "euforia": 2.01,
         "optimis": -0.56,
-        "panik": -0.728,
+        "panik": -0.725,
         "takut": -0.75,
         "tenang": 0.336
       },
@@ -8628,22 +9272,22 @@
       },
       "hit_pct": 42.39,
       "edge_net": {
-        "TEST": -0.197,
+        "TEST": -0.195,
         "TRAIN": -0.597,
         "VALID": -0.796
       },
-      "p": 0.51,
-      "q": 0.84,
+      "p": 0.511,
+      "q": 0.8368,
       "n_eff": 77,
       "random_entry": {
-        "p50": -0.007,
-        "p95": 0.477,
+        "p50": -0.008,
+        "p95": 0.478,
         "beats_p95": false
       },
       "in_sample": -0.276,
-      "holdout": 0.203,
+      "holdout": 0.205,
       "reasons": [
-        "q = 0.840 (tidak signifikan)"
+        "q = 0.837 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -21.39,
@@ -8667,7 +9311,7 @@
             "n": 680
           },
           "Q3": {
-            "excess": -0.146,
+            "excess": -0.144,
             "n": 659
           },
           "Q4": {
@@ -8681,7 +9325,7 @@
             "n": 117
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.155,
+            "excess": -0.153,
             "n": 671
           },
           "IHSG \u003c MA200, tenang": {
@@ -8699,7 +9343,7 @@
         },
         "sektor": {
           "Basic Materials": {
-            "excess": 0.229,
+            "excess": 0.231,
             "n": 660
           },
           "Communication Services": {
@@ -8723,7 +9367,7 @@
             "n": 292
           },
           "Healthcare": {
-            "excess": -1.705,
+            "excess": -1.71,
             "n": 78
           },
           "Industrials": {
@@ -8754,7 +9398,7 @@
       "grade": "D",
       "n": 4390,
       "split": {
-        "TEST": 0.266,
+        "TEST": 0.265,
         "TRAIN": 0.088,
         "VALID": -0.004
       },
@@ -8769,7 +9413,7 @@
         "5": -0.21,
         "60": 0.19
       },
-      "t": 0.655,
+      "t": 0.654,
       "years_won": "5/7",
       "by_year": {
         "2020": 0.163,
@@ -8778,12 +9422,12 @@
         "2023": -0.011,
         "2024": 0.079,
         "2025": 0,
-        "2026": 0.216
+        "2026": 0.214
       },
       "by_mood": {
         "euforia": 0.794,
         "optimis": -0.082,
-        "panik": 1.088,
+        "panik": 1.087,
         "takut": -0.421,
         "tenang": -0.135
       },
@@ -8801,22 +9445,22 @@
       },
       "hit_pct": 43.78,
       "edge_net": {
-        "TEST": -0.134,
+        "TEST": -0.135,
         "TRAIN": -0.312,
         "VALID": -0.404
       },
       "p": 0.515,
-      "q": 0.84,
+      "q": 0.8368,
       "n_eff": 77,
       "random_entry": {
         "p50": -0.006,
-        "p95": 0.375,
+        "p95": 0.374,
         "beats_p95": false
       },
       "in_sample": 0.052,
-      "holdout": 0.266,
+      "holdout": 0.265,
       "reasons": [
-        "q = 0.840 (tidak signifikan)"
+        "q = 0.837 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -29.61,
@@ -8840,7 +9484,7 @@
             "n": 1051
           },
           "Q3": {
-            "excess": -0.639,
+            "excess": -0.64,
             "n": 1031
           },
           "Q4": {
@@ -8854,7 +9498,7 @@
             "n": 189
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.212,
+            "excess": -0.213,
             "n": 1097
           },
           "IHSG \u003c MA200, tenang": {
@@ -8880,15 +9524,15 @@
             "n": 358
           },
           "Consumer Cyclical": {
-            "excess": 0.309,
+            "excess": 0.305,
             "n": 330
           },
           "Consumer Defensive": {
-            "excess": -0.876,
+            "excess": -0.875,
             "n": 622
           },
           "Energy": {
-            "excess": 1.449,
+            "excess": 1.448,
             "n": 695
           },
           "Financial Services": {
@@ -8917,6 +9561,338 @@
           }
         }
       }
+    },
+    {
+      "name": "Komponen engine: Trend EMA",
+      "category": "engine",
+      "kind": "value",
+      "in_app": true,
+      "explain": "Skor faktor 'Trend EMA' di decision engine.",
+      "grade": "D",
+      "direction": "tinggi",
+      "n": 1520,
+      "split": {
+        "TEST": 0.021,
+        "TRAIN": -0.001,
+        "VALID": 0.031
+      },
+      "split_n": {
+        "TEST": 213,
+        "TRAIN": 854,
+        "VALID": 453
+      },
+      "horizons": {
+        "10": 0.008,
+        "20": 0.012,
+        "5": 0.01,
+        "60": 0.015
+      },
+      "t": 0.649,
+      "years_won": "5/7",
+      "by_year": {
+        "2020": -0.004,
+        "2021": -0.032,
+        "2022": 0.024,
+        "2023": 0.007,
+        "2024": 0.035,
+        "2025": 0.038,
+        "2026": 0.007
+      },
+      "by_mood": {
+        "euforia": 0.002,
+        "optimis": 0.058,
+        "panik": -0.038,
+        "takut": 0.006,
+        "tenang": 0.012
+      },
+      "mood_n": {
+        "euforia": 87,
+        "optimis": 342,
+        "panik": 252,
+        "takut": 352,
+        "tenang": 487
+      },
+      "edge_net": {
+        "TEST": 0.533,
+        "TRAIN": 0.137,
+        "VALID": 1.377
+      },
+      "p": 0.496,
+      "q": 0.8368,
+      "n_eff": 77,
+      "in_sample": 0.01,
+      "holdout": 0.021,
+      "stable": true,
+      "reasons": [
+        "q = 0.837 (tidak signifikan)"
+      ],
+      "groups": {
+        "rezim": {
+          "?": {
+            "excess": -0.468,
+            "n": 79
+          },
+          "IHSG \u003c MA200, bergejolak": {
+            "excess": 0.417,
+            "n": 340
+          },
+          "IHSG \u003c MA200, tenang": {
+            "excess": 0.082,
+            "n": 154
+          },
+          "IHSG \u003e MA200, bergejolak": {
+            "excess": 2.957,
+            "n": 254
+          },
+          "IHSG \u003e MA200, tenang": {
+            "excess": 0.856,
+            "n": 693
+          }
+        }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.945,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.812,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.997,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 1.049,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.84,
+          "n": 1480
+        }
+      ]
+    },
+    {
+      "name": "Net margin",
+      "category": "fundamental",
+      "kind": "value",
+      "in_app": false,
+      "explain": "Laba bersih ÷ pendapatan.",
+      "note": "Laporan tahunan Yahoo FY2022+ (dianggap terbit 90 hari setelah tutup buku) → sampel ±Apr 2023–sekarang.",
+      "grade": "D",
+      "direction": "rendah",
+      "n": 844,
+      "split": {
+        "TEST": -0.021,
+        "TRAIN": 0.019,
+        "VALID": -0.01
+      },
+      "split_n": {
+        "TEST": 213,
+        "TRAIN": 178,
+        "VALID": 453
+      },
+      "horizons": {
+        "10": -0.002,
+        "20": -0.007,
+        "5": -0.001,
+        "60": -0.024
+      },
+      "t": -0.678,
+      "years_won": "2/4",
+      "by_year": {
+        "2023": 0.019,
+        "2024": 0.033,
+        "2025": -0.062,
+        "2026": -0.012
+      },
+      "by_mood": {
+        "euforia": 0.002,
+        "optimis": -0.014,
+        "panik": 0.003,
+        "takut": -0.004,
+        "tenang": -0.011
+      },
+      "mood_n": {
+        "euforia": 42,
+        "optimis": 203,
+        "panik": 170,
+        "takut": 198,
+        "tenang": 231
+      },
+      "edge_net": {
+        "TEST": 0.64,
+        "TRAIN": -0.203,
+        "VALID": 0.058
+      },
+      "p": 0.497,
+      "q": 0.8368,
+      "n_eff": 44,
+      "in_sample": 0.002,
+      "holdout": 0.021,
+      "stable": true,
+      "reasons": [
+        "q = 0.837 (tidak signifikan)"
+      ],
+      "groups": {
+        "rezim": {
+          "IHSG \u003c MA200, bergejolak": {
+            "excess": 1.084,
+            "n": 306
+          },
+          "IHSG \u003c MA200, tenang": {
+            "excess": -0.407,
+            "n": 78
+          },
+          "IHSG \u003e MA200, bergejolak": {
+            "excess": 0.817,
+            "n": 175
+          },
+          "IHSG \u003e MA200, tenang": {
+            "excess": 0.074,
+            "n": 285
+          }
+        }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.701,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.627,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.47,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.404,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.467,
+          "n": 804
+        }
+      ]
+    },
+    {
+      "name": "Piotroski F-score",
+      "category": "fundamental",
+      "kind": "value",
+      "in_app": false,
+      "explain": "Skor kesehatan 0–9 (laba, arus kas, utang, likuiditas, dilusi, margin, perputaran aset).",
+      "note": "Laporan tahunan Yahoo FY2022+ (dianggap terbit 90 hari setelah tutup buku) → sampel ±Apr 2023–sekarang.",
+      "grade": "D",
+      "direction": "rendah",
+      "n": 608,
+      "split": {
+        "TEST": 0.022,
+        "VALID": -0.032
+      },
+      "split_n": {
+        "TEST": 213,
+        "VALID": 395
+      },
+      "horizons": {
+        "10": -0.011,
+        "20": -0.013,
+        "5": -0.01,
+        "60": -0.015
+      },
+      "t": -0.648,
+      "years_won": "2/3",
+      "by_year": {
+        "2024": -0.051,
+        "2025": -0.013,
+        "2026": 0.022
+      },
+      "by_mood": {
+        "euforia": -0.058,
+        "optimis": -0.04,
+        "panik": 0.021,
+        "takut": -0.017,
+        "tenang": -0.003
+      },
+      "mood_n": {
+        "euforia": 40,
+        "optimis": 147,
+        "panik": 154,
+        "takut": 140,
+        "tenang": 127
+      },
+      "edge_net": {
+        "TEST": 0.586,
+        "VALID": 0.177
+      },
+      "p": 0.516,
+      "q": 0.8368,
+      "n_eff": 31,
+      "in_sample": 0.032,
+      "holdout": -0.022,
+      "stable": true,
+      "reasons": [
+        "q = 0.837 (tidak signifikan)"
+      ],
+      "groups": {
+        "rezim": {
+          "IHSG \u003c MA200, bergejolak": {
+            "excess": 0.148,
+            "n": 292
+          },
+          "IHSG \u003c MA200, tenang": {
+            "excess": 0.03,
+            "n": 19
+          },
+          "IHSG \u003e MA200, bergejolak": {
+            "excess": 0.116,
+            "n": 160
+          },
+          "IHSG \u003e MA200, tenang": {
+            "excess": 2.741,
+            "n": 137
+          }
+        }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.722,
+          "n": 618
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.679,
+          "n": 568
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.883,
+          "n": 618
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.912,
+          "n": 608
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.924,
+          "n": 568
+        }
+      ]
     },
     {
       "name": "Komponen engine: Market Structure",
@@ -8978,6 +9954,7 @@
       "n_eff": 77,
       "in_sample": 0.005,
       "holdout": 0.014,
+      "stable": false,
       "reasons": [
         "q = 0.840 (tidak signifikan)"
       ],
@@ -9004,255 +9981,34 @@
             "n": 693
           }
         }
-      }
-    },
-    {
-      "name": "Komponen engine: Trend EMA",
-      "category": "engine",
-      "kind": "value",
-      "in_app": true,
-      "explain": "Skor faktor 'Trend EMA' di decision engine.",
-      "grade": "D",
-      "direction": "tinggi",
-      "n": 1520,
-      "split": {
-        "TEST": 0.021,
-        "TRAIN": -0.001,
-        "VALID": 0.031
       },
-      "split_n": {
-        "TEST": 213,
-        "TRAIN": 854,
-        "VALID": 453
-      },
-      "horizons": {
-        "10": 0.008,
-        "20": 0.012,
-        "5": 0.01,
-        "60": 0.015
-      },
-      "t": 0.648,
-      "years_won": "5/7",
-      "by_year": {
-        "2020": -0.004,
-        "2021": -0.032,
-        "2022": 0.024,
-        "2023": 0.007,
-        "2024": 0.035,
-        "2025": 0.038,
-        "2026": 0.007
-      },
-      "by_mood": {
-        "euforia": 0.002,
-        "optimis": 0.058,
-        "panik": -0.038,
-        "takut": 0.006,
-        "tenang": 0.012
-      },
-      "mood_n": {
-        "euforia": 87,
-        "optimis": 342,
-        "panik": 252,
-        "takut": 352,
-        "tenang": 487
-      },
-      "edge_net": {
-        "TEST": 0.533,
-        "TRAIN": 0.137,
-        "VALID": 1.377
-      },
-      "p": 0.496,
-      "q": 0.84,
-      "n_eff": 77,
-      "in_sample": 0.01,
-      "holdout": 0.021,
-      "reasons": [
-        "q = 0.840 (tidak signifikan)"
-      ],
-      "groups": {
-        "rezim": {
-          "?": {
-            "excess": -0.468,
-            "n": 79
-          },
-          "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.417,
-            "n": 340
-          },
-          "IHSG \u003c MA200, tenang": {
-            "excess": 0.082,
-            "n": 154
-          },
-          "IHSG \u003e MA200, bergejolak": {
-            "excess": 2.957,
-            "n": 254
-          },
-          "IHSG \u003e MA200, tenang": {
-            "excess": 0.856,
-            "n": 693
-          }
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.029,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.017,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.012,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.239,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.114,
+          "n": 1480
         }
-      }
-    },
-    {
-      "name": "Net margin",
-      "category": "fundamental",
-      "kind": "value",
-      "in_app": false,
-      "explain": "Laba bersih ÷ pendapatan.",
-      "note": "Laporan tahunan Yahoo FY2022+ (dianggap terbit 90 hari setelah tutup buku) → sampel ±Apr 2023–sekarang.",
-      "grade": "D",
-      "direction": "rendah",
-      "n": 844,
-      "split": {
-        "TEST": -0.021,
-        "TRAIN": 0.019,
-        "VALID": -0.01
-      },
-      "split_n": {
-        "TEST": 213,
-        "TRAIN": 178,
-        "VALID": 453
-      },
-      "horizons": {
-        "10": -0.002,
-        "20": -0.007,
-        "5": -0.001,
-        "60": -0.024
-      },
-      "t": -0.678,
-      "years_won": "2/4",
-      "by_year": {
-        "2023": 0.019,
-        "2024": 0.033,
-        "2025": -0.062,
-        "2026": -0.012
-      },
-      "by_mood": {
-        "euforia": 0.002,
-        "optimis": -0.014,
-        "panik": 0.003,
-        "takut": -0.004,
-        "tenang": -0.011
-      },
-      "mood_n": {
-        "euforia": 42,
-        "optimis": 203,
-        "panik": 170,
-        "takut": 198,
-        "tenang": 231
-      },
-      "edge_net": {
-        "TEST": 0.641,
-        "TRAIN": -0.203,
-        "VALID": 0.058
-      },
-      "p": 0.497,
-      "q": 0.84,
-      "n_eff": 44,
-      "in_sample": 0.002,
-      "holdout": 0.021,
-      "reasons": [
-        "q = 0.840 (tidak signifikan)"
-      ],
-      "groups": {
-        "rezim": {
-          "IHSG \u003c MA200, bergejolak": {
-            "excess": 1.084,
-            "n": 306
-          },
-          "IHSG \u003c MA200, tenang": {
-            "excess": -0.407,
-            "n": 78
-          },
-          "IHSG \u003e MA200, bergejolak": {
-            "excess": 0.817,
-            "n": 175
-          },
-          "IHSG \u003e MA200, tenang": {
-            "excess": 0.074,
-            "n": 285
-          }
-        }
-      }
-    },
-    {
-      "name": "Piotroski F-score",
-      "category": "fundamental",
-      "kind": "value",
-      "in_app": false,
-      "explain": "Skor kesehatan 0–9 (laba, arus kas, utang, likuiditas, dilusi, margin, perputaran aset).",
-      "note": "Laporan tahunan Yahoo FY2022+ (dianggap terbit 90 hari setelah tutup buku) → sampel ±Apr 2023–sekarang.",
-      "grade": "D",
-      "direction": "rendah",
-      "n": 608,
-      "split": {
-        "TEST": 0.022,
-        "VALID": -0.032
-      },
-      "split_n": {
-        "TEST": 213,
-        "VALID": 395
-      },
-      "horizons": {
-        "10": -0.011,
-        "20": -0.013,
-        "5": -0.01,
-        "60": -0.015
-      },
-      "t": -0.646,
-      "years_won": "2/3",
-      "by_year": {
-        "2024": -0.051,
-        "2025": -0.013,
-        "2026": 0.022
-      },
-      "by_mood": {
-        "euforia": -0.058,
-        "optimis": -0.04,
-        "panik": 0.021,
-        "takut": -0.017,
-        "tenang": -0.003
-      },
-      "mood_n": {
-        "euforia": 40,
-        "optimis": 147,
-        "panik": 154,
-        "takut": 140,
-        "tenang": 127
-      },
-      "edge_net": {
-        "TEST": 0.585,
-        "VALID": 0.177
-      },
-      "p": 0.519,
-      "q": 0.84,
-      "n_eff": 31,
-      "in_sample": 0.032,
-      "holdout": -0.022,
-      "reasons": [
-        "q = 0.840 (tidak signifikan)"
-      ],
-      "groups": {
-        "rezim": {
-          "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.147,
-            "n": 292
-          },
-          "IHSG \u003c MA200, tenang": {
-            "excess": 0.03,
-            "n": 19
-          },
-          "IHSG \u003e MA200, bergejolak": {
-            "excess": 0.116,
-            "n": 160
-          },
-          "IHSG \u003e MA200, tenang": {
-            "excess": 2.741,
-            "n": 137
-          }
-        }
-      }
+      ]
     },
     {
       "name": "Skor decision engine",
@@ -9288,7 +10044,7 @@
         "2023": 0.005,
         "2024": 0.055,
         "2025": 0.001,
-        "2026": -0.001
+        "2026": -0
       },
       "by_mood": {
         "euforia": 0.021,
@@ -9314,6 +10070,7 @@
       "n_eff": 77,
       "in_sample": 0.009,
       "holdout": 0.013,
+      "stable": false,
       "reasons": [
         "q = 0.850 (tidak signifikan)"
       ],
@@ -9340,7 +10097,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.721,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.533,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.53,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.692,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.417,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Parabolic SAR berbalik naik",
@@ -9351,7 +10135,7 @@
       "grade": "D",
       "n": 2787,
       "split": {
-        "TEST": -0.28,
+        "TEST": -0.287,
         "TRAIN": 0.24,
         "VALID": -0.522
       },
@@ -9366,7 +10150,7 @@
         "5": 0.13,
         "60": -0.28
       },
-      "t": 0.651,
+      "t": 0.649,
       "years_won": "3/7",
       "by_year": {
         "2020": -1.006,
@@ -9375,12 +10159,12 @@
         "2023": 0.317,
         "2024": -0.545,
         "2025": -0.366,
-        "2026": -0.404
+        "2026": -0.411
       },
       "by_mood": {
         "euforia": 1.914,
         "optimis": -0.389,
-        "panik": 0.107,
+        "panik": 0.099,
         "takut": -0.769,
         "tenang": 0.11
       },
@@ -9398,22 +10182,22 @@
       },
       "hit_pct": 43.24,
       "edge_net": {
-        "TEST": -0.68,
+        "TEST": -0.687,
         "TRAIN": -0.16,
         "VALID": -0.922
       },
       "p": 0.556,
-      "q": 0.8585,
+      "q": 0.86,
       "n_eff": 77,
       "random_entry": {
-        "p50": -0.001,
-        "p95": 0.497,
+        "p50": -0,
+        "p95": 0.496,
         "beats_p95": false
       },
       "in_sample": -0.054,
-      "holdout": -0.28,
+      "holdout": -0.287,
       "reasons": [
-        "q = 0.859 (tidak signifikan)"
+        "q = 0.860 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -18.62,
@@ -9429,15 +10213,15 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 1.399,
+            "excess": 1.396,
             "n": 784
           },
           "Q2": {
-            "excess": -0.499,
+            "excess": -0.498,
             "n": 681
           },
           "Q3": {
-            "excess": -0.655,
+            "excess": -0.657,
             "n": 667
           },
           "Q4": {
@@ -9451,7 +10235,7 @@
             "n": 112
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.092,
+            "excess": -0.097,
             "n": 695
           },
           "IHSG \u003c MA200, tenang": {
@@ -9473,11 +10257,11 @@
             "n": 685
           },
           "Communication Services": {
-            "excess": 0.361,
+            "excess": 0.357,
             "n": 228
           },
           "Consumer Cyclical": {
-            "excess": -1.447,
+            "excess": -1.449,
             "n": 198
           },
           "Consumer Defensive": {
@@ -9489,7 +10273,7 @@
             "n": 438
           },
           "Financial Services": {
-            "excess": -1.133,
+            "excess": -1.134,
             "n": 290
           },
           "Healthcare": {
@@ -9509,7 +10293,7 @@
             "n": 26
           },
           "Utilities": {
-            "excess": -0.725,
+            "excess": -0.746,
             "n": 106
           }
         }
@@ -9524,7 +10308,7 @@
       "grade": "D",
       "n": 1083,
       "split": {
-        "TEST": -1.138,
+        "TEST": -1.131,
         "TRAIN": -0.315,
         "VALID": -0.224
       },
@@ -9539,7 +10323,7 @@
         "5": 0.24,
         "60": -0.87
       },
-      "t": -0.579,
+      "t": -0.575,
       "years_won": "1/7",
       "by_year": {
         "2020": -0.847,
@@ -9548,12 +10332,12 @@
         "2023": -0.559,
         "2024": -0.192,
         "2025": -0.202,
-        "2026": -1.264
+        "2026": -1.256
       },
       "by_mood": {
         "euforia": -0.504,
         "optimis": 1.067,
-        "panik": -0.735,
+        "panik": -0.72,
         "takut": -0.909,
         "tenang": -1.215
       },
@@ -9571,22 +10355,22 @@
       },
       "hit_pct": 44.6,
       "edge_net": {
-        "TEST": -1.538,
+        "TEST": -1.531,
         "TRAIN": -0.715,
         "VALID": -0.624
       },
-      "p": 0.558,
-      "q": 0.8585,
+      "p": 0.559,
+      "q": 0.86,
       "n_eff": 76,
       "random_entry": {
-        "p50": -0.026,
-        "p95": 0.781,
+        "p50": -0.025,
+        "p95": 0.779,
         "beats_p95": false
       },
       "in_sample": -0.279,
-      "holdout": -1.138,
+      "holdout": -1.131,
       "reasons": [
-        "q = 0.859 (tidak signifikan)"
+        "q = 0.860 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -11.15,
@@ -9602,7 +10386,7 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 2.307,
+            "excess": 2.308,
             "n": 296
           },
           "Q2": {
@@ -9610,7 +10394,7 @@
             "n": 288
           },
           "Q3": {
-            "excess": -2.259,
+            "excess": -2.255,
             "n": 249
           },
           "Q4": {
@@ -9624,7 +10408,7 @@
             "n": 28
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -1.785,
+            "excess": -1.78,
             "n": 274
           },
           "IHSG \u003c MA200, tenang": {
@@ -9658,11 +10442,11 @@
             "n": 144
           },
           "Energy": {
-            "excess": 1.857,
+            "excess": 1.867,
             "n": 178
           },
           "Financial Services": {
-            "excess": -0.167,
+            "excess": -0.17,
             "n": 124
           },
           "Healthcare": {
@@ -9738,7 +10522,7 @@
         "tenang": 450
       },
       "edge_net": {
-        "TEST": -3.083,
+        "TEST": -3.084,
         "TRAIN": 0.29,
         "VALID": 4.647
       },
@@ -9747,13 +10531,14 @@
       "n_eff": 70,
       "in_sample": 0.036,
       "holdout": -0.097,
+      "stable": true,
       "reasons": [
         "q = 0.860 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 1.255,
+            "excess": 1.254,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -9769,7 +10554,34 @@
             "n": 659
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 1.765,
+          "n": 1400
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 1.531,
+          "n": 1350
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.932,
+          "n": 1400
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.906,
+          "n": 1390
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.943,
+          "n": 1350
+        }
+      ]
     },
     {
       "name": "Beta 60 hari vs IHSG",
@@ -9822,7 +10634,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 2.497,
+        "TEST": 2.498,
         "TRAIN": 0.104,
         "VALID": -0.452
       },
@@ -9831,6 +10643,7 @@
       "n_eff": 77,
       "in_sample": -0.022,
       "holdout": 0.21,
+      "stable": false,
       "reasons": [
         "q = 0.860 (tidak signifikan)"
       ],
@@ -9857,7 +10670,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.688,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.457,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.148,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.18,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.074,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Jarak ke EMA200",
@@ -9919,6 +10759,7 @@
       "n_eff": 77,
       "in_sample": 0.019,
       "holdout": -0.021,
+      "stable": false,
       "reasons": [
         "q = 0.860 (tidak signifikan)"
       ],
@@ -9945,7 +10786,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 2.38,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 2.15,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 1.268,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 1.318,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 1.161,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Suasana pasar: optimis (RSI IHSG 60–70)",
@@ -9957,7 +10825,7 @@
       "direction": "baik",
       "n": 342,
       "split": {
-        "TEST": 4.03,
+        "TEST": 4.029,
         "TRAIN": -0.491,
         "VALID": 1.099
       },
@@ -9975,8 +10843,8 @@
         "2022": -0.094,
         "2023": -0.732,
         "2024": -2.094,
-        "2025": 4.959,
-        "2026": -0.442
+        "2025": 4.958,
+        "2026": -0.444
       },
       "by_mood": {
         "optimis": 0.572
@@ -9985,7 +10853,7 @@
         "optimis": 342
       },
       "edge_net": {
-        "TEST": 3.63,
+        "TEST": 3.629,
         "TRAIN": -0.891,
         "VALID": 0.699
       },
@@ -9993,7 +10861,7 @@
       "q": 0.8602,
       "n_eff": 48,
       "in_sample": 0.114,
-      "holdout": 4.03,
+      "holdout": 4.029,
       "reasons": [
         "q = 0.860 (tidak signifikan)"
       ],
@@ -10004,7 +10872,7 @@
             "n": 27
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 2.865,
+            "excess": 2.864,
             "n": 34
           },
           "IHSG \u003c MA200, tenang": {
@@ -10032,7 +10900,7 @@
       "direction": "baik",
       "n": 310,
       "split": {
-        "TEST": 1.524,
+        "TEST": 1.522,
         "TRAIN": -0.864,
         "VALID": 0.498
       },
@@ -10042,7 +10910,7 @@
         "VALID": 131
       },
       "horizons": {},
-      "t": -0.53,
+      "t": -0.531,
       "years_won": "2/6",
       "by_year": {
         "2020": 0.271,
@@ -10051,10 +10919,10 @@
         "2023": -1.282,
         "2024": -1.439,
         "2025": 3.627,
-        "2026": -1.989
+        "2026": -1.99
       },
       "by_mood": {
-        "euforia": -2.892,
+        "euforia": -2.893,
         "optimis": 2.696,
         "panik": -1.438,
         "takut": -3.324,
@@ -10068,7 +10936,7 @@
         "tenang": 109
       },
       "edge_net": {
-        "TEST": 1.124,
+        "TEST": 1.122,
         "TRAIN": -1.264,
         "VALID": 0.098
       },
@@ -10076,7 +10944,7 @@
       "q": 0.8602,
       "n_eff": 41,
       "in_sample": -0.121,
-      "holdout": 1.524,
+      "holdout": 1.522,
       "reasons": [
         "q = 0.860 (tidak signifikan)"
       ],
@@ -10099,7 +10967,7 @@
             "n": 66
           },
           "IHSG \u003e MA200, tenang": {
-            "excess": 0.321,
+            "excess": 0.32,
             "n": 113
           }
         }
@@ -10156,7 +11024,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 1.089,
+        "TEST": 1.09,
         "TRAIN": -1.358,
         "VALID": -2.245
       },
@@ -10165,6 +11033,7 @@
       "n_eff": 77,
       "in_sample": -0.007,
       "holdout": 0.112,
+      "stable": true,
       "reasons": [
         "q = 0.864 (tidak signifikan)"
       ],
@@ -10175,7 +11044,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.342,
+            "excess": 0.343,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -10191,7 +11060,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.751,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.697,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.639,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.819,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.568,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Rupiah menguat \u003e 2% dalam 20 hari",
@@ -10321,17 +11217,18 @@
         "tenang": 231
       },
       "edge_net": {
-        "TEST": 0.408,
+        "TEST": 0.409,
         "TRAIN": 0.117,
         "VALID": 1.419
       },
-      "p": 0.632,
-      "q": 0.8819,
+      "p": 0.631,
+      "q": 0.8805,
       "n_eff": 44,
       "in_sample": 0.025,
       "holdout": -0.057,
+      "stable": true,
       "reasons": [
-        "q = 0.882 (tidak signifikan)"
+        "q = 0.880 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
@@ -10352,7 +11249,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 1.449,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 1.476,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.955,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.92,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 1.102,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Suasana pasar: takut (RSI IHSG 40–50)",
@@ -10364,7 +11288,7 @@
       "direction": "buruk",
       "n": 352,
       "split": {
-        "TEST": -3.953,
+        "TEST": -3.955,
         "TRAIN": -0.47,
         "VALID": -0.637
       },
@@ -10383,7 +11307,7 @@
         "2023": -0.982,
         "2024": -2.533,
         "2025": 1.6,
-        "2026": -4.244
+        "2026": -4.245
       },
       "by_mood": {
         "takut": -0.938
@@ -10392,7 +11316,7 @@
         "takut": 352
       },
       "edge_net": {
-        "TEST": 3.553,
+        "TEST": 3.555,
         "TRAIN": 0.07,
         "VALID": 0.237
       },
@@ -10400,7 +11324,7 @@
       "q": 0.8841,
       "n_eff": 58,
       "in_sample": 0.529,
-      "holdout": 3.953,
+      "holdout": 3.955,
       "reasons": [
         "q = 0.884 (tidak signifikan)"
       ],
@@ -10419,7 +11343,7 @@
             "n": 55
           },
           "IHSG \u003e MA200, bergejolak": {
-            "excess": -2.905,
+            "excess": -2.906,
             "n": 54
           },
           "IHSG \u003e MA200, tenang": {
@@ -10438,7 +11362,7 @@
       "grade": "D",
       "n": 2370,
       "split": {
-        "TEST": -1.273,
+        "TEST": -1.275,
         "TRAIN": 0.311,
         "VALID": 0.146
       },
@@ -10462,12 +11386,12 @@
         "2023": 0.299,
         "2024": 0.705,
         "2025": -0.947,
-        "2026": -0.766
+        "2026": -0.768
       },
       "by_mood": {
         "euforia": 2.813,
         "optimis": 0.213,
-        "panik": 0.395,
+        "panik": 0.393,
         "takut": -1.284,
         "tenang": -0.326
       },
@@ -10485,7 +11409,7 @@
       },
       "hit_pct": 42.78,
       "edge_net": {
-        "TEST": -1.673,
+        "TEST": -1.675,
         "TRAIN": -0.089,
         "VALID": -0.254
       },
@@ -10498,7 +11422,7 @@
         "beats_p95": false
       },
       "in_sample": 0.245,
-      "holdout": -1.273,
+      "holdout": -1.275,
       "reasons": [
         "q = 0.889 (tidak signifikan)"
       ],
@@ -10524,7 +11448,7 @@
             "n": 584
           },
           "Q3": {
-            "excess": -1.235,
+            "excess": -1.236,
             "n": 555
           },
           "Q4": {
@@ -10538,7 +11462,7 @@
             "n": 108
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.072,
+            "excess": -0.073,
             "n": 566
           },
           "IHSG \u003c MA200, tenang": {
@@ -10560,7 +11484,7 @@
             "n": 579
           },
           "Communication Services": {
-            "excess": 0.286,
+            "excess": 0.281,
             "n": 206
           },
           "Consumer Cyclical": {
@@ -10568,7 +11492,7 @@
             "n": 171
           },
           "Consumer Defensive": {
-            "excess": -1.866,
+            "excess": -1.867,
             "n": 303
           },
           "Energy": {
@@ -10627,7 +11551,7 @@
         "5": -0.004,
         "60": -0.015
       },
-      "t": -0.433,
+      "t": -0.432,
       "years_won": "3/7",
       "by_year": {
         "2020": 0.01,
@@ -10662,6 +11586,7 @@
       "n_eff": 77,
       "in_sample": -0.002,
       "holdout": 0.041,
+      "stable": false,
       "reasons": [
         "q = 0.907 (tidak signifikan)"
       ],
@@ -10688,7 +11613,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.071,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.103,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.089,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.076,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.01,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "IHSG di atas MA50 (gate lama)",
@@ -10700,7 +11652,7 @@
       "direction": "baik",
       "n": 899,
       "split": {
-        "TEST": 3.45,
+        "TEST": 3.448,
         "TRAIN": -0.318,
         "VALID": 0.681
       },
@@ -10719,7 +11671,7 @@
         "2023": -1.696,
         "2024": -2.024,
         "2025": 4.694,
-        "2026": -0.071
+        "2026": -0.073
       },
       "by_mood": {
         "euforia": 2.161,
@@ -10736,7 +11688,7 @@
         "tenang": 395
       },
       "edge_net": {
-        "TEST": 3.05,
+        "TEST": 3.048,
         "TRAIN": -0.718,
         "VALID": 0.281
       },
@@ -10744,7 +11696,7 @@
       "q": 0.9067,
       "n_eff": 62,
       "in_sample": 0.024,
-      "holdout": 3.45,
+      "holdout": 3.448,
       "reasons": [
         "q = 0.907 (tidak signifikan)"
       ],
@@ -10755,7 +11707,7 @@
             "n": 52
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 2.538,
+            "excess": 2.537,
             "n": 81
           },
           "IHSG \u003c MA200, tenang": {
@@ -10955,7 +11907,7 @@
       "grade": "D",
       "n": 2588,
       "split": {
-        "TEST": -0.989,
+        "TEST": -0.98,
         "TRAIN": 0.07,
         "VALID": -0.48
       },
@@ -10970,7 +11922,7 @@
         "5": -0.23,
         "60": -0.19
       },
-      "t": -0.299,
+      "t": -0.295,
       "years_won": "3/7",
       "by_year": {
         "2020": -0.036,
@@ -10979,12 +11931,12 @@
         "2023": 0.235,
         "2024": 0.065,
         "2025": -1.507,
-        "2026": -0.461
+        "2026": -0.452
       },
       "by_mood": {
         "euforia": -0.363,
         "optimis": -0.789,
-        "panik": -1.27,
+        "panik": -1.258,
         "takut": -0.013,
         "tenang": 0.27
       },
@@ -11002,11 +11954,11 @@
       },
       "hit_pct": 42.08,
       "edge_net": {
-        "TEST": -1.389,
+        "TEST": -1.38,
         "TRAIN": -0.33,
         "VALID": -0.88
       },
-      "p": 0.722,
+      "p": 0.723,
       "q": 0.9245,
       "n_eff": 77,
       "random_entry": {
@@ -11015,7 +11967,7 @@
         "beats_p95": false
       },
       "in_sample": -0.143,
-      "holdout": -0.989,
+      "holdout": -0.98,
       "reasons": [
         "q = 0.924 (tidak signifikan)"
       ],
@@ -11033,15 +11985,15 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 0.912,
+            "excess": 0.913,
             "n": 716
           },
           "Q2": {
-            "excess": -0.349,
+            "excess": -0.346,
             "n": 625
           },
           "Q3": {
-            "excess": -0.809,
+            "excess": -0.807,
             "n": 630
           },
           "Q4": {
@@ -11055,7 +12007,7 @@
             "n": 121
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.798,
+            "excess": -0.791,
             "n": 644
           },
           "IHSG \u003c MA200, tenang": {
@@ -11077,7 +12029,7 @@
             "n": 641
           },
           "Communication Services": {
-            "excess": 0.646,
+            "excess": 0.652,
             "n": 210
           },
           "Consumer Cyclical": {
@@ -11089,7 +12041,7 @@
             "n": 356
           },
           "Energy": {
-            "excess": 1.443,
+            "excess": 1.445,
             "n": 416
           },
           "Financial Services": {
@@ -11113,7 +12065,7 @@
             "n": 26
           },
           "Utilities": {
-            "excess": -0.914,
+            "excess": -0.892,
             "n": 98
           }
         }
@@ -11184,7 +12136,7 @@
       "n_eff": 76,
       "random_entry": {
         "p50": -0.004,
-        "p95": 0.671,
+        "p95": 0.672,
         "beats_p95": false
       },
       "in_sample": 0.041,
@@ -11301,7 +12253,7 @@
       "grade": "D",
       "n": 1964,
       "split": {
-        "TEST": -0.177,
+        "TEST": -0.178,
         "TRAIN": 0.232,
         "VALID": -0.351
       },
@@ -11316,7 +12268,7 @@
         "5": 0.08,
         "60": 0.04
       },
-      "t": 0.307,
+      "t": 0.306,
       "years_won": "2/7",
       "by_year": {
         "2020": 1.72,
@@ -11325,12 +12277,12 @@
         "2023": -0.154,
         "2024": -0.405,
         "2025": -0.133,
-        "2026": -0.333
+        "2026": -0.334
       },
       "by_mood": {
         "euforia": 0.904,
         "optimis": 0.401,
-        "panik": 0.212,
+        "panik": 0.21,
         "takut": -0.227,
         "tenang": -0.553
       },
@@ -11348,7 +12300,7 @@
       },
       "hit_pct": 42.97,
       "edge_net": {
-        "TEST": -0.577,
+        "TEST": -0.578,
         "TRAIN": -0.168,
         "VALID": -0.751
       },
@@ -11357,11 +12309,11 @@
       "n_eff": 76,
       "random_entry": {
         "p50": -0.003,
-        "p95": 0.549,
+        "p95": 0.548,
         "beats_p95": false
       },
       "in_sample": 0.003,
-      "holdout": -0.177,
+      "holdout": -0.178,
       "reasons": [
         "q = 0.924 (tidak signifikan)"
       ],
@@ -11379,7 +12331,7 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 1.31,
+            "excess": 1.309,
             "n": 573
           },
           "Q2": {
@@ -11401,7 +12353,7 @@
             "n": 93
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.506,
+            "excess": -0.507,
             "n": 478
           },
           "IHSG \u003c MA200, tenang": {
@@ -11419,7 +12371,7 @@
         },
         "sektor": {
           "Basic Materials": {
-            "excess": 0.326,
+            "excess": 0.325,
             "n": 484
           },
           "Communication Services": {
@@ -11668,7 +12620,7 @@
         "2023": 0.027,
         "2024": 0.066,
         "2025": 0.015,
-        "2026": 0.008
+        "2026": 0.009
       },
       "by_mood": {
         "euforia": -0.006,
@@ -11685,15 +12637,16 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": 0.632,
+        "TEST": 0.633,
         "TRAIN": 0.212,
         "VALID": 2.224
       },
-      "p": 0.726,
+      "p": 0.725,
       "q": 0.9245,
       "n_eff": 77,
       "in_sample": 0.005,
       "holdout": 0.024,
+      "stable": false,
       "reasons": [
         "q = 0.924 (tidak signifikan)"
       ],
@@ -11720,7 +12673,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.795,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 0.856,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.384,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.709,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.414,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Kekuatan relatif 60 hari vs IHSG",
@@ -11773,7 +12753,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": -1.469,
+        "TEST": -1.472,
         "TRAIN": -0.925,
         "VALID": -0.938
       },
@@ -11782,6 +12762,7 @@
       "n_eff": 77,
       "in_sample": 0.001,
       "holdout": 0.025,
+      "stable": true,
       "reasons": [
         "q = 0.924 (tidak signifikan)"
       ],
@@ -11792,7 +12773,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.652,
+            "excess": 0.65,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -11808,7 +12789,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.562,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.446,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.487,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.478,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.403,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Komponen engine: Trend Strength",
@@ -11835,7 +12843,7 @@
         "5": -0.009,
         "60": 0.011
       },
-      "t": 0.344,
+      "t": 0.345,
       "years_won": "4/7",
       "by_year": {
         "2020": 0.035,
@@ -11870,6 +12878,7 @@
       "n_eff": 77,
       "in_sample": 0.012,
       "holdout": -0.022,
+      "stable": false,
       "reasons": [
         "q = 0.924 (tidak signifikan)"
       ],
@@ -11896,7 +12905,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 1.272,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 1.421,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.645,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 1.013,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.832,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Bollinger %B",
@@ -11923,7 +12959,7 @@
         "5": -0.012,
         "60": -0.008
       },
-      "t": -0.283,
+      "t": -0.282,
       "years_won": "5/7",
       "by_year": {
         "2020": 0.028,
@@ -11953,13 +12989,14 @@
         "TRAIN": -0.762,
         "VALID": -1.074
       },
-      "p": 0.764,
-      "q": 0.9261,
+      "p": 0.766,
+      "q": 0.9285,
       "n_eff": 77,
       "in_sample": 0.007,
       "holdout": -0.006,
+      "stable": false,
       "reasons": [
-        "q = 0.926 (tidak signifikan)"
+        "q = 0.928 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
@@ -11984,7 +13021,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.308,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.25,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.278,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.352,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.202,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Bollinger squeeze lalu tembus atas",
@@ -12184,7 +13248,7 @@
         "5": -0.009,
         "60": -0.01
       },
-      "t": -0.253,
+      "t": -0.252,
       "years_won": "4/7",
       "by_year": {
         "2020": 0.027,
@@ -12210,15 +13274,16 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": -1.233,
+        "TEST": -1.236,
         "TRAIN": -0.758,
         "VALID": -1.623
       },
-      "p": 0.81,
+      "p": 0.811,
       "q": 0.9495,
       "n_eff": 77,
       "in_sample": 0.004,
       "holdout": -0.002,
+      "stable": false,
       "reasons": [
         "q = 0.950 (tidak signifikan)"
       ],
@@ -12229,7 +13294,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.394,
+            "excess": 0.392,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -12245,7 +13310,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.511,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.324,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.261,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.33,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.202,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "3 hari bursa terakhir tiap bulan",
@@ -12257,7 +13349,7 @@
       "direction": "baik",
       "n": 226,
       "split": {
-        "TEST": -0.169,
+        "TEST": -0.17,
         "TRAIN": 0.068,
         "VALID": 0.364
       },
@@ -12275,14 +13367,14 @@
         "2022": 0.523,
         "2023": -1.194,
         "2024": -1.6,
-        "2025": 2.522,
-        "2026": -0.486
+        "2025": 2.521,
+        "2026": -0.488
       },
       "by_mood": {
         "euforia": 0.805,
         "optimis": 0.538,
-        "panik": -0.205,
-        "takut": -0.396,
+        "panik": -0.206,
+        "takut": -0.397,
         "tenang": 0.422
       },
       "mood_n": {
@@ -12293,7 +13385,7 @@
         "tenang": 69
       },
       "edge_net": {
-        "TEST": -0.569,
+        "TEST": -0.57,
         "TRAIN": -0.332,
         "VALID": -0.036
       },
@@ -12301,7 +13393,7 @@
       "q": 0.9495,
       "n_eff": 76,
       "in_sample": 0.172,
-      "holdout": -0.169,
+      "holdout": -0.17,
       "reasons": [
         "q = 0.950 (tidak signifikan)"
       ],
@@ -12312,7 +13404,7 @@
             "n": 10
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.302,
+            "excess": 0.301,
             "n": 52
           },
           "IHSG \u003c MA200, tenang": {
@@ -12320,7 +13412,7 @@
             "n": 22
           },
           "IHSG \u003e MA200, bergejolak": {
-            "excess": 1.155,
+            "excess": 1.154,
             "n": 37
           },
           "IHSG \u003e MA200, tenang": {
@@ -12340,7 +13432,7 @@
       "direction": "baik",
       "n": 301,
       "split": {
-        "TEST": -0.321,
+        "TEST": -0.323,
         "TRAIN": 0.161,
         "VALID": 0.298
       },
@@ -12359,7 +13451,7 @@
         "2023": -1.035,
         "2024": -2.112,
         "2025": 3.74,
-        "2026": -1.701
+        "2026": -1.702
       },
       "by_mood": {
         "euforia": 2.158,
@@ -12376,7 +13468,7 @@
         "tenang": 93
       },
       "edge_net": {
-        "TEST": -0.721,
+        "TEST": -0.723,
         "TRAIN": -0.239,
         "VALID": -0.102
       },
@@ -12384,7 +13476,7 @@
       "q": 0.9495,
       "n_eff": 76,
       "in_sample": 0.21,
-      "holdout": -0.321,
+      "holdout": -0.323,
       "reasons": [
         "q = 0.950 (tidak signifikan)"
       ],
@@ -12414,197 +13506,6 @@
       }
     },
     {
-      "name": "MACD cross naik",
-      "category": "momentum",
-      "kind": "signal",
-      "in_app": true,
-      "explain": "Garis MACD memotong ke atas garis sinyal.",
-      "grade": "D",
-      "n": 2504,
-      "split": {
-        "TEST": -1.118,
-        "TRAIN": 0.083,
-        "VALID": -0.125
-      },
-      "split_n": {
-        "TEST": 446,
-        "TRAIN": 1258,
-        "VALID": 800
-      },
-      "horizons": {
-        "10": 0.12,
-        "20": -0.2,
-        "5": 0.17,
-        "60": -0.53
-      },
-      "t": 0.095,
-      "years_won": "3/7",
-      "by_year": {
-        "2020": 0.935,
-        "2021": 0.379,
-        "2022": -0.277,
-        "2023": -0.209,
-        "2024": -0.448,
-        "2025": 0.134,
-        "2026": -1.211
-      },
-      "by_mood": {
-        "euforia": 1.469,
-        "optimis": 0.606,
-        "panik": 0.115,
-        "takut": -1.453,
-        "tenang": -0.289
-      },
-      "mood_n": {
-        "euforia": 137,
-        "optimis": 602,
-        "panik": 345,
-        "takut": 592,
-        "tenang": 828
-      },
-      "trade_atr": {
-        "TEST": -2.632,
-        "TRAIN": -0.282,
-        "VALID": -0.16
-      },
-      "hit_pct": 42.49,
-      "edge_net": {
-        "TEST": -1.518,
-        "TRAIN": -0.317,
-        "VALID": -0.525
-      },
-      "p": 0.933,
-      "q": 0.9712,
-      "n_eff": 77,
-      "random_entry": {
-        "p50": 0.006,
-        "p95": 0.554,
-        "beats_p95": false
-      },
-      "in_sample": 0.002,
-      "holdout": -1.118,
-      "stable": true,
-      "reasons": [
-        "q = 0.971 (tidak signifikan)"
-      ],
-      "portfolio": {
-        "cagr_pct": -17.76,
-        "sharpe": -0.83,
-        "max_dd_pct": 76.55,
-        "profit_factor": 0.82,
-        "win_rate_pct": 34.05,
-        "avg_win_pct": 10.01,
-        "avg_loss_pct": -6.27,
-        "trades": 1498,
-        "exposure_pct": 75.89
-      },
-      "groups": {
-        "likuiditas": {
-          "Q1": {
-            "excess": 0.434,
-            "n": 720
-          },
-          "Q2": {
-            "excess": -0.036,
-            "n": 595
-          },
-          "Q3": {
-            "excess": -0.218,
-            "n": 596
-          },
-          "Q4": {
-            "excess": -1.105,
-            "n": 593
-          }
-        },
-        "rezim": {
-          "?": {
-            "excess": 0.21,
-            "n": 106
-          },
-          "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.149,
-            "n": 618
-          },
-          "IHSG \u003c MA200, tenang": {
-            "excess": -0.182,
-            "n": 188
-          },
-          "IHSG \u003e MA200, bergejolak": {
-            "excess": -0.729,
-            "n": 551
-          },
-          "IHSG \u003e MA200, tenang": {
-            "excess": 0.012,
-            "n": 1041
-          }
-        },
-        "sektor": {
-          "Basic Materials": {
-            "excess": 0.764,
-            "n": 602
-          },
-          "Communication Services": {
-            "excess": 0.542,
-            "n": 199
-          },
-          "Consumer Cyclical": {
-            "excess": 0.191,
-            "n": 174
-          },
-          "Consumer Defensive": {
-            "excess": -1.737,
-            "n": 352
-          },
-          "Energy": {
-            "excess": 1.513,
-            "n": 393
-          },
-          "Financial Services": {
-            "excess": -1.063,
-            "n": 276
-          },
-          "Healthcare": {
-            "excess": -2.038,
-            "n": 70
-          },
-          "Industrials": {
-            "excess": -1.248,
-            "n": 178
-          },
-          "Real Estate": {
-            "excess": -2.822,
-            "n": 137
-          },
-          "Technology": {
-            "excess": -1.18,
-            "n": 26
-          },
-          "Utilities": {
-            "excess": -0.02,
-            "n": 97
-          }
-        }
-      },
-      "params": [
-        {
-          "label": "MACD(8,18,6)",
-          "excess": -0.306,
-          "n": 3059
-        },
-        {
-          "label": "MACD(12,26,9)",
-          "excess": -0.197,
-          "n": 2504
-        },
-        {
-          "label": "MACD(16,34,12)",
-          "excess": -0.308,
-          "n": 2027
-        }
-      ]
-    },
-    {
       "name": "Engine: sinyal BUY baru",
       "category": "engine",
       "kind": "signal",
@@ -12613,7 +13514,7 @@
       "grade": "D",
       "n": 2252,
       "split": {
-        "TEST": -1.501,
+        "TEST": -1.498,
         "TRAIN": 0.186,
         "VALID": 1.197
       },
@@ -12628,7 +13529,7 @@
         "5": 0.31,
         "60": 0.68
       },
-      "t": 0.132,
+      "t": 0.136,
       "years_won": "4/7",
       "by_year": {
         "2020": 0.717,
@@ -12637,12 +13538,12 @@
         "2023": 0.556,
         "2024": 0.307,
         "2025": 1.725,
-        "2026": -1.473
+        "2026": -1.47
       },
       "by_mood": {
         "euforia": 0.382,
         "optimis": 0.431,
-        "panik": -0.621,
+        "panik": -0.617,
         "takut": -0.486,
         "tenang": 0.7
       },
@@ -12660,12 +13561,12 @@
       },
       "hit_pct": 42.98,
       "edge_net": {
-        "TEST": -1.901,
+        "TEST": -1.898,
         "TRAIN": -0.214,
         "VALID": 0.797
       },
-      "p": 0.849,
-      "q": 0.9712,
+      "p": 0.845,
+      "q": 0.9691,
       "n_eff": 77,
       "random_entry": {
         "p50": -0.019,
@@ -12673,9 +13574,9 @@
         "beats_p95": false
       },
       "in_sample": 0.584,
-      "holdout": -1.501,
+      "holdout": -1.498,
       "reasons": [
-        "q = 0.971 (tidak signifikan)"
+        "q = 0.969 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -12.14,
@@ -12699,7 +13600,7 @@
             "n": 542
           },
           "Q3": {
-            "excess": 0.331,
+            "excess": 0.333,
             "n": 537
           },
           "Q4": {
@@ -12713,7 +13614,7 @@
             "n": 114
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.186,
+            "excess": -0.184,
             "n": 455
           },
           "IHSG \u003c MA200, tenang": {
@@ -12747,7 +13648,7 @@
             "n": 295
           },
           "Energy": {
-            "excess": 1.708,
+            "excess": 1.71,
             "n": 372
           },
           "Financial Services": {
@@ -12776,6 +13677,370 @@
           }
         }
       }
+    },
+    {
+      "name": "Hull MA (20) berbalik naik",
+      "category": "tren",
+      "kind": "signal",
+      "in_app": false,
+      "explain": "Hull Moving Average berubah arah dari turun ke naik.",
+      "grade": "D",
+      "n": 3094,
+      "split": {
+        "TEST": -0.771,
+        "TRAIN": 0.166,
+        "VALID": -0.46
+      },
+      "split_n": {
+        "TEST": 556,
+        "TRAIN": 1548,
+        "VALID": 990
+      },
+      "horizons": {
+        "10": 0.11,
+        "20": -0.2,
+        "5": -0.06,
+        "60": -0.31
+      },
+      "t": 0.23,
+      "years_won": "3/7",
+      "by_year": {
+        "2020": -0.521,
+        "2021": 0.222,
+        "2022": 0.336,
+        "2023": 0.22,
+        "2024": -0.181,
+        "2025": -0.802,
+        "2026": -0.674
+      },
+      "by_mood": {
+        "euforia": 0.908,
+        "optimis": 0.047,
+        "panik": -0.142,
+        "takut": -0.68,
+        "tenang": -0.2
+      },
+      "mood_n": {
+        "euforia": 174,
+        "optimis": 713,
+        "panik": 426,
+        "takut": 837,
+        "tenang": 944
+      },
+      "trade_atr": {
+        "TEST": -2.268,
+        "TRAIN": -0.474,
+        "VALID": 0.02
+      },
+      "hit_pct": 43.05,
+      "edge_net": {
+        "TEST": -1.171,
+        "TRAIN": -0.234,
+        "VALID": -0.86
+      },
+      "p": 0.848,
+      "q": 0.9691,
+      "n_eff": 77,
+      "random_entry": {
+        "p50": 0.002,
+        "p95": 0.5,
+        "beats_p95": false
+      },
+      "in_sample": -0.078,
+      "holdout": -0.771,
+      "reasons": [
+        "q = 0.969 (tidak signifikan)"
+      ],
+      "portfolio": {
+        "cagr_pct": -14.68,
+        "sharpe": -0.52,
+        "max_dd_pct": 72.13,
+        "profit_factor": 0.87,
+        "win_rate_pct": 35.6,
+        "avg_win_pct": 10.15,
+        "avg_loss_pct": -6.43,
+        "trades": 1576,
+        "exposure_pct": 83.63
+      },
+      "groups": {
+        "likuiditas": {
+          "Q1": {
+            "excess": 0.999,
+            "n": 856
+          },
+          "Q2": {
+            "excess": -0.866,
+            "n": 746
+          },
+          "Q3": {
+            "excess": -0.474,
+            "n": 755
+          },
+          "Q4": {
+            "excess": -0.649,
+            "n": 737
+          }
+        },
+        "rezim": {
+          "?": {
+            "excess": -0.119,
+            "n": 128
+          },
+          "IHSG \u003c MA200, bergejolak": {
+            "excess": -0.235,
+            "n": 772
+          },
+          "IHSG \u003c MA200, tenang": {
+            "excess": -0.243,
+            "n": 259
+          },
+          "IHSG \u003e MA200, bergejolak": {
+            "excess": -0.722,
+            "n": 600
+          },
+          "IHSG \u003e MA200, tenang": {
+            "excess": 0.049,
+            "n": 1335
+          }
+        },
+        "sektor": {
+          "Basic Materials": {
+            "excess": 0.546,
+            "n": 740
+          },
+          "Communication Services": {
+            "excess": 0.406,
+            "n": 248
+          },
+          "Consumer Cyclical": {
+            "excess": -1.211,
+            "n": 225
+          },
+          "Consumer Defensive": {
+            "excess": -1.581,
+            "n": 440
+          },
+          "Energy": {
+            "excess": 2.393,
+            "n": 493
+          },
+          "Financial Services": {
+            "excess": -1.277,
+            "n": 318
+          },
+          "Healthcare": {
+            "excess": -1.321,
+            "n": 80
+          },
+          "Industrials": {
+            "excess": -0.498,
+            "n": 229
+          },
+          "Real Estate": {
+            "excess": -2.953,
+            "n": 175
+          },
+          "Technology": {
+            "excess": -3.008,
+            "n": 30
+          },
+          "Utilities": {
+            "excess": -0.953,
+            "n": 116
+          }
+        }
+      }
+    },
+    {
+      "name": "MACD cross naik",
+      "category": "momentum",
+      "kind": "signal",
+      "in_app": true,
+      "explain": "Garis MACD memotong ke atas garis sinyal.",
+      "grade": "D",
+      "n": 2504,
+      "split": {
+        "TEST": -1.114,
+        "TRAIN": 0.083,
+        "VALID": -0.125
+      },
+      "split_n": {
+        "TEST": 446,
+        "TRAIN": 1258,
+        "VALID": 800
+      },
+      "horizons": {
+        "10": 0.12,
+        "20": -0.2,
+        "5": 0.17,
+        "60": -0.53
+      },
+      "t": 0.097,
+      "years_won": "3/7",
+      "by_year": {
+        "2020": 0.935,
+        "2021": 0.379,
+        "2022": -0.277,
+        "2023": -0.209,
+        "2024": -0.448,
+        "2025": 0.134,
+        "2026": -1.206
+      },
+      "by_mood": {
+        "euforia": 1.469,
+        "optimis": 0.606,
+        "panik": 0.121,
+        "takut": -1.453,
+        "tenang": -0.289
+      },
+      "mood_n": {
+        "euforia": 137,
+        "optimis": 602,
+        "panik": 345,
+        "takut": 592,
+        "tenang": 828
+      },
+      "trade_atr": {
+        "TEST": -2.632,
+        "TRAIN": -0.282,
+        "VALID": -0.16
+      },
+      "hit_pct": 42.49,
+      "edge_net": {
+        "TEST": -1.514,
+        "TRAIN": -0.317,
+        "VALID": -0.525
+      },
+      "p": 0.932,
+      "q": 0.9712,
+      "n_eff": 77,
+      "random_entry": {
+        "p50": 0.006,
+        "p95": 0.554,
+        "beats_p95": false
+      },
+      "in_sample": 0.002,
+      "holdout": -1.114,
+      "stable": true,
+      "reasons": [
+        "q = 0.971 (tidak signifikan)"
+      ],
+      "portfolio": {
+        "cagr_pct": -17.76,
+        "sharpe": -0.83,
+        "max_dd_pct": 76.55,
+        "profit_factor": 0.82,
+        "win_rate_pct": 34.05,
+        "avg_win_pct": 10.01,
+        "avg_loss_pct": -6.27,
+        "trades": 1498,
+        "exposure_pct": 75.89
+      },
+      "groups": {
+        "likuiditas": {
+          "Q1": {
+            "excess": 0.434,
+            "n": 720
+          },
+          "Q2": {
+            "excess": -0.032,
+            "n": 595
+          },
+          "Q3": {
+            "excess": -0.218,
+            "n": 596
+          },
+          "Q4": {
+            "excess": -1.105,
+            "n": 593
+          }
+        },
+        "rezim": {
+          "?": {
+            "excess": 0.21,
+            "n": 106
+          },
+          "IHSG \u003c MA200, bergejolak": {
+            "excess": -0.146,
+            "n": 618
+          },
+          "IHSG \u003c MA200, tenang": {
+            "excess": -0.182,
+            "n": 188
+          },
+          "IHSG \u003e MA200, bergejolak": {
+            "excess": -0.729,
+            "n": 551
+          },
+          "IHSG \u003e MA200, tenang": {
+            "excess": 0.012,
+            "n": 1041
+          }
+        },
+        "sektor": {
+          "Basic Materials": {
+            "excess": 0.764,
+            "n": 602
+          },
+          "Communication Services": {
+            "excess": 0.542,
+            "n": 199
+          },
+          "Consumer Cyclical": {
+            "excess": 0.191,
+            "n": 174
+          },
+          "Consumer Defensive": {
+            "excess": -1.737,
+            "n": 352
+          },
+          "Energy": {
+            "excess": 1.512,
+            "n": 393
+          },
+          "Financial Services": {
+            "excess": -1.063,
+            "n": 276
+          },
+          "Healthcare": {
+            "excess": -2.038,
+            "n": 70
+          },
+          "Industrials": {
+            "excess": -1.248,
+            "n": 178
+          },
+          "Real Estate": {
+            "excess": -2.822,
+            "n": 137
+          },
+          "Technology": {
+            "excess": -1.18,
+            "n": 26
+          },
+          "Utilities": {
+            "excess": 0.002,
+            "n": 97
+          }
+        }
+      },
+      "params": [
+        {
+          "label": "MACD(8,18,6)",
+          "excess": -0.306,
+          "n": 3059
+        },
+        {
+          "label": "MACD(12,26,9)",
+          "excess": -0.196,
+          "n": 2504
+        },
+        {
+          "label": "MACD(16,34,12)",
+          "excess": -0.308,
+          "n": 2027
+        }
+      ]
     },
     {
       "name": "ROC (10) tembus 0",
@@ -12810,12 +14075,12 @@
         "2023": 0.056,
         "2024": -0.48,
         "2025": 0.528,
-        "2026": -1.179
+        "2026": -1.18
       },
       "by_mood": {
         "euforia": 1.254,
         "optimis": -0.248,
-        "panik": -0.597,
+        "panik": -0.598,
         "takut": -0.225,
         "tenang": 0.098
       },
@@ -12886,7 +14151,7 @@
             "n": 136
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.589,
+            "excess": -0.59,
             "n": 760
           },
           "IHSG \u003c MA200, tenang": {
@@ -12924,7 +14189,7 @@
             "n": 495
           },
           "Financial Services": {
-            "excess": -1.091,
+            "excess": -1.092,
             "n": 326
           },
           "Healthcare": {
@@ -12945,179 +14210,6 @@
           },
           "Utilities": {
             "excess": -1.516,
-            "n": 116
-          }
-        }
-      }
-    },
-    {
-      "name": "Hull MA (20) berbalik naik",
-      "category": "tren",
-      "kind": "signal",
-      "in_app": false,
-      "explain": "Hull Moving Average berubah arah dari turun ke naik.",
-      "grade": "D",
-      "n": 3094,
-      "split": {
-        "TEST": -0.774,
-        "TRAIN": 0.166,
-        "VALID": -0.46
-      },
-      "split_n": {
-        "TEST": 556,
-        "TRAIN": 1548,
-        "VALID": 990
-      },
-      "horizons": {
-        "10": 0.11,
-        "20": -0.2,
-        "5": -0.06,
-        "60": -0.31
-      },
-      "t": 0.228,
-      "years_won": "3/7",
-      "by_year": {
-        "2020": -0.521,
-        "2021": 0.222,
-        "2022": 0.336,
-        "2023": 0.22,
-        "2024": -0.181,
-        "2025": -0.802,
-        "2026": -0.677
-      },
-      "by_mood": {
-        "euforia": 0.908,
-        "optimis": 0.047,
-        "panik": -0.147,
-        "takut": -0.68,
-        "tenang": -0.2
-      },
-      "mood_n": {
-        "euforia": 174,
-        "optimis": 713,
-        "panik": 426,
-        "takut": 837,
-        "tenang": 944
-      },
-      "trade_atr": {
-        "TEST": -2.268,
-        "TRAIN": -0.474,
-        "VALID": 0.02
-      },
-      "hit_pct": 43.05,
-      "edge_net": {
-        "TEST": -1.174,
-        "TRAIN": -0.234,
-        "VALID": -0.86
-      },
-      "p": 0.85,
-      "q": 0.9712,
-      "n_eff": 77,
-      "random_entry": {
-        "p50": 0.002,
-        "p95": 0.5,
-        "beats_p95": false
-      },
-      "in_sample": -0.078,
-      "holdout": -0.774,
-      "reasons": [
-        "q = 0.971 (tidak signifikan)"
-      ],
-      "portfolio": {
-        "cagr_pct": -14.68,
-        "sharpe": -0.52,
-        "max_dd_pct": 72.13,
-        "profit_factor": 0.87,
-        "win_rate_pct": 35.6,
-        "avg_win_pct": 10.15,
-        "avg_loss_pct": -6.43,
-        "trades": 1576,
-        "exposure_pct": 83.63
-      },
-      "groups": {
-        "likuiditas": {
-          "Q1": {
-            "excess": 1,
-            "n": 856
-          },
-          "Q2": {
-            "excess": -0.87,
-            "n": 746
-          },
-          "Q3": {
-            "excess": -0.474,
-            "n": 755
-          },
-          "Q4": {
-            "excess": -0.649,
-            "n": 737
-          }
-        },
-        "rezim": {
-          "?": {
-            "excess": -0.119,
-            "n": 128
-          },
-          "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.237,
-            "n": 772
-          },
-          "IHSG \u003c MA200, tenang": {
-            "excess": -0.243,
-            "n": 259
-          },
-          "IHSG \u003e MA200, bergejolak": {
-            "excess": -0.722,
-            "n": 600
-          },
-          "IHSG \u003e MA200, tenang": {
-            "excess": 0.049,
-            "n": 1335
-          }
-        },
-        "sektor": {
-          "Basic Materials": {
-            "excess": 0.546,
-            "n": 740
-          },
-          "Communication Services": {
-            "excess": 0.406,
-            "n": 248
-          },
-          "Consumer Cyclical": {
-            "excess": -1.211,
-            "n": 225
-          },
-          "Consumer Defensive": {
-            "excess": -1.581,
-            "n": 440
-          },
-          "Energy": {
-            "excess": 2.393,
-            "n": 493
-          },
-          "Financial Services": {
-            "excess": -1.276,
-            "n": 318
-          },
-          "Healthcare": {
-            "excess": -1.321,
-            "n": 80
-          },
-          "Industrials": {
-            "excess": -0.498,
-            "n": 229
-          },
-          "Real Estate": {
-            "excess": -2.953,
-            "n": 175
-          },
-          "Technology": {
-            "excess": -3.008,
-            "n": 30
-          },
-          "Utilities": {
-            "excess": -0.972,
             "n": 116
           }
         }
@@ -13148,7 +14240,7 @@
         "5": -0.006,
         "60": -0.006
       },
-      "t": -0.103,
+      "t": -0.102,
       "years_won": "3/7",
       "by_year": {
         "2020": -0,
@@ -13174,7 +14266,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": -0.695,
+        "TEST": -0.697,
         "TRAIN": -1.007,
         "VALID": -1.523
       },
@@ -13183,6 +14275,7 @@
       "n_eff": 77,
       "in_sample": 0,
       "holdout": 0.008,
+      "stable": false,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13193,7 +14286,7 @@
             "n": 79
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.745,
+            "excess": 0.743,
             "n": 340
           },
           "IHSG \u003c MA200, tenang": {
@@ -13209,7 +14302,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.646,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.403,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.435,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.531,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.311,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "CMF (20)",
@@ -13271,6 +14391,7 @@
       "n_eff": 77,
       "in_sample": 0.004,
       "holdout": -0.021,
+      "stable": false,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13297,7 +14418,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.061,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.173,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.088,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.083,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.108,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Turnover 20 hari (ukuran)",
@@ -13359,6 +14507,7 @@
       "n_eff": 77,
       "in_sample": 0.017,
       "holdout": -0.068,
+      "stable": true,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13385,7 +14534,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.416,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.619,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.32,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.367,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.492,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "Komponen engine: Volume",
@@ -13412,7 +14588,7 @@
         "5": 0.008,
         "60": 0.006
       },
-      "t": 0.084,
+      "t": 0.085,
       "years_won": "4/7",
       "by_year": {
         "2020": 0.032,
@@ -13438,7 +14614,7 @@
         "tenang": 487
       },
       "edge_net": {
-        "TEST": -0.374,
+        "TEST": -0.375,
         "TRAIN": -0.701,
         "VALID": -1.229
       },
@@ -13447,6 +14623,7 @@
       "n_eff": 77,
       "in_sample": -0.003,
       "holdout": 0.018,
+      "stable": false,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13473,7 +14650,34 @@
             "n": 693
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.523,
+          "n": 1530
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.249,
+          "n": 1480
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.164,
+          "n": 1530
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.182,
+          "n": 1520
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.164,
+          "n": 1480
+        }
+      ]
     },
     {
       "name": "ROE",
@@ -13501,7 +14705,7 @@
         "5": 0.008,
         "60": 0.004
       },
-      "t": 0.09,
+      "t": 0.091,
       "years_won": "3/4",
       "by_year": {
         "2023": 0.022,
@@ -13533,6 +14737,7 @@
       "n_eff": 44,
       "in_sample": -0.003,
       "holdout": 0.044,
+      "stable": true,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13555,7 +14760,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": -0.383,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.257,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": -0.617,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": -0.553,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": -0.556,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Kapitalisasi pasar (ukuran)",
@@ -13606,7 +14838,7 @@
         "tenang": 231
       },
       "edge_net": {
-        "TEST": 1.635,
+        "TEST": 1.634,
         "TRAIN": -1.424,
         "VALID": 1.041
       },
@@ -13615,13 +14847,14 @@
       "n_eff": 44,
       "in_sample": 0.001,
       "holdout": 0.014,
+      "stable": true,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
       "groups": {
         "rezim": {
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.353,
+            "excess": -0.354,
             "n": 306
           },
           "IHSG \u003c MA200, tenang": {
@@ -13637,7 +14870,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.998,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": 1.555,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.711,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.74,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 1.158,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Suasana pasar: tenang (RSI IHSG 50–60)",
@@ -13649,7 +14909,7 @@
       "direction": "buruk",
       "n": 487,
       "split": {
-        "TEST": 3.449,
+        "TEST": 3.447,
         "TRAIN": -0.611,
         "VALID": -0.237
       },
@@ -13668,16 +14928,16 @@
         "2023": -1.633,
         "2024": -2.926,
         "2025": 5.276,
-        "2026": 1.565
+        "2026": 1.563
       },
       "by_mood": {
-        "tenang": -0.181
+        "tenang": -0.182
       },
       "mood_n": {
         "tenang": 487
       },
       "edge_net": {
-        "TEST": -3.849,
+        "TEST": -3.847,
         "TRAIN": 0.211,
         "VALID": -0.163
       },
@@ -13685,7 +14945,7 @@
       "q": 0.9712,
       "n_eff": 67,
       "in_sample": 0.506,
-      "holdout": -3.449,
+      "holdout": -3.447,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13696,7 +14956,7 @@
             "n": 29
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.771,
+            "excess": 0.77,
             "n": 70
           },
           "IHSG \u003c MA200, tenang": {
@@ -13724,7 +14984,7 @@
       "direction": "baik",
       "n": 87,
       "split": {
-        "TEST": -4.288,
+        "TEST": -4.29,
         "TRAIN": 4.485,
         "VALID": 0.36
       },
@@ -13743,7 +15003,7 @@
         "2023": -0.923,
         "2024": 0.747,
         "2025": 0.839,
-        "2026": -7.108
+        "2026": -7.11
       },
       "by_mood": {
         "euforia": 2.161
@@ -13752,15 +15012,15 @@
         "euforia": 87
       },
       "edge_net": {
-        "TEST": -4.688,
+        "TEST": -4.69,
         "TRAIN": 4.085,
         "VALID": -0.04
       },
-      "p": 0.94,
+      "p": 0.941,
       "q": 0.9712,
       "n_eff": 16,
       "in_sample": 2.814,
-      "holdout": -4.288,
+      "holdout": -4.29,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13779,7 +15039,7 @@
             "n": 16
           },
           "IHSG \u003e MA200, tenang": {
-            "excess": 3.083,
+            "excess": 3.082,
             "n": 68
           }
         }
@@ -13795,7 +15055,7 @@
       "direction": "baik",
       "n": 206,
       "split": {
-        "TEST": -2.565,
+        "TEST": -2.567,
         "TRAIN": 1.38,
         "VALID": -0.043
       },
@@ -13814,7 +15074,7 @@
         "2023": -1.209,
         "2024": 0.045,
         "2025": 0.264,
-        "2026": -3.566
+        "2026": -3.567
       },
       "by_mood": {
         "euforia": 3.114,
@@ -13831,7 +15091,7 @@
         "tenang": 33
       },
       "edge_net": {
-        "TEST": -2.965,
+        "TEST": -2.967,
         "TRAIN": 0.98,
         "VALID": -0.443
       },
@@ -13839,7 +15099,7 @@
       "q": 0.9712,
       "n_eff": 32,
       "in_sample": 0.901,
-      "holdout": -2.565,
+      "holdout": -2.567,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13850,7 +15110,7 @@
             "n": 43
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -1.144,
+            "excess": -1.145,
             "n": 20
           },
           "IHSG \u003c MA200, tenang": {
@@ -13878,7 +15138,7 @@
       "direction": "buruk",
       "n": 201,
       "split": {
-        "TEST": -5.038,
+        "TEST": -5.028,
         "TRAIN": -0.224,
         "VALID": 1.835
       },
@@ -13888,7 +15148,7 @@
         "VALID": 57
       },
       "horizons": {},
-      "t": 0.087,
+      "t": 0.09,
       "years_won": "4/6",
       "by_year": {
         "2020": 5.009,
@@ -13897,11 +15157,11 @@
         "2023": -2.378,
         "2024": -2.683,
         "2025": 7.222,
-        "2026": -5.038
+        "2026": -5.028
       },
       "by_mood": {
         "optimis": 2.282,
-        "panik": 0.302,
+        "panik": 0.306,
         "takut": -0.782,
         "tenang": -1.844
       },
@@ -13912,15 +15172,15 @@
         "tenang": 51
       },
       "edge_net": {
-        "TEST": 4.638,
+        "TEST": 4.628,
         "TRAIN": -0.176,
         "VALID": -2.235
       },
-      "p": 0.899,
+      "p": 0.897,
       "q": 0.9712,
       "n_eff": 37,
       "in_sample": -0.463,
-      "holdout": 5.038,
+      "holdout": 5.028,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -13931,7 +15191,7 @@
             "n": 17
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 1.072,
+            "excess": 1.077,
             "n": 60
           },
           "IHSG \u003c MA200, tenang": {
@@ -13959,7 +15219,7 @@
       "direction": "buruk",
       "n": 296,
       "split": {
-        "TEST": 0.16,
+        "TEST": 0.167,
         "TRAIN": 0.019,
         "VALID": -0.154
       },
@@ -13969,7 +15229,7 @@
         "VALID": 88
       },
       "horizons": {},
-      "t": 0.149,
+      "t": 0.151,
       "years_won": "4/7",
       "by_year": {
         "2020": 5.356,
@@ -13977,14 +15237,14 @@
         "2022": 0.176,
         "2023": -0.992,
         "2024": -1.812,
-        "2025": 2.758,
-        "2026": -1.135
+        "2025": 2.757,
+        "2026": -1.128
       },
       "by_mood": {
         "euforia": 2.066,
         "optimis": 0.182,
-        "panik": -0.718,
-        "takut": -0.696,
+        "panik": -0.712,
+        "takut": -0.697,
         "tenang": 0.314
       },
       "mood_n": {
@@ -13995,15 +15255,15 @@
         "tenang": 95
       },
       "edge_net": {
-        "TEST": -0.56,
+        "TEST": -0.567,
         "TRAIN": -0.419,
         "VALID": -0.246
       },
-      "p": 0.889,
+      "p": 0.888,
       "q": 0.9712,
       "n_eff": 76,
       "in_sample": 0.041,
-      "holdout": -0.16,
+      "holdout": -0.167,
       "reasons": [
         "q = 0.971 (tidak signifikan)"
       ],
@@ -14014,7 +15274,7 @@
             "n": 14
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.928,
+            "excess": 0.933,
             "n": 65
           },
           "IHSG \u003c MA200, tenang": {
@@ -14041,7 +15301,7 @@
       "grade": "D",
       "n": 2616,
       "split": {
-        "TEST": -0.017,
+        "TEST": -0.018,
         "TRAIN": 0.238,
         "VALID": -0.378
       },
@@ -14056,7 +15316,7 @@
         "5": -0.03,
         "60": -0.36
       },
-      "t": 0.005,
+      "t": 0.004,
       "years_won": "3/7",
       "by_year": {
         "2020": 0.463,
@@ -14065,7 +15325,7 @@
         "2023": 0.799,
         "2024": -0.19,
         "2025": -0.434,
-        "2026": -0.102
+        "2026": -0.103
       },
       "by_mood": {
         "euforia": 0.806,
@@ -14088,22 +15348,22 @@
       },
       "hit_pct": 42.97,
       "edge_net": {
-        "TEST": -0.417,
+        "TEST": -0.418,
         "TRAIN": -0.162,
         "VALID": -0.778
       },
-      "p": 0.972,
-      "q": 0.9802,
+      "p": 0.973,
+      "q": 0.9812,
       "n_eff": 77,
       "random_entry": {
         "p50": 0.005,
-        "p95": 0.522,
+        "p95": 0.521,
         "beats_p95": false
       },
       "in_sample": 0.002,
-      "holdout": -0.017,
+      "holdout": -0.018,
       "reasons": [
-        "q = 0.980 (tidak signifikan)"
+        "q = 0.981 (tidak signifikan)"
       ],
       "portfolio": {
         "cagr_pct": -15.36,
@@ -14141,7 +15401,7 @@
             "n": 111
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": -0.25,
+            "excess": -0.251,
             "n": 609
           },
           "IHSG \u003c MA200, tenang": {
@@ -14179,7 +15439,7 @@
             "n": 418
           },
           "Financial Services": {
-            "excess": 0.035,
+            "excess": 0.034,
             "n": 269
           },
           "Healthcare": {
@@ -14270,7 +15530,7 @@
       "n_eff": 76,
       "random_entry": {
         "p50": -0.01,
-        "p95": 0.488,
+        "p95": 0.487,
         "beats_p95": false
       },
       "in_sample": 0.139,
@@ -14400,11 +15660,11 @@
       },
       "horizons": {
         "10": -0.019,
-        "20": -0.029,
+        "20": -0.03,
         "5": -0.013,
         "60": -0.042
       },
-      "t": -2.198,
+      "t": -2.201,
       "years_won": "2/4",
       "by_year": {
         "2023": -0.055,
@@ -14427,7 +15687,7 @@
         "tenang": 231
       },
       "edge_net": {
-        "TEST": 0.172,
+        "TEST": 0.173,
         "TRAIN": -0.78,
         "VALID": -0.545
       },
@@ -14436,6 +15696,7 @@
       "n_eff": 44,
       "in_sample": 0.039,
       "holdout": 0,
+      "stable": false,
       "reasons": [
         "q = 0.305 (tidak signifikan)",
         "in-sample 0.039 → TEST 0.000: turun \u003e 50% (indikasi overfit)"
@@ -14459,7 +15720,34 @@
             "n": 285
           }
         }
-      }
+      },
+      "params": [
+        {
+          "label": "top 20%, 10 hari",
+          "excess": 0.01,
+          "n": 854
+        },
+        {
+          "label": "top 20%, 60 hari",
+          "excess": -0.028,
+          "n": 804
+        },
+        {
+          "label": "top 33%, 10 hari",
+          "excess": 0.711,
+          "n": 854
+        },
+        {
+          "label": "top 33%, 20 hari",
+          "excess": 0.728,
+          "n": 844
+        },
+        {
+          "label": "top 33%, 60 hari",
+          "excess": 0.835,
+          "n": 804
+        }
+      ]
     },
     {
       "name": "Volume spike 2× + candle hijau",
@@ -14470,7 +15758,7 @@
       "grade": "F",
       "n": 2159,
       "split": {
-        "TEST": -0.496,
+        "TEST": -0.498,
         "TRAIN": 0.496,
         "VALID": 1.046
       },
@@ -14494,12 +15782,12 @@
         "2023": 0.776,
         "2024": 0.743,
         "2025": 1.179,
-        "2026": -0.551
+        "2026": -0.553
       },
       "by_mood": {
         "euforia": 1.948,
         "optimis": 0.859,
-        "panik": 0.185,
+        "panik": 0.183,
         "takut": -1.462,
         "tenang": 0.914
       },
@@ -14517,7 +15805,7 @@
       },
       "hit_pct": 43.86,
       "edge_net": {
-        "TEST": -0.896,
+        "TEST": -0.898,
         "TRAIN": 0.096,
         "VALID": 0.646
       },
@@ -14530,11 +15818,11 @@
         "beats_p95": false
       },
       "in_sample": 0.723,
-      "holdout": -0.496,
+      "holdout": -0.498,
       "stable": false,
       "reasons": [
         "q = 0.312 (tidak signifikan)",
-        "in-sample 0.723 → TEST -0.496: turun \u003e 50% (indikasi overfit)"
+        "in-sample 0.723 → TEST -0.498: turun \u003e 50% (indikasi overfit)"
       ],
       "portfolio": {
         "cagr_pct": -21.69,
@@ -14550,7 +15838,7 @@
       "groups": {
         "likuiditas": {
           "Q1": {
-            "excess": 1.973,
+            "excess": 1.972,
             "n": 795
           },
           "Q2": {
@@ -14572,7 +15860,7 @@
             "n": 93
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.419,
+            "excess": 0.417,
             "n": 499
           },
           "IHSG \u003c MA200, tenang": {
@@ -14606,7 +15894,7 @@
             "n": 292
           },
           "Energy": {
-            "excess": 1.72,
+            "excess": 1.719,
             "n": 358
           },
           "Financial Services": {
@@ -14614,7 +15902,7 @@
             "n": 207
           },
           "Healthcare": {
-            "excess": -1.265,
+            "excess": -1.275,
             "n": 35
           },
           "Industrials": {
@@ -14643,12 +15931,12 @@
         },
         {
           "label": "volume \u003e 2.0×",
-          "excess": 0.479,
+          "excess": 0.478,
           "n": 2159
         },
         {
           "label": "volume \u003e 2.6×",
-          "excess": 0.779,
+          "excess": 0.778,
           "n": 1508
         }
       ]
@@ -14663,7 +15951,7 @@
       "direction": "baik",
       "n": 252,
       "split": {
-        "TEST": -1.191,
+        "TEST": -1.188,
         "TRAIN": 1.753,
         "VALID": -0.538
       },
@@ -14673,7 +15961,7 @@
         "VALID": 71
       },
       "horizons": {},
-      "t": 1.35,
+      "t": 1.351,
       "years_won": "2/6",
       "by_year": {
         "2020": 5.524,
@@ -14682,16 +15970,16 @@
         "2023": 1.074,
         "2024": -0.522,
         "2025": -0.568,
-        "2026": -1.191
+        "2026": -1.188
       },
       "by_mood": {
-        "panik": 0.138
+        "panik": 0.139
       },
       "mood_n": {
         "panik": 252
       },
       "edge_net": {
-        "TEST": -1.591,
+        "TEST": -1.588,
         "TRAIN": 1.353,
         "VALID": -0.938
       },
@@ -14699,10 +15987,10 @@
       "q": 0.5109,
       "n_eff": 38,
       "in_sample": 0.791,
-      "holdout": -1.191,
+      "holdout": -1.188,
       "reasons": [
         "q = 0.511 (tidak signifikan)",
-        "in-sample 0.791 → TEST -1.191: turun \u003e 50% (indikasi overfit)"
+        "in-sample 0.791 → TEST -1.188: turun \u003e 50% (indikasi overfit)"
       ],
       "groups": {
         "rezim": {
@@ -14711,7 +15999,7 @@
             "n": 8
           },
           "IHSG \u003c MA200, bergejolak": {
-            "excess": 0.427,
+            "excess": 0.428,
             "n": 132
           },
           "IHSG \u003c MA200, tenang": {
@@ -14761,9 +16049,9 @@
       },
       "by_mood": {
         "euforia": 10.921,
-        "optimis": 2.311,
-        "panik": -0.627,
-        "takut": 0.368,
+        "optimis": 2.31,
+        "panik": -0.626,
+        "takut": 0.367,
         "tenang": 3.637
       },
       "mood_n": {
@@ -14802,7 +16090,7 @@
             "n": 11
           },
           "IHSG \u003e MA200, bergejolak": {
-            "excess": 1,
+            "excess": 0.998,
             "n": 11
           },
           "IHSG \u003e MA200, tenang": {

@@ -422,3 +422,34 @@ func regimeGroups(o []obs, reg map[string]string) map[string]GroupStat {
 	}
 	return groupBy(ev, func(e tagged) string { return orQ(reg[e.date]) })
 }
+
+// healthyOnly narrows every stock's tradable days to the "saham sehat"
+// universe (decided 2026-11-20), using only what was known that day: among
+// the liquid stocks of the date, the topN (40) with the largest 20-day turnover,
+// then price >= Rp500 and ATR <= 4% of price. The market baseline is built
+// from s.liquid, so it becomes the same healthy set automatically.
+func healthyOnly(res []stockOut, topN int) {
+	type pt struct {
+		s  *series
+		i  int
+		to float64
+	}
+	by := map[string][]pt{}
+	for _, o := range res {
+		if o.s == nil {
+			continue
+		}
+		for i := 0; i < o.s.n; i++ {
+			if o.s.liquid[i] {
+				by[o.s.date[i]] = append(by[o.s.date[i]], pt{o.s, i, o.s.to20[i]})
+			}
+		}
+	}
+	for _, ps := range by {
+		sort.Slice(ps, func(a, b int) bool { return ps[a].to > ps[b].to })
+		for k, p := range ps {
+			s, i := p.s, p.i
+			s.liquid[i] = k < topN && s.c[i] >= 500 && s.atr[i]/s.c[i] <= 0.04
+		}
+	}
+}

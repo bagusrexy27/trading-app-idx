@@ -186,6 +186,16 @@ Dari audit terhadap kerangka "valid 4 lapis" (hitungan benar → daya prediksi �
 - **Kesimpulan Fase 6**: 120 indikator → 0 signifikan setelah koreksi uji berganda (terdekat: VIX > 25, q 0,06); 116 D, 4 F; tidak ada strategi sinyal yang mengalahkan IHSG sebagai portofolio. Rapor menyarankan app berhenti memakai indikator sebagai *penentu beli*; yang tersisa sebagai alat bantu: aturan keluar (stop/target ATR), ukuran posisi, dan log uji maju.
 - **Koreksi**: catatan Fase 4 "return maju = total return" ternyata keliru — edit-nya gagal diam-diam (skrip tidak cocok indentasi). Baru benar-benar terpasang di #3; semua angka Fase 4 sebelum ini berbasis harga saja.
 
+## Fase 7 — uji "saham sehat" (2026-11-20)
+
+Usulan user: uji di saham sehat, bukan gorengan. Temuan pemicu: di universe semua saham likuid, 47/50 sinyal "menang" di kuartil likuiditas terbawah tapi hanya 6/50 di kuartil teratas — tanda pembanding (rata-rata semua saham) dan bias survivorship saham kecil mencampuri hasil.
+
+- **Definisi (dipilih user, point-in-time)**: per tanggal, 40 saham dengan transaksi 20 hari terbesar di antara saham likuid, harga ≥ Rp500, ATR ≤ 4%. Kriteria ARA/ARB sengaja **tidak** dipakai (saham sehat ikut ARB saat crash pasar — membuangnya menghapus periode terburuk). Pembanding = rata-rata saham sehat di tanggal yang sama. Pemilihan nama manual (BBCA/ADRO/AADI) dan daftar LQ45 hari ini ditolak karena bocoran masa depan.
+- **Kode**: `go run ./research/rapor -universe sehat` → `research/rapor/sehat/<tanggal>.json` + log uji maju sendiri `research/forward/sehat/`. `-sehatn 30|50` = uji sensitivitas ukuran (ke `research/out/`, tanpa log). Run `-minto`/`-out`/`-sehatn` tidak pernah menulis log uji maju. Indikator nilai sekarang juga diuji di parameter tetangga: 20%/33% termurah × tahan 10/20/60 hari (dinormalkan per 20 hari).
+- **Hasil**: 7 B, 1 C, 109 D, 2 E, 1 F; 10 indikator q < 0,05 (vs 0 di semua saham). Yang B: **PBV rendah, earnings yield tinggi (PER rendah), sales yield, EBITDA÷EV, dividend yield, Altman Z rendah, VIX > 25**. Paling kokoh: **PER rendah & PBV rendah** — B di top 30/40/50 dan stabil di semua varian (+0,9 s/d +2,0%/20 hari sebelum biaya). Sinyal teknikal tetap tidak berguna (0/50 mengalahkan IHSG sebagai portofolio; MFI & inside bar = E).
+- **Kenapa belum A**: untung terkumpul di Des 2025+ (pasar jatuh), Apr–Des 2023 belum untung setelah biaya; data fundamental hanya ±3,5 tahun; uji ini dirancang setelah melihat hasil semua saham. PBV sempat A di top 50 — tidak dipakai (memilih varian terbaik = cocok-cocokan); nilai resmi dari top 40.
+- **Langkah bukti**: log uji maju saham sehat (manual, sama seperti log utama).
+
 **Catatan kejujuran**: periode TEST (Des 2025+) sudah dilihat berkali-kali di sesi 2026-11-20 dan aturan nilai sudah 2× diubah setelah melihat hasil → TEST bukan holdout bersih lagi. Universe juga bocor sedikit (35 saham tambahan dipilih pakai likuiditas & kapitalisasi hari ini; tanpa saham delisting). Bukti bersih satu-satunya = forward test mulai 2026-11-20.
 
 ## Keputusan (2026-11-20)
