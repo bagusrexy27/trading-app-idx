@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fmt } from '../utils'
 import {
-  IconToday, IconMarket, IconSession, IconScreener, IconPortfolio, IconPractice, IconBook, IconCoin,
+  IconToday, IconMarket, IconSession, IconScreener, IconPortfolio, IconPractice, IconBook, IconCoin, IconRapor,
   IconAlerts, IconPlus, IconChevronLeft, IconChevronRight, IconWatchlist,
 } from './icons'
 
@@ -14,7 +14,7 @@ const PANEL_W = 232
 export default function Sidebar({
   stocks, selected, activeView, loading, panelOpen, onPanelOpenChange,
   onSelect, onAdd, onUpdateAll, onOpenAlerts,
-  onViewToday, onViewOverview, onViewSession, onViewAdvisor, onViewPortfolio, onViewDividends, onViewPractice, onViewGlossary,
+  onViewToday, onViewOverview, onViewSession, onViewAdvisor, onViewPortfolio, onViewDividends, onViewPractice, onViewGlossary, onViewRapor,
   mobileDrawer, onCloseMobile,
 }) {
   const [search, setSearch] = useState('')
@@ -55,6 +55,7 @@ export default function Sidebar({
             <RailBtn icon={<IconPortfolio />} label="Port" active={activeView === 'portfolio'} onClick={() => { onViewPortfolio(); onCloseMobile?.() }} />
             <RailBtn icon={<IconCoin />} label="Dividen" active={activeView === 'dividends'} onClick={() => { onViewDividends(); onCloseMobile?.() }} />
             <RailBtn icon={<IconPractice />} label="Drill" active={activeView === 'practice'} onClick={() => { onViewPractice(); onCloseMobile?.() }} />
+            <RailBtn icon={<IconRapor />} label="Rapor" active={activeView === 'rapor'} onClick={() => { onViewRapor(); onCloseMobile?.() }} />
             <RailBtn icon={<IconBook />} label="Kamus" active={activeView === 'kamus'} onClick={() => { onViewGlossary(); onCloseMobile?.() }} />
           </nav>
 

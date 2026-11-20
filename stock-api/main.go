@@ -273,6 +273,7 @@ func main() {
 	api.HandleFunc("/stocks/{symbol}/fundamental", handlers.SaveFundamental).Methods("POST")
 	api.HandleFunc("/dividends", handlers.GetDividends).Methods("GET")
 	api.HandleFunc("/dividends", handlers.SaveDividends).Methods("POST")
+	api.HandleFunc("/research/rapor", handlers.GetRapor).Methods("GET")
 
 	// ── Analysis endpoints ────────────────────────────────────────────────────
 	api.HandleFunc("/analysis/{symbol}/summary", a.Summary).Methods("GET")

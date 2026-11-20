@@ -95,3 +95,22 @@ func TestIchimokuIsDisplaced(t *testing.T) {
 		t.Error("chikou of the last bar is in the future")
 	}
 }
+
+// TestSARReversalClamp pins the flip-day rule found by research/l1_check.py
+// against TA-Lib (2026-11-20): on a reversal SAR jumps to the old extreme but
+// never inside today's or yesterday's range — here the downtrend's lowest low
+// (95) is above today's low (90), so the new long SAR is 90, not 95.
+func TestSARReversalClamp(t *testing.T) {
+	bar := func(d string, h, l, c float64) models.StockPrice {
+		return models.StockPrice{Date: d, High: h, Low: l, Close: c}
+	}
+	p := []models.StockPrice{
+		bar("d0", 120, 110, 112), bar("d1", 112, 104, 105), // starts bearish
+		bar("d2", 106, 98, 99), bar("d3", 100, 95, 96),
+		bar("d4", 130, 90, 128), // takes out the SAR: flip to long, low 90 < old extreme 95
+	}
+	got := SAR(p)
+	if last := got[len(got)-1]; last.Value != 90 {
+		t.Fatalf("flip-day SAR = %v, want 90 (min of old extreme 95, today's low 90, yesterday's low 95)", last.Value)
+	}
+}

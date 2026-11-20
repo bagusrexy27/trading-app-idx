@@ -87,6 +87,16 @@ export function IconBook(props) {
   )
 }
 
+export function IconRapor(props) {
+  return (
+    <svg {...S} {...props}>
+      <rect x="5" y="4" width="14" height="17" rx="2" />
+      <path d="M9 2h6v4H9z" />
+      <path d="M9 12l2 2 4-4M9 17h6" />
+    </svg>
+  )
+}
+
 export function IconAlerts(props) {
   return (
     <svg {...S} {...props}>

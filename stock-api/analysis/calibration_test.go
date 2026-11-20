@@ -21,7 +21,8 @@ func TestPlanOutcome(t *testing.T) {
 
 	p := flatBars(n)
 	p[3].High = 110
-	if r, pnl, _, ok := planOutcome(p, 0, 95, 110); !ok || r != "WIN" || R2(pnl) != 10 {
+	// P&L is net of the round-trip cost: +10% target → +9.6%
+	if r, pnl, _, ok := planOutcome(p, 0, 95, 110); !ok || r != "WIN" || R2(pnl) != 10-RoundTripCostPct {
 		t.Errorf("win: got %s %.2f %v", r, pnl, ok)
 	}
 
@@ -33,8 +34,8 @@ func TestPlanOutcome(t *testing.T) {
 
 	p = flatBars(n)
 	p[3].Open, p[3].Low = 90, 90 // gap through stop exits at the open
-	if r, pnl, _, _ := planOutcome(p, 0, 95, 110); r != "LOSS" || R2(pnl) != -10 {
-		t.Errorf("gap: got %s %.2f, want LOSS -10", r, pnl)
+	if r, pnl, _, _ := planOutcome(p, 0, 95, 110); r != "LOSS" || R2(pnl) != -10-RoundTripCostPct {
+		t.Errorf("gap: got %s %.2f, want LOSS -10.4", r, pnl)
 	}
 
 	if r, _, _, ok := planOutcome(flatBars(n), 0, 95, 110); !ok || r != "TIMEOUT" {

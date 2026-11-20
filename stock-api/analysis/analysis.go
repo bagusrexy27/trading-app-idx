@@ -491,9 +491,10 @@ func SAR(prices []models.StockPrice) []Point {
 				newSAR = prices[i-2].Low
 			}
 			if p.Low <= newSAR {
-				// Reversal to bearish
+				// Reversal to bearish: SAR jumps to the old extreme, but never
+				// below today's or yesterday's high (Wilder / TA-Lib).
 				bull = false
-				newSAR = ep
+				newSAR = math.Max(ep, math.Max(p.High, prices[i-1].High))
 				ep = p.Low
 				af = afInit
 			} else {
@@ -510,9 +511,10 @@ func SAR(prices []models.StockPrice) []Point {
 				newSAR = prices[i-2].High
 			}
 			if p.High >= newSAR {
-				// Reversal to bullish
+				// Reversal to bullish: SAR jumps to the old extreme, but never
+				// above today's or yesterday's low (Wilder / TA-Lib).
 				bull = true
-				newSAR = ep
+				newSAR = math.Min(ep, math.Min(p.Low, prices[i-1].Low))
 				ep = p.High
 				af = afInit
 			} else {

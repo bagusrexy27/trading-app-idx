@@ -22,6 +22,7 @@ WORKDIR /app
 COPY --from=build /out/stock-api ./stock-api
 COPY --from=ui /app/static ./static
 COPY data ./seed-data
+COPY research/rapor/*.json ./research/rapor/
 ENV DATA_DIR=/data SEED_DIR=/app/seed-data PORT=8080 TZ=Asia/Jakarta
 EXPOSE 8080
 CMD ["./stock-api"]

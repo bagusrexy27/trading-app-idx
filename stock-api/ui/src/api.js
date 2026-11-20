@@ -72,6 +72,7 @@ export const api = {
   session:  () => req('/session'),
   ihsg:     () => req('/ihsg'),
   calibration: () => req('/calibration'),
+  rapor:    () => req('/research/rapor'),
   dividends: {
     list: (refresh) => req(`/dividends${refresh ? '?refresh=1' : ''}`),
     save: (list) => req('/dividends', { method: 'POST', body: JSON.stringify(list) }),

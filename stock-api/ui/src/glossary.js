@@ -22,7 +22,7 @@ export const GLOSSARY = {
   target:    { istilah: 'Target / TP', kategori: 'Rencana trading', arti: 'Take Profit — harga tujuan untuk ambil untung. TP1 = target pertama (terdekat).' },
   rr:        { istilah: 'R:R (risk-reward)', kategori: 'Rencana trading', arti: 'Perbandingan potensi rugi (ke stop) dan potensi untung (ke target). 1:3 = risiko Rp1 untuk peluang untung Rp3. Umumnya cari minimal 1:2.' },
   winrate:   { istilah: 'Kena target (win rate)', kategori: 'Rencana trading', arti: 'Dari kasus historis yang mirip, berapa persen yang menyentuh target sebelum stop dalam 20 hari bursa. Ini data nyata, bukan ramalan.' },
-  avgpnl:    { istilah: 'Rata-rata hasil per trade', kategori: 'Rencana trading', arti: 'Rata-rata untung/rugi (%) dari semua kasus historis serupa. Lebih penting dari win rate: win rate tinggi tapi rata-rata minus tetap rugi.' },
+  avgpnl:    { istilah: 'Rata-rata hasil per trade', kategori: 'Rencana trading', arti: 'Rata-rata untung/rugi (%) dari semua kasus historis serupa. Lebih penting dari win rate: win rate tinggi tapi rata-rata minus tetap rugi. Sudah dipotong biaya transaksi ±0,4% per trade (beli 0,15% + jual 0,25%).' },
   sampel:    { istilah: 'Sampel (n)', kategori: 'Rencana trading', arti: 'Jumlah kasus historis yang dihitung. Di bawah 30 = angka belum bisa dipercaya.' },
   cutloss:   { istilah: 'Cut loss', kategori: 'Rencana trading', arti: 'Menjual saham yang sedang rugi untuk menghentikan kerugian, biasanya saat stop-loss tersentuh.' },
   avgdown:   { istilah: 'Average down', kategori: 'Rencana trading', arti: 'Membeli lagi saat harga turun supaya harga rata-rata lebih murah. Berbahaya kalau trennya memang turun.' },

@@ -391,6 +391,11 @@ func firstTP(d Decision) float64 {
 	return d.TakeProfit[0].Price
 }
 
+// RoundTripCostPct is the IDX trading cost charged on every plan: ±0.15% to
+// buy + ±0.25% to sell (incl. 0.1% final income tax), broker-dependent. Every
+// P&L the app reports (calibration, decision backtest) is net of it.
+const RoundTripCostPct = 0.4
+
 // planOutcome resolves the plan made at the close of bar i: enter at the next
 // open, WIN at TP1, LOSS at the stop (gap-through exits at the open, same-bar
 // touch = LOSS), TIMEOUT at the close of bar i+CalibHorizon. exit is the bar it
@@ -398,6 +403,14 @@ func firstTP(d Decision) float64 {
 // before it resolves (result "OPEN", pnl marked at the last close).
 // Shared by Calibrate and BacktestDecision so both report the same rules.
 func planOutcome(prices []models.StockPrice, i int, stop, target float64) (result string, pnlPct float64, exit int, ok bool) {
+	result, pnlPct, exit, ok = planOutcomeGross(prices, i, stop, target)
+	if result != "" {
+		pnlPct -= RoundTripCostPct
+	}
+	return
+}
+
+func planOutcomeGross(prices []models.StockPrice, i int, stop, target float64) (result string, pnlPct float64, exit int, ok bool) {
 	n := len(prices)
 	entry := prices[i+1].Open
 	if entry <= 0 {

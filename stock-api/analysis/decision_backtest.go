@@ -61,7 +61,7 @@ func BacktestDecisionWithBroker(prices []models.StockPrice, brokerDays []BrokerD
 		}
 		res.Trades = append(res.Trades, DecisionTrade{
 			EntryDate: prices[i+1].Date, EntryPrice: R2(entry),
-			ExitDate: prices[exit].Date, ExitPrice: R2(entry * (1 + pnl/100)),
+			ExitDate: prices[exit].Date, ExitPrice: R2(entry * (1 + (pnl+RoundTripCostPct)/100)), // pnl is net of cost, the price is not
 			Signal: dec.Signal, Result: result, PnLPct: R2(pnl),
 			RiskReward: dec.RiskReward,
 		})
