@@ -10,8 +10,8 @@ import (
 // Fase 6 #3 statistics (docs/rapor-indikator-plan.md). Fixed seeds so a
 // re-run gives the same numbers.
 const (
-	bootN     = 2000 // block-bootstrap resamples
-	randomN   = 1000 // random-entry simulations
+	bootN     = 20000 // block-bootstrap resamples: smallest p ≈ 1e-4, so even a lone effect can pass BH over ~120 tests
+	randomN   = 1000  // random-entry simulations
 	seed      = 42
 	qMax      = 0.05 // Benjamini–Hochberg false-discovery rate
 	minNEff   = 24   // months: below this an indicator can't reach A
@@ -64,8 +64,8 @@ func bootP(m []float64, rng *rand.Rand) float64 {
 			above++
 		}
 	}
-	p := 2 * float64(min(below, above)) / bootN
-	return math.Max(math.Min(p, 1), 1.0/bootN)
+	p := 2 * float64(min(below, above)+1) / (bootN + 1) // add-one: never exactly 0
+	return math.Min(p, 1)
 }
 
 func randomEntry(pool []float64, n int, rng *rand.Rand) *Random {

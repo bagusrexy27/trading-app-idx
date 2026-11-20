@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
-import { GRADES, KIND_LABEL, MOODS, PERIODS, isGood, fmtMetric, directionText, filterRows } from '../rapor'
+import { GRADES, KIND_LABEL, MOODS, PERIODS, isGood, fmtMetric, directionText, filterRows, pctView } from '../rapor'
 
 const tone = (g) => (g === true ? 'text-tv-green' : g === false ? 'text-tv-red' : 'text-tv-muted')
 
@@ -79,13 +79,13 @@ function Detail({ r, bench }) {
           <div className="text-[10px] font-bold uppercase tracking-wider text-tv-muted mb-1">
             Parameter tetangga (±30%) — {r.stable == null ? 'belum diuji' : r.stable ? 'stabil (arah sama, efek ≥ ½)' : 'tidak stabil'}
           </div>
-          <Cells r={r} keys={r.params.map(c => [c.label, c.label])} values={Object.fromEntries(r.params.map(c => [c.label, c.excess]))} />
+          <Cells r={pctView(r)} keys={r.params.map(c => [c.label, c.label])} values={Object.fromEntries(r.params.map(c => [c.label, c.excess]))} />
         </div>
       )}
       {Object.entries(r.groups || {}).map(([g, stats]) => (
         <div key={g}>
           <div className="text-[10px] font-bold uppercase tracking-wider text-tv-muted mb-1">Per {g} (hanya deskriptif — tidak menaikkan nilai)</div>
-          <Cells r={r} keys={Object.keys(stats).sort().map(k => [k, k])}
+          <Cells r={pctView(r)} keys={Object.keys(stats).sort().map(k => [k, k])}
             values={Object.fromEntries(Object.entries(stats).map(([k, v]) => [k, v.excess]))}
             counts={Object.fromEntries(Object.entries(stats).map(([k, v]) => [k, v.n]))} />
         </div>
@@ -130,8 +130,10 @@ export default function Rapor() {
   const [universe, setUniverse] = useState('')
 
   useEffect(() => {
+    let alive = true // a slower response for the previous tab must not overwrite this one
     setRep(null); setErr(null)
-    api.rapor(universe).then(setRep).catch(e => setErr(e.message))
+    api.rapor(universe).then(d => alive && setRep(d)).catch(e => alive && setErr(e.message))
+    return () => { alive = false }
   }, [universe])
 
   const rows = useMemo(() => filterRows(rep?.indicators || [], f), [rep, f])

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isGood, fmtMetric, filterRows } from './rapor'
+import { isGood, fmtMetric, filterRows, pctView } from './rapor'
 
 describe('isGood', () => {
   it('signals: beating the market is good', () => {
@@ -37,5 +37,17 @@ describe('filterRows', () => {
     expect(filterRows(rows, { appOnly: true }).map(r => r.name)).toEqual(['MACD cross naik'])
     expect(filterRows(rows, { q: 'bangkrut' }).length).toBe(1)
     expect(filterRows(rows).length).toBe(2)
+  })
+})
+
+describe('pctView', () => {
+  it('value-indicator cells are direction-adjusted %: positive is good even for "rendah" (PBV)', () => {
+    const pbv = { kind: 'value', direction: 'rendah' }
+    expect(fmtMetric(pctView(pbv), 1.2)).toBe('+1.20%')
+    expect(isGood(pctView(pbv), 1.2)).toBe(true)
+  })
+  it('timing cells keep their own direction', () => {
+    const t = { kind: 'timing', direction: 'buruk' }
+    expect(pctView(t)).toBe(t)
   })
 })

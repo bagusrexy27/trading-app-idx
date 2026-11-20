@@ -133,11 +133,20 @@ func summarize(r *Result, o20 []obs, mood map[string]string, minYearN int) {
 	})
 	dir := 1.0
 	if r.Kind != "signal" {
-		all := make([]float64, len(o20))
-		for i, x := range o20 {
-			all[i] = x.v
+		// the useful direction is picked WITHOUT the TEST period, so TEST stays
+		// out-of-sample for the sign too (review 2026-11-20); all data only
+		// when there is nothing before TEST
+		var pre, all []float64
+		for _, x := range o20 {
+			all = append(all, x.v)
+			if splitOf(x.date) != "TEST" {
+				pre = append(pre, x.v)
+			}
 		}
-		if mean(all) < 0 {
+		if len(pre) == 0 {
+			pre = all
+		}
+		if mean(pre) < 0 {
 			dir = -1
 		}
 		r.Direction = map[bool]string{true: "tinggi", false: "rendah"}[dir > 0]

@@ -98,9 +98,13 @@ func main() {
 	cat := append(append(append([]indicator{}, catalogue...), components()...), fundamentals()...)
 
 	funds := make([]*fundData, len(syms)) // sequential + paced: Yahoo rate-limits bursts
+	var noFund []string                   // no fundamentals → price-only returns (no dividends) for that stock
 	for k, sym := range syms {
 		f, fetched := loadFund(sym)
 		funds[k] = f
+		if f == nil {
+			noFund = append(noFund, sym)
+		}
 		if fetched {
 			time.Sleep(300 * time.Millisecond)
 		}
@@ -397,6 +401,16 @@ func main() {
 	if len(logs) > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("Uji maju (forward test): %d hari tercatat sejak %s; sinyal baru dinilai setelah 20 hari bursa.", len(logs), logs[0].Date))
 	}
+	if len(noFund) > 0 {
+		rep.Notes = append(rep.Notes, fmt.Sprintf("⚠️ %d saham tanpa data fundamental/dividen (unduhan Yahoo gagal): %v — return-nya hanya harga, rasio fundamentalnya kosong.", len(noFund), noFund))
+	}
+	codes := map[string]bool{}
+	for _, l := range logs {
+		codes[l.Code] = true
+	}
+	if len(codes) > 1 {
+		rep.Notes = append(rep.Notes, fmt.Sprintf("⚠️ Kode Rapor berubah selama uji maju (%d versi): sinyal dari versi kode berbeda dinilai bersama — cek kolom code di research/forward/.", len(codes)))
+	}
 	if len(broken) > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("⚠️ Rantai hash log uji maju rusak pada: %v — ada file yang diubah setelah ditulis.", broken))
 	}
@@ -524,7 +538,10 @@ func fail(format string, a ...any) {
 // liquid stocks by the indicator (in its useful direction) and hold h days.
 // Returns the per-date mean excess return (before costs).
 func topFrac(res []stockOut, j int, dir float64, excess func(*series, int, int) float64, frac float64, h int) []obs {
-	type pt struct{ v, x float64 }
+	type pt struct {
+		sym  string
+		v, x float64
+	}
 	by := map[string][]pt{}
 	for _, o := range res {
 		if o.s == nil {
@@ -533,7 +550,7 @@ func topFrac(res []stockOut, j int, dir float64, excess func(*series, int, int) 
 		for i := 0; i < o.s.n; i++ {
 			v, x := o.vals[j][i], excess(o.s, h, i)
 			if o.s.liquid[i] && !math.IsNaN(v) && !math.IsInf(v, 0) && !math.IsNaN(x) {
-				by[o.s.date[i]] = append(by[o.s.date[i]], pt{v * dir, x})
+				by[o.s.date[i]] = append(by[o.s.date[i]], pt{o.s.sym, v * dir, x})
 			}
 		}
 	}
@@ -542,7 +559,9 @@ func topFrac(res []stockOut, j int, dir float64, excess func(*series, int, int) 
 		if len(ps) < minICCross {
 			continue
 		}
-		sort.Slice(ps, func(a, b int) bool { return ps[a].v > ps[b].v })
+		sort.Slice(ps, func(a, b int) bool { // ties (integer scores) broken by symbol, same rule as the forward log
+			return ps[a].v > ps[b].v || (ps[a].v == ps[b].v && ps[a].sym < ps[b].sym)
+		})
 		k := int(float64(len(ps)) * frac)
 		xs := make([]float64, k)
 		for q := 0; q < k; q++ {

@@ -196,6 +196,21 @@ Usulan user: uji di saham sehat, bukan gorengan. Temuan pemicu: di universe semu
 - **Kenapa belum A**: untung terkumpul di Des 2025+ (pasar jatuh), Apr–Des 2023 belum untung setelah biaya; data fundamental hanya ±3,5 tahun; uji ini dirancang setelah melihat hasil semua saham. PBV sempat A di top 50 — tidak dipakai (memilih varian terbaik = cocok-cocokan); nilai resmi dari top 40.
 - **Langkah bukti**: log uji maju saham sehat (manual, sama seperti log utama).
 
+## Fase 8 — perbaikan hasil code review (2026-11-20)
+
+Review independen atas semua commit hari ini (engine `research/rapor` + app). Tidak ada look-ahead, race, atau masalah keamanan; yang diperbaiki:
+1. **Kondisi "3 hari bursa terakhir tiap bulan"** selalu benar untuk 3 tanggal terbaru (hari bursa berikutnya belum ada) → sekarang pakai kalender (hari kerja tersisa di bulan itu). Diperbaiki sebelum log uji maju pertama ditulis. Test: `timing_test.go`.
+2. **UI**: sel parameter tetangga & pecahan rezim indikator nilai adalah % yang sudah searah, tapi tampil sebagai IC dan diwarnai terbalik (PBV positif = merah) → `pctView` di `rapor.js` (+ test).
+3. **Arah indikator nilai/timing** sekarang dipilih dari data sebelum TEST saja, supaya TEST tetap di luar sampel untuk pilihan arah.
+4. **Resolusi bootstrap** 2.000× → 20.000× dan p = 2(k+1)/(N+1). Sebelumnya p minimum 0,0005 → dengan 120 uji, satu efek kuat yang sendirian mentok q ≈ 0,06. **Ini mengubah hasil**: di semua saham **VIX > 25 jadi B (q 0,024)** — klaim "0 dari 120 signifikan" tidak berlaku lagi (yang lolos adalah timing, bukan pemilih saham).
+5. **Skor uji maju indikator nilai** = rata-rata excess 20% terbaik (sama dengan backtest), bukan terbaik − terburuk.
+6. **Saham tanpa data fundamental** (dividen ikut hilang) dicatat di notes laporan; begitu juga kalau **kode Rapor berubah** di tengah log uji maju.
+7. Pengurutan "top 20%" stabil dengan pemecah seri kode saham (skor bulat seperti Piotroski); race saat ganti tab universe di UI.
+
+Efek pemilihan arah tanpa TEST: 11 indikator D berganti arah (noise). Valuasi di saham sehat **tidak** berganti arah — "PER/PBV rendah lebih bagus" sudah terlihat sebelum 2026. Hasil setelah perbaikan: semua saham 1 B (VIX > 25), 115 D, 4 F; saham sehat 8 B, 109 D, 2 E, 1 F.
+
+Belum dikerjakan (tercatat): `research/blindtest` masih tanpa biaya (sengaja, supaya kriteria K1–K6 beku 2025-11-28 tetap sebanding); `COPY research/rapor/sehat/*.json` gagal kalau folder kosong; Sharpe portofolio hanya dari bulan yang ada exit; finalitas candle bergantung mtime (bisa terkecoh `git checkout`).
+
 **Catatan kejujuran**: periode TEST (Des 2025+) sudah dilihat berkali-kali di sesi 2026-11-20 dan aturan nilai sudah 2× diubah setelah melihat hasil → TEST bukan holdout bersih lagi. Universe juga bocor sedikit (35 saham tambahan dipilih pakai likuiditas & kapitalisasi hari ini; tanpa saham delisting). Bukti bersih satu-satunya = forward test mulai 2026-11-20.
 
 ## Keputusan (2026-11-20)

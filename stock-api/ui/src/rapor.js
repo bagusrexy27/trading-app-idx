@@ -53,3 +53,11 @@ export function filterRows(rows, { q = '', grade = '', kind = '', cat = '', appO
     (!cat || r.category === cat) &&
     (!appOnly || r.in_app))
 }
+
+// pctView: how to show an indicator's parameter-neighbour and group cells.
+// For value indicators those cells are % returns of the best 20% already
+// turned to the useful side (not ICs, not raw direction), so they read like a
+// signal: % with "> 0 = good". Signals and timing cells keep their own view.
+export function pctView(r) {
+  return r.kind === 'value' ? { ...r, kind: 'signal' } : r
+}

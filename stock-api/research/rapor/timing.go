@@ -84,8 +84,12 @@ func timingConds(jk dateSeries, mood map[string]string, breadth map[string]float
 	}
 	lastOfMonth := map[string]bool{} // last 3 trading days of each month
 	for i, d := range tradeDays {
-		if i+3 >= len(tradeDays) || tradeDays[i+3][:7] != d[:7] {
-			lastOfMonth[d] = true
+		if i+3 < len(tradeDays) {
+			lastOfMonth[d] = tradeDays[i+3][:7] != d[:7]
+		} else {
+			// newest bars: the next trading days are not known yet — use the
+			// calendar (weekdays left in the month; holidays ignored)
+			lastOfMonth[d] = weekdaysLeftInMonth(d) < 3
 		}
 	}
 	wd := func(w time.Weekday) func(string) bool {
@@ -172,4 +176,19 @@ func timingResults(conds []timingCond, m20 map[string]float64, mood, reg map[str
 		out = append(out, r)
 	}
 	return out
+}
+
+// weekdaysLeftInMonth counts Mon–Fri days after d in d's month.
+func weekdaysLeftInMonth(d string) int {
+	t, err := time.Parse("2006-01-02", d)
+	if err != nil {
+		return 99
+	}
+	n := 0
+	for x := t.AddDate(0, 0, 1); x.Month() == t.Month(); x = x.AddDate(0, 0, 1) {
+		if x.Weekday() != time.Saturday && x.Weekday() != time.Sunday {
+			n++
+		}
+	}
+	return n
 }

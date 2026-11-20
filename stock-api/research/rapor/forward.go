@@ -38,7 +38,7 @@ type fwdLog struct {
 type Forward struct {
 	Since  string  `json:"since"`
 	N      int     `json:"n"`                 // resolved signals / dates
-	Excess float64 `json:"excess"`            // same unit as Result.Split (direction-adjusted for values/timing)
+	Excess float64 `json:"excess"`            // % before costs, same measure as the backtest's netObs: signal = 20d excess per signal · value = best-20% side's 20d excess per date · timing = market deviation on its side
 	Hit    float64 `json:"hit_pct,omitempty"` // signals: % beating the market
 }
 
@@ -171,11 +171,15 @@ func writeForward(res []stockOut, cat []indicator, conds []timingCond, tradeDays
 			if ind.val == nil || len(v) < minICCross {
 				continue
 			}
-			sort.Slice(v, func(a, b int) bool { return v[a].v < v[b].v })
+			// ties (integer scores like Piotroski) broken by symbol, same rule as topFrac
 			k := len(v) / 5
+			sort.Slice(v, func(a, b int) bool { return v[a].v < v[b].v || (v[a].v == v[b].v && v[a].sym < v[b].sym) })
 			for q := 0; q < k; q++ {
 				l.Low[ind.Name] = append(l.Low[ind.Name], v[q].sym)
-				l.High[ind.Name] = append(l.High[ind.Name], v[len(v)-1-q].sym)
+			}
+			sort.Slice(v, func(a, b int) bool { return v[a].v > v[b].v || (v[a].v == v[b].v && v[a].sym < v[b].sym) })
+			for q := 0; q < k; q++ {
+				l.High[ind.Name] = append(l.High[ind.Name], v[q].sym)
 			}
 		}
 		for _, c := range conds {
@@ -240,14 +244,13 @@ func scoreForward(rs []Result, logs []fwdLog, res []stockOut, excess func(*serie
 						}
 					}
 				}
-			case "value": // best side (backtest direction) minus worst side, per date
-				best, worst := l.High[r.Name], l.Low[r.Name]
+			case "value": // best 20% side in the backtest direction, per date — same as netObs (topFrac 0.2)
+				best := l.High[r.Name]
 				if r.Direction == "rendah" {
-					best, worst = worst, best
+					best = l.Low[r.Name]
 				}
-				b, w := sideMean(best, l.Date, bySym, excess), sideMean(worst, l.Date, bySym, excess)
-				if !math.IsNaN(b) && !math.IsNaN(w) {
-					xs = append(xs, b-w)
+				if b := sideMean(best, l.Date, bySym, excess); !math.IsNaN(b) {
+					xs = append(xs, b)
 				}
 			case "timing":
 				if l.Timing[r.Name] {
