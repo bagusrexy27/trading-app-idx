@@ -1,7 +1,7 @@
 {
   "symbol": "MEDS",
   "exchange": "JKT",
-  "last_updated": "2026-11-03",
+  "last_updated": "2026-11-20",
   "prices": [
     {
       "date": "2022-08-10",
@@ -8113,7 +8113,111 @@
       "high": 63,
       "low": 58,
       "close": 59,
-      "volume": 10175700
+      "volume": 10212100
+    },
+    {
+      "date": "2026-11-04",
+      "open": 58,
+      "high": 58,
+      "low": 55,
+      "close": 55,
+      "volume": 12633600
+    },
+    {
+      "date": "2026-11-05",
+      "open": 56,
+      "high": 58,
+      "low": 55,
+      "close": 58,
+      "volume": 5359500
+    },
+    {
+      "date": "2026-11-06",
+      "open": 57,
+      "high": 58,
+      "low": 56,
+      "close": 57,
+      "volume": 2892700
+    },
+    {
+      "date": "2026-11-09",
+      "open": 57,
+      "high": 60,
+      "low": 56,
+      "close": 58,
+      "volume": 6439400
+    },
+    {
+      "date": "2026-11-10",
+      "open": 58,
+      "high": 60,
+      "low": 57,
+      "close": 58,
+      "volume": 7743200
+    },
+    {
+      "date": "2026-11-11",
+      "open": 58,
+      "high": 60,
+      "low": 58,
+      "close": 58,
+      "volume": 3365100
+    },
+    {
+      "date": "2026-11-12",
+      "open": 58,
+      "high": 61,
+      "low": 58,
+      "close": 60,
+      "volume": 8930500
+    },
+    {
+      "date": "2026-11-13",
+      "open": 60,
+      "high": 65,
+      "low": 60,
+      "close": 64,
+      "volume": 21614600
+    },
+    {
+      "date": "2026-11-16",
+      "open": 64,
+      "high": 66,
+      "low": 62,
+      "close": 64,
+      "volume": 11187600
+    },
+    {
+      "date": "2026-11-17",
+      "open": 64,
+      "high": 65,
+      "low": 63,
+      "close": 63,
+      "volume": 4827300
+    },
+    {
+      "date": "2026-11-18",
+      "open": 65,
+      "high": 65,
+      "low": 61,
+      "close": 62,
+      "volume": 11102100
+    },
+    {
+      "date": "2026-11-19",
+      "open": 62,
+      "high": 64,
+      "low": 61,
+      "close": 62,
+      "volume": 6671800
+    },
+    {
+      "date": "2026-11-20",
+      "open": 62,
+      "high": 63,
+      "low": 61,
+      "close": 61,
+      "volume": 921300
     }
   ]
 }

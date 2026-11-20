@@ -1,7 +1,7 @@
 {
   "symbol": "BELL",
   "exchange": "JKT",
-  "last_updated": "2026-11-03",
+  "last_updated": "2026-11-20",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13177,7 +13177,111 @@
       "high": 65,
       "low": 59,
       "close": 59,
-      "volume": 4796600
+      "volume": 4788100
+    },
+    {
+      "date": "2026-11-04",
+      "open": 59,
+      "high": 60,
+      "low": 55,
+      "close": 55,
+      "volume": 4516700
+    },
+    {
+      "date": "2026-11-05",
+      "open": 55,
+      "high": 74,
+      "low": 55,
+      "close": 74,
+      "volume": 79121900
+    },
+    {
+      "date": "2026-11-06",
+      "open": 73,
+      "high": 73,
+      "low": 69,
+      "close": 69,
+      "volume": 8384000
+    },
+    {
+      "date": "2026-11-09",
+      "open": 65,
+      "high": 70,
+      "low": 65,
+      "close": 67,
+      "volume": 23061000
+    },
+    {
+      "date": "2026-11-10",
+      "open": 67,
+      "high": 81,
+      "low": 65,
+      "close": 70,
+      "volume": 148048100
+    },
+    {
+      "date": "2026-11-11",
+      "open": 70,
+      "high": 71,
+      "low": 66,
+      "close": 68,
+      "volume": 17498400
+    },
+    {
+      "date": "2026-11-12",
+      "open": 68,
+      "high": 72,
+      "low": 67,
+      "close": 71,
+      "volume": 10234200
+    },
+    {
+      "date": "2026-11-13",
+      "open": 72,
+      "high": 74,
+      "low": 69,
+      "close": 73,
+      "volume": 12933700
+    },
+    {
+      "date": "2026-11-16",
+      "open": 75,
+      "high": 78,
+      "low": 71,
+      "close": 73,
+      "volume": 14225100
+    },
+    {
+      "date": "2026-11-17",
+      "open": 74,
+      "high": 74,
+      "low": 70,
+      "close": 71,
+      "volume": 9112300
+    },
+    {
+      "date": "2026-11-18",
+      "open": 71,
+      "high": 80,
+      "low": 68,
+      "close": 69,
+      "volume": 76108800
+    },
+    {
+      "date": "2026-11-19",
+      "open": 69,
+      "high": 87,
+      "low": 66,
+      "close": 74,
+      "volume": 258518800
+    },
+    {
+      "date": "2026-11-20",
+      "open": 73,
+      "high": 77,
+      "low": 70,
+      "close": 70,
+      "volume": 34634300
     }
   ]
 }

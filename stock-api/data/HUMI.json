@@ -1,7 +1,7 @@
 {
   "symbol": "HUMI",
   "exchange": "JKT",
-  "last_updated": "2026-11-03",
+  "last_updated": "2026-11-20",
   "prices": [
     {
       "date": "2023-08-09",
@@ -6178,6 +6178,110 @@
       "low": 76,
       "close": 76,
       "volume": 16910100
+    },
+    {
+      "date": "2026-11-04",
+      "open": 71,
+      "high": 74,
+      "low": 71,
+      "close": 73,
+      "volume": 20184600
+    },
+    {
+      "date": "2026-11-05",
+      "open": 76,
+      "high": 78,
+      "low": 72,
+      "close": 74,
+      "volume": 13961300
+    },
+    {
+      "date": "2026-11-06",
+      "open": 73,
+      "high": 74,
+      "low": 69,
+      "close": 74,
+      "volume": 14634500
+    },
+    {
+      "date": "2026-11-09",
+      "open": 74,
+      "high": 77,
+      "low": 72,
+      "close": 74,
+      "volume": 9129700
+    },
+    {
+      "date": "2026-11-10",
+      "open": 75,
+      "high": 79,
+      "low": 74,
+      "close": 77,
+      "volume": 14452800
+    },
+    {
+      "date": "2026-11-11",
+      "open": 77,
+      "high": 81,
+      "low": 76,
+      "close": 77,
+      "volume": 20224900
+    },
+    {
+      "date": "2026-11-12",
+      "open": 77,
+      "high": 81,
+      "low": 77,
+      "close": 80,
+      "volume": 12130900
+    },
+    {
+      "date": "2026-11-13",
+      "open": 80,
+      "high": 84,
+      "low": 77,
+      "close": 82,
+      "volume": 29551700
+    },
+    {
+      "date": "2026-11-16",
+      "open": 82,
+      "high": 84,
+      "low": 79,
+      "close": 80,
+      "volume": 13957900
+    },
+    {
+      "date": "2026-11-17",
+      "open": 81,
+      "high": 82,
+      "low": 79,
+      "close": 82,
+      "volume": 10915900
+    },
+    {
+      "date": "2026-11-18",
+      "open": 82,
+      "high": 98,
+      "low": 79,
+      "close": 82,
+      "volume": 251037700
+    },
+    {
+      "date": "2026-11-19",
+      "open": 83,
+      "high": 86,
+      "low": 79,
+      "close": 81,
+      "volume": 49960700
+    },
+    {
+      "date": "2026-11-20",
+      "open": 78,
+      "high": 82,
+      "low": 76,
+      "close": 76,
+      "volume": 22271000
     }
   ]
 }

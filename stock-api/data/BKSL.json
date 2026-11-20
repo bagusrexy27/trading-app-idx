@@ -1,7 +1,7 @@
 {
   "symbol": "BKSL",
   "exchange": "JKT",
-  "last_updated": "2026-11-03",
+  "last_updated": "2026-11-20",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13177,7 +13177,111 @@
       "high": 41,
       "low": 37,
       "close": 37,
-      "volume": 89162500
+      "volume": 89590100
+    },
+    {
+      "date": "2026-11-04",
+      "open": 36,
+      "high": 37,
+      "low": 35,
+      "close": 36,
+      "volume": 104982800
+    },
+    {
+      "date": "2026-11-05",
+      "open": 36,
+      "high": 39,
+      "low": 36,
+      "close": 37,
+      "volume": 65666700
+    },
+    {
+      "date": "2026-11-06",
+      "open": 37,
+      "high": 37,
+      "low": 35,
+      "close": 37,
+      "volume": 42850300
+    },
+    {
+      "date": "2026-11-09",
+      "open": 37,
+      "high": 39,
+      "low": 36,
+      "close": 38,
+      "volume": 73098100
+    },
+    {
+      "date": "2026-11-10",
+      "open": 38,
+      "high": 39,
+      "low": 37,
+      "close": 38,
+      "volume": 130378400
+    },
+    {
+      "date": "2026-11-11",
+      "open": 38,
+      "high": 41,
+      "low": 37,
+      "close": 38,
+      "volume": 167693300
+    },
+    {
+      "date": "2026-11-12",
+      "open": 38,
+      "high": 44,
+      "low": 38,
+      "close": 43,
+      "volume": 251078800
+    },
+    {
+      "date": "2026-11-13",
+      "open": 45,
+      "high": 46,
+      "low": 42,
+      "close": 44,
+      "volume": 150978800
+    },
+    {
+      "date": "2026-11-16",
+      "open": 45,
+      "high": 45,
+      "low": 41,
+      "close": 42,
+      "volume": 78041000
+    },
+    {
+      "date": "2026-11-17",
+      "open": 42,
+      "high": 43,
+      "low": 41,
+      "close": 43,
+      "volume": 39301500
+    },
+    {
+      "date": "2026-11-18",
+      "open": 43,
+      "high": 43,
+      "low": 41,
+      "close": 41,
+      "volume": 44390300
+    },
+    {
+      "date": "2026-11-19",
+      "open": 41,
+      "high": 41,
+      "low": 39,
+      "close": 39,
+      "volume": 61062100
+    },
+    {
+      "date": "2026-11-20",
+      "open": 39,
+      "high": 40,
+      "low": 38,
+      "close": 38,
+      "volume": 25758500
     }
   ]
 }

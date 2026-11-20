@@ -1,7 +1,7 @@
 {
   "symbol": "GTSI",
   "exchange": "JKT",
-  "last_updated": "2026-11-03",
+  "last_updated": "2026-11-20",
   "prices": [
     {
       "date": "2021-09-08",
@@ -9913,7 +9913,111 @@
       "high": 79,
       "low": 70,
       "close": 70,
-      "volume": 12663200
+      "volume": 12664200
+    },
+    {
+      "date": "2026-11-04",
+      "open": 66,
+      "high": 68,
+      "low": 66,
+      "close": 66,
+      "volume": 14868200
+    },
+    {
+      "date": "2026-11-05",
+      "open": 67,
+      "high": 73,
+      "low": 67,
+      "close": 69,
+      "volume": 56711700
+    },
+    {
+      "date": "2026-11-06",
+      "open": 68,
+      "high": 68,
+      "low": 65,
+      "close": 66,
+      "volume": 22716300
+    },
+    {
+      "date": "2026-11-09",
+      "open": 65,
+      "high": 68,
+      "low": 62,
+      "close": 62,
+      "volume": 32756300
+    },
+    {
+      "date": "2026-11-10",
+      "open": 64,
+      "high": 69,
+      "low": 61,
+      "close": 67,
+      "volume": 27742400
+    },
+    {
+      "date": "2026-11-11",
+      "open": 67,
+      "high": 73,
+      "low": 65,
+      "close": 66,
+      "volume": 31079100
+    },
+    {
+      "date": "2026-11-12",
+      "open": 66,
+      "high": 72,
+      "low": 66,
+      "close": 69,
+      "volume": 23388800
+    },
+    {
+      "date": "2026-11-13",
+      "open": 70,
+      "high": 75,
+      "low": 68,
+      "close": 73,
+      "volume": 29411600
+    },
+    {
+      "date": "2026-11-16",
+      "open": 73,
+      "high": 74,
+      "low": 69,
+      "close": 70,
+      "volume": 18072500
+    },
+    {
+      "date": "2026-11-17",
+      "open": 71,
+      "high": 76,
+      "low": 70,
+      "close": 74,
+      "volume": 22464600
+    },
+    {
+      "date": "2026-11-18",
+      "open": 76,
+      "high": 87,
+      "low": 70,
+      "close": 73,
+      "volume": 350856500
+    },
+    {
+      "date": "2026-11-19",
+      "open": 74,
+      "high": 76,
+      "low": 68,
+      "close": 69,
+      "volume": 59294200
+    },
+    {
+      "date": "2026-11-20",
+      "open": 69,
+      "high": 71,
+      "low": 65,
+      "close": 65,
+      "volume": 20913400
     }
   ]
 }

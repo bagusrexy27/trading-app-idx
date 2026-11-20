@@ -1,7 +1,7 @@
 {
   "symbol": "DEFI",
   "exchange": "JKT",
-  "last_updated": "2026-11-03",
+  "last_updated": "2026-11-20",
   "prices": [
     {
       "date": "2020-01-02",
@@ -13177,7 +13177,111 @@
       "high": 73,
       "low": 67,
       "close": 67,
-      "volume": 6889200
+      "volume": 6889600
+    },
+    {
+      "date": "2026-11-04",
+      "open": 66,
+      "high": 66,
+      "low": 63,
+      "close": 63,
+      "volume": 7015700
+    },
+    {
+      "date": "2026-11-05",
+      "open": 62,
+      "high": 67,
+      "low": 62,
+      "close": 65,
+      "volume": 3614100
+    },
+    {
+      "date": "2026-11-06",
+      "open": 63,
+      "high": 79,
+      "low": 63,
+      "close": 66,
+      "volume": 42084700
+    },
+    {
+      "date": "2026-11-09",
+      "open": 66,
+      "high": 69,
+      "low": 62,
+      "close": 64,
+      "volume": 12968800
+    },
+    {
+      "date": "2026-11-10",
+      "open": 64,
+      "high": 72,
+      "low": 64,
+      "close": 70,
+      "volume": 21035400
+    },
+    {
+      "date": "2026-11-11",
+      "open": 70,
+      "high": 72,
+      "low": 68,
+      "close": 70,
+      "volume": 5699300
+    },
+    {
+      "date": "2026-11-12",
+      "open": 69,
+      "high": 73,
+      "low": 69,
+      "close": 71,
+      "volume": 4380800
+    },
+    {
+      "date": "2026-11-13",
+      "open": 72,
+      "high": 76,
+      "low": 71,
+      "close": 75,
+      "volume": 8046200
+    },
+    {
+      "date": "2026-11-16",
+      "open": 74,
+      "high": 76,
+      "low": 71,
+      "close": 72,
+      "volume": 7912600
+    },
+    {
+      "date": "2026-11-17",
+      "open": 75,
+      "high": 87,
+      "low": 73,
+      "close": 79,
+      "volume": 103637300
+    },
+    {
+      "date": "2026-11-18",
+      "open": 79,
+      "high": 80,
+      "low": 74,
+      "close": 74,
+      "volume": 15128800
+    },
+    {
+      "date": "2026-11-19",
+      "open": 73,
+      "high": 79,
+      "low": 71,
+      "close": 74,
+      "volume": 18947200
+    },
+    {
+      "date": "2026-11-20",
+      "open": 73,
+      "high": 77,
+      "low": 72,
+      "close": 73,
+      "volume": 3125700
     }
   ]
 }
