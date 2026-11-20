@@ -3,10 +3,16 @@
 
   python research/ml.py probe                 # walk-forward report, test years 2022..now
   python research/ml.py freeze                # freeze top-10% big-move list -> research/frozen/bigmove-<date>.json
-  python research/ml.py validate <date>       # score a frozen list once 20 bars have passed
+  python research/ml.py validate <date>...    # score frozen list(s), pooled, once 20 bars have passed
 
 Needs research/out/jkse.json (written by `go run ./research/blindtest export`). Run from stock-api/.
 Big move = |close[t+20]/close[t] - 1| > 2 x vol20 x sqrt(20) (direction ignored).
+
+Validity check 2026-11-03: measured against vol20 the lift is mostly an artifact (a calm stock has
+a low threshold and just returns to its normal volatility). So validate also scores a second label,
+big_lr = same move vs the stock's 250-day volatility, and the DECISION uses big_lr (rule fixed
+2026-11-03, before any frozen list resolved). Historical replay: vol20 label passes ~80%, big_lr
+lift per test year 1.0-2.1x.
 """
 import json, sys
 from pathlib import Path
@@ -46,6 +52,7 @@ def features(p):
     x = pd.DataFrame(index=p.index)
     for n in (1, 5, 20, 60): x[f'r{n}'] = c.pct_change(n)
     for n in (5, 20, 60): x[f'vol{n}'] = lr.rolling(n).std()
+    x['vol250'] = lr.rolling(250, min_periods=120).std()   # not a model feature; long-run yardstick for big_lr
     x['atr'] = tr.rolling(14).mean() / c
     x['rsi'] = 100 - 100 / (1 + up / dn)
     for m in (20, 50, 200): x[f'ma{m}'] = c / c.rolling(m).mean() - 1
@@ -61,6 +68,8 @@ def features(p):
         x[f'fvol{h}'] = lr[::-1].rolling(h).std()[::-1].shift(-1)           # realized vol of the next h bars
         x[f'fdd{h}'] = p.low[::-1].rolling(h).min()[::-1].shift(-1) / c - 1   # worst low of the next h bars
         x[f'big{h}'] = (x[f'fwd{h}'].abs() > 2 * x.vol20 * np.sqrt(h)).astype(float).where(x[f'fwd{h}'].notna())
+        x[f'big_lr{h}'] = (x[f'fwd{h}'].abs() > 2 * x.vol250 * np.sqrt(h)).astype(float).where(
+            x[f'fwd{h}'].notna() & x.vol250.notna())
     return x
 
 
@@ -165,22 +174,32 @@ def freeze():
     print(f"frozen {path.name}: {len(now)} stocks, flagged {n}: {', '.join(out['flagged'])}")
 
 
-def validate(asof):
-    fz = json.load(open(FROZEN / f'bigmove-{asof}.json'))
+def validate(*asof):
+    """Score one or more frozen lists, pooled. Decision label = big_lr (vs 250-day vol)."""
     df = panel()
-    day = df[df.date == pd.Timestamp(asof)].set_index('sym')
-    rows = day.loc[[s['symbol'] for s in fz['stocks'] if s['symbol'] in day.index]]
-    if rows[f'big{H}'].isna().any():
-        sys.exit(f"not yet: need {H} bars after {asof} (newest bar {df.date.max().date()})")
-    flagged = rows.loc[[s for s in fz['flagged'] if s in rows.index]]
-    base, hit = rows[f'big{H}'].mean(), flagged[f'big{H}'].mean()
-    for s, r in flagged.iterrows():
-        print(f"  {s:5s} {r[f'fwd{H}']*100:+6.1f}%  threshold ±{2*r.vol20*np.sqrt(H)*100:.1f}%  {'BIG' if r[f'big{H}'] else '-'}")
-    lift = hit / base if base else float('inf')
-    print(f"all {base*100:.1f}% ({len(rows)})  flagged {hit*100:.1f}% ({len(flagged)})  lift {lift:.2f}x"
-          f"  -> {'PASS' if lift >= fz['pass_lift'] else 'FAIL'} (need {fz['pass_lift']}x)")
+    allrows, flags = [], []
+    for d in asof:
+        fz = json.load(open(FROZEN / f'bigmove-{d}.json'))
+        day = df[df.date == pd.Timestamp(d)].set_index('sym')
+        rows = day.loc[[s['symbol'] for s in fz['stocks'] if s['symbol'] in day.index]]
+        if rows[f'big{H}'].isna().any():
+            sys.exit(f"not yet: need {H} bars after {d} (newest bar {df.date.max().date()})")
+        print(f"{d}:")
+        for s, r in rows.loc[[s for s in fz['flagged'] if s in rows.index]].iterrows():
+            print(f"  {s:5s} {r[f'fwd{H}']*100:+6.1f}%  vs vol20 ±{2*r.vol20*np.sqrt(H)*100:.1f}% {'BIG' if r[f'big{H}'] else '-  '}"
+                  f"  vs vol250 ±{2*r.vol250*np.sqrt(H)*100:.1f}% {'BIG' if r[f'big_lr{H}'] else '-'}")
+        allrows.append(rows); flags.append(rows.loc[[s for s in fz['flagged'] if s in rows.index]])
+    rows, flagged = pd.concat(allrows), pd.concat(flags)
+    for label, col, decides in (('vol20 (artifact-prone)', f'big{H}', False), ('vol250 (DECISION)', f'big_lr{H}', True)):
+        r, f = rows.dropna(subset=[col]), flagged.dropna(subset=[col])
+        base, hit = r[col].mean(), f[col].mean()
+        lift = hit / base if base else float('inf')
+        verdict = ('PASS' if lift >= PASS_LIFT else 'FAIL') if decides else 'info only'
+        print(f"{label:24s} all {base*100:4.1f}% ({len(r)})  flagged {hit*100:4.1f}% ({len(f)})  lift {lift:.2f}x  -> {verdict}")
+    if len(asof) < 3:
+        print(f"(decision needs 3 pooled freezes; have {len(asof)})")
 
 
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else 'probe'
-    {'probe': probe, 'freeze': freeze, 'validate': lambda: validate(sys.argv[2])}[cmd]()
+    {'probe': probe, 'freeze': freeze, 'validate': lambda: validate(*sys.argv[2:])}[cmd]()
