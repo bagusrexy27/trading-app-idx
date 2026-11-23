@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"math"
 	"os"
 	"path/filepath"
@@ -130,11 +131,21 @@ func writeForward(res []stockOut, cat []indicator, conds []timingCond, tradeDays
 		}
 		return true
 	}
+	// a partial update-all (Yahoo errors, timeout) leaves some stocks one
+	// session behind: hold asOf back until they catch up, or a log with a
+	// subset of stocks would be frozen forever.
+	if lag := lagging(res, tradeDays, asOf); len(lag) > 0 {
+		fmt.Printf("forward: %s held back — %d stock(s) still end on the previous session: %v\n", asOf, len(lag), lag)
+		for len(dates) > 0 && dates[len(dates)-1] >= asOf {
+			dates = dates[:len(dates)-1]
+		}
+	}
 	kept := dates[:0]
 	for _, d := range dates {
-		if final(d) {
-			kept = append(kept, d)
+		if !final(d) {
+			break // logs stay contiguous: a skipped day would never be logged later
 		}
+		kept = append(kept, d)
 	}
 	dates = kept
 	code, prev := codeHash(), ""
@@ -204,6 +215,29 @@ func writeForward(res []stockOut, cat []indicator, conds []timingCond, tradeDays
 		written++
 	}
 	return written, nil
+}
+
+// lagging lists stocks whose newest bar is the trading day right before asOf
+// while asOf itself exists — the signature of a stock the last update missed.
+// A stock two or more sessions behind (suspended, delisted) is not lagging,
+// so it holds asOf back for one run at most.
+//
+// ponytail: an update that fails for the same stock two runs in a row lets
+// asOf through without it; a coverage threshold is the upgrade if that bites.
+func lagging(res []stockOut, tradeDays []string, asOf string) []string {
+	k := sort.SearchStrings(tradeDays, asOf)
+	if k == 0 || k >= len(tradeDays) || tradeDays[k] != asOf {
+		return nil
+	}
+	prev := tradeDays[k-1]
+	var out []string
+	for _, o := range res {
+		if o.s != nil && o.s.n > 0 && o.s.date[o.s.n-1] == prev {
+			out = append(out, o.s.sym)
+		}
+	}
+	sort.Strings(out)
+	return out
 }
 
 // scoreForward attaches forward-test results to rs using the same excess

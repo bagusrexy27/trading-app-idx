@@ -78,10 +78,12 @@ func main() {
 	mood := moods(idx)
 
 	ext := map[string]dateSeries{} // other markets, for timing conditions + USD reporters
+	var macroMissing []string      // a missing series reads as "condition false": never log that into the forward test
 	for _, sym := range []string{"USDIDR=X", "^GSPC", "^VIX", "CL=F", "GC=F"} {
 		p, _, err := fetcher.Fetch(sym, time.Date(2019, 6, 1, 0, 0, 0, 0, time.UTC))
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "makro %s: %v\n", sym, err)
+		if err != nil || len(p) == 0 {
+			fmt.Fprintf(os.Stderr, "makro %s: %v (%d bars)\n", sym, err, len(p))
+			macroMissing = append(macroMissing, sym)
 			continue
 		}
 		ext[sym] = newDateSeries(p)
@@ -363,7 +365,12 @@ func main() {
 
 	forwardDir = filepath.Join("research", "forward", *universe) // each universe keeps its own hash chain
 	written, ferr := 0, error(nil)
-	if *minTO == 20 && *out == "" && *sehatN == 40 { // sensitivity runs (-minto, -out, -sehatn) never touch the forward log
+	switch {
+	case *minTO != 20 || *out != "" || *sehatN != 40:
+		// sensitivity runs (-minto, -out, -sehatn) never touch the forward log
+	case len(macroMissing) > 0:
+		fmt.Printf("forward: not logged — macro fetch failed for %v; the next run catches up the missed days\n", macroMissing)
+	default:
 		written, ferr = writeForward(res, cat, conds, jk.dates, asOf)
 	}
 	if ferr != nil {

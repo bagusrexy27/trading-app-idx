@@ -28,3 +28,24 @@ func TestForwardChainDetectsEdits(t *testing.T) {
 		t.Fatalf("edit of 2026-11-20 must break the link from 2026-11-23, got %v", broken)
 	}
 }
+
+// A partial update-all must hold the newest session back instead of logging
+// it with a subset of stocks; a suspended stock (2+ sessions behind) must not
+// block the log.
+func TestLaggingHoldsBackPartialUpdate(t *testing.T) {
+	days := []string{"2026-11-18", "2026-11-19", "2026-11-20"}
+	st := func(sym string, last int) stockOut {
+		return stockOut{s: &series{sym: sym, n: last + 1, date: days[:last+1]}}
+	}
+	res := []stockOut{st("BBCA", 2), st("BBRI", 1), st("SUSP", 0), {}}
+	if got := lagging(res, days, "2026-11-20"); len(got) != 1 || got[0] != "BBRI" {
+		t.Fatalf("want [BBRI] lagging, got %v", got)
+	}
+	res[1] = st("BBRI", 2)
+	if got := lagging(res, days, "2026-11-20"); len(got) != 0 {
+		t.Fatalf("all caught up (SUSP is suspended), got %v", got)
+	}
+	if got := lagging(res, days, "2026-11-21"); got != nil {
+		t.Fatalf("asOf not a trading day must not hold back, got %v", got)
+	}
+}
