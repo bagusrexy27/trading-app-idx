@@ -1,0 +1,3 @@
+
+# Forward-test logs are hash-chained over their exact bytes: never convert line endings.
+stock-api/research/forward/** -text
