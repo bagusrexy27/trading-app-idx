@@ -7,22 +7,14 @@ import OmbakMeter from './OmbakMeter'
 import { tip } from '../glossary'
 import { ScenarioBar, pickProj } from './Projection'
 
-// Kolom beli memakai gerbang yang sama dengan screener mode=buy
-// (handlers/advisor_screen.go): R/R ≥ 1 dan transaksi ≥ 2 M/hari. Saham yang
-// BUY tapi tidak lolos jatuh ke "menunggu", bukan ke "hindari".
-const MIN_RR = 1, MIN_TURNOVER_BN = 2
-const isBuy = r => (r.signal === 'BUY' || r.signal === 'STRONG_BUY') && r.risk_reward >= MIN_RR && r.turnover_bn >= MIN_TURNOVER_BN
+// Kolom Tren naik memakai gerbang yang sama dengan screener mode=buy
+// (handlers/advisor_screen.go) + transaksi ≥ 2 M/hari. Saham Tren naik yang
+// tidak likuid jatuh ke "menunggu", bukan ke "Tren turun".
+const MIN_TURNOVER_BN = 2
+const isBuy = r => r.signal === 'BUY' && r.turnover_bn >= MIN_TURNOVER_BN
 
-// Alasan satu baris: pakai note dari engine kalau ada; kalau tidak, rakit dari
-// trend / structure / volume_state — tanpa teks dikarang di frontend.
-function reasonOf(r) {
-  if (r.note) return r.note
-  const bits = []
-  if (r.trend?.overall) bits.push(r.trend.overall)
-  if (r.structure) bits.push(r.structure)
-  if (r.volume_state) bits.push(`Vol ${r.volume_state}`)
-  return bits.join(' · ') || '—'
-}
+// Alasan satu baris: note dari backend kalau ada, kalau tidak tren gabungan.
+const reasonOf = r => r.note || (r.trend?.overall ? `Tren ${r.trend.overall}` : '—')
 
 function Sparkline({ data, positive }) {
   if (!data || data.length < 2) return <div className="h-7 w-16" />
@@ -38,21 +30,10 @@ function Sparkline({ data, positive }) {
   )
 }
 
-function ScoreChip({ score }) {
-  const tone = score >= 60 ? 'text-tv-green border-tv-green/30 bg-tv-green/10'
-    : score >= 40 ? 'text-tv-yellow border-tv-yellow/30 bg-tv-yellow/10'
-    : 'text-tv-red border-tv-red/30 bg-tv-red/10'
-  return (
-    <span className={`text-[11px] font-bold tabular-nums px-2 py-0.5 rounded border ${tone}`}>
-      {score}
-    </span>
-  )
-}
-
 function TickerCard({ r, onSelect }) {
   const pct = r.change_pct
   const pos = (pct ?? 0) >= 0
-  const buyish = r.signal === 'BUY' || r.signal === 'STRONG_BUY'
+  const buyish = r.signal === 'BUY'
   const c = r.calibration
   const proj = buyish ? pickProj(c, 20) : null
   return (
@@ -83,7 +64,6 @@ function TickerCard({ r, onSelect }) {
           ${buyish ? 'text-tv-green border-tv-green/30 bg-tv-green/10' : 'text-tv-red border-tv-red/30 bg-tv-red/10'}`}>
           {signalLabel(r.signal)}
         </span>
-        <ScoreChip score={r.score} />
       </div>
 
       <div className="flex items-center gap-3">
@@ -102,7 +82,7 @@ function TickerCard({ r, onSelect }) {
           <div className="text-[11px] text-tv-muted truncate mt-0.5" title={reasonOf(r)}>{reasonOf(r)}</div>
           {buyish && calibShort(c) && (
             <div className={`text-[10px] mt-0.5 ${c.avg_pnl_pct > 0 ? 'text-tv-green' : 'text-tv-red'}`}
-              title={`Skor ${c.score_lo}–${c.score_hi} saat ${REGIME_LABEL[c.regime] ?? 'semua kondisi IHSG'}: rencana kena TP1 sebelum stop dalam ${c.horizon} hari bursa.`}>
+              title={`Saran Tren naik saat ${REGIME_LABEL[c.regime] ?? 'semua kondisi IHSG'}: kalau masuk, target +3 ATR kena sebelum stop dalam ${c.horizon} hari bursa (setelah biaya).`}>
               {c.avg_pnl_pct > 0 ? '' : '⚠️ '}{calibShort(c)}
             </div>
           )}
@@ -140,7 +120,7 @@ function Column({ title, tone, rows, onSelect, empty }) {
 export default function DecisionBoard({ stocks = [], loading: stocksLoading, onSelect, onAdd, onUpdateAll }) {
   const [screen, setScreen] = useState([])
   const [loading, setLoading] = useState(true)
-  const [sort, setSort] = useState('score') // score | rr | volume
+  const [sort, setSort] = useState('volume') // volume (backend) | change
   const [shariaOnly, setShariaOnly] = useState(false)
   const [undervalueOnly, setUndervalueOnly] = useState(false)
   const [index, setIndex] = useState('') // '' | 'idx30' | 'lq45'
@@ -179,20 +159,16 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
     }))
   }, [screen, stocks])
 
-  // 'score' = urutan backend apa adanya (skor → keyakinan → R/R), sama dengan screener.
+  // 'volume' = urutan backend apa adanya (likuiditas), sama dengan screener.
   const sorted = useMemo(() => {
     const list = rows.filter(r => (!shariaOnly || r.syariah) && (!index || r[index]) && (!undervalueOnly || r.valuation?.undervalue))
-    if (sort === 'rr') list.sort((a, b) => (b.risk_reward || 0) - (a.risk_reward || 0))
-    if (sort === 'volume') list.sort((a, b) => (b.turnover_bn || 0) - (a.turnover_bn || 0))
+    if (sort === 'change') list.sort((a, b) => (b.change_pct ?? -Infinity) - (a.change_pct ?? -Infinity))
     return list
   }, [rows, sort, shariaOnly, index, undervalueOnly])
 
   const buy = sorted.filter(isBuy)
   const buySyms = new Set(buy.map(r => r.symbol))
-  // Hindari: SELL/STRONG_SELL atau skor <40. Urut skor terendah dulu, kecuali user memilih urutan lain.
-  const avoid = sorted
-    .filter(r => !buySyms.has(r.symbol) && (r.signal === 'SELL' || r.signal === 'STRONG_SELL' || (r.score ?? 100) < 40))
-  if (sort === 'score') avoid.reverse()
+  const avoid = sorted.filter(r => !buySyms.has(r.symbol) && r.signal === 'SELL')
   const avoidSyms = new Set(avoid.map(r => r.symbol))
   const waiting = sorted.filter(r => !buySyms.has(r.symbol) && !avoidSyms.has(r.symbol))
 
@@ -204,7 +180,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">Hari Ini</h1>
           <p className="text-xs text-tv-muted mt-1">
-            Peringkat Decision Engine untuk semua saham yang kamu lacak. Kolom tren naik hanya setup dengan R/R ≥ {MIN_RR} dan transaksi ≥ {MIN_TURNOVER_BN} M/hari.
+            Saran untuk semua saham yang kamu lacak. Kolom Tren naik = keempat syarat pola "tren naik belum pucuk" terpenuhi dan transaksi ≥ {MIN_TURNOVER_BN} M/hari.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -213,9 +189,8 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
             onChange={e => setSort(e.target.value)}
             className="bg-tv-input border border-tv-border rounded-lg px-2.5 py-1.5 text-xs text-tv-text outline-none"
           >
-            <option value="score">Urut: Skor</option>
-            <option value="rr">Urut: R:R</option>
             <option value="volume">Urut: Likuiditas</option>
+            <option value="change">Urut: Perubahan hari ini</option>
           </select>
           <select
             value={index}
@@ -292,9 +267,7 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
               tone="text-tv-green"
               rows={buy}
               onSelect={onSelect}
-              empty={regime === 'down'
-                ? 'IHSG di bawah MA50 — sinyal tren naik ditahan sampai IHSG kembali di atas MA50.'
-                : `Belum ada saham tren naik dengan R/R ≥ ${MIN_RR} dan likuid.`}
+              empty="Hari ini belum ada saham likuid yang memenuhi keempat syarat Tren naik." 
             />
             <Column
               title="Tren turun"
@@ -309,8 +282,8 @@ export default function DecisionBoard({ stocks = [], loading: stocksLoading, onS
               <span className="font-semibold text-tv-text mr-2">{waiting.length} saham menunggu</span>
               {waiting.map(r => (
                 <button key={r.symbol} onClick={() => onSelect(r.symbol)}
-                  title={r.signal === 'BUY' || r.signal === 'STRONG_BUY'
-                    ? `${signalLabel(r.signal)} tapi R/R ${r.risk_reward?.toFixed(1)} · likuiditas ${r.turnover_bn} M/hari`
+                  title={r.signal === 'BUY'
+                    ? `${signalLabel(r.signal)} tapi likuiditas ${r.turnover_bn} M/hari`
                     : signalLabel(r.signal)}
                   className="mr-2 hover:text-tv-blue transition-colors">
                   {r.symbol}

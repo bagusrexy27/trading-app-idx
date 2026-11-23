@@ -667,8 +667,6 @@ type overviewItem struct {
 	RSI      float64 `json:"rsi"`
 	Trend    string  `json:"trend"`
 	Signal   string  `json:"signal"`
-	Score    int     `json:"score"`
-	MaxScore int     `json:"max_score"`
 	VolRatio float64 `json:"vol_ratio"`
 	// Rata-rata nilai transaksi harian 20 hari (miliar Rp) — ukuran kotak heatmap.
 	TurnoverBn float64 `json:"turnover_bn"`
@@ -736,8 +734,6 @@ func (h *AnalysisHandler) Overview(w http.ResponseWriter, r *http.Request) {
 				RSI:        rsi14,
 				Trend:      trendLabel(latest.Close, sma20, sma50),
 				Signal:     dec.Signal,
-				Score:      dec.Score,
-				MaxScore:   100,
 				VolRatio:   volRatio,
 				TurnoverBn: analysis.R2(avgTurnoverBn(prices, 20)),
 			}}
@@ -752,13 +748,8 @@ func (h *AnalysisHandler) Overview(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Sort: highest score first, then alphabetically
-	sort.Slice(items, func(i, j int) bool {
-		if items[i].Score != items[j].Score {
-			return items[i].Score > items[j].Score
-		}
-		return items[i].Symbol < items[j].Symbol
-	})
+	// Sort: most traded first (no score ranking — see analysis.Saran)
+	sort.Slice(items, func(i, j int) bool { return items[i].TurnoverBn > items[j].TurnoverBn })
 
 	respond(w, 200, true, "", items)
 }
@@ -815,8 +806,6 @@ type sessionItem struct {
 	VolRatio     float64       `json:"vol_ratio"`
 	Pattern      candlePattern `json:"pattern"`
 	Signal       string        `json:"signal"`
-	Score        int           `json:"score"`
-	MaxScore     int           `json:"max_score"`
 }
 
 func (h *AnalysisHandler) Session(w http.ResponseWriter, r *http.Request) {
@@ -891,8 +880,6 @@ func (h *AnalysisHandler) Session(w http.ResponseWriter, r *http.Request) {
 				VolRatio:     volRatio,
 				Pattern:      candleInfo(prices),
 				Signal:       dec.Signal,
-				Score:        dec.Score,
-				MaxScore:     100,
 			}}
 		}()
 	}

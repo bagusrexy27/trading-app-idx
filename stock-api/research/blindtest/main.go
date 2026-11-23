@@ -59,7 +59,9 @@ type Row struct {
 	RR         float64               `json:"risk_reward"`
 	TurnoverBn float64               `json:"turnover_bn"`
 	ATRPct     float64               `json:"atr_pct"`
-	Candidate  bool                  `json:"candidate"` // passes the screener buy filter (BUY/STRONG_BUY, R/R >= 1)
+	Candidate  bool                  `json:"candidate"`           // Saran BUY (weighted-engine freezes: BUY/STRONG_BUY, R/R >= 1)
+	BaseStop   float64               `json:"base_stop,omitempty"` // ATR plan for every stock (analysis.SaranPlan) = random-entry baseline
+	BaseTarget float64               `json:"base_target,omitempty"`
 	Calib      *analysis.CalibLookup `json:"calibration"`
 	Stock      *analysis.CalibStat   `json:"stock_record"`
 	Proj       []analysis.ProjView   `json:"projection"`
@@ -77,13 +79,14 @@ type Frozen struct {
 	Criteria []string                       `json:"criteria"`
 }
 
+// criteria for Saran freezes (from 2026-11-30), fixed in docs/DECISIONS.md on
+// 2026-11-23 before any result. Older frozen files carry their own criteria
+// (K1–K6 of the weighted engine) inside the file.
 var criteria = []string{
-	"K1: rata-rata return 20 hari bursa kelompok BUY > kelompok SELL/STRONG_SELL (kalau kandidat BUY < 3, pakai 10 skor tertinggi vs 10 skor terendah)",
-	"K2: rata-rata return 20 hari kelompok BUY > IHSG 20 hari",
-	"K3: korelasi peringkat Spearman skor vs return 20 hari > 0 (semua saham turnover >= 2 M)",
-	"K4: rencana trading kandidat BUY (entry open hari berikutnya, TP1 vs stop, 20 hari): rata-rata P&L > 0",
-	"K5: 70-90% saham realisasi 20 hari berada dalam band p10-p90 proyeksi (ideal 80%)",
-	"K6: kandidat dengan rekam jejak saham > 0 mengungguli kandidat dengan rekam jejak <= 0 (20 hari)",
+	"S1: gabungan freeze 30 Nov 2026, 31 Des 2026, 30 Jan 2027 berisi >= 30 saran Tren naik (BUY); kurang dari 30 -> diperpanjang per bulan, bukan diputuskan",
+	"S2: rencana Tren naik (entry open besok, stop -1,5 ATR, target +3 ATR, timeout 20 bar, biaya 0,4%): rata-rata hasil > 0",
+	"S3: rata-rata hasil S2 > rata-rata rencana yang sama pada semua saham likuid di tanggal yang sama (entry acak, base_stop/base_target)",
+	"LULUS = S1 dan S2 dan S3. GAGAL -> saran diganti fakta saja (tanpa label saran)",
 }
 
 func frozenPath() string { return filepath.Join(frozenDir, cutoff+".json") }
@@ -192,34 +195,26 @@ func analyze() {
 		if to < minTurnover {
 			continue
 		}
-		d := analysis.DecisionEngine(p)
+		d := analysis.Saran(p)
 		n := len(p)
 		atr := analysis.ATR(p, 14)
-		atrPct := atr[len(atr)-1].Value / p[n-1].Close * 100
+		atrNow := atr[len(atr)-1].Value
+		atrPct := atrNow / p[n-1].Close * 100
 		r := Row{
-			Symbol: sym, Close: p[n-1].Close, Signal: d.Signal, Score: d.Score, Confidence: d.Confidence,
-			Trend: d.Trend, Structure: d.MarketStructure.State, Volume: d.Volume.Status,
-			EntryLow: d.EntryZone.Buy[0], EntryHigh: d.EntryZone.Buy[1], EntryIdeal: d.EntryZone.Ideal,
-			Stop: d.StopLoss, RR: d.RiskReward, TurnoverBn: analysis.R2(to), ATRPct: analysis.R2(atrPct),
-			Calib: calib.Lookup(d.Score, regime), Stock: calib.PerSymbol[sym],
-			Proj: calib.Project(d.Score, regime, atrPct),
+			Symbol: sym, Close: p[n-1].Close, Signal: d.Signal, Trend: d.Trend,
+			EntryIdeal: d.EntryZone.Ideal, Stop: d.StopLoss, RR: d.RiskReward,
+			TurnoverBn: analysis.R2(to), ATRPct: analysis.R2(atrPct),
+			Calib: calib.Lookup(d.Signal, regime), Stock: calib.PerSymbol[sym],
+			Proj:      calib.Project(d.Signal, regime, atrPct),
+			Candidate: d.Signal == "BUY",
 		}
+		r.BaseStop, r.BaseTarget = analysis.SaranPlan(p[n-1].Close, atrNow)
 		if len(d.TakeProfit) > 0 {
 			r.Target = d.TakeProfit[0].Price
 		}
-		r.Candidate = (d.Signal == "BUY" || d.Signal == "STRONG_BUY") && d.RiskReward >= 1
 		rows = append(rows, r)
 	}
-	sort.Slice(rows, func(i, j int) bool {
-		a, b := rows[i], rows[j]
-		if a.Score != b.Score {
-			return a.Score > b.Score
-		}
-		if a.Confidence != b.Confidence {
-			return a.Confidence > b.Confidence
-		}
-		return a.RR > b.RR
-	})
+	sort.Slice(rows, func(i, j int) bool { return rows[i].TurnoverBn > rows[j].TurnoverBn })
 	counts := map[string]int{}
 	for _, r := range rows {
 		counts[r.Signal]++
@@ -241,10 +236,10 @@ func analyze() {
 	fmt.Printf("calib as-of cutoff: stocks=%d buy_calls %s\n", calib.Stocks, js(calib.BuyCalls))
 	fmt.Printf("scanned=%d excluded(%d)=%v  counts=%v\n", len(series), len(excluded), excluded, counts)
 	for _, r := range rows {
-		fmt.Printf("%-5s %-11s sc=%2d cf=%2d c=%-6.0f RR=%.2f T=%s/%s/%s st=%q vol=%s cand=%v to=%.1f\n",
-			r.Symbol, r.Signal, r.Score, r.Confidence, r.Close, r.RR, r.Trend.Long, r.Trend.Medium, r.Trend.Short, r.Structure, r.Volume, r.Candidate, r.TurnoverBn)
-		if r.Signal == "BUY" || r.Signal == "STRONG_BUY" {
-			fmt.Printf("      entry %.0f-%.0f (%.0f) stop %.0f tp %.0f | calib %s | stock %s\n", r.EntryLow, r.EntryHigh, r.EntryIdeal, r.Stop, r.Target, js(r.Calib), js(r.Stock))
+		fmt.Printf("%-5s %-5s c=%-6.0f T=%s/%s/%s to=%.1f\n",
+			r.Symbol, r.Signal, r.Close, r.Trend.Long, r.Trend.Medium, r.Trend.Short, r.TurnoverBn)
+		if r.Signal == "BUY" {
+			fmt.Printf("      entry %.0f stop %.0f tp %.0f | calib %s | stock %s\n", r.EntryIdeal, r.Stop, r.Target, js(r.Calib), js(r.Stock))
 			for _, p := range r.Proj {
 				if p.Horizon == 20 {
 					fmt.Printf("      proj20 %s\n", js(p))
@@ -333,6 +328,8 @@ func validate() {
 		PlanPnL  float64
 		InBand   bool
 		Realized string
+		BasePlan string
+		BasePnL  float64
 	}
 	var rs []res
 	for _, r := range fz.Rows {
@@ -349,6 +346,7 @@ func validate() {
 			}
 		}
 		x.Plan, x.PlanPnL = planOutcome(p, i, r.Stop, r.Target)
+		x.BasePlan, x.BasePnL = planOutcome(p, i, r.BaseStop, r.BaseTarget)
 		for _, pv := range r.Proj {
 			if v, ok := x.Ret[20]; ok && pv.Horizon == 20 {
 				x.InBand = v >= pv.Band[0] && v <= pv.Band[4]
@@ -449,6 +447,25 @@ func validate() {
 	plan("semua BUY", buys)
 	plan("WAIT", waits)
 	plan("SELL (kalau dibeli)", sells)
+
+	// S1–S3 (Saran freezes only; older files have no base plan). Net of
+	// cost here — the gross plan() lines above stay comparable with K1–K6.
+	resolved := func(r string) bool { return r == "WIN" || r == "LOSS" || r == "TIMEOUT" }
+	var buyNet, baseNet []float64
+	for _, x := range rs {
+		if x.Signal == "BUY" && resolved(x.Plan) {
+			buyNet = append(buyNet, x.PlanPnL-analysis.RoundTripCostPct)
+		}
+		if resolved(x.BasePlan) {
+			baseNet = append(baseNet, x.BasePnL-analysis.RoundTripCostPct)
+		}
+	}
+	if len(baseNet) > 0 {
+		fmt.Println("── Saran S1–S3 (net biaya 0,4%; gabungkan semua freeze untuk vonis) ──")
+		fmt.Printf("  S1 Tren naik selesai: n=%d (butuh >= 30 gabungan)  sum %+.2f\n", len(buyNet), sum(buyNet))
+		fmt.Printf("  S2 rata-rata Tren naik: %+.2f%% (lulus jika > 0)\n", mean(buyNet))
+		fmt.Printf("  S3 entry acak semua likuid: n=%d avg %+.2f%%  sum %+.2f (lulus jika S2 > ini)\n", len(baseNet), mean(baseNet), sum(baseNet))
+	}
 
 	fmt.Println("── projection 20d check ──")
 	var nb, inb, rb, rsd, rbr int
@@ -569,11 +586,15 @@ func mean(s []float64) float64 {
 	if len(s) == 0 {
 		return math.NaN()
 	}
+	return sum(s) / float64(len(s))
+}
+
+func sum(s []float64) float64 {
 	t := 0.0
 	for _, v := range s {
 		t += v
 	}
-	return t / float64(len(s))
+	return t
 }
 
 func median(s []float64) float64 {

@@ -51,18 +51,18 @@ func TestPlanOutcome(t *testing.T) {
 }
 
 func TestCalibLookupFallsBackToAll(t *testing.T) {
-	c := &Calibration{Horizon: CalibHorizon, Buckets: map[string]map[int]*CalibStat{
-		"all":  {60: {Samples: 100, WinRate: 55}},
-		"down": {60: {Samples: 5, WinRate: 20}}, // too thin
+	c := &Calibration{Horizon: CalibHorizon, Buckets: map[string]map[string]*CalibStat{
+		"all":  {"BUY": {Samples: 100, WinRate: 55}},
+		"down": {"BUY": {Samples: 5, WinRate: 20}}, // too thin
 	}}
-	l := c.Lookup(64, "down")
-	if l.Samples != 100 || !l.Reliable || l.Regime != "down" || l.ScoreLo != 60 || l.ScoreHi != 69 {
+	l := c.Lookup("BUY", "down")
+	if l.Samples != 100 || !l.Reliable || l.Regime != "down" || l.Signal != "BUY" {
 		t.Errorf("got %+v", l)
 	}
-	if l := c.Lookup(64, ""); l.Regime != "unknown" {
+	if l := c.Lookup("BUY", ""); l.Regime != "unknown" {
 		t.Errorf("unknown regime: got %+v", l)
 	}
-	if (*Calibration)(nil).Lookup(50, "up") != nil {
+	if (*Calibration)(nil).Lookup("WAIT", "up") != nil {
 		t.Error("nil calibration must return nil")
 	}
 }

@@ -11,7 +11,7 @@ import (
 	"stock-api/storage"
 )
 
-// calibCache holds the Decision Engine calibration table. It goes stale when
+// calibCache holds the Saran calibration table. It goes stale when
 // the newest stored bar or the number of stocks changes (update / add /
 // remove). A rebuild replays the engine on every bar since 2020 (~10s on a
 // multi-core box, longer on a small VM), so a stale table keeps being served
@@ -112,27 +112,27 @@ func rebuildCalibration(series map[string][]models.StockPrice, key string) (*ana
 // calibrationFor is the per-stock view attached to decision/screen rows.
 type calibrationFor struct {
 	*analysis.CalibLookup
-	Stock      *analysis.CalibStat `json:"stock,omitempty"`      // this stock's own score ≥ 60 days
+	Stock      *analysis.CalibStat `json:"stock,omitempty"`      // this stock's own Tren naik days
 	Projection []analysis.ProjView `json:"projection,omitempty"` // measured bull/side/bear per horizon
 }
 
-func lookupCalibration(c *analysis.Calibration, regime, symbol string, score int, prices []models.StockPrice) *calibrationFor {
-	l := c.Lookup(score, regime)
+func lookupCalibration(c *analysis.Calibration, regime, symbol, signal string, prices []models.StockPrice) *calibrationFor {
+	l := c.Lookup(signal, regime)
 	if l == nil {
 		return nil
 	}
 	out := &calibrationFor{CalibLookup: l, Stock: c.PerSymbol[symbol]}
 	if atr := analysis.ATR(prices, 14); len(atr) > 0 {
-		out.Projection = c.Project(score, regime, atr[len(atr)-1].Value/prices[len(prices)-1].Close*100)
+		out.Projection = c.Project(signal, regime, atr[len(atr)-1].Value/prices[len(prices)-1].Close*100)
 	}
 	return out
 }
 
 // Calibration — GET /api/calibration
 //
-// Historical outcome table of the Decision Engine: per score bucket and IHSG
-// regime, how often the plan (entry next open → TP1 before stop, 20 bars)
-// actually worked, plus the bull/side/bear projection per horizon.
+// Historical outcome table of Saran: per verdict and IHSG regime, how often
+// the ATR plan (entry next open → target before stop, 20 bars) actually
+// worked, plus the bull/side/bear projection per horizon.
 func (h *AnalysisHandler) Calibration(w http.ResponseWriter, r *http.Request) {
 	c, regime := currentCalibration()
 	if c == nil {

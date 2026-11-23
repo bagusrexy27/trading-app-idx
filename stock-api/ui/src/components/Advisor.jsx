@@ -1,28 +1,17 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
-import { fmt, REGIME_LABEL, signalLabel, GATED_PLAN } from '../utils'
+import { fmt, REGIME_LABEL, signalLabel } from '../utils'
 import { ProjectionCard } from './Projection'
 import ValuationCard from './ValuationCard'
 
 const SIGNAL = {
-  STRONG_BUY:  { text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
-  BUY:         { text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
-  WAIT:        { text: 'text-tv-yellow', banner: 'border-tv-yellow/40 bg-tv-yellow/5' },
-  SELL:        { text: 'text-tv-red',    banner: 'border-tv-red/40 bg-tv-red/5' },
-  STRONG_SELL: { text: 'text-tv-red',    banner: 'border-tv-red/40 bg-tv-red/5' },
+  BUY:  { text: 'text-tv-green',  banner: 'border-tv-green/40 bg-tv-green/5' },
+  WAIT: { text: 'text-tv-yellow', banner: 'border-tv-yellow/40 bg-tv-yellow/5' },
+  SELL: { text: 'text-tv-red',    banner: 'border-tv-red/40 bg-tv-red/5' },
 }
 
 const trendToneOf = (t) =>
   t?.includes('Bullish') ? 'text-tv-green' : t?.includes('Bearish') ? 'text-tv-red' : 'text-tv-yellow'
-
-function ScoreBar({ score }) {
-  const color = score >= 60 ? 'bg-tv-green' : score >= 40 ? 'bg-tv-yellow' : 'bg-tv-red'
-  return (
-    <div className="w-16 h-1.5 bg-tv-bg rounded-full overflow-hidden shrink-0">
-      <div className={`h-full ${color}`} style={{ width: `${score}%` }} />
-    </div>
-  )
-}
 
 function Pill({ label, value, tone = 'text-tv-text' }) {
   return (
@@ -33,26 +22,27 @@ function Pill({ label, value, tone = 'text-tv-text' }) {
   )
 }
 
-// Rekam jejak nyata: seberapa sering rencana dengan skor & kondisi IHSG serupa
-// berhasil di masa lalu (replay semua saham, tanpa look-ahead).
+// Rekam jejak nyata: hasil rencana ATR (stop −1,5 ATR, target +3 ATR) pada
+// hari-hari dengan saran & kondisi IHSG yang sama (replay semua saham, tanpa
+// look-ahead, setelah biaya).
 function CalibCard({ c }) {
   const good = c.avg_pnl_pct > 0
   return (
     <div className={`bg-tv-card border rounded-xl p-4 ${good ? 'border-tv-border' : 'border-tv-red/40'}`}>
       <div className="text-xs font-bold text-tv-muted uppercase mb-2">Rekam jejak historis</div>
       <p className="text-sm leading-relaxed">
-        Skor {c.score_lo}–{c.score_hi} saat {REGIME_LABEL[c.regime]}: dari <b>{c.samples.toLocaleString('id-ID')}</b> kasus serupa,
-        rata-rata hasil <b className={good ? 'text-tv-green' : 'text-tv-red'}>{fmt.pct(c.avg_pnl_pct)}</b> per trade.
-        <span className="text-tv-muted"> Rencana kena TP1 sebelum stop {Math.round(c.win_rate)}% dalam {c.horizon} hari bursa.</span>
+        Saran "{signalLabel(c.signal)}" saat {REGIME_LABEL[c.regime]}: dari <b>{c.samples.toLocaleString('id-ID')}</b> kasus,
+        kalau masuk rata-rata hasilnya <b className={good ? 'text-tv-green' : 'text-tv-red'}>{fmt.pct(c.avg_pnl_pct)}</b> per trade.
+        <span className="text-tv-muted"> Target kena sebelum stop {Math.round(c.win_rate)}% dalam {c.horizon} hari bursa.</span>
       </p>
-      {c.stock?.samples > 0 && (
+      {c.signal === 'BUY' && c.stock?.samples > 0 && (
         <p className="text-xs text-tv-muted mt-1.5">
-          Saham ini sendiri: rata-rata {fmt.pct(c.stock.avg_pnl_pct)} dari {c.stock.samples} hari sinyal beli ({Math.round(c.stock.win_rate)}% kena TP).
+          Saham ini sendiri: rata-rata {fmt.pct(c.stock.avg_pnl_pct)} dari {c.stock.samples} hari Tren naik ({Math.round(c.stock.win_rate)}% kena target).
         </p>
       )}
-      {!good && <p className="text-xs text-tv-red mt-1.5">⚠️ Rata-rata historis negatif — setup seperti ini belum terbukti menguntungkan.</p>}
+      {!good && <p className="text-xs text-tv-red mt-1.5">⚠️ Rata-rata historis negatif — masuk di kondisi seperti ini belum terbukti menguntungkan.</p>}
       {!c.reliable && <p className="text-xs text-tv-yellow mt-1.5">Sampel sedikit — angka ini belum bisa dipercaya.</p>}
-      <p className="text-[10px] text-tv-muted mt-2">Data sejak 2020 (saham IPO setelahnya: sejak listing); hari-hari berurutan saling tumpang-tindih, jadi jumlah kasus terlihat lebih besar dari aslinya. Bukan jaminan.</p>
+      <p className="text-[10px] text-tv-muted mt-2">Data sejak 2020 (saham IPO setelahnya: sejak listing), setelah biaya 0,4%/trade; hari-hari berurutan saling tumpang-tindih, jadi jumlah kasus terlihat lebih besar dari aslinya. Bukan jaminan.</p>
     </div>
   )
 }
@@ -90,7 +80,7 @@ export default function Advisor({ symbol, decisionData }) {
     <div className="flex items-center justify-center h-64 text-tv-muted">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-tv-border border-t-tv-blue rounded-full animate-spin" />
-        <span className="text-sm">Scoring {symbol}…</span>
+        <span className="text-sm">Memeriksa {symbol}…</span>
       </div>
     </div>
   )
@@ -98,133 +88,126 @@ export default function Advisor({ symbol, decisionData }) {
   if (!dec)  return null
 
   const v = SIGNAL[dec.signal] || SIGNAL.WAIT
-  const canTrade = dec.signal === 'STRONG_BUY' || dec.signal === 'BUY'
+  const isBuy = dec.signal === 'BUY'
+  const hasPlan = dec.stop_loss > 0 && dec.take_profit?.length > 0
 
   return (
     <div className="p-4 sm:p-6 space-y-5 max-w-4xl mx-auto">
 
-      <div className={`rounded-xl border-2 p-5 ${v.banner} ${canTrade ? 'breathe-green' : ''}`}>
-        <div className="flex items-center gap-3">
-          <div>
-            <div className={`text-xl font-extrabold ${v.text} flex items-center gap-2`}>
-              {signalLabel(dec.signal)}
-              {dec.syariah && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-tv-green/10 text-tv-green border border-tv-green/30">Sharia</span>
-              )}
-            </div>
-            <div className="text-[11px] text-tv-muted">
-              Score <b className="text-tv-text">{dec.score}/100</b> · confidence <b className="text-tv-text">{dec.confidence}%</b> · Decision Engine (weighted factors)
-            </div>
-            {dec.note && (
-              <div className="mt-1.5 text-[11px] text-tv-yellow">{dec.note}</div>
-            )}
-          </div>
+      <div className={`rounded-xl border-2 p-5 ${v.banner} ${isBuy ? 'breathe-green' : ''}`}>
+        <div className={`text-xl font-extrabold ${v.text} flex items-center gap-2`}>
+          {signalLabel(dec.signal)}
+          {dec.syariah && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-tv-green/10 text-tv-green border border-tv-green/30">Syariah</span>
+          )}
         </div>
+        <div className="text-[11px] text-tv-muted">
+          Pola "tren naik belum pucuk" — Tren naik kalau keempat syarat di bawah terpenuhi. Masih diuji maju (Nov 2026 – Jan 2027).
+        </div>
+        {dec.note && (
+          <div className="mt-2 text-[12px] text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/20 rounded-lg px-3 py-2">⚠️ {dec.note}</div>
+        )}
       </div>
 
       <div className="bg-tv-card border border-tv-border rounded-xl p-4">
-        <div className="text-xs font-bold text-tv-muted uppercase mb-3">Decision Engine backtest</div>
-        {btLoading ? (
-          <div className="text-sm text-tv-muted">Computing historical performance…</div>
-        ) : !bt || (bt.total === 0 && bt.open_trades === 0) ? (
-          <div className="text-sm text-tv-muted">Not enough data for backtest (need ≥61 bars).</div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-              <div>
-                <div className="text-[11px] text-tv-muted">Expectancy / trade</div>
-                <div className={`font-bold ${bt.expectancy_pct >= 0 ? 'text-tv-green' : 'text-tv-red'}`}>{bt.expectancy_pct > 0 ? '+' : ''}{bt.expectancy_pct?.toFixed(2)}%</div>
-              </div>
-              <div>
-                <div className="text-[11px] text-tv-muted">Win rate</div>
-                <div className="font-bold text-tv-muted">{bt.win_rate?.toFixed(1)}%</div>
-              </div>
-              <div>
-                <div className="text-[11px] text-tv-muted">Trades (closed)</div>
-                <div className="font-bold">{bt.total} <span className="text-tv-muted font-normal">({bt.wins}W / {bt.losses}L{bt.timeouts ? ` / ${bt.timeouts} timeout` : ''}{bt.open_trades ? ` · ${bt.open_trades} open` : ''})</span></div>
-              </div>
-              <div>
-                <div className="text-[11px] text-tv-muted">Avg planned R:R</div>
-                <div className="font-bold">1 : {bt.avg_rr?.toFixed(1)}</div>
-              </div>
+        <div className="text-xs font-bold text-tv-muted uppercase mb-3">Syarat Tren naik</div>
+        <div className="space-y-1.5">
+          {dec.components?.map((c, i) => (
+            <div key={i} className="flex items-center gap-2 text-[13px]">
+              <span className="w-5 shrink-0">{c.score === 100 ? '✅' : '❌'}</span>
+              <span className="w-40 shrink-0">{c.name}</span>
+              <span className="text-tv-muted truncate" title={c.note}>{c.note}</span>
             </div>
-            <p className="text-[10px] text-tv-muted mt-2">
-              Simulation: enter next open on STRONG_BUY/BUY, exit at stop/TP1 or close after 20 bars (timeout). Same rules as the calibration record. No look-ahead.
-            </p>
-          </>
+          ))}
+        </div>
+        {dec.signal === 'SELL' && (
+          <p className="text-[11px] text-tv-muted mt-3">Tren turun = tren pendek dan menengah sama-sama turun. Hanya gambaran, bukan ajakan jual.</p>
         )}
       </div>
 
       {dec.calibration?.samples > 0 && <CalibCard c={dec.calibration} />}
 
+      <div className="bg-tv-card border border-tv-border rounded-xl p-4">
+        <div className="text-xs font-bold text-tv-muted uppercase mb-3">Kalau masuk (rencana ATR)</div>
+        {hasPlan ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+            <div>
+              <div className="text-[11px] text-tv-muted">Harga acuan (close)</div>
+              <div className="font-bold tabular-nums">{fmt.price(dec.entry_zone.ideal)}</div>
+            </div>
+            <div>
+              <div className="text-[11px] text-tv-muted">Batas rugi (−1,5 ATR)</div>
+              <div className="font-bold tabular-nums text-tv-red">{fmt.price(dec.stop_loss)}</div>
+            </div>
+            <div>
+              <div className="text-[11px] text-tv-muted">Target (+3 ATR)</div>
+              <div className="font-bold tabular-nums text-tv-green">{fmt.price(dec.take_profit[0].price)}</div>
+            </div>
+            <div>
+              <div className="text-[11px] text-tv-muted">Risk / reward</div>
+              <div className="font-bold">1 : {dec.risk_reward?.toFixed(1)}</div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-[12px] text-tv-muted">Tidak ada rencana untuk Tren turun.</div>
+        )}
+        <div className="flex flex-wrap gap-x-6 gap-y-1 text-[12px] mt-3">
+          <span className="text-tv-muted">Support: <b className="text-tv-green tabular-nums">{dec.support?.map(fmt.price).join(' · ')}</b></span>
+          <span className="text-tv-muted">Resistance: <b className="text-tv-red tabular-nums">{dec.resistance?.map(fmt.price).join(' · ')}</b></span>
+        </div>
+        {hasPlan && !isBuy && (
+          <div className="mt-3 text-[11px] text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/20 rounded-lg px-3 py-2">
+            Saran saat ini <b>{signalLabel(dec.signal)}</b> — angka di atas hanya ukuran risiko kalau tetap masuk, bukan ajakan beli.
+          </div>
+        )}
+        <p className="text-[10px] text-tv-muted mt-2">Hitung jumlah lot dari modal & batas rugi di tab Risk.</p>
+      </div>
+
+      <div className="bg-tv-card border border-tv-border rounded-xl p-4">
+        <div className="text-xs font-bold text-tv-muted uppercase mb-3">Backtest saran di saham ini</div>
+        {btLoading ? (
+          <div className="text-sm text-tv-muted">Menghitung kinerja historis…</div>
+        ) : !bt || (bt.total === 0 && bt.open_trades === 0) ? (
+          <div className="text-sm text-tv-muted">Belum ada Tren naik di riwayat saham ini.</div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+              <div>
+                <div className="text-[11px] text-tv-muted">Rata-rata / trade</div>
+                <div className={`font-bold ${bt.expectancy_pct >= 0 ? 'text-tv-green' : 'text-tv-red'}`}>{bt.expectancy_pct > 0 ? '+' : ''}{bt.expectancy_pct?.toFixed(2)}%</div>
+              </div>
+              <div>
+                <div className="text-[11px] text-tv-muted">Kena target</div>
+                <div className="font-bold text-tv-muted">{bt.win_rate?.toFixed(1)}%</div>
+              </div>
+              <div>
+                <div className="text-[11px] text-tv-muted">Trade (selesai)</div>
+                <div className="font-bold">{bt.total} <span className="text-tv-muted font-normal">({bt.wins}W / {bt.losses}L{bt.timeouts ? ` / ${bt.timeouts} timeout` : ''}{bt.open_trades ? ` · ${bt.open_trades} berjalan` : ''})</span></div>
+              </div>
+              <div>
+                <div className="text-[11px] text-tv-muted">R:R rencana</div>
+                <div className="font-bold">1 : {bt.avg_rr?.toFixed(1)}</div>
+              </div>
+            </div>
+            <p className="text-[10px] text-tv-muted mt-2">
+              Simulasi: masuk open besok saat Tren naik, keluar di stop/target atau close setelah 20 hari bursa. Aturan sama dengan rekam jejak, setelah biaya, tanpa look-ahead.
+            </p>
+          </>
+        )}
+      </div>
+
       <ValuationCard v={dec.valuation} />
 
       {dec.close > 0 && <ProjectionCard calibration={dec.calibration} close={dec.close} />}
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <Pill label="Long trend" value={dec.trend.long} tone={trendToneOf(dec.trend.long)} />
-        <Pill label="Medium trend" value={dec.trend.medium} tone={trendToneOf(dec.trend.medium)} />
-        <Pill label="Short trend" value={dec.trend.short} tone={trendToneOf(dec.trend.short)} />
-        <Pill label="Structure" value={`${dec.market_structure.state} (${dec.market_structure.strength})`} />
-      </div>
-
-      <div className="bg-tv-card border border-tv-border rounded-xl p-4">
-        <div className="text-xs font-bold text-tv-muted uppercase mb-3">Trade plan</div>
-        {dec.gated ? (
-          <div className="text-[12px] text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/20 rounded-lg px-3 py-2">{GATED_PLAN}</div>
-        ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-          <div>
-            <div className="text-[11px] text-tv-muted">Entry zone (ideal {fmt.price(dec.entry_zone.ideal)})</div>
-            <div className="font-bold tabular-nums">{fmt.price(dec.entry_zone.buy[0])} – {fmt.price(dec.entry_zone.buy[1])}</div>
-          </div>
-          <div>
-            <div className="text-[11px] text-tv-muted">Stop loss</div>
-            <div className="font-bold tabular-nums text-tv-red">{fmt.price(dec.stop_loss)}</div>
-          </div>
-          <div>
-            <div className="text-[11px] text-tv-muted">Take profit</div>
-            <div className="font-bold tabular-nums text-tv-green">
-              {dec.take_profit.map(t => `${fmt.price(t.price)} (${t.portion})`).join(' · ')}
-            </div>
-          </div>
-          <div>
-            <div className="text-[11px] text-tv-muted">Risk / reward</div>
-            <div className={`font-bold ${dec.risk_reward >= 2 ? 'text-tv-green' : dec.risk_reward >= 1 ? 'text-tv-yellow' : 'text-tv-red'}`}>1 : {dec.risk_reward?.toFixed(1)}</div>
-          </div>
-        </div>
-        )}
-        <div className="flex flex-wrap gap-x-6 gap-y-1 text-[12px] mt-3">
-          <span className="text-tv-muted">Support: <b className="text-tv-green tabular-nums">{dec.support.map(fmt.price).join(' · ')}</b></span>
-          <span className="text-tv-muted">Resistance: <b className="text-tv-red tabular-nums">{dec.resistance.map(fmt.price).join(' · ')}</b></span>
-        </div>
-        {!canTrade && !dec.gated && (
-          <div className="mt-3 text-[11px] text-tv-yellow bg-tv-yellow/10 border border-tv-yellow/20 rounded-lg px-3 py-2">
-            Plan above only applies IF the setup becomes valid. Current signal is <b>{signalLabel(dec.signal)}</b> — not an entry yet.
-          </div>
-        )}
-      </div>
-
-      <div className="bg-tv-card border border-tv-border rounded-xl p-4">
-        <div className="text-xs font-bold text-tv-muted uppercase mb-3">Score breakdown</div>
-        <div className="space-y-1.5">
-          {dec.components?.map((c, i) => (
-            <div key={i} className="flex items-center gap-2 text-[12px]">
-              <span className="w-36 shrink-0 text-tv-muted">{c.name} <span className="text-[10px]">({c.weight}%)</span></span>
-              <ScoreBar score={c.score} />
-              <span className="w-7 text-right tabular-nums font-bold">{c.score}</span>
-              <span className="text-tv-muted truncate" title={c.note}>{c.note}</span>
-            </div>
-          ))}
-        </div>
-        <p className="text-[10px] text-tv-muted mt-3 leading-relaxed">
-          Score 50 = neutral. Includes FVG confluence and bandarmology when broker data exists, and Valuasi (10%) when the stock passes the quality screen.
-          Confidence = how aligned the factors are — not a price guarantee.
-        </p>
+      <div className="grid grid-cols-3 gap-2">
+        <Pill label="Tren panjang" value={dec.trend.long} tone={trendToneOf(dec.trend.long)} />
+        <Pill label="Tren menengah" value={dec.trend.medium} tone={trendToneOf(dec.trend.medium)} />
+        <Pill label="Tren pendek" value={dec.trend.short} tone={trendToneOf(dec.trend.short)} />
       </div>
 
       <p className="text-[10px] text-tv-muted text-center pt-2">
-        Not a buy/sell solicitation. Probabilistic analysis — decisions and risk are yours.
+        Bukan ajakan jual/beli. Analisa probabilistik — keputusan dan risiko di tangan Anda.
       </p>
     </div>
   )

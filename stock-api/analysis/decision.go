@@ -9,6 +9,10 @@ import (
 
 // ── Decision Engine ──────────────────────────────────────────────────────────
 //
+// RESEARCH ONLY since 2026-11-23: the app's verdict is Saran (saran.go). This
+// engine is kept unchanged because research/rapor and the frozen forward-test
+// log (rules fixed 2026-11-20) score it — changing it voids that test.
+//
 // Weighted multi-factor scoring engine. Unlike the Advisor (hard if/else price
 // action tree), this scores every factor 0–100, combines them with fixed
 // weights, and outputs a transparent decision: 5-level signal, numeric
@@ -75,34 +79,11 @@ type Decision struct {
 	Components      []FactorScore `json:"components"`
 	Note            string        `json:"note,omitempty"`      // set when the signal was gated down
 	Valuation       *Valuation    `json:"valuation,omitempty"` // 3-year PBV band + quality screen, when fundamentals are cached
-	Gated           bool          `json:"gated,omitempty"`     // IHSG < SMA50: no buy verdict, trade plan withheld (GateRegime)
 }
 
 // BuyScore is the minimum decision score for a BUY call. Calibration buckets
 // "buy calls" by the same line, so change it here only.
 const BuyScore = 60
-
-// RegimeGateNote explains a buy verdict held back by GateRegime.
-const RegimeGateNote = "IHSG di bawah MA50 — sinyal tren naik ditahan; rencana beli disembunyikan sampai IHSG kembali di atas MA50."
-
-// GateRegime is the market-regime gate. While IHSG is below its SMA50
-// (regime "down") no stock gets a buy verdict and no trade plan is published:
-// the 2020–2026 replay (research/) found BUY calls in that regime won only
-// 25–43% of the time with a negative median, while the score itself has ~zero
-// edge at picking stocks. The score is kept, so calibration lookups still
-// match. Any other regime ("up", or "" when ^JKSE is unavailable) passes d
-// through unchanged.
-func GateRegime(d Decision, regime string) Decision {
-	if regime != "down" {
-		return d
-	}
-	if d.Signal == "BUY" || d.Signal == "STRONG_BUY" {
-		d.Signal, d.Note = "WAIT", RegimeGateNote
-	}
-	d.Gated = true
-	d.EntryZone, d.StopLoss, d.TakeProfit, d.RiskReward = EntryZone{}, 0, nil, 0
-	return d
-}
 
 // Calibration knobs. These are tuned against IDX behaviour (crash gaps leave
 // swing levels stranded far above price), not universal constants — adjust
@@ -260,6 +241,55 @@ func clampScore(v float64) int {
 	return int(math.Round(math.Max(0, math.Min(100, v))))
 }
 
+// trendSet labels short (EMA10/20), medium (EMA20/50) and long (EMA50/200,
+// falling back to EMA20/50 when <200 bars) trends plus their weighted blend.
+func trendSet(close, ema10, ema20, ema50, ema200 float64) (TrendSet, int) {
+	longT := trendFrom(close, ema50, ema200)
+	if ema200 == 0 {
+		longT = trendFrom(close, ema20, ema50)
+	}
+	t := TrendSet{
+		Long:   longT,
+		Medium: trendFrom(close, ema20, ema50),
+		Short:  trendFrom(close, ema10, ema20),
+	}
+	sc := clampScore(0.5*float64(trendScore(t.Long)) +
+		0.3*float64(trendScore(t.Medium)) +
+		0.2*float64(trendScore(t.Short)))
+	// Label the blend that is actually scored — a single timeframe read on its
+	// own misrepresents it (medium can be red while the setup is bullish overall).
+	t.Overall = overallTrendLabel(sc)
+	return t, sc
+}
+
+// srLevels returns up to 3 supports (nearest first) and resistances (nearest
+// first) from clustered swings, with fallbacks when price sits at the extreme
+// of its range.
+func srLevels(prices []models.StockPrice, swings []swingPt, close, atr float64) (supports, resistances []float64) {
+	for _, lv := range clusterLevels(swings) {
+		if lv < close {
+			supports = append(supports, lv)
+		} else if lv > close {
+			resistances = append(resistances, lv)
+		}
+	}
+	sortDesc(supports)
+	sortAsc(resistances)
+	if len(supports) > 3 {
+		supports = supports[:3]
+	}
+	if len(resistances) > 3 {
+		resistances = resistances[:3]
+	}
+	if len(supports) == 0 {
+		supports = []float64{roundTick(minLow(prices, 20))}
+	}
+	if len(resistances) == 0 {
+		resistances = []float64{roundTick(close + 2*atr), roundTick(close + 3.5*atr)}
+	}
+	return
+}
+
 // DecisionEngine runs the weighted scoring model. Needs ≥ 60 bars.
 func DecisionEngine(prices []models.StockPrice) Decision {
 	return DecisionEngineWithBroker(prices, nil)
@@ -298,23 +328,7 @@ func DecisionEngineFull(prices []models.StockPrice, brokerDays []BrokerDay, val 
 		macdHist = m[len(m)-1].Histogram
 	}
 
-	// ── Trend (long falls back to EMA20/50 when <200 bars) ──────────────────
-	longT := trendFrom(close, ema50, ema200)
-	if ema200 == 0 {
-		longT = trendFrom(close, ema20, ema50)
-	}
-	trend := TrendSet{
-		Long:   longT,
-		Medium: trendFrom(close, ema20, ema50),
-		Short:  trendFrom(close, ema10, ema20),
-	}
-	trendSc := clampScore(0.5*float64(trendScore(trend.Long)) +
-		0.3*float64(trendScore(trend.Medium)) +
-		0.2*float64(trendScore(trend.Short)))
-	// Label the blend the engine actually scores — a single timeframe read on
-	// its own misrepresents the verdict (medium can be red while the setup is
-	// bullish overall).
-	trend.Overall = overallTrendLabel(trendSc)
+	trend, trendSc := trendSet(close, ema10, ema20, ema50, ema200)
 
 	// ── Market structure from fractal swings ─────────────────────────────────
 	swings := fractalSwings(prices, 90)
@@ -349,31 +363,7 @@ func DecisionEngineFull(prices []models.StockPrice, brokerDays []BrokerDay, val 
 	}
 	structStrength := clampScore(math.Abs(float64(structSc)-50) * 2)
 
-	// ── Support / Resistance zones from clustered swings ─────────────────────
-	levels := clusterLevels(swings)
-	var supports, resistances []float64
-	for _, lv := range levels {
-		if lv < close {
-			supports = append(supports, lv)
-		} else if lv > close {
-			resistances = append(resistances, lv)
-		}
-	}
-	sortDesc(supports)   // nearest support first
-	sortAsc(resistances) // nearest resistance first
-	if len(supports) > 3 {
-		supports = supports[:3]
-	}
-	if len(resistances) > 3 {
-		resistances = resistances[:3]
-	}
-	// fallbacks when price sits at the extreme of its range
-	if len(supports) == 0 {
-		supports = []float64{roundTick(minLow(prices, 20))}
-	}
-	if len(resistances) == 0 {
-		resistances = []float64{roundTick(close + 2*atr), roundTick(close + 3.5*atr)}
-	}
+	supports, resistances := srLevels(prices, swings, close, atr)
 
 	s1 := supports[0]
 	r1 := resistances[0]

@@ -369,47 +369,29 @@ func generateLocalAnalysis(
 
 	sb.WriteString("\n\n**Outlook & Rekomendasi**\n")
 
-	// Stop, target & R/R come from the decision engine — the same plan the
-	// Saran tab and the screener show, so the write-up never contradicts them.
-	score, maxScore := dec.Score, 100
-	stopLoss, rr := dec.StopLoss, dec.RiskReward
-	t1, t2 := close*1.03, close*1.06
-	if len(dec.TakeProfit) > 0 {
-		t1 = dec.TakeProfit[0].Price
-		t2 = t1
+	// Verdict, stop & target come from analysis.Saran via decide() — the same
+	// plan the Saran tab and the screener show, so the write-up never
+	// contradicts them. Descriptive, not imperative: the rule is still under
+	// forward test (docs/DECISIONS.md).
+	var unmet []string
+	for _, c := range dec.Components {
+		if c.Score < 100 {
+			unmet = append(unmet, strings.ToLower(c.Name)+" ("+c.Note+")")
+		}
 	}
-	if len(dec.TakeProfit) > 1 {
-		t2 = dec.TakeProfit[1].Price
-	}
-
-	nearSup := "support terdekat"
-	if len(supports) > 0 {
-		nearSup = supports[0]
-	}
-
 	switch dec.Signal {
-	case "STRONG_BUY", "STRONG BUY":
-		sb.WriteString(fmt.Sprintf(
-			"ENTRY — Momentum sangat bullish (skor %d/%d). Masuk di area saat ini (%.0f) atau pada pullback ke %s. Stop-loss di %.0f. Target 1: %.0f, Target 2: %.0f. R/R ≈ %.1f:1.",
-			score, maxScore, close, nearSup, stopLoss, t1, t2, rr))
 	case "BUY":
+		t1 := 0.0
+		if len(dec.TakeProfit) > 0 {
+			t1 = dec.TakeProfit[0].Price
+		}
 		sb.WriteString(fmt.Sprintf(
-			"AKUMULASI — Sinyal bullish (skor %d/%d). Ideal masuk pada pullback ke %s, bukan di harga saat ini (%.0f). Stop-loss di %.0f. Target: %.0f.",
-			score, maxScore, nearSup, close, stopLoss, t1))
-	case "WAIT":
-		sb.WriteString(fmt.Sprintf(
-			"WAIT & SEE — Sinyal netral (skor %d/%d). Pasar konsolidasi di range %.0f–%.0f. Tunggu breakout disertai volume tinggi sebelum masuk posisi baru.",
-			score, maxScore, lower, upper))
+			"Tren naik — keempat syarat pola \"tren naik belum pucuk\" terpenuhi. Kalau masuk di sekitar %.0f: batas rugi %.0f (−1,5 ATR), target %.0f (+3 ATR), R/R ≈ %.1f:1. Historis pola ini untung tipis dan hanya saat IHSG di atas MA50.",
+			close, dec.StopLoss, t1, dec.RiskReward))
 	case "SELL":
-		sb.WriteString(fmt.Sprintf(
-			"KURANGI POSISI — Tekanan jual mulai dominan (skor %d/%d). Take profit sebagian jika masih memegang. Hindari membeli baru. Pantau %s sebagai potensi titik reversal.",
-			score, maxScore, nearSup))
-	case "STRONG_SELL", "STRONG SELL":
-		sb.WriteString(fmt.Sprintf(
-			"EXIT — Tekanan bearish kuat (skor %d/%d). Keluar dari posisi atau cut loss jika harga menembus support kritis. Re-entry hanya setelah RSI recovery dari oversold dan MACD bullish crossover terkonfirmasi.",
-			score, maxScore))
+		sb.WriteString("Tren turun — tren pendek dan menengah sama-sama turun. Bukan ajakan jual; pola beli belum terbentuk.")
 	default:
-		sb.WriteString(fmt.Sprintf("Pantau perkembangan indikator lebih lanjut. Skor sinyal: %d/%d.", score, maxScore))
+		sb.WriteString("Tunggu — pola tren naik belum lengkap. Belum terpenuhi: " + strings.Join(unmet, "; ") + ".")
 	}
 	if dec.Note != "" {
 		sb.WriteString(" " + dec.Note)

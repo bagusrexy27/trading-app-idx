@@ -227,49 +227,38 @@ Narasi teknikal **berbasis aturan, lokal** — tidak memanggil LLM eksternal. Di
 
 ---
 
-## Decision engine
+## Saran
 
 ### `GET /analysis/{symbol}/decision`
 
+Verdict dari `analysis.Saran` (sejak 2026-11-23). Contoh ASII, 23 Nov 2026:
+
 ```json
-{"success":true,"data":{"symbol":"BBCA","syariah":false,"decision":{
-  "signal":"WAIT","confidence":71,"score":46,
-  "trend":{"long":"Bearish","medium":"Weak Bullish","short":"Sideways","overall":"Weak Bearish"},
-  "market_structure":{"state":"HH + LL (mixed)","strength":30},
-  "volume":{"status":"Normal","score":55},
-  "momentum":{"status":"Bearish","score":31},
-  "support":[6175,6075,5875],
-  "resistance":[6350,6525,6850],
-  "entry_zone":{"buy":[6150,6200],"ideal":6175},
-  "stop_loss":6100,
-  "take_profit":[{"price":6350,"portion":"50%"},{"price":6525,"portion":"50%"}],
-  "risk_reward":2.33,
-  "probability":{"bullish":28,"sideways":38,"bearish":34},
+{"success":true,"data":{"symbol":"ASII","syariah":false,"close":5400,"decision":{
+  "signal":"BUY","confidence":0,"score":0,
+  "trend":{"long":"Weak Bearish","medium":"Bullish","short":"Bullish","overall":"Weak Bullish"},
+  "support":[5300,5175,5025],
+  "resistance":[5800],
+  "entry_zone":{"buy":[5400,5400],"ideal":5400},
+  "stop_loss":5075,
+  "take_profit":[{"price":6050,"portion":"100%"}],
+  "risk_reward":2,
   "components":[
-    {"name":"Market Structure","score":65,"weight":23,"note":"HH + LL (mixed)"},
-    {"name":"Trend EMA","score":35,"weight":16,"note":"L:Bearish M:Weak Bullish S:Sideways"},
-    {"name":"Money Flow","score":33,"weight":10,"note":"Distribusi (CMF -0.11, MFI 47)"},
-    {"name":"Volume","score":55,"weight":10,"note":"Normal (0.89× rata-rata 20D)"},
-    {"name":"Support/Resistance","score":54,"weight":10,"note":"support -0.8% / resistance +2.0%"},
-    {"name":"Momentum","score":31,"weight":7,"note":"RSI 41, MACD hist -44.4"},
-    {"name":"Trend Strength","score":30,"weight":4,"note":"ADX 16 (sideways)"},
-    {"name":"Candlestick","score":35,"weight":3,"note":"Bar merah"},
-    {"name":"Risk/Reward","score":75,"weight":2,"note":"R/R 2.3"},
-    {"name":"FVG Confluence","score":13,"weight":7,"note":"FVG bear inverted (0.2%)"},
-    {"name":"Bandarmology","score":50,"weight":8,"note":"data broker tidak tersedia"}
-  ]
-}}}
+    {"name":"Tren pendek naik","score":100,"weight":0,"note":"EMA10 vs EMA20: Bullish"},
+    {"name":"Tren menengah naik","score":100,"weight":0,"note":"EMA20 vs EMA50: Bullish"},
+    {"name":"Belum terlalu jauh","score":100,"weight":0,"note":"0.9 ATR di atas EMA20 (syarat 0–1.5)"},
+    {"name":"RSI wajar","score":100,"weight":0,"note":"RSI 59 (syarat 50–65)"}
+  ],
+  "note":"IHSG di bawah MA50 — secara historis saran Tren naik di kondisi ini rata-rata rugi. Lihat rekam jejak di bawah."
+},
+"calibration":{"regime":"down","signal":"BUY","horizon":20,"samples":4942,"win_rate":25.84,"avg_pnl_pct":-0.97,"reliable":true,"stock":{"…":"…"},"projection":["…"]}}}
 ```
 
-`signal`: `STRONG_BUY` · `BUY` · `WAIT` · `SELL` · `STRONG_SELL`.
-
-Field `note` (opsional, di level `decision`) muncul kalau signal diturunkan paksa ke `WAIT` karena confidence rendah. Bobot faktor dan kalibrasinya dijelaskan di [architecture.md](architecture.md#1-decision-engine-analysisdecisiongo).
-
-Skor `Bandarmology` bernilai 50 (netral) selama `data/broker/{SYMBOL}.json` belum ada.
+`signal`: `BUY` (Tren naik: keempat `components` bernilai 100) · `WAIT` (Tunggu) · `SELL` (Tren turun: tren pendek & menengah Bearish; tanpa rencana, `stop_loss` 0). `score`/`confidence` selalu 0 (aturan checklist, bukan skor). Rencana = close, stop −1,5 ATR, target +3 ATR. `note` muncul pada `BUY` saat IHSG < MA50. `valuation` (PBV band) ikut sebagai info bila ada.
 
 ### `GET /analysis/{symbol}/decision-backtest`
 
-Memutar ulang sinyal decision engine atas seluruh histori tersimpan. Aturan exit = kalibrasi (`planOutcome`): masuk open hari berikutnya, keluar di stop (gap tembus = harga open) atau TP1, atau close setelah 20 bar (timeout). Trade tidak tumpang tindih.
+Memutar ulang saran Tren naik atas seluruh histori tersimpan. Aturan exit = kalibrasi (`planOutcome`): masuk open hari berikutnya, keluar di stop (gap tembus = harga open) atau target, atau close setelah 20 bar (timeout), setelah biaya 0,4%. Trade tidak tumpang tindih.
 
 ```json
 {"success":true,"data":{"symbol":"BBCA","backtest":{
@@ -286,7 +275,7 @@ Memutar ulang sinyal decision engine atas seluruh histori tersimpan. Aturan exit
 }}}
 ```
 
-`result`: `WIN` · `LOSS` · `TIMEOUT` · `OPEN` (data habis sebelum selesai). `win_rate` = wins / total (timeout dihitung bukan menang), `expectancy_pct` = rata-rata P&L termasuk timeout — definisi sama dengan `calibration`. Ini backtest sederhana atas data harian tersimpan — tanpa slippage, tanpa biaya, tanpa pengecekan likuiditas. Pakai sebagai pembanding relatif antar simbol, bukan sebagai ekspektasi keuntungan.
+`result`: `WIN` · `LOSS` · `TIMEOUT` · `OPEN` (data habis sebelum selesai). `win_rate` = wins / total (timeout dihitung bukan menang), `expectancy_pct` = rata-rata P&L termasuk timeout — definisi sama dengan `calibration`. Ini backtest sederhana atas data harian tersimpan — tanpa slippage, tanpa pengecekan likuiditas. Pakai sebagai pembanding relatif antar simbol, bukan sebagai ekspektasi keuntungan.
 
 ---
 
@@ -294,36 +283,32 @@ Memutar ulang sinyal decision engine atas seluruh histori tersimpan. Aturan exit
 
 ### `GET /advisor/screen`
 
-Menjalankan decision engine ke seluruh simbol tersimpan lalu merangking hasilnya.
+Menjalankan Saran ke seluruh simbol tersimpan. Filter fakta, diurutkan menurut `turnover_bn` (bukan peringkat "terbaik").
 
 | Param | Default | Keterangan |
 |---|---|---|
-| `mode` | `buy` | Sisi yang dicari |
+| `mode` | `buy` | `buy` = hanya Tren naik, `all` = semua |
 | `min_turnover` | `2` | Turnover minimum dalam miliar rupiah |
-| `min_rr` | `0` | Risk/reward minimum |
-| `min_confidence` | `0` | Confidence minimum (0–100) |
-| `syariah` | `false` | `true` = hanya konstituen ISSI |
-| `include_low_rr` | `false` | `true` = jangan buang kandidat R:R rendah |
+| `syariah` | `false` | `true` = hanya daftar syariah (DES OJK) |
+| `index` | — | `idx30` / `lq45` |
 | `undervalue` | `false` | `true` = hanya saham `valuation.undervalue` (PBV di bawah rata-rata 3 tahun + lolos 4 saringan kualitas) |
 
 ```json
 {"success":true,"data":{
-  "mode":"buy","matched":10,
-  "min_turnover":2,"min_rr":0,"min_confidence":0,"include_low_rr":false,
+  "mode":"buy","matched":7,"scanned":127,"regime":"down",
+  "min_turnover":2,"syariah":false,"index":"","undervalue":false,
   "results":[
-    {"symbol":"OILS","close":308,"signal":"BUY","score":68,"confidence":56,
-     "trend":{"long":"Bullish","medium":"Bullish","short":"Bullish","overall":"Bullish"},
-     "structure":"HH + HL","volume_state":"Normal",
-     "entry_low":294,"entry_high":304,"entry_ideal":298,
-     "stop":278,"target":320,"risk_reward":1.1,
-     "probability":{"bullish":46,"sideways":33,"bearish":21},
-     "turnover_bn":5.57,"syariah":false},
+    {"symbol":"ASII","close":5400,"signal":"BUY",
+     "trend":{"long":"Weak Bearish","medium":"Bullish","short":"Bullish","overall":"Weak Bullish"},
+     "entry_ideal":5400,"stop":5075,"target":6050,"risk_reward":2,
+     "turnover_bn":276.2,"syariah":false,"idx30":true,"lq45":true,
+     "note":"IHSG di bawah MA50 — …","calibration":{"…":"…"}},
     "…"
   ]
 }}
 ```
 
-Endpoint ini menghitung engine penuh untuk setiap saham dalam satu request, jadi ini yang paling berat di seluruh API. Naikkan `min_turnover` untuk mempersempit hasil.
+Endpoint ini menghitung Saran untuk setiap saham dalam satu request, jadi ini yang paling berat di seluruh API. Naikkan `min_turnover` untuk mempersempit hasil.
 
 ---
 

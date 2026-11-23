@@ -2,19 +2,19 @@ package analysis
 
 import "stock-api/models"
 
-// DecisionTrade is one simulated trade driven by the Decision Engine.
+// DecisionTrade is one simulated trade driven by Saran.
 type DecisionTrade struct {
 	EntryDate  string  `json:"entry_date"`
 	EntryPrice float64 `json:"entry_price"`
 	ExitDate   string  `json:"exit_date"`
 	ExitPrice  float64 `json:"exit_price"`
-	Signal     string  `json:"signal"` // STRONG_BUY | BUY that triggered entry
+	Signal     string  `json:"signal"` // BUY that triggered entry
 	Result     string  `json:"result"` // WIN | LOSS | TIMEOUT | OPEN (see planOutcome)
 	PnLPct     float64 `json:"pnl_pct"`
 	RiskReward float64 `json:"risk_reward"` // planned R/R at entry
 }
 
-// DecisionBacktestResult summarizes Decision Engine replay performance.
+// DecisionBacktestResult summarizes Saran replay performance.
 // Total = wins + losses + timeouts; WinRate = wins / total and ExpectancyPct =
 // mean P&L incl. timeouts — the same definitions as CalibStat.
 type DecisionBacktestResult struct {
@@ -31,15 +31,10 @@ type DecisionBacktestResult struct {
 	AvgRR         float64         `json:"avg_rr"` // mean planned R/R of entries
 }
 
-// BacktestDecision replays history using DecisionEngine (no look-ahead).
-// Each STRONG_BUY/BUY plan is resolved by planOutcome (same rules as
-// Calibrate); trades don't overlap — the next signal is looked for after exit.
+// BacktestDecision replays history using Saran (no look-ahead). Each BUY
+// ("Tren naik") plan is resolved by planOutcome (same rules as Calibrate);
+// trades don't overlap — the next signal is looked for after exit.
 func BacktestDecision(prices []models.StockPrice) DecisionBacktestResult {
-	return BacktestDecisionWithBroker(prices, nil)
-}
-
-// BacktestDecisionWithBroker is BacktestDecision with optional broker flow data.
-func BacktestDecisionWithBroker(prices []models.StockPrice, brokerDays []BrokerDay) DecisionBacktestResult {
 	res := DecisionBacktestResult{Trades: []DecisionTrade{}}
 	n := len(prices)
 	if n < 61 {
@@ -47,8 +42,8 @@ func BacktestDecisionWithBroker(prices []models.StockPrice, brokerDays []BrokerD
 	}
 
 	for i := 59; i < n-1; i++ {
-		dec := DecisionEngineWithBroker(prices[:i+1], brokerDaysUpTo(brokerDays, prices[i].Date))
-		if dec.Signal != "STRONG_BUY" && dec.Signal != "BUY" {
+		dec := Saran(prices[:i+1])
+		if dec.Signal != "BUY" {
 			continue
 		}
 		result, pnl, exit, _ := planOutcome(prices, i, dec.StopLoss, firstTP(dec))
@@ -107,15 +102,4 @@ func BacktestDecisionWithBroker(prices []models.StockPrice, brokerDays []BrokerD
 		res.AvgRR = R2(rrSum / float64(len(res.Trades)))
 	}
 	return res
-}
-
-// brokerDaysUpTo drops broker days after date so a replay cannot see the future.
-func brokerDaysUpTo(days []BrokerDay, date string) []BrokerDay {
-	out := days[:0:0]
-	for _, d := range days {
-		if d.Date <= date {
-			out = append(out, d)
-		}
-	}
-	return out
 }

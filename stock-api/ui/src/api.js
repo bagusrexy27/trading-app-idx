@@ -61,11 +61,8 @@ export const api = {
     const p = new URLSearchParams()
     p.set('mode', opts.mode ?? 'buy')
     p.set('min_turnover', String(opts.minTurnover ?? 2))
-    if (opts.minRR != null && opts.minRR > 0) p.set('min_rr', String(opts.minRR))
-    if (opts.minConfidence != null && opts.minConfidence > 0) p.set('min_confidence', String(opts.minConfidence))
     if (opts.syariah) p.set('syariah', 'true')
     if (opts.index) p.set('index', opts.index)
-    if (opts.includeLowRR) p.set('include_low_rr', 'true')
     if (opts.undervalue) p.set('undervalue', 'true')
     return req(`/advisor/screen?${p}`)
   },

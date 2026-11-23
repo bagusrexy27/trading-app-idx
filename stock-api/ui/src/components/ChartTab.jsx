@@ -481,7 +481,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
 
     const last  = prices[prices.length - 1]
     const tp    = proj.take_profit ?? []
-    const entry = proj.entry_zone?.ideal || last.close // 0 when the regime gate withholds the plan
+    const entry = proj.entry_zone?.ideal || last.close // 0 for Tren turun (no plan)
 
     // Jarak ditempuh dalam satuan "berapa hari gerak rata-rata" = jarak / ATR.
     // Target yang jauh relatif volatilitasnya butuh lebih banyak bar, jadi tiap
@@ -502,7 +502,7 @@ export default function ChartTab({ data, symbol, showToast, compact = false }) {
     const pts = [{ time: last.date, value: last.close }, { time: at(entryBar), value: entry }]
     if (tp[0] && tp1Bar > entryBar) pts.push({ time: at(tp1Bar), value: tp[0].price })
     if (tp[1] && tp2Bar > tp1Bar)   pts.push({ time: at(tp2Bar), value: tp[1].price })
-    plan.setData(proj.gated ? [] : pts) // gated: no plan path, the measured cone still shows
+    plan.setData(tp.length ? pts : []) // Tren turun: no plan path, the measured cone still shows
 
     // Kerucut terukur: persentil hasil kasus historis serupa di hari ke-projH,
     // ditarik mundur ke hari ke-t dengan akar waktu (ketidakpastian menumpuk

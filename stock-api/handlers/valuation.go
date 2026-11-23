@@ -70,17 +70,18 @@ func valuationOf(sym string, prices []models.StockPrice) *analysis.Valuation {
 	return e.Band.Evaluate(last.Close, last.Date)
 }
 
-// decide is the one way handlers get a verdict: price action + broker flow +
-// valuation, then the IHSG regime gate (IHSG < SMA50 on the stock's last bar:
-// no buy verdict, no trade plan). Every view that shows BUY/SELL must call
-// this so they agree.
+// decide is the one way handlers get a verdict: analysis.Saran, plus the IHSG
+// regime warning (IHSG < SMA50 on the stock's last bar → note on a Tren naik,
+// nothing hidden). The PBV band rides along as info; it does not change the
+// verdict. Every view that shows a verdict must call this so they agree.
 //
-// ponytail: ^JKSE unavailable → regime unknown → no gate (fail open), same
-// as the calibration table built without regimes.
+// ponytail: ^JKSE unavailable → regime unknown → no warning, same as the
+// calibration table built without regimes.
 func decide(sym string, prices []models.StockPrice) analysis.Decision {
-	d := analysis.DecisionEngineFull(prices, LoadBrokerDays(sym), valuationOf(sym, prices))
+	d := analysis.Saran(prices)
+	d.Valuation = valuationOf(sym, prices)
 	if idx, _, err := jkseBars(); err == nil && len(idx) > 50 && len(prices) > 0 {
-		d = analysis.GateRegime(d, analysis.IndexRegime(idx)(prices[len(prices)-1].Date))
+		d = analysis.WarnRegime(d, analysis.IndexRegime(idx)(prices[len(prices)-1].Date))
 	}
 	return d
 }

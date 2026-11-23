@@ -6,15 +6,13 @@ import MarketHeatmap from './MarketHeatmap'
 import WeeklyRecap from './WeeklyRecap'
 import Term from './Term'
 
-// Overview signals come from the decision engine (STRONG_BUY…STRONG_SELL incl. WAIT).
-const SIGNAL_ORDER = ['STRONG_BUY', 'BUY', 'WAIT', 'SELL', 'STRONG_SELL']
+// Overview verdicts come from analysis.Saran (BUY | WAIT | SELL).
+const SIGNAL_ORDER = ['BUY', 'WAIT', 'SELL']
 
 const SUMMARY_CARDS = [
-  { signal: 'STRONG_BUY',  cls: 'bg-tv-green text-white' },
-  { signal: 'BUY',         cls: 'bg-tv-green/15 text-tv-green border border-tv-green/30' },
-  { signal: 'WAIT',        cls: 'bg-tv-muted/10 text-tv-muted border border-tv-muted/20' },
-  { signal: 'SELL',        cls: 'bg-tv-red/15 text-tv-red border border-tv-red/30' },
-  { signal: 'STRONG_SELL', cls: 'bg-tv-red text-white' },
+  { signal: 'BUY',  cls: 'bg-tv-green/15 text-tv-green border border-tv-green/30' },
+  { signal: 'WAIT', cls: 'bg-tv-muted/10 text-tv-muted border border-tv-muted/20' },
+  { signal: 'SELL', cls: 'bg-tv-red/15 text-tv-red border border-tv-red/30' },
 ]
 
 const COLUMNS = [
@@ -26,8 +24,7 @@ const COLUMNS = [
   { label: 'RSI',      key: 'rsi',       term: 'rsi'      },
   { label: 'Trend',    key: 'trend',     center: true, term: 'trend' },
   { label: 'Vol/Avg',  key: 'vol_ratio', term: 'volratio' },
-  { label: 'Signal',   key: 'signal',    term: 'sinyal'   },
-  { label: 'Score',    key: 'score',     term: 'skor'     },
+  { label: 'Saran',    key: 'signal',    term: 'sinyal'   },
 ]
 
 function trendInfo(trend) {
@@ -37,7 +34,7 @@ function trendInfo(trend) {
 }
 
 function getSortVal(item, key) {
-  if (key === 'signal') return item.max_score ? item.score / item.max_score : 0
+  if (key === 'signal') return 2 - SIGNAL_ORDER.indexOf(item.signal) // Tren naik dulu
   if (key === 'trend')  return item.trend === 'bullish' ? 2 : item.trend === 'bearish' ? 0 : 1
   return item[key]
 }
@@ -45,7 +42,7 @@ function getSortVal(item, key) {
 export default function MarketOverview({ onSelectStock, showToast }) {
   const [items, setItems]     = useState([])
   const [loading, setLoading] = useState(true)
-  const [sortKey, setSortKey] = useState('score')
+  const [sortKey, setSortKey] = useState('signal')
   const [sortDir, setSortDir] = useState(-1) // -1 = desc
   const [mode, setMode]       = useState('table') // table | map | recap
 
@@ -106,7 +103,7 @@ export default function MarketOverview({ onSelectStock, showToast }) {
       <IHSGChart />
 
       {/* Summary cards */}
-      <div className="grid grid-cols-5 gap-3 mb-6">
+      <div className="grid grid-cols-3 gap-3 mb-6">
         {SUMMARY_CARDS.map(({ signal, cls }) => (
           <div key={signal} className={`rounded-xl px-3 py-3 text-center ${cls}`}>
             <div className="text-2xl font-bold">{counts[signal]}</div>
@@ -209,9 +206,6 @@ export default function MarketOverview({ onSelectStock, showToast }) {
                           {signalLabel(item.signal)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <SignalScore score={item.score} max={item.max_score} />
-                      </td>
                     </tr>
                   )
                 })}
@@ -226,19 +220,3 @@ export default function MarketOverview({ onSelectStock, showToast }) {
   )
 }
 
-function SignalScore({ score, max }) {
-  if (!max) return <span className="text-tv-muted text-xs">-</span>
-  const pct = Math.abs(score / max) * 100
-  const barColor = score > 0 ? 'bg-tv-green' : score < 0 ? 'bg-tv-red' : 'bg-tv-muted/40'
-  const textColor = score > 0 ? 'text-tv-green' : score < 0 ? 'text-tv-red' : 'text-tv-muted'
-  return (
-    <div className="flex flex-col items-end gap-1">
-      <span className={`text-xs font-semibold ${textColor}`}>
-        {score > 0 ? '+' : ''}{score}/{max}
-      </span>
-      <div className="w-12 h-1 bg-tv-border rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  )
-}

@@ -47,7 +47,7 @@ func TestBacktestDecisionProducesTrades(t *testing.T) {
 		if tr.EntryPrice <= 0 {
 			t.Fatalf("invalid entry price: %+v", tr)
 		}
-		if tr.Signal != "STRONG_BUY" && tr.Signal != "BUY" {
+		if tr.Signal != "BUY" {
 			t.Fatalf("unexpected signal: %s", tr.Signal)
 		}
 	}

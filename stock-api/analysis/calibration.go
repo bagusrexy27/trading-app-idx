@@ -11,19 +11,17 @@ import (
 
 // ── Calibration ──────────────────────────────────────────────────────────────
 //
-// Calibration replays the Decision Engine over every tracked stock's history
-// (no look-ahead) and records what actually happened to each day's plan:
-// enter at next open, WIN if TP1 is hit before the stop within Horizon bars,
-// LOSS if the stop is hit first (same-bar touch counts as LOSS — conservative),
-// TIMEOUT if neither. Results are bucketed by score and by market regime
-// (IHSG close vs its SMA50 on the signal day).
-//
-// ponytail: broker flow is left out of the replay (nil) — stored broker days
-// are recent/mock and would leak future data. Live scores include it (8%).
+// Calibration replays Saran over every tracked stock's history (no
+// look-ahead) and records what actually happened to each day's ATR plan
+// (stop −1.5 ATR, target +3 ATR from the close): enter at next open, WIN if
+// the target is hit before the stop within Horizon bars, LOSS if the stop is
+// hit first (same-bar touch counts as LOSS — conservative), TIMEOUT if
+// neither. Every verdict gets the plan, so "Tunggu" and "Tren turun" also show
+// what entering anyway would have done. Results are keyed by verdict
+// (BUY/WAIT/SELL) and market regime (IHSG close vs its SMA50 on the signal day).
 
 const (
 	CalibHorizon    = 20 // trading days a plan is given to resolve
-	calibBucketSize = 10 // score bucket width
 	calibMinSamples = 30 // below this a bucket's rate is not trusted
 )
 
@@ -42,7 +40,7 @@ var ProjHorizons = []int{5, 10, 20}
 
 const projK = 0.5
 
-// ProjStat is the scenario split for one regime × horizon × score bucket.
+// ProjStat is the scenario split for one regime × horizon × verdict.
 // Quantiles are in z units (volatility-normalised).
 type ProjStat struct {
 	Samples  int        `json:"samples"`
@@ -125,24 +123,23 @@ func (s *CalibStat) add(result string, pnl float64) {
 	s.AvgPnLPct = R2(s.pnlSum / float64(s.Samples))
 }
 
-// Calibration is the per-bucket outcome table. Regime keys: "all", "up"
-// (IHSG ≥ SMA50), "down" (IHSG < SMA50). Bucket key = score / 10 * 10.
+// Calibration is the per-verdict outcome table. Regime keys: "all", "up"
+// (IHSG ≥ SMA50), "down" (IHSG < SMA50). Verdict key = BUY | WAIT | SELL.
 type Calibration struct {
-	Horizon   int                           `json:"horizon"`
-	AsOf      string                        `json:"as_of"`
-	Stocks    int                           `json:"stocks"`
-	Buckets   map[string]map[int]*CalibStat `json:"buckets"`
-	BuyCalls  map[string]*CalibStat         `json:"buy_calls"`  // score ≥ 60 (BUY/STRONG_BUY band), per regime
-	PerSymbol map[string]*CalibStat         `json:"per_symbol"` // score ≥ 60 days, per stock, all regimes
-	// Projection: regime → horizon → score bucket.
-	Projection map[string]map[int]map[int]*ProjStat `json:"projection"`
+	Horizon   int                              `json:"horizon"`
+	AsOf      string                           `json:"as_of"`
+	Stocks    int                              `json:"stocks"`
+	Buckets   map[string]map[string]*CalibStat `json:"buckets"`
+	BuyCalls  map[string]*CalibStat            `json:"buy_calls"`  // = Buckets[regime]["BUY"]
+	PerSymbol map[string]*CalibStat            `json:"per_symbol"` // BUY days, per stock, all regimes
+	// Projection: regime → horizon → verdict.
+	Projection map[string]map[int]map[string]*ProjStat `json:"projection"`
 }
 
 // CalibLookup is what a single live decision gets attached.
 type CalibLookup struct {
 	Regime    string  `json:"regime"` // up | down | unknown
-	ScoreLo   int     `json:"score_lo"`
-	ScoreHi   int     `json:"score_hi"`
+	Signal    string  `json:"signal"`
 	Horizon   int     `json:"horizon"`
 	Samples   int     `json:"samples"`
 	WinRate   float64 `json:"win_rate"`
@@ -184,23 +181,23 @@ func IndexRegime(index []models.StockPrice) RegimeFunc {
 	}
 }
 
-// Calibrate replays DecisionEngine on every series. regime may be nil.
-// Cost: one engine run per bar per stock — seconds for ~80 stocks × ~1.5y.
+// Calibrate replays Saran on every series. regime may be nil.
+// Cost: one Saran run per bar per stock, spread over all CPUs.
 func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibration {
 	c := &Calibration{
 		Horizon:    CalibHorizon,
-		Buckets:    map[string]map[int]*CalibStat{"all": {}, "up": {}, "down": {}},
+		Buckets:    map[string]map[string]*CalibStat{"all": {}, "up": {}, "down": {}},
 		BuyCalls:   map[string]*CalibStat{"all": {}, "up": {}, "down": {}},
 		PerSymbol:  map[string]*CalibStat{},
-		Projection: map[string]map[int]map[int]*ProjStat{},
+		Projection: map[string]map[int]map[string]*ProjStat{},
 	}
 	for _, r := range []string{"all", "up", "down"} {
-		c.Projection[r] = map[int]map[int]*ProjStat{}
+		c.Projection[r] = map[int]map[string]*ProjStat{}
 		for _, h := range ProjHorizons {
-			c.Projection[r][h] = map[int]*ProjStat{}
+			c.Projection[r][h] = map[string]*ProjStat{}
 		}
 	}
-	plans := replayPlans(series)
+	signals := replaySignals(series)
 	for sym, prices := range series {
 		n := len(prices)
 		if n < 61 {
@@ -212,8 +209,7 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 		}
 		atr := ATR(prices, 14) // atr[k] belongs to prices[k+14]
 		for i := 59; i < n-1; i++ {
-			dec := plans[sym][i-59]
-			b := scoreBucket(dec.Score)
+			b := signals[sym][i-59]
 			keys := []string{"all"}
 			if regime != nil {
 				if r := regime(prices[i].Date); r != "" {
@@ -234,11 +230,12 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 					}
 				}
 			}
-			result, pnl, _, ok := planOutcome(prices, i, dec.StopLoss, dec.TP1)
+			stop, target := SaranPlan(prices[i].Close, atr[i-14].Value)
+			result, pnl, _, ok := planOutcome(prices, i, stop, target)
 			if !ok {
 				continue
 			}
-			if dec.Score >= BuyScore {
+			if b == "BUY" {
 				if c.PerSymbol[sym] == nil {
 					c.PerSymbol[sym] = &CalibStat{}
 				}
@@ -249,7 +246,7 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 					c.Buckets[k][b] = &CalibStat{}
 				}
 				c.Buckets[k][b].add(result, pnl)
-				if dec.Score >= BuyScore {
+				if b == "BUY" {
 					c.BuyCalls[k].add(result, pnl)
 				}
 			}
@@ -265,22 +262,16 @@ func Calibrate(series map[string][]models.StockPrice, regime RegimeFunc) *Calibr
 	return c
 }
 
-// replayedPlan is the slice of a Decision that Calibrate needs per bar.
-type replayedPlan struct {
-	Score         int
-	StopLoss, TP1 float64
-}
-
-// replayPlans runs DecisionEngine on every bar of every series (no
-// look-ahead) — the expensive part, O(bars²) per stock — spread over all CPUs.
-// plans[sym][i-59] is the plan made at the close of bar i.
-func replayPlans(series map[string][]models.StockPrice) map[string][]replayedPlan {
+// replaySignals runs Saran on every bar of every series (no look-ahead) —
+// the expensive part, O(bars²) per stock — spread over all CPUs.
+// signals[sym][i-59] is the verdict at the close of bar i.
+func replaySignals(series map[string][]models.StockPrice) map[string][]string {
 	type job struct {
 		sym    string
 		prices []models.StockPrice
 	}
 	jobs := make(chan job)
-	out := make(map[string][]replayedPlan, len(series))
+	out := make(map[string][]string, len(series))
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	for w := 0; w < runtime.NumCPU(); w++ {
@@ -289,10 +280,9 @@ func replayPlans(series map[string][]models.StockPrice) map[string][]replayedPla
 			defer wg.Done()
 			for j := range jobs {
 				n := len(j.prices)
-				ps := make([]replayedPlan, 0, n-60)
+				ps := make([]string, 0, n-60)
 				for i := 59; i < n-1; i++ {
-					d := DecisionEngine(j.prices[:i+1])
-					ps = append(ps, replayedPlan{d.Score, d.StopLoss, firstTP(d)})
+					ps = append(ps, Saran(j.prices[:i+1]).Signal)
 				}
 				mu.Lock()
 				out[j.sym] = ps
@@ -310,13 +300,13 @@ func replayPlans(series map[string][]models.StockPrice) map[string][]replayedPla
 	return out
 }
 
-// Lookup returns the historical record for a live score in the given regime,
-// falling back to "all" when the regime bucket is too thin.
-func (c *Calibration) Lookup(score int, regime string) *CalibLookup {
+// Lookup returns the historical record for a live verdict in the given
+// regime, falling back to "all" when the regime bucket is too thin.
+func (c *Calibration) Lookup(signal, regime string) *CalibLookup {
 	if c == nil {
 		return nil
 	}
-	b := scoreBucket(score)
+	b := signal
 	key := regime
 	if key != "up" && key != "down" {
 		key, regime = "all", "unknown"
@@ -326,7 +316,7 @@ func (c *Calibration) Lookup(score int, regime string) *CalibLookup {
 		key = "all"
 		s = c.Buckets[key][b]
 	}
-	out := &CalibLookup{Regime: regime, ScoreLo: b, ScoreHi: b + calibBucketSize - 1, Horizon: c.Horizon}
+	out := &CalibLookup{Regime: regime, Signal: signal, Horizon: c.Horizon}
 	if s != nil {
 		out.Samples, out.WinRate, out.AvgPnLPct = s.Samples, s.WinRate, s.AvgPnLPct
 		out.Reliable = s.Samples >= calibMinSamples
@@ -334,14 +324,14 @@ func (c *Calibration) Lookup(score int, regime string) *CalibLookup {
 	return out
 }
 
-// Project returns, per horizon, the measured scenario split for a live score
+// Project returns, per horizon, the measured scenario split for a live verdict
 // in the given regime (falling back to "all" when thin), with the normal range
 // converted to % using this stock's current ATR% (ATR14 / close × 100).
-func (c *Calibration) Project(score int, regime string, atrPct float64) []ProjView {
+func (c *Calibration) Project(signal, regime string, atrPct float64) []ProjView {
 	if c == nil || atrPct <= 0 {
 		return nil
 	}
-	b := scoreBucket(score)
+	b := signal
 	key := regime
 	if key != "up" && key != "down" {
 		key, regime = "all", "unknown"
@@ -372,16 +362,6 @@ func (c *Calibration) Project(score int, regime string, atrPct float64) []ProjVi
 		out = append(out, v)
 	}
 	return out
-}
-
-func scoreBucket(score int) int {
-	if score >= 100 {
-		score = 99
-	}
-	if score < 0 {
-		score = 0
-	}
-	return score / calibBucketSize * calibBucketSize
 }
 
 func firstTP(d Decision) float64 {

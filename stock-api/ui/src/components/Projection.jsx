@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { fmt, REGIME_LABEL } from '../utils'
+import { fmt, REGIME_LABEL, signalLabel } from '../utils'
 
 // Proyeksi terukur dari kalibrasi: dari semua kasus historis dengan skor &
 // kondisi IHSG serupa, berapa persen yang h hari bursa kemudian naik / datar /
@@ -64,7 +64,7 @@ export function ProjectionCard({ calibration, close }) {
       ) : (
         <>
           <p className="text-xs text-tv-muted mb-2.5 leading-relaxed">
-            Dari <b className="text-tv-text">{p.samples.toLocaleString('id-ID')}</b> kasus dengan skor {calibration.score_lo}–{calibration.score_hi} saat {regimeText(p.regime)},
+            Dari <b className="text-tv-text">{p.samples.toLocaleString('id-ID')}</b> kasus dengan saran "{signalLabel(calibration.signal)}" saat {regimeText(p.regime)},
             {' '}{h} hari bursa kemudian harganya:
           </p>
           <ScenarioBar p={p} />

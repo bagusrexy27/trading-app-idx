@@ -18,7 +18,7 @@ export default function RiskCalc({ data }) {
     const e = parseFloat(entry)    || lastClose
     const atr = lastAtr
 
-    const p1 = positionSize({ modal: m, riskPct: rp, entry: e, atr, atrMult: 1 })
+    const p1 = positionSize({ modal: m, riskPct: rp, entry: e, atr, atrMult: 1.5 }) // = rencana Saran (2R = +3 ATR)
     const p2 = positionSize({ modal: m, riskPct: rp, entry: e, atr, atrMult: 2 })
     const riskRp = p1.riskRp
     const sl1x = p1.sl, sl2x = p2.sl
@@ -66,8 +66,8 @@ export default function RiskCalc({ data }) {
           {/* Stop loss scenarios */}
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: '1× ATR Stop', sl: calc.sl1x, lots: calc.lots1x, shares: calc.shares1, actualRisk: calc.actualRisk1 },
-              { label: '2× ATR Stop', sl: calc.sl2x, lots: calc.lots2x, shares: calc.shares2, actualRisk: calc.actualRisk2 },
+              { label: '1,5× ATR Stop (rencana saran)', key: 1, sl: calc.sl1x, lots: calc.lots1x, shares: calc.shares1, actualRisk: calc.actualRisk1 },
+              { label: '2× ATR Stop', key: 2, sl: calc.sl2x, lots: calc.lots2x, shares: calc.shares2, actualRisk: calc.actualRisk2 },
             ].map(sc => (
               <div key={sc.label} className="bg-tv-card border border-tv-border rounded-xl p-4 space-y-3">
                 <div className="text-[10px] font-bold uppercase text-tv-muted">{sc.label}</div>
@@ -82,9 +82,9 @@ export default function RiskCalc({ data }) {
                   <div className="text-[9px] text-tv-muted uppercase font-bold mb-1">R:R Targets</div>
                   {calc.targets.map(t => (
                     <div key={t.r} className="flex justify-between items-center text-[11px]">
-                      <span className="text-tv-muted">{t.r}R Target</span>
+                      <span className="text-tv-muted">{t.r}R Target{sc.key === 1 && t.r === 2 ? ' (+3 ATR)' : ''}</span>
                       <span className="text-tv-green font-semibold tabular-nums">
-                        {fmt.price(sc.label.startsWith('1') ? t.tp1 : t.tp2)}
+                        {fmt.price(sc.key === 1 ? t.tp1 : t.tp2)}
                       </span>
                     </div>
                   ))}

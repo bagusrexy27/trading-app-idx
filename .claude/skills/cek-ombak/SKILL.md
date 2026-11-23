@@ -78,33 +78,38 @@ tidak menarik apa-apa. Jadi cukup panggil ini sekali — yang fresh ke-skip send
 Dua panggilan:
 
 ```bash
-# Semua kandidat BUY / STRONG_BUY, ranked (score → confidence → RR)
+# Semua saham dengan saran Tren naik (BUY), urut likuiditas
 curl -s "http://localhost:1111/api/advisor/screen?mode=buy&min_turnover=2"
 
 # Semua saham (buat cari yang AVOID/REDUCE)
 curl -s "http://localhost:1111/api/advisor/screen?mode=all&min_turnover=2"
 ```
 
-Field per row: `symbol, close, signal, score, confidence, trend{long,medium,short,overall},
-structure, volume_state, entry_low, entry_high, entry_ideal, stop, target, risk_reward,
-turnover_bn, syariah, note, calibration`.
-Top-level: `regime` (`up` = IHSG di atas MA50, `down` = di bawah, `unknown`).
+Saran = `analysis.Saran` (sejak 2026-11-23, menggantikan skor engine): `BUY` = Tren naik
+(pola "tren naik belum pucuk": tren pendek & menengah naik, harga 0–1,5 ATR di atas EMA20,
+RSI 50–65), `SELL` = Tren turun (tren pendek & menengah turun, deskripsi saja, tanpa
+rencana), `WAIT` = Tunggu. Tidak ada skor/confidence lagi.
 
-Yang terukur ada di `calibration`:
-- `win_rate`, `samples`, `avg_pnl_pct` — dari semua kasus historis dengan skor
-  `score_lo`–`score_hi` di regime yang sama: % rencana yang kena TP1 sebelum stop
-  dalam `horizon` (20) hari bursa, dan rata-rata hasil per trade.
+Field per row: `symbol, close, signal, trend{long,medium,short,overall}, entry_ideal
+(= close), stop (−1,5 ATR), target (+3 ATR), risk_reward (≈2), turnover_bn, syariah,
+idx30, lq45, note, calibration, valuation`.
+Top-level: `regime` (`up` = IHSG di atas MA50, `down` = di bawah, `unknown`). Saat `down`,
+`note` tiap Tren naik berisi peringatan regime (tidak ada yang disembunyikan).
+
+Yang terukur ada di `calibration` (setelah biaya 0,4%):
+- `signal`, `win_rate`, `samples`, `avg_pnl_pct` — dari semua hari historis dengan saran
+  yang sama di regime yang sama: % rencana ATR yang kena target sebelum stop dalam
+  `horizon` (20) hari bursa, dan rata-rata hasil per trade.
 - `reliable` = false → sampel < 30, sebut "belum bisa dipercaya".
-- `stock{samples,win_rate,avg_pnl_pct}` — rekam jejak saham itu sendiri (hari sinyal beli).
+- `stock{samples,win_rate,avg_pnl_pct}` — rekam jejak saham itu sendiri (hari Tren naik).
 - `projection[]` — per `horizon` (5/10/20 hari bursa): `bullish/sideways/bearish` (% kasus
   serupa yang naik/datar/turun melewati `threshold_pct`, ambang sesuai volatilitas saham),
   `band_pct` = [p10, p25, median, p75, p90] hasil dalam %, `samples`, `reliable`.
 
-Win rate tinggi belum tentu untung (TP bisa lebih dekat dari stop) — yang menentukan
-`avg_pnl_pct`. Negatif = setup ini secara historis rugi.
+Win rate ±30% wajar (target 2× jarak stop) — yang menentukan `avg_pnl_pct`. Negatif =
+kondisi ini secara historis rugi.
 
-Dari hasil `mode=all`, ambil yang `signal` = `SELL` atau `STRONG_SELL` untuk bagian
-warning (engine pakai skala STRONG_BUY/BUY/WAIT/SELL/STRONG_SELL).
+Dari hasil `mode=all`, ambil yang `signal` = `SELL` (Tren turun) untuk bagian warning.
 
 ## Langkah 3b — 1 subagent riset berita kandidat BUY
 
@@ -134,36 +139,37 @@ Format:
 
 1. **Konteks pasar** — 1 baris: IHSG hari ini (nilai + arah) dari langkah 1, plus
    `regime` dari screener. Kalau `regime` = `down`: tulis tegas di awal report —
-   "IHSG di bawah MA50; secara historis sinyal BUY di kondisi ini rata-rata rugi
+   "IHSG di bawah MA50; secara historis saran Tren naik di kondisi ini rata-rata rugi
    (cek `GET /api/calibration` → `buy_calls.down.avg_pnl_pct`). Sikap default: tahan / posisi kecil." 
 2. **Sentimen berita (dari langkah 4)** — 3 baris, satu per kategori:
    - `🇮🇩 Domestik: [Bullish/Netral/Bearish]` — 1 kalimat faktor utama (mis. "asing net sell Rp3,4 T 5 hari, transisi Gubernur BI").
    - `🌏 Global: [label]` — 1 kalimat (mis. "pasar wait-and-see jelang FOMC Fed").
    - `🀄 Regional: [label]` — 1 kalimat.
-3. **Kandidat BUY hari ini** — TAMPILKAN SEMUA yang lolos (jangan dipotong), sudah
-   urut dari terbaik. Per saham satu blok ringkas:
-   - `SYMBOL` — signal (STRONG_BUY/BUY) · skor X/100 · confidence Y% · 🕌 kalau syariah
-   - Entry: `entry_low`–`entry_high` (ideal `entry_ideal`) · Stop: `stop` · Target: `target` · RR 1:`risk_reward`
-   - Rekam jejak: kena TP `calibration.win_rate`% dari `calibration.samples` kasus serupa,
+3. **Tren naik hari ini** — TAMPILKAN SEMUA yang lolos (jangan dipotong), urut likuiditas
+   (bukan peringkat terbaik). Per saham satu blok ringkas:
+   - `SYMBOL` — Tren naik · likuid `turnover_bn` M/hari · 🕌 kalau syariah
+   - Kalau masuk: acuan `entry_ideal` · Stop: `stop` · Target: `target` · RR 1:`risk_reward`
+   - Rekam jejak: kena target `calibration.win_rate`% dari `calibration.samples` kasus serupa,
      rata-rata `calibration.avg_pnl_pct`%/trade · saham ini sendiri: `calibration.stock.win_rate`%
      (n=`calibration.stock.samples`). Tandai ⚠️ kalau `avg_pnl_pct` < 0 atau `reliable` false.
    - Proyeksi 20 hari (`projection` horizon 20): Bullish X% · Sideways Y% · Bearish Z% ·
      8 dari 10 kasus `band_pct[0]`% s/d `band_pct[4]`% (≈ harga dari `close`). Bearish > Bullish → ⚠️.
    - `📰 Berita:` dari langkah 3b (label + 1 kalimat). Negatif → ⚠️.
-   - 1 baris alasan: dari trend + structure + volume_state (terjemahkan ke bahasa awam,
-     mis. "struktur naik (higher-high), volume konfirmasi").
-4. **⚠️ Perhatian (SELL/STRONG_SELL)** — daftar symbol yang sinyalnya jelek, 1 baris each
-   (symbol · signal · alasan singkat). Berguna kalau user pegang barangnya. Kalau
-   kosong, tulis "tidak ada".
+   - 1 baris alasan: dari trend (terjemahkan ke bahasa awam, mis. "tren pendek & menengah
+     naik, belum terlalu jauh dari rata-rata 20 hari").
+4. **⚠️ Tren turun** — daftar symbol `SELL`, 1 baris each (symbol · tren singkat). Bukan
+   ajakan jual; berguna kalau user pegang barangnya. Kalau kosong, tulis "tidak ada".
 5. **🧭 Kesimpulan** — 1 paragraf pendek: gabungkan sentimen berita (langkah 4) +
    kondisi teknikal (jumlah BUY vs SELL, arah IHSG). Kasih arah jelas: pasar lagi
-   condong risk-on/risk-off/hati-hati, dan saran sikap (mis. "selektif, utamakan RR
-   tinggi + confidence tinggi; kurangi posisi kalau IHSG tembus support X"). Jangan
+   condong risk-on/risk-off/hati-hati, dan saran sikap (mis. "selektif, posisi kecil
+   selama IHSG di bawah MA50; kurangi posisi kalau IHSG tembus support X"). Jangan
    generik — sebut angka/faktor konkret dari data hari ini.
 6. Tutup: 1 baris disclaimer — rekam jejak dari data Yahoo sejak 2020 (delay) +
    rangkuman berita publik, bukan kepastian; selalu pakai stop-loss.
 7. **Sources** — gabungan semua url dari SUMBER/baris agent, sebagai markdown link.
 
-Harga IDX = integer rupiah, tanpa desimal. Ranking sudah dari backend (skor) — jangan
-diurut ulang, tapi kandidat dengan `calibration.avg_pnl_pct` negatif wajib diberi ⚠️. Kalau `matched` = 0, bilang tidak ada setup BUY layak hari ini
-(pasar lagi lesu) dan tetap tampilkan bagian warning.
+Harga IDX = integer rupiah, tanpa desimal. Urutan dari backend (likuiditas) — jangan
+diurut ulang atau dirangking "terbaik"; kandidat dengan `calibration.avg_pnl_pct` negatif
+wajib diberi ⚠️. Saran Tren naik masih uji maju (Nov 2026 – Jan 2027) — sebut sekali.
+Kalau `matched` = 0, bilang hari ini belum ada saham yang memenuhi keempat syarat Tren
+naik (polanya memang jarang) dan tetap tampilkan bagian warning.

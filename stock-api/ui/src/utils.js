@@ -18,19 +18,13 @@ export const colorOf = (n) =>
 export const bgOf = (n) =>
   n > 0 ? 'bg-tv-green/10 text-tv-green' : n < 0 ? 'bg-tv-red/10 text-tv-red' : 'bg-tv-muted/10 text-tv-muted'
 
-// Label tampilan sinyal: menggambarkan tren, bukan perintah beli/jual — riset
-// 2020–2026 (stock-api/research/) menunjukkan skor engine hampir tidak bisa
-// memilih saham pemenang. Nilai di API tetap STRONG_BUY…STRONG_SELL (payload
-// lama memakai spasi).
+// Label tampilan saran (analysis.Saran): menggambarkan tren, bukan perintah
+// beli/jual. API mengirim BUY | WAIT | SELL; STRONG_* hanya ada di payload lama.
 const SIGNAL_LABEL = { STRONG_BUY: 'Tren naik kuat', BUY: 'Tren naik', WAIT: 'Tunggu', SELL: 'Tren turun', STRONG_SELL: 'Tren turun kuat' }
 export const signalLabel = (s) => {
   const u = (s || '').toUpperCase().replace(/ /g, '_')
   return SIGNAL_LABEL[u] ?? u.replace(/_/g, ' ')
 }
-
-// Gate regime (analysis.GateRegime): saat IHSG < MA50 rencana entry/stop/target
-// dikosongkan backend (`gated: true`); UI menampilkan teks ini sebagai gantinya.
-export const GATED_PLAN = 'Rencana beli disembunyikan — IHSG di bawah MA50. Muncul lagi saat IHSG kembali di atas MA50.'
 
 export const signalStyle = (s) => {
   const u = (s || '').toUpperCase().replace(/ /g, '_')

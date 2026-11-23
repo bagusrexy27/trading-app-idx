@@ -56,6 +56,8 @@ Repo ini punya **dua** generator verdict yang jalan berdampingan. Keduanya dipak
 
 ### 1. Decision engine (`analysis/decision.go`)
 
+> **Sejak 2026-11-23 engine ini hanya untuk riset** (Rapor + log uji maju yang aturannya beku). Verdict app = `analysis.Saran` (`analysis/saran.go`): Tren naik = tren pendek & menengah Bullish, harga 0–1,5 ATR di atas EMA20, RSI 50–65; rencana close / −1,5 ATR / +3 ATR; IHSG < MA50 = peringatan, bukan gate. Kalibrasi & proyeksi dikelompokkan per saran × regime. Lihat `docs/DECISIONS.md`.
+
 Skoring berbobot. Setiap faktor dinilai 0–100 (50 = netral), dikalikan bobot tetap, dijumlahkan jadi satu skor:
 
 | Faktor | Bobot |

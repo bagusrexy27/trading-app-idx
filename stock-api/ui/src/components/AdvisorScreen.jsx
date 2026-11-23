@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
-import { fmt, calibShort, REGIME_LABEL, signalLabel, GATED_PLAN } from '../utils'
+import { fmt, calibShort, REGIME_LABEL, signalLabel } from '../utils'
 import { ValuationChip } from './ValuationCard'
 import { tip } from '../glossary'
 import { HorizonToggle, ScenarioBar, pickProj, projEdge } from './Projection'
 
 const SIGNAL = {
-  STRONG_BUY:  { icon: '🚀', badge: 'bg-tv-green/15 text-tv-green border-tv-green/40', bar: 'bg-tv-green' },
   BUY:         { icon: '✅', badge: 'bg-tv-green/10 text-tv-green border-tv-green/30', bar: 'bg-tv-green' },
   WAIT:        { icon: '⏳', badge: 'bg-tv-yellow/10 text-tv-yellow border-tv-yellow/30', bar: 'bg-tv-yellow' },
   SELL:        { icon: '⚠️', badge: 'bg-tv-red/10 text-tv-red border-tv-red/30', bar: 'bg-tv-red' },
-  STRONG_SELL: { icon: '🚫', badge: 'bg-tv-red/15 text-tv-red border-tv-red/40', bar: 'bg-tv-red' },
 }
 
 function Select({ label, value, onChange, options, strings = false }) {
@@ -52,15 +50,11 @@ function Card({ r, h, onSelect }) {
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-3">
-        {/* Blended trend — a single timeframe here reads as a contradiction
-            against the verdict, which scores all three. */}
         <span title={`Panjang: ${r.trend?.long} · Menengah: ${r.trend?.medium} · Pendek: ${r.trend?.short}`}>
           <Chip tone={trendToneOf(r.trend?.overall)}>Trend {r.trend?.overall}</Chip>
         </span>
-        <Chip>{r.structure}</Chip>
-        <Chip>Vol {r.volume_state}</Chip>
         {calibShort(r.calibration) && (
-          <span title={`Skor ${r.calibration.score_lo}–${r.calibration.score_hi}, ${REGIME_LABEL[r.calibration.regime]}: rencana kena TP1 sebelum stop dalam ${r.calibration.horizon} hari bursa. Rata-rata hasil ${fmt.pct(r.calibration.avg_pnl_pct)}/trade.`}>
+          <span title={`Saran "${signalLabel(r.calibration.signal)}", ${REGIME_LABEL[r.calibration.regime]}: kalau masuk, target +3 ATR kena sebelum stop dalam ${r.calibration.horizon} hari bursa. Rata-rata hasil ${fmt.pct(r.calibration.avg_pnl_pct)}/trade setelah biaya.`}>
             <Chip tone={r.calibration.avg_pnl_pct > 0 ? 'text-tv-green' : 'text-tv-red'}>{calibShort(r.calibration)}</Chip>
           </span>
         )}
@@ -69,13 +63,13 @@ function Card({ r, h, onSelect }) {
         <ValuationChip v={r.valuation} />
       </div>
 
-      {/* mini trade plan — withheld while the regime gate is on (note explains held buys) */}
-      {r.gated ? (!r.note && <p className="text-[10px] text-tv-muted mb-3">{GATED_PLAN}</p>) : (
+      {/* mini ATR plan — Tren turun carries none */}
+      {r.stop > 0 && (
       <div className="grid grid-cols-4 gap-2 text-center mb-3">
-        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('entry')}>Entry</div><div className="text-xs font-bold tabular-nums">{fmt.price(r.entry_low)}–{fmt.price(r.entry_high)}</div></div>
+        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('entry')}>Acuan</div><div className="text-xs font-bold tabular-nums">{fmt.price(r.entry_ideal)}</div></div>
         <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('stop')}>Stop</div><div className="text-xs font-bold tabular-nums text-tv-red">{fmt.price(r.stop)}</div></div>
-        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('target')}>TP1</div><div className="text-xs font-bold tabular-nums text-tv-green">{fmt.price(r.target)}</div></div>
-        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('rr')}>R/R</div><div className={`text-xs font-bold ${r.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-yellow'}`}>1:{r.risk_reward?.toFixed(1)}</div></div>
+        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('target')}>Target</div><div className="text-xs font-bold tabular-nums text-tv-green">{fmt.price(r.target)}</div></div>
+        <div><div className="text-[9px] text-tv-muted uppercase cursor-help" title={tip('rr')}>R/R</div><div className="text-xs font-bold">1:{r.risk_reward?.toFixed(1)}</div></div>
       </div>
       )}
 
@@ -87,18 +81,10 @@ function Card({ r, h, onSelect }) {
       )}
 
       {r.note && (
-        <p className="text-[10px] text-tv-yellow/90 mb-2 leading-snug border-l-2 border-tv-yellow/40 pl-2">
+        <p className="text-[10px] text-tv-yellow/90 leading-snug border-l-2 border-tv-yellow/40 pl-2">
           {r.note}
         </p>
       )}
-
-      {/* decision score bar */}
-      <div className="flex items-center gap-2">
-        <div className="flex-1 h-1.5 rounded-full bg-tv-bg overflow-hidden">
-          <div className={`h-full ${v.bar}`} style={{ width: `${r.score}%` }} />
-        </div>
-        <span className="text-[10px] text-tv-muted tabular-nums">skor {r.score}/100 · yakin {r.confidence}%</span>
-      </div>
     </button>
   )
 }
@@ -110,13 +96,9 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
   const [undervalueOnly, setUndervalueOnly] = useState(false)
   const [index, setIndex] = useState('') // '' | 'idx30' | 'lq45'
   const [maxPrice, setMaxPrice]   = useState(0)   // 0 = semua
-  const [minScore, setMinScore]   = useState(0)
-  const [volFilter, setVolFilter] = useState('')  // '' = semua
-  const [minRR, setMinRR]         = useState(0)
-  const [minConfidence, setMinConfidence] = useState(0)
   const [trendFilter, setTrendFilter] = useState('') // '' | 'Bullish' | 'Bearish'
   const [horizon, setHorizon] = useState(20)
-  const [sortBy, setSortBy]   = useState('score') // 'score' (backend) | 'proj'
+  const [sortBy, setSortBy]   = useState('turnover') // 'turnover' (backend) | 'proj'
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
   const [reloadKey, setReloadKey] = useState(0)
@@ -127,8 +109,6 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
     api.advisorScreen({
       mode,
       minTurnover: minTurn,
-      minRR: minRR || undefined,
-      minConfidence: minConfidence || undefined,
       syariah: syariahOnly || undefined,
       undervalue: undervalueOnly || undefined,
       index: index || undefined,
@@ -137,13 +117,11 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       .catch(e => { if (alive) showToast?.(e.message, 'error') })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
-  }, [mode, minTurn, minRR, minConfidence, syariahOnly, undervalueOnly, index, reloadKey, showToast])
+  }, [mode, minTurn, syariahOnly, undervalueOnly, index, reloadKey, showToast])
 
-  // Filter harga/skor/volume/trend tetap di client — backend sudah handle R/R, keyakinan, syariah.
+  // Filter harga/trend di client — backend sudah handle likuiditas, syariah, indeks, undervalue.
   const results = (data?.results ?? []).filter(r =>
     (!maxPrice || r.close <= maxPrice) &&
-    (!minScore || r.score >= minScore) &&
-    (!volFilter || r.volume_state === volFilter) &&
     (!trendFilter || r.trend?.overall?.includes(trendFilter))
   )
   if (sortBy === 'proj') {
@@ -156,7 +134,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
       <div className="mb-5">
         <h1 className="text-xl font-extrabold flex items-center gap-2">🧭 Advisor Screener</h1>
         <p className="text-xs text-tv-muted mt-1">
-          Decision Engine ke semua saham: skor berbobot 11 faktor (struktur, trend, money flow, volume, S/R, momentum, ADX, candle, R/R, FVG, bandarmology) + valuasi PBV 3 tahun untuk saham yang lolos saringan kualitas. Diurutkan dari skor tertinggi, atau dari proyeksi terbaik (Bullish% − Bearish% terukur).
+          Saran ke semua saham: Tren naik = pola "tren naik belum pucuk" (tren pendek & menengah naik, harga 0–1,5 ATR di atas EMA20, RSI 50–65). Bukan peringkat saham terbaik — diurutkan menurut likuiditas, atau proyeksi terukur (Bullish% − Bearish%).
         </p>
       </div>
 
@@ -172,13 +150,9 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
         </div>
         <Select label="Likuiditas" value={minTurn} onChange={setMinTurn} options={[[0, 'Semua'], [2, '≥2 bn/hr'], [5, '≥5 bn/hr'], [20, '≥20 bn/hr']]} />
         <Select label="Harga" value={maxPrice} onChange={setMaxPrice} options={[[0, 'Semua'], [500, '≤500'], [1000, '≤1.000'], [2000, '≤2.000'], [5000, '≤5.000']]} />
-        <Select label="Skor" value={minScore} onChange={setMinScore} options={[[0, 'Semua'], [50, '≥50'], [60, '≥60'], [70, '≥70']]} />
-        <Select label="Keyakinan" value={minConfidence} onChange={setMinConfidence} options={[[0, 'Semua'], [50, '≥50%'], [60, '≥60%'], [70, '≥70%']]} />
-        <Select label="Volume" value={volFilter} onChange={setVolFilter} strings options={[['', 'Semua'], ['Above Average', 'Di atas rata²'], ['Normal', 'Normal'], ['Below Average', 'Di bawah rata²']]} />
-        <Select label="R/R" value={minRR} onChange={setMinRR} options={[[0, '≥1 (default)'], [1.5, '≥1.5'], [2, '≥2'], [3, '≥3']]} />
         <Select label="Indeks" value={index} onChange={setIndex} strings options={[['', 'Semua'], ['lq45', 'LQ45'], ['idx30', 'IDX30']]} />
         <Select label="Trend" value={trendFilter} onChange={setTrendFilter} strings options={[['', 'Semua'], ['Bullish', 'Bullish'], ['Bearish', 'Bearish'], ['Sideways', 'Sideways']]} />
-        <Select label="Urutkan" value={sortBy} onChange={setSortBy} strings options={[['score', 'Skor'], ['proj', 'Proyeksi terbaik']]} />
+        <Select label="Urutkan" value={sortBy} onChange={setSortBy} strings options={[['turnover', 'Likuiditas'], ['proj', 'Proyeksi terbaik']]} />
         <HorizonToggle value={horizon} onChange={setHorizon} />
         <button onClick={() => setSyariahOnly(s => !s)}
           className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${syariahOnly ? 'bg-tv-green/15 text-tv-green border-tv-green/40' : 'text-tv-muted border-tv-border hover:text-tv-text'}`}>
@@ -208,14 +182,14 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
 
       {data?.regime === 'down' && !loading && (
         <div className="text-xs text-tv-red bg-tv-red/10 border border-tv-red/30 rounded-lg px-3 py-2 mb-3">
-          ⚠️ {REGIME_LABEL.down} (pasar sedang turun). Sinyal tren naik ditahan dan rencana beli disembunyikan sampai IHSG kembali di atas MA50 — secara historis, beli di kondisi ini rata-rata <b>rugi</b>.
+          ⚠️ {REGIME_LABEL.down} (pasar sedang turun). Saran Tren naik tetap ditampilkan, tapi secara historis masuk di kondisi ini rata-rata <b>rugi</b> — lihat rekam jejak di tiap kartu.
         </div>
       )}
 
       {/* Summary line */}
       {data && !loading && (
         <div className="text-[11px] text-tv-muted mb-4">
-          {data.scanned} saham dipindai · <b className="text-tv-text">{results.length}</b> lolos {mode === 'buy' ? 'tren naik (skor ≥60)' : 'filter'}{results.length !== data.matched ? ` (dari ${data.matched} sebelum filter)` : ''}
+          {data.scanned} saham dipindai · <b className="text-tv-text">{results.length}</b> lolos {mode === 'buy' ? 'Tren naik' : 'filter'}{results.length !== data.matched ? ` (dari ${data.matched} sebelum filter)` : ''}
         </div>
       )}
 
@@ -238,9 +212,7 @@ export default function AdvisorScreen({ onSelectStock, showToast }) {
           <p className="text-xs text-tv-muted max-w-md mx-auto leading-relaxed">
             {mode !== 'buy'
               ? 'Gak ada data. Coba turunkan filter likuiditas.'
-              : data?.regime === 'down'
-                ? 'IHSG di bawah MA50 — semua sinyal tren naik ditahan sampai IHSG kembali di atas MA50. Sabar, tahan cash. Lihat "📋 Semua" untuk gambaran pasar.'
-                : 'Pasar lagi lemah — gak ada saham dengan skor ≥60. Ini normal & sehat: sistem nolak entry paksa. Sabar, tahan cash, cek lagi nanti. Atau lihat "📋 Semua" untuk gambaran pasar.'}
+              : 'Hari ini belum ada saham yang memenuhi keempat syarat Tren naik. Itu normal — polanya memang jarang. Lihat "📋 Semua" untuk gambaran pasar.'}
           </p>
         </div>
       )}

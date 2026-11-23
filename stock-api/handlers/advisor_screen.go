@@ -13,56 +13,35 @@ import (
 
 // screenFilters holds query params for /api/advisor/screen.
 type screenFilters struct {
-	Mode          string
-	MinTurnover   float64
-	MinRR         float64
-	MinConfidence int
-	SyariahOnly   bool
-	Index         string // "" | "idx30" | "lq45"
-	IncludeLowRR  bool
-	Undervalue    bool // only quality stocks below their 3-year mean PBV
+	Mode        string
+	MinTurnover float64
+	SyariahOnly bool
+	Index       string // "" | "idx30" | "lq45"
+	Undervalue  bool   // only quality stocks below their 3-year mean PBV
 }
 
 func parseScreenFilters(r *http.Request) screenFilters {
-	mode := r.URL.Query().Get("mode")
+	q := r.URL.Query()
+	mode := q.Get("mode")
 	if mode == "" {
 		mode = "buy"
 	}
 	f := screenFilters{Mode: mode, MinTurnover: 2.0}
-	if v := r.URL.Query().Get("min_turnover"); v != "" {
-		if n, err := strconv.ParseFloat(v, 64); err == nil {
-			f.MinTurnover = n
-		}
+	if n, err := strconv.ParseFloat(q.Get("min_turnover"), 64); err == nil {
+		f.MinTurnover = n
 	}
-	if v := r.URL.Query().Get("min_rr"); v != "" {
-		if n, err := strconv.ParseFloat(v, 64); err == nil {
-			f.MinRR = n
-		}
-	}
-	if v := r.URL.Query().Get("min_confidence"); v != "" {
-		if n, err := strconv.Atoi(v); err == nil {
-			f.MinConfidence = n
-		}
-	}
-	f.SyariahOnly = r.URL.Query().Get("syariah") == "true"
-	f.Index = strings.ToLower(r.URL.Query().Get("index"))
-	f.IncludeLowRR = r.URL.Query().Get("include_low_rr") == "true"
-	f.Undervalue = r.URL.Query().Get("undervalue") == "true"
+	f.SyariahOnly = q.Get("syariah") == "true"
+	f.Index = strings.ToLower(q.Get("index"))
+	f.Undervalue = q.Get("undervalue") == "true"
 	return f
 }
 
-// screenRow is one ranked screener result.
+// screenRow is one screener result.
 type screenRow struct {
 	Symbol      string              `json:"symbol"`
 	Close       float64             `json:"close"`
-	Signal      string              `json:"signal"`
-	Score       int                 `json:"score"`
-	Confidence  int                 `json:"confidence"`
+	Signal      string              `json:"signal"` // BUY | WAIT | SELL (analysis.Saran)
 	Trend       analysis.TrendSet   `json:"trend"`
-	Structure   string              `json:"structure"`
-	VolumeState string              `json:"volume_state"`
-	EntryLow    float64             `json:"entry_low"`
-	EntryHigh   float64             `json:"entry_high"`
 	EntryIdeal  float64             `json:"entry_ideal"`
 	Stop        float64             `json:"stop"`
 	Target      float64             `json:"target"`
@@ -72,16 +51,15 @@ type screenRow struct {
 	IDX30       bool                `json:"idx30"`
 	LQ45        bool                `json:"lq45"`
 	Note        string              `json:"note,omitempty"`
-	Gated       bool                `json:"gated,omitempty"`       // IHSG < SMA50: plan fields are zero (analysis.GateRegime)
-	Calibration *calibrationFor     `json:"calibration,omitempty"` // measured history for this score + regime
+	Calibration *calibrationFor     `json:"calibration,omitempty"` // measured history for this verdict + regime
 	Valuation   *analysis.Valuation `json:"valuation,omitempty"`   // 3-year PBV band + quality screen
 }
 
-// filterScreenRows applies mode and quality gates to ranked rows.
+// filterScreenRows applies the fact filters. mode=buy keeps Tren naik only.
 func filterScreenRows(rows []screenRow, f screenFilters) []screenRow {
 	out := make([]screenRow, 0, len(rows))
 	for _, row := range rows {
-		if f.Mode == "buy" && row.Signal != "STRONG_BUY" && row.Signal != "BUY" {
+		if f.Mode == "buy" && row.Signal != "BUY" {
 			continue
 		}
 		if f.Undervalue && (row.Valuation == nil || !row.Valuation.Undervalue) {
@@ -93,16 +71,6 @@ func filterScreenRows(rows []screenRow, f screenFilters) []screenRow {
 		if (f.Index == "idx30" && !row.IDX30) || (f.Index == "lq45" && !row.LQ45) {
 			continue
 		}
-		if f.MinConfidence > 0 && row.Confidence < f.MinConfidence {
-			continue
-		}
-		if f.MinRR > 0 && row.RiskReward < f.MinRR {
-			continue
-		}
-		// Default buy mode excludes sub-1 R/R unless explicitly allowed.
-		if f.Mode == "buy" && !f.IncludeLowRR && f.MinRR <= 0 && row.RiskReward < 1 {
-			continue
-		}
 		out = append(out, row)
 	}
 	return out
@@ -110,10 +78,10 @@ func filterScreenRows(rows []screenRow, f screenFilters) []screenRow {
 
 // AdvisorScreen — GET /api/advisor/screen?mode=buy&min_turnover=2
 //
-// Runs the weighted Decision Engine across every tracked stock and returns a
-// ranked list. `mode=buy` (default) keeps only actionable long setups
-// (STRONG_BUY/BUY); `mode=all` returns every stock. `min_turnover` (in billion
-// IDR/day) filters out illiquid names (default 2).
+// Runs Saran across every tracked stock and returns the rows sorted by
+// turnover: fact filters, no "best stock" ranking (the old score had no
+// edge). `mode=buy` (default) keeps Tren naik only; `mode=all` returns every
+// stock. `min_turnover` (billion IDR/day) filters out illiquid names (default 2).
 func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) {
 	f := parseScreenFilters(r)
 	if !validIndex(f.Index) {
@@ -144,51 +112,37 @@ func (h *AnalysisHandler) AdvisorScreen(w http.ResponseWriter, r *http.Request) 
 		}
 
 		dec := decide(sym, d.Prices)
-		target := 0.0 // no TP when the regime gate withholds the plan
+		target := 0.0 // Tren turun carries no plan
 		if len(dec.TakeProfit) > 0 {
 			target = dec.TakeProfit[0].Price
 		}
 		rows = append(rows, screenRow{
 			Symbol: sym, Close: d.Prices[n-1].Close,
-			Signal: dec.Signal, Score: dec.Score, Confidence: dec.Confidence, Gated: dec.Gated,
-			Trend: dec.Trend, Structure: dec.MarketStructure.State, VolumeState: dec.Volume.Status,
-			EntryLow: dec.EntryZone.Buy[0], EntryHigh: dec.EntryZone.Buy[1], EntryIdeal: dec.EntryZone.Ideal,
-			Stop: dec.StopLoss, Target: target, RiskReward: dec.RiskReward,
+			Signal: dec.Signal, Trend: dec.Trend,
+			EntryIdeal: dec.EntryZone.Ideal, Stop: dec.StopLoss, Target: target, RiskReward: dec.RiskReward,
 			TurnoverBn: analysis.R2(turnover),
 			Syariah:    isSyariah(sym), IDX30: isIDX30(sym), LQ45: isLQ45(sym), Note: dec.Note,
-			Calibration: lookupCalibration(calib, regime, sym, dec.Score, d.Prices),
+			Calibration: lookupCalibration(calib, regime, sym, dec.Signal, d.Prices),
 			Valuation:   dec.Valuation,
 		})
 	}
 
-	sort.Slice(rows, func(i, j int) bool {
-		if rows[i].Score != rows[j].Score {
-			return rows[i].Score > rows[j].Score
-		}
-		if rows[i].Confidence != rows[j].Confidence {
-			return rows[i].Confidence > rows[j].Confidence
-		}
-		return rows[i].RiskReward > rows[j].RiskReward
-	})
-
+	sort.Slice(rows, func(i, j int) bool { return rows[i].TurnoverBn > rows[j].TurnoverBn })
 	out := filterScreenRows(rows, f)
 
 	respond(w, 200, true, "", map[string]interface{}{
-		"mode":           f.Mode,
-		"min_turnover":   f.MinTurnover,
-		"min_rr":         f.MinRR,
-		"min_confidence": f.MinConfidence,
-		"syariah":        f.SyariahOnly,
-		"index":          f.Index,
-		"index_stale":    indexStale(time.Now()), // daftar IDX30/LQ45 lewat periode
-		"index_until":    indexValidUntil,
-		"syariah_stale":  syariahStale(time.Now()), // DES OJK lewat periode
-		"syariah_until":  syariahValidUntil,
-		"include_low_rr": f.IncludeLowRR,
-		"undervalue":     f.Undervalue,
-		"regime":         regime, // IHSG vs SMA50: up | down | unknown
-		"scanned":        scanned,
-		"matched":        len(out),
-		"results":        out,
+		"mode":          f.Mode,
+		"min_turnover":  f.MinTurnover,
+		"syariah":       f.SyariahOnly,
+		"index":         f.Index,
+		"index_stale":   indexStale(time.Now()), // daftar IDX30/LQ45 lewat periode
+		"index_until":   indexValidUntil,
+		"syariah_stale": syariahStale(time.Now()), // DES OJK lewat periode
+		"syariah_until": syariahValidUntil,
+		"undervalue":    f.Undervalue,
+		"regime":        regime, // IHSG vs SMA50: up | down | unknown
+		"scanned":       scanned,
+		"matched":       len(out),
+		"results":       out,
 	})
 }

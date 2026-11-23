@@ -83,7 +83,7 @@ export default function SessionPrep({ onSelectStock, showToast }) {
   }
 
   const getSortVal = (item, key) => {
-    if (key === 'signal') return item.max_score ? item.score / item.max_score : 0
+    if (key === 'signal') return { BUY: 2, WAIT: 1, SELL: 0 }[item.signal] ?? 1
     return item[key]
   }
 

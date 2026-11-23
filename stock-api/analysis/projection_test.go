@@ -20,11 +20,11 @@ func TestProjStatFinalize(t *testing.T) {
 }
 
 func TestProjectScalesBandByATR(t *testing.T) {
-	c := &Calibration{Projection: map[string]map[int]map[int]*ProjStat{"all": {}}}
+	c := &Calibration{Projection: map[string]map[int]map[string]*ProjStat{"all": {}}}
 	for _, h := range ProjHorizons {
-		c.Projection["all"][h] = map[int]*ProjStat{60: {Samples: 50, Z: [5]float64{-1, -0.5, 0, 0.5, 1}}}
+		c.Projection["all"][h] = map[string]*ProjStat{"BUY": {Samples: 50, Z: [5]float64{-1, -0.5, 0, 0.5, 1}}}
 	}
-	v := c.Project(65, "up", 2) // regime "up" missing → falls back to "all"
+	v := c.Project("BUY", "up", 2) // regime "up" missing → falls back to "all"
 	if len(v) != 3 || v[2].Horizon != 20 || v[2].Regime != "all" {
 		t.Fatalf("views = %+v", v)
 	}
@@ -55,7 +55,7 @@ func TestCalibrateProjectionSteadyRise(t *testing.T) {
 		for b, p := range cal.Projection["all"][h] {
 			samples += p.Samples
 			if p.Bullish != 100 {
-				t.Errorf("h=%d bucket %d: bullish %.2f%%, want 100", h, b, p.Bullish)
+				t.Errorf("h=%d bucket %s: bullish %.2f%%, want 100", h, b, p.Bullish)
 			}
 		}
 		// replay runs i = 59 … n-2; a case needs i+h < n

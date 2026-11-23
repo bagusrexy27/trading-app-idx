@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, lazy, Suspense, memo } from 'react'
 import { api } from '../api'
-import { fmt, colorOf, signalLabel, GATED_PLAN } from '../utils'
+import { fmt, colorOf, signalLabel } from '../utils'
 import Overview from './Overview'
 import RiskCalc from './RiskCalc'
 import ReportUpload from './ReportUpload'
@@ -196,8 +196,8 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
   const c = summary.changes['1d']
   const dec = data.decision?.decision
   const signalNow = dec?.signal
-  const buyish = signalNow === 'BUY' || signalNow === 'STRONG_BUY'
-  const avoidish = signalNow === 'SELL' || signalNow === 'STRONG_SELL'
+  const buyish = signalNow === 'BUY'
+  const avoidish = signalNow === 'SELL'
   const verdictLabel = signalLabel(signalNow || 'WAIT')
   const verdictTone = buyish
     ? { wrap: 'bg-tv-green/5 border-tv-green/20', text: 'text-tv-green' }
@@ -293,23 +293,20 @@ export default function StockPanel({ symbol, onDeleted, onUpdated, showToast }) 
               {verdictLabel}
             </span>
             <span className="text-xs text-tv-muted">
-              Score <b className="text-tv-text tabular-nums">{dec.score}</b>
-              <span className="mx-1.5 text-tv-border">·</span>
-              Conf <b className="text-tv-text tabular-nums">{dec.confidence}%</b>
+              {dec.components?.filter(c => c.score === 100).length ?? 0}/4 syarat
             </span>
-            {dec.gated ? (
-              <span className="text-xs text-tv-muted">{GATED_PLAN}</span>
-            ) : (
+            {dec.stop_loss > 0 && (
             <span className="text-xs text-tv-muted tabular-nums">
-              Entry <b className="text-tv-text">{fmt.price(dec.entry_zone?.ideal ?? dec.entry_zone?.buy?.[0])}</b>
+              Acuan <b className="text-tv-text">{fmt.price(dec.entry_zone?.ideal)}</b>
               <span className="mx-1.5 text-tv-border">·</span>
               Stop <b className="text-tv-red">{fmt.price(dec.stop_loss)}</b>
               <span className="mx-1.5 text-tv-border">·</span>
               Target <b className="text-tv-green">{fmt.price(dec.take_profit?.[0]?.price)}</b>
               <span className="mx-1.5 text-tv-border">·</span>
-              R:R <b className={dec.risk_reward >= 2 ? 'text-tv-green' : 'text-tv-text'}>1:{dec.risk_reward?.toFixed(1)}</b>
+              R:R <b className="text-tv-text">1:{dec.risk_reward?.toFixed(1)}</b>
             </span>
             )}
+            {dec.note && <span className="text-xs text-tv-yellow">⚠️ {dec.note}</span>}
           </div>
         )}
       </div>
