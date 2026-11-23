@@ -1,0 +1,528 @@
+{
+  "date": "2026-11-20",
+  "made_at": "2026-11-23T11:53:19+07:00",
+  "code": "5d56f04a37b7faacc4dd975c87677def5661babf0503518d8f596e556a7b48cf",
+  "prev": "",
+  "stocks": 15,
+  "signals": {
+    "A/D line tembus rata-rata 20": [
+      "BMRI"
+    ],
+    "Aroon (25) naik memotong turun": [
+      "AMRT",
+      "BBCA"
+    ],
+    "CMF tembus 0": [
+      "BBCA",
+      "PGAS"
+    ],
+    "FVG: harga masuk gap bullish": [
+      "TLKM"
+    ],
+    "Fibonacci mantul di 61,8%": [
+      "BBRI"
+    ],
+    "Key Levels: mantul di support S1": [
+      "ANTM",
+      "BBRI",
+      "MEDC"
+    ],
+    "Pembalikan 5 hari (turun \u003e 5% sepekan)": [
+      "MEDC"
+    ],
+    "Pivot harian tembus naik": [
+      "AADI"
+    ],
+    "ROC (10) tembus 0": [
+      "ADRO"
+    ],
+    "Stochastic cross naik di bawah 20": [
+      "MEDC"
+    ],
+    "Struktur HH + HL baru": [
+      "TLKM"
+    ]
+  },
+  "high": {
+    "ADX (14)": [
+      "AMRT",
+      "MEDC",
+      "ICBP"
+    ],
+    "ATR % (volatilitas harian)": [
+      "MEDC",
+      "AMRT",
+      "ANTM"
+    ],
+    "Akrual": [
+      "ANTM",
+      "BBRI",
+      "BBCA"
+    ],
+    "Altman Z-score": [
+      "ANTM",
+      "AMRT"
+    ],
+    "Beta 60 hari vs IHSG": [
+      "TLKM",
+      "ANTM",
+      "BBRI"
+    ],
+    "Bollinger %B": [
+      "AMRT",
+      "ICBP",
+      "BBRI"
+    ],
+    "CMF (20)": [
+      "UNTR",
+      "ASII",
+      "BBRI"
+    ],
+    "Current ratio": [
+      "ICBP",
+      "ADRO"
+    ],
+    "DER (utang ÷ ekuitas)": [
+      "MEDC",
+      "ICBP",
+      "BMRI"
+    ],
+    "Dividend yield 12 bulan": [
+      "BMRI",
+      "ADRO",
+      "BBRI"
+    ],
+    "EBITDA ÷ EV (kebalikan EV/EBITDA)": [
+      "PGAS",
+      "TLKM"
+    ],
+    "Earnings yield (kebalikan PER)": [
+      "AADI",
+      "UNTR",
+      "BMRI"
+    ],
+    "Iliquiditas Amihud": [
+      "AMRT",
+      "ICBP",
+      "MEDC"
+    ],
+    "Jarak ke EMA200": [
+      "PTBA",
+      "ASII",
+      "AADI"
+    ],
+    "Jarak ke high 52 minggu": [
+      "PTBA",
+      "ADRO",
+      "ICBP"
+    ],
+    "Kapitalisasi pasar (ukuran)": [
+      "BBCA",
+      "BBRI",
+      "BMRI"
+    ],
+    "Kekuatan relatif 60 hari vs IHSG": [
+      "PTBA",
+      "ASII",
+      "PGAS"
+    ],
+    "Komponen engine: Candlestick": [
+      "AADI",
+      "ADRO",
+      "ANTM"
+    ],
+    "Komponen engine: FVG Confluence": [
+      "BMRI",
+      "ICBP",
+      "BBNI"
+    ],
+    "Komponen engine: Market Structure": [
+      "ASII",
+      "BBCA",
+      "PGAS"
+    ],
+    "Komponen engine: Momentum": [
+      "ICBP",
+      "PGAS",
+      "BBRI"
+    ],
+    "Komponen engine: Money Flow": [
+      "ASII",
+      "BBRI",
+      "UNTR"
+    ],
+    "Komponen engine: Risk/Reward": [
+      "ASII",
+      "ADRO",
+      "BBRI"
+    ],
+    "Komponen engine: Support/Resistance": [
+      "ASII",
+      "BBNI",
+      "MEDC"
+    ],
+    "Komponen engine: Trend EMA": [
+      "PGAS",
+      "ASII",
+      "PTBA"
+    ],
+    "Komponen engine: Trend Strength": [
+      "AMRT",
+      "ICBP",
+      "ASII"
+    ],
+    "Komponen engine: Volume": [
+      "PTBA",
+      "UNTR",
+      "TLKM"
+    ],
+    "MAX 20 hari (efek lotre)": [
+      "PGAS",
+      "ANTM",
+      "AMRT"
+    ],
+    "MFI (14)": [
+      "ICBP",
+      "BBCA",
+      "PGAS"
+    ],
+    "Momentum 12−1 bulan": [
+      "AADI",
+      "PTBA",
+      "ADRO"
+    ],
+    "Momentum 6−1 bulan": [
+      "AADI",
+      "PTBA",
+      "MEDC"
+    ],
+    "Net margin": [
+      "BBCA",
+      "BMRI",
+      "BBNI"
+    ],
+    "PBV (harga ÷ nilai buku)": [
+      "AMRT",
+      "BBCA",
+      "ANTM"
+    ],
+    "Pertumbuhan laba (YoY)": [
+      "ANTM",
+      "ICBP",
+      "AMRT"
+    ],
+    "Pertumbuhan pendapatan (YoY)": [
+      "ANTM",
+      "BBRI",
+      "AMRT"
+    ],
+    "Piotroski F-score": [
+      "ANTM",
+      "ICBP"
+    ],
+    "ROA": [
+      "ANTM",
+      "AADI",
+      "UNTR"
+    ],
+    "ROE": [
+      "AADI",
+      "BBCA",
+      "ANTM"
+    ],
+    "RSI (14)": [
+      "ICBP",
+      "PGAS",
+      "BBRI"
+    ],
+    "Rasio volume": [
+      "ASII",
+      "ANTM",
+      "TLKM"
+    ],
+    "Return 1 bulan": [
+      "ASII",
+      "ICBP",
+      "PGAS"
+    ],
+    "Return 1 minggu": [
+      "AMRT",
+      "ICBP",
+      "BBCA"
+    ],
+    "Sales yield (kebalikan PSR)": [
+      "AMRT",
+      "PGAS",
+      "UNTR"
+    ],
+    "Skor decision engine": [
+      "ASII",
+      "PGAS",
+      "BBCA"
+    ],
+    "Turnover 20 hari (ukuran)": [
+      "BBCA",
+      "BBRI",
+      "BMRI"
+    ],
+    "Volatilitas 60 hari": [
+      "TLKM",
+      "ANTM",
+      "MEDC"
+    ]
+  },
+  "low": {
+    "ADX (14)": [
+      "UNTR",
+      "ADRO",
+      "PTBA"
+    ],
+    "ATR % (volatilitas harian)": [
+      "BMRI",
+      "UNTR",
+      "BBNI"
+    ],
+    "Akrual": [
+      "TLKM",
+      "AMRT",
+      "MEDC"
+    ],
+    "Altman Z-score": [
+      "MEDC",
+      "PGAS"
+    ],
+    "Beta 60 hari vs IHSG": [
+      "ICBP",
+      "UNTR",
+      "AADI"
+    ],
+    "Bollinger %B": [
+      "AADI",
+      "ADRO",
+      "MEDC"
+    ],
+    "CMF (20)": [
+      "AADI",
+      "AMRT",
+      "ADRO"
+    ],
+    "Current ratio": [
+      "TLKM",
+      "AMRT"
+    ],
+    "DER (utang ÷ ekuitas)": [
+      "BBCA",
+      "ANTM",
+      "AMRT"
+    ],
+    "Dividend yield 12 bulan": [
+      "MEDC",
+      "ICBP",
+      "PTBA"
+    ],
+    "EBITDA ÷ EV (kebalikan EV/EBITDA)": [
+      "PTBA",
+      "MEDC"
+    ],
+    "Earnings yield (kebalikan PER)": [
+      "MEDC",
+      "AMRT",
+      "BBCA"
+    ],
+    "Iliquiditas Amihud": [
+      "BMRI",
+      "BBCA",
+      "BBRI"
+    ],
+    "Jarak ke EMA200": [
+      "AMRT",
+      "TLKM",
+      "MEDC"
+    ],
+    "Jarak ke high 52 minggu": [
+      "TLKM",
+      "ANTM",
+      "AMRT"
+    ],
+    "Kapitalisasi pasar (ukuran)": [
+      "MEDC",
+      "PGAS",
+      "ADRO"
+    ],
+    "Kekuatan relatif 60 hari vs IHSG": [
+      "TLKM",
+      "AMRT",
+      "ANTM"
+    ],
+    "Komponen engine: Candlestick": [
+      "AMRT",
+      "ASII",
+      "BBCA"
+    ],
+    "Komponen engine: FVG Confluence": [
+      "ANTM",
+      "BBRI",
+      "ASII"
+    ],
+    "Komponen engine: Market Structure": [
+      "AMRT",
+      "MEDC",
+      "AADI"
+    ],
+    "Komponen engine: Momentum": [
+      "MEDC",
+      "AADI",
+      "PTBA"
+    ],
+    "Komponen engine: Money Flow": [
+      "AADI",
+      "ADRO",
+      "MEDC"
+    ],
+    "Komponen engine: Risk/Reward": [
+      "AADI",
+      "AMRT",
+      "ANTM"
+    ],
+    "Komponen engine: Support/Resistance": [
+      "TLKM",
+      "ANTM",
+      "AMRT"
+    ],
+    "Komponen engine: Trend EMA": [
+      "ANTM",
+      "MEDC",
+      "TLKM"
+    ],
+    "Komponen engine: Trend Strength": [
+      "MEDC",
+      "ANTM",
+      "TLKM"
+    ],
+    "Komponen engine: Volume": [
+      "AMRT",
+      "ICBP",
+      "BBCA"
+    ],
+    "MAX 20 hari (efek lotre)": [
+      "BMRI",
+      "MEDC",
+      "AADI"
+    ],
+    "MFI (14)": [
+      "AADI",
+      "MEDC",
+      "PTBA"
+    ],
+    "Momentum 12−1 bulan": [
+      "AMRT",
+      "BBCA",
+      "TLKM"
+    ],
+    "Momentum 6−1 bulan": [
+      "AMRT",
+      "PGAS",
+      "TLKM"
+    ],
+    "Net margin": [
+      "AMRT",
+      "MEDC",
+      "PGAS"
+    ],
+    "PBV (harga ÷ nilai buku)": [
+      "MEDC",
+      "PGAS",
+      "BBNI"
+    ],
+    "Pertumbuhan laba (YoY)": [
+      "MEDC",
+      "ADRO",
+      "PTBA"
+    ],
+    "Pertumbuhan pendapatan (YoY)": [
+      "ADRO",
+      "AADI",
+      "UNTR"
+    ],
+    "Piotroski F-score": [
+      "ADRO",
+      "ASII"
+    ],
+    "ROA": [
+      "MEDC",
+      "BBNI",
+      "BMRI"
+    ],
+    "ROE": [
+      "MEDC",
+      "PGAS",
+      "ADRO"
+    ],
+    "RSI (14)": [
+      "MEDC",
+      "AADI",
+      "ANTM"
+    ],
+    "Rasio volume": [
+      "PTBA",
+      "ICBP",
+      "PGAS"
+    ],
+    "Return 1 bulan": [
+      "MEDC",
+      "AADI",
+      "PTBA"
+    ],
+    "Return 1 minggu": [
+      "AADI",
+      "ANTM",
+      "PTBA"
+    ],
+    "Sales yield (kebalikan PSR)": [
+      "BBCA",
+      "BMRI",
+      "BBRI"
+    ],
+    "Skor decision engine": [
+      "AMRT",
+      "MEDC",
+      "ANTM"
+    ],
+    "Turnover 20 hari (ukuran)": [
+      "ICBP",
+      "UNTR",
+      "AMRT"
+    ],
+    "Volatilitas 60 hari": [
+      "ICBP",
+      "BBNI",
+      "BMRI"
+    ]
+  },
+  "timing": {
+    "2 minggu sebelum Lebaran": false,
+    "3 hari bursa terakhir tiap bulan": false,
+    "Breadth lebar (\u003e 70% saham di atas EMA50)": false,
+    "Breadth sempit (\u003c 30% saham di atas EMA50)": false,
+    "Bulan Desember (window dressing)": false,
+    "Bulan Januari": false,
+    "Emas naik \u003e 5% dalam 20 hari": false,
+    "IHSG di atas MA50 (gate lama)": false,
+    "IHSG turun \u003e 10% dari puncak 1 tahun": true,
+    "IHSG turun \u003e 20% dari puncak 1 tahun": true,
+    "Minyak naik \u003e 10% dalam 20 hari": false,
+    "Rupiah melemah \u003e 2% dalam 20 hari": false,
+    "Rupiah menguat \u003e 2% dalam 20 hari": false,
+    "S\u0026P 500 di atas MA50": false,
+    "S\u0026P 500 turun \u003e 2% semalam": true,
+    "S\u0026P 500 turun \u003e 5% dalam 20 hari": true,
+    "Sinyal Jumat (beli Senin)": true,
+    "Sinyal Kamis (beli Jumat)": false,
+    "Suasana pasar: euforia (RSI IHSG \u003e 70)": false,
+    "Suasana pasar: optimis (RSI IHSG 60–70)": false,
+    "Suasana pasar: panik (RSI IHSG \u003c 40)": false,
+    "Suasana pasar: takut (RSI IHSG 40–50)": true,
+    "Suasana pasar: tenang (RSI IHSG 50–60)": false,
+    "VIX \u003e 25 (pasar global takut)": true
+  }
+}

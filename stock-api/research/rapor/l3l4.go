@@ -424,10 +424,12 @@ func regimeGroups(o []obs, reg map[string]string) map[string]GroupStat {
 }
 
 // healthyOnly narrows every stock's tradable days to the "saham sehat"
-// universe (decided 2026-11-20), using only what was known that day: among
-// the liquid stocks of the date, the topN (40) with the largest 20-day turnover,
-// then price >= Rp500 and ATR <= 4% of price. The market baseline is built
-// from s.liquid, so it becomes the same healthy set automatically.
+// universe, using only what was known that day: among the liquid stocks of
+// the date, the topN (40) with the largest 20-day turnover and price >= Rp500,
+// then the calmer half of those by ATR% ("tenang relatif", decided
+// 2026-11-23 — the first version's absolute ATR <= 4% shrank to 6–12 stocks a
+// day in the volatile 2026 market). The market baseline is built from
+// s.liquid, so it becomes the same healthy set automatically.
 func healthyOnly(res []stockOut, topN int) {
 	type pt struct {
 		s  *series
@@ -441,15 +443,25 @@ func healthyOnly(res []stockOut, topN int) {
 		}
 		for i := 0; i < o.s.n; i++ {
 			if o.s.liquid[i] {
+				o.s.liquid[i] = false // re-enabled below only for the healthy set
 				by[o.s.date[i]] = append(by[o.s.date[i]], pt{o.s, i, o.s.to20[i]})
 			}
 		}
 	}
 	for _, ps := range by {
-		sort.Slice(ps, func(a, b int) bool { return ps[a].to > ps[b].to })
+		sort.Slice(ps, func(a, b int) bool { return ps[a].to > ps[b].to || (ps[a].to == ps[b].to && ps[a].s.sym < ps[b].s.sym) })
+		var big []pt // top-turnover, price >= Rp500, with an ATR
 		for k, p := range ps {
-			s, i := p.s, p.i
-			s.liquid[i] = k < topN && s.c[i] >= 500 && s.atr[i]/s.c[i] <= 0.04
+			if k < topN && p.s.c[p.i] >= 500 && !math.IsNaN(p.s.atr[p.i]) {
+				big = append(big, p)
+			}
+		}
+		atrPct := func(p pt) float64 { return p.s.atr[p.i] / p.s.c[p.i] }
+		sort.Slice(big, func(a, b int) bool {
+			return atrPct(big[a]) < atrPct(big[b]) || (atrPct(big[a]) == atrPct(big[b]) && big[a].s.sym < big[b].s.sym)
+		})
+		for _, p := range big[:(len(big)+1)/2] { // calmer half
+			p.s.liquid[p.i] = true
 		}
 	}
 }

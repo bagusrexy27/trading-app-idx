@@ -62,7 +62,7 @@ const (
 func main() {
 	minTO := flag.Float64("minto", 20, "minimum 20-day average turnover, Rp bn, for a day to count")
 	out := flag.String("out", "", "output file (default research/rapor/<as_of>.json)")
-	universe := flag.String("universe", "", `"sehat" = only healthy stocks: top 40 by turnover that day, price >= Rp500, ATR <= 4% (baseline = same set)`)
+	universe := flag.String("universe", "", `"sehat" = only healthy stocks: top 40 by turnover that day with price >= Rp500, calmer half by ATR% (baseline = same set)`)
 	sehatN := flag.Int("sehatn", 40, "with -universe sehat: how many top-turnover stocks per day (sensitivity: 30/50 write to research/out/)")
 	flag.Parse()
 	if *universe != "" && *universe != "sehat" {
@@ -416,7 +416,7 @@ func main() {
 	}
 	if *universe == "sehat" {
 		rep.Universe = "sehat"
-		rep.Notes = append(rep.Notes, "Universe 'saham sehat': per tanggal hanya 40 saham dengan transaksi 20 hari terbesar, harga ≥ Rp500, ATR ≤ 4%; pembanding = rata-rata saham sehat di tanggal yang sama.")
+		rep.Notes = append(rep.Notes, "Universe 'saham sehat': per tanggal, dari 40 saham dengan transaksi 20 hari terbesar dan harga ≥ Rp500, separuh dengan ATR% terendah (±20 saham, 'tenang relatif'); pembanding = rata-rata saham sehat di tanggal yang sama.")
 	}
 	if *out == "" {
 		*out = filepath.Join("research", "rapor", *universe, asOf+".json") // sehat → research/rapor/sehat/ (the app serves research/rapor/*.json)

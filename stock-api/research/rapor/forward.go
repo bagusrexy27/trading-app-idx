@@ -93,19 +93,26 @@ func (s *series) barIndex(d string) int {
 	return -1
 }
 
-// writeForward logs every trading date after the last logged one up to asOf
-// (only asOf on the very first run). Existing files are never rewritten.
+// forwardStart is the first date the forward test covers. The signal rules
+// were frozen in commit 40e5ed8 (2026-11-20) before any 20-day outcome from
+// that date was known, so dates from here on are out-of-sample even when a
+// missed evening run logs them later (decided 2026-11-23: the 20 Nov run was
+// missed). Never move it earlier — those dates were seen during development.
+const forwardStart = "2026-11-20"
+
+// writeForward logs every trading date after the last logged one (from
+// forwardStart on the very first run) up to asOf. Existing files are never
+// rewritten.
 func writeForward(res []stockOut, cat []indicator, conds []timingCond, tradeDays []string, asOf string) (int, error) {
 	logs, lastBytes, _ := readForward()
+	from := forwardStart
+	if len(logs) > 0 {
+		from = logs[len(logs)-1].Date
+	}
 	var dates []string
-	if len(logs) == 0 {
-		dates = []string{asOf}
-	} else {
-		from := logs[len(logs)-1].Date
-		for _, d := range tradeDays {
-			if d > from && d <= asOf {
-				dates = append(dates, d)
-			}
+	for _, d := range tradeDays {
+		if (d > from || (len(logs) == 0 && d == forwardStart)) && d <= asOf {
+			dates = append(dates, d)
 		}
 	}
 	// only final candles: today's bar counts after the 16:15 WIB close

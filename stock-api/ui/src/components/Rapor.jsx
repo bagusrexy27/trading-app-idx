@@ -164,7 +164,7 @@ export default function Rapor() {
       <div className="mt-3">{tabs}</div>
       {universe === 'sehat' && (
         <p className="text-xs text-tv-yellow mb-2 max-w-3xl">
-          Saham sehat = tiap hari hanya 40 saham dengan transaksi 20 hari terbesar, harga ≥ Rp500, ATR ≤ 4%. Pembandingnya sesama saham sehat di hari yang sama.
+          Saham sehat = tiap hari, dari 40 saham dengan transaksi 20 hari terbesar dan harga ≥ Rp500, diambil separuh yang paling tenang (ATR terendah) — ±20 saham. Pembandingnya sesama saham sehat di hari yang sama.
         </p>
       )}
       <p className="text-xs text-tv-muted mt-1 mb-4 max-w-3xl leading-relaxed">

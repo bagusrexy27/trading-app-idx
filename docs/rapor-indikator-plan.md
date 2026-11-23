@@ -211,6 +211,16 @@ Efek pemilihan arah tanpa TEST: 11 indikator D berganti arah (noise). Valuasi di
 
 Belum dikerjakan (tercatat): `research/blindtest` masih tanpa biaya (sengaja, supaya kriteria K1–K6 beku 2025-11-28 tetap sebanding); `COPY research/rapor/sehat/*.json` gagal kalau folder kosong; Sharpe portofolio hanya dari bulan yang ada exit; finalitas candle bergantung mtime (bisa terkecoh `git checkout`).
 
+## Fase 9 — uji maju dimulai, saham sehat "tenang relatif" (2026-11-23)
+
+- **Uji maju**: run Jumat 20 Nov terlewat (manual). `forwardStart = "2026-11-20"` di `forward.go`: run pertama mencatat sejak 20 Nov (aturan sinyal beku di 40e5ed8 sebelum hasil 20 hari diketahui, jadi tetap di luar sampel). Log pertama: `research/forward/2026-11-20.json` (68 saham, 110 sinyal) + `research/forward/sehat/2026-11-20.json`. **Otomatis**: Windows Task Scheduler "IDX Rapor uji maju", Senin–Jumat 17:00 → `stock-api/research/forward_daily.cmd` (nyalakan backend kalau mati, update-all, kedua Rapor; log `research/out/forward_daily.log`). Log uji maju tetap perlu di-commit manual.
+- **Masalah definisi sehat lama**: ATR ≤ 4% absolut menyusut ke 6–12 saham/hari di 2026 (132 dari 234 hari sejak Des 2025 < 10 saham) → hasil valuasi Des 25+ bertumpu pada 1–2 saham, dan uji maju valuasi tidak bisa menilai (0 kuintil di log 20 Nov).
+- **Definisi baru (dipilih user)**: dari 40 saham transaksi terbesar dengan harga ≥ Rp500, ambil separuh dengan ATR% terendah (±20 saham/hari, selalu). Log uji maju sehat 20 Nov versi lama dihapus dan dicatat ulang (15 saham, 46 indikator nilai berkuintil).
+- **Hasil saham sehat baru**: 1 A, 3 B, 1 C, 112 D, 3 F. **A: EBITDA ÷ EV** (edge setelah biaya +0,7 / +0,4 / +5,3%, q 0,007, stabil). B: PBV rendah, earnings yield (PER rendah), VIX > 25. Gugur: dividend yield & sales yield (→ D), Altman Z (→ C), komponen candlestick (→ D).
+- **Batas klaim**: universe sudah 3 versi (semua → sehat absolut → sehat relatif), untung masih terkumpul di Des 2025+, fundamental ±3,5 tahun. A = lolos semua uji backtest, belum terbukti. Hakimnya uji maju.
+
+**Gap yang tersisa (dibahas di sesi baru)**: app masih memberi sinyal BUY/SELL dari engine berbasis indikator yang D + gate MA50 (tidak lolos uji); daftar hapus indikator belum diputuskan; temuan valuasi belum dipakai di app (tunggu uji maju); skill Cek Ombak masih logika lama. Tenggat: freeze blindtest 30 Nov, DES syariah 30 Nov, validasi big-move ±1 Des, IDX30/LQ45 basi sejak 30 Okt.
+
 **Catatan kejujuran**: periode TEST (Des 2025+) sudah dilihat berkali-kali di sesi 2026-11-20 dan aturan nilai sudah 2× diubah setelah melihat hasil → TEST bukan holdout bersih lagi. Universe juga bocor sedikit (35 saham tambahan dipilih pakai likuiditas & kapitalisasi hari ini; tanpa saham delisting). Bukti bersih satu-satunya = forward test mulai 2026-11-20.
 
 ## Keputusan (2026-11-20)
